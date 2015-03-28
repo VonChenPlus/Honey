@@ -14,7 +14,8 @@ namespace MATH
     {
         #if defined(_M_IX86) || defined(_M_X64)
         #include <emmintrin.h>
-        void fast_matrix_mul_4x4_sse(float *dest, const float *a, const float *b) {
+        void fast_matrix_mul_4x4_sse(float *dest, const float *a, const float *b)
+        {
             int i;
             __m128 a_col_1 = _mm_loadu_ps(a);
             __m128 a_col_2 = _mm_loadu_ps(&a[4]);

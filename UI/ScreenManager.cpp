@@ -77,8 +77,7 @@ namespace UI
                 else
                 {
                     auto iter = stack_.end();
-                    iter--;
-                    iter--;
+                    iter-=2;
                     Layer backback = *iter;
                     // Also shift to the right somehow...
                     backback.screen->render();
@@ -109,6 +108,36 @@ namespace UI
         stack_.clear();
         delete nextScreen_;
         nextScreen_ = 0;
+    }
+
+    bool ScreenManager::touch(const TouchInput &touch)
+    {
+        if (!stack_.empty())
+        {
+            return stack_.back().screen->touch(touch);
+        }
+
+        return false;
+    }
+
+    bool ScreenManager::key(const KeyInput &key)
+    {
+        if (!stack_.empty())
+        {
+            return stack_.back().screen->key(key);
+        }
+
+        return false;
+    }
+
+    bool ScreenManager::axis(const AxisInput &axis)
+    {
+        if (!stack_.empty())
+        {
+            return stack_.back().screen->axis(axis);
+        }
+
+        return false;
     }
 
     void ScreenManager::push(Screen *screen, LAYER_FLAG layerFlags)

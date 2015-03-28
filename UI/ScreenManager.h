@@ -2,6 +2,10 @@
 #define SCREENMANAGER
 
 #include <vector>
+#include "INPUT/InputState.h"
+using Input::TouchInput;
+using Input::KeyInput;
+using Input::AxisInput;
 
 namespace UI
 {
@@ -26,6 +30,11 @@ namespace UI
         void render();
         void resized();
         void shutdown();
+
+        // Instant touch, separate from the update() mechanism.
+        bool touch(const TouchInput &touch);
+        bool key(const KeyInput &key);
+        bool axis(const AxisInput &touch);
 
         // Push a dialog box in front. Currently 1-level only.
         void push(Screen *screen, LAYER_FLAG layerFlags = LAYER_DEFAULT);
