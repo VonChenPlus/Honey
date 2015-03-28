@@ -11,7 +11,14 @@
 
 #include <locale.h>
 
+#include "UI/ScreenManager.h"
+
+using UI::ScreenManager;
+
+ScreenManager *screenManager;
+
 void NativeInit() 
 {
     setlocale( LC_ALL, "C" );
+    screenManager = new ScreenManager;
 }

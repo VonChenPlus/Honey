@@ -120,4 +120,26 @@ inline uint64 swap64(const uint8* _pData) {return swap64(*(const uint64*)_pData)
 typedef char TCHAR;
 #endif
 
+#ifndef NULL
+#ifdef __cplusplus
+#define NULL    0
+#else
+#define NULL    ((void *)0)
+#endif /* __cplusplus */
+#endif /* NULL */
+
+#ifdef _MSC_VER
+    #if _MSC_VER > 1600
+        #define NULLPTR nullptr
+    #else
+        #define NULLPTR NULL
+    #endif
+#else
+    #define NULLPTR NULL
+#endif
+
+#ifndef UNUSED
+#define UNUSED(x) (void)x;
+#endif
+
 #endif

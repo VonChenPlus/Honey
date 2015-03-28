@@ -8,7 +8,10 @@ P = $$_PRO_FILE_PWD_/../Native
 
 INCLUDEPATH += $$P
 
-SOURCES += $$P/BASE/*.cpp
+SOURCES += $$P/BASE/*.cpp \
+    $$P/UI/*.cpp
 
 HEADERS += \
-    $$P/BASE/BasicTypes.h
+    $$P/BASE/BasicTypes.h \
+    $$P/UI/Screen.h \
+    $$P/UI/ScreenManager.h
