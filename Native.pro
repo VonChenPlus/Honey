@@ -6,6 +6,8 @@ CONFIG += staticlib
 
 P = $$_PRO_FILE_PWD_/../Native
 
+include($$P/Settings.pri)
+
 INCLUDEPATH += $$P
 
 SOURCES += $$P/BASE/*.cpp \
