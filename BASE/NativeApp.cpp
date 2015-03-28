@@ -10,15 +10,17 @@
 // in NativeShutdown.
 
 #include <locale.h>
+#include <memory>
+using std::shared_ptr;
+using std::make_shared;
 
 #include "UI/ScreenManager.h"
-
 using UI::ScreenManager;
 
-ScreenManager *screenManager;
+shared_ptr<ScreenManager> screenManager;
 
 void NativeInit() 
 {
     setlocale( LC_ALL, "C" );
-    screenManager = new ScreenManager;
+    screenManager = make_shared<ScreenManager>();
 }

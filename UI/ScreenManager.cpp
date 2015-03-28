@@ -51,9 +51,8 @@ namespace UI
     {
         // Have to notify the whole stack, otherwise there will be problems when going back
         // to non-top screens.
-        for (auto iter = stack_.begin(); iter != stack_.end(); ++iter) {
-            iter->screen->resized();
-        }
+        for (const auto &iter : stack_ )
+            iter.screen->resized();
     }
 
     void ScreenManager::render()
@@ -99,8 +98,8 @@ namespace UI
 
     void ScreenManager::shutdown()
     {
-        for (auto x = stack_.begin(); x != stack_.end(); x++)
-            delete x->screen;
+        for (const auto &iter : stack_)
+            delete iter.screen;
         stack_.clear();
         delete nextScreen_;
         nextScreen_ = 0;
