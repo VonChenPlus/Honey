@@ -16,7 +16,8 @@ namespace UI
 
     void ScreenManager::switchScreen(Screen *screen)
     {
-        if (screen == nextScreen_) {
+        if (screen == nextScreen_)
+        {
             //ELOG("Already switching to this screen");
             return;
         }
@@ -24,13 +25,16 @@ namespace UI
         // will only become apparent if the dialog is closed. The previous screen will stick around
         // until that switch.
         // TODO: is this still true?
-        if (nextScreen_ != NULLPTR) {
+        if (nextScreen_ != NULLPTR)
+        {
             //FLOG("Already had a nextScreen_");
         }
-        if (screen == NULLPTR) {
+        if (screen == NULLPTR)
+        {
             //WLOG("Swiching to a zero screen, this can't be good");
         }
-        if (stack_.empty() || screen != stack_.back().screen) {
+        if (stack_.empty() || screen != stack_.back().screen)
+        {
             nextScreen_ = screen;
             nextScreen_->setScreenManager(this);
         }
@@ -38,11 +42,13 @@ namespace UI
 
     void ScreenManager::update()
     {
-        if (nextScreen_) {
+        if (nextScreen_)
+        {
             switchToNext();
         }
 
-        if (stack_.size()) {
+        if (stack_.size())
+        {
             stack_.back().screen->update();
         }
     }
@@ -107,12 +113,14 @@ namespace UI
 
     void ScreenManager::push(Screen *screen, LAYER_FLAG layerFlags)
     {
-        if (nextScreen_ && stack_.empty()) {
+        if (nextScreen_ && stack_.empty())
+        {
             // we're during init, this is OK
             switchToNext();
         }
         screen->setScreenManager(this);
-        if (screen->isTransparent()) {
+        if (screen->isTransparent())
+        {
             layerFlags = LAYER_TRANSPARENT;
         }
 

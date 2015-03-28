@@ -1,6 +1,7 @@
 #ifndef BASICYPES
 #define BASICYPES
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>  // for byte swapping
 
@@ -140,6 +141,15 @@ typedef char TCHAR;
 
 #ifndef UNUSED
 #define UNUSED(x) (void)x;
+#endif
+
+// Implement C99 functions and similar that are missing in MSVC.
+#if defined(_MSC_VER) && _MSC_VER < 1900
+
+int c99_snprintf(char* str, size_t size, const char* format, ...);
+#define snprintf c99_snprintf
+#define vscprintf _vscprintf
+
 #endif
 
 #endif
