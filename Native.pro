@@ -8,7 +8,7 @@ P = $$_PRO_FILE_PWD_/../Native
 
 INCLUDEPATH += $$P
 
-SOURCES += $$P/Base/*.cpp
+SOURCES += $$P/BASE/*.cpp
 
 HEADERS += \
     $$P/BASE/BasicTypes.h
