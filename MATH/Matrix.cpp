@@ -75,6 +75,23 @@ namespace MATH
             dest[ww] = b[wx] * a[xw] + b[wy] * a[yw] + b[wz] * a[zw] + b[ww] * a[ww];
         }
 
+        #undef xx
+        #undef xy
+        #undef xz
+        #undef xw
+        #undef yx
+        #undef yy
+        #undef yz
+        #undef yw
+        #undef zx
+        #undef zy
+        #undef zz
+        #undef zw
+        #undef wx
+        #undef wy
+        #undef wz
+        #undef ww
+
         #define fast_matrix_mul_4x4 fast_matrix_mul_4x4_c
         #endif
     }

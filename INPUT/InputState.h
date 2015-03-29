@@ -63,14 +63,6 @@ namespace Input
         TOUCH_CANCEL = 1 << 3,  // Sent by scrollviews to their children when they detect a scroll
         TOUCH_WHEEL = 1 << 4,  // Scrollwheel event. Usually only affects Y but can potentially affect X.
         TOUCH_MOUSE = 1 << 5,  // Identifies that this touch event came from a mouse
-
-        // These are the Android getToolType() codes, shifted by 10.
-        TOUCH_TOOL_MASK = 7 << 10,
-        TOUCH_TOOL_UNKNOWN = 0 << 10,
-        TOUCH_TOOL_FINGER = 1 << 10,
-        TOUCH_TOOL_STYLUS = 2 << 10,
-        TOUCH_TOOL_MOUSE = 3 << 10,
-        TOUCH_TOOL_ERASER = 4 << 10,
     };
 
     struct TouchInput
