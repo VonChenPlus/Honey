@@ -1,4 +1,6 @@
 #include "View.h"
+using MATH::Point;
+using MATH::Bounds;
 
 namespace UI
 {
@@ -15,7 +17,8 @@ namespace UI
 
     // Default values
 
-    void View::getContentDimensions(const UIContext &dc, float &w, float &h) const {
+    void View::getContentDimensions(const UIContext &dc, float &w, float &h) const
+    {
         w = 10.0f;
         h = 10.0f;
     }

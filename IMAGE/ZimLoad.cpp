@@ -5,6 +5,8 @@
 #include <stdlib.h>
 
 #include "EXTERNALS/zlib/zlib.h"
+#include "FILE/FileRead.h"
+using FILE::ReadLocalFile;
 
 namespace IMAGE
 {
@@ -144,9 +146,10 @@ namespace IMAGE
         return num_levels;
     }
 
-    int LoadZIM(const char *filename, int *width, int *height, int *format, uint8_t **image) {
+    int LoadZIM(const char *filename, int *width, int *height, int *format, uint8_t **image)
+    {
         size_t size;
-        uint8_t *buffer = VFSReadFile(filename, &size);
+        uint8_t *buffer = ReadLocalFile(filename, &size);
         if (!buffer)
         {
             return 0;

@@ -8,6 +8,9 @@ using IMAGE::LoadZIMPtr;
 using IMAGE::ZIM_FORMAT_MASK;
 #include "IMAGE/PNGLoad.h"
 using IMAGE::PNGLoadPtr;
+#include "EXTERNALS/jpge/jpgd.h"
+#include "FILE/FileRead.h"
+using _FILE::ReadLocalFile;
 
 namespace THIN3D
 {
@@ -153,19 +156,21 @@ namespace THIN3D
 
     static T3DImageType DetectImageFileType(const uint8_t *data, size_t size)
     {
+        UNUSED(size);
         if (!memcmp(data, "ZIMG", 4))
         {
             return ZIM;
         }
-        else if (!memcmp(data, "\x89\x50\x4E\x47", 4)) {
+        else if (!memcmp(data, "\x89\x50\x4E\x47", 4))
+        {
             return PNG;
         }
-        else if (!memcmp(data, "\xff\xd8\xff\xe0", 4)) {
+        else if (!memcmp(data, "\xff\xd8\xff\xe0", 4))
+        {
             return JPEG;
         }
-        else {
-            return TYPE_UNKNOWN;
-        }
+
+        return TYPE_UNKNOWN;
     }
 
     static bool LoadTextureLevels(const uint8_t *data, size_t size, T3DImageType type, int width[16], int height[16], int *num_levels, T3DImageFormat *fmt, uint8_t *image[16], int *zim_flags)
@@ -193,7 +198,7 @@ namespace THIN3D
             break;
         case PNG:
             {
-                if (1 == PNGLoadPtr((const unsigned char *)data, size, &width[0], &height[0], &image[0], false))
+                if (1 == PNGLoadPtr((const unsigned char *)data, size, &width[0], &height[0], &image[0]))
                 {
                     *num_levels = 1;
                     *fmt = RGBA8888;
@@ -204,7 +209,8 @@ namespace THIN3D
             {
                 int actual_components = 0;
                 unsigned char *jpegBuf = jpgd::decompress_jpeg_image_from_memory(data, (int)size, &width[0], &height[0], &actual_components, 4);
-                if (jpegBuf) {
+                if (jpegBuf)
+                {
                     *num_levels = 1;
                     *fmt = RGBA8888;
                     image[0] = (uint8_t *)jpegBuf;
@@ -254,7 +260,7 @@ namespace THIN3D
     {
         filename_ = "";
         size_t fileSize;
-        uint8_t *buffer = VFSReadFile(filename.c_str(), &fileSize);
+        uint8_t *buffer = ReadLocalFile(filename.c_str(), &fileSize);
         if (!buffer)
         {
             return false;

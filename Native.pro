@@ -10,21 +10,6 @@ include($$P/Settings.pri)
 
 INCLUDEPATH += $$P
 
-# Zlib
-win32|contains(QT_CONFIG, no-zlib)
-{
-    SOURCES += $$P/EXTERNALS/zlib/*.c
-    HEADERS += $$P/EXTERNALS/zlib/*.h
-}
-
-# libpng
-SOURCES += $$P/EXTERNALS/libpng17/*.c
-HEADERS += $$P/EXTERNALS/libpng17/*.h
-
-# jpg
-SOURCES += $$P/EXTERNALS/jpge/*.c
-HEADERS += $$P/EXTERNALS/jpge/*.h
-
 SOURCES += $$P/BASE/NativeApp.cpp \
     $$P/MATH/Vector.cpp \
     $$P/MATH/Matrix.cpp \
@@ -36,7 +21,11 @@ SOURCES += $$P/BASE/NativeApp.cpp \
     $$P/THIN3D/Thin3D.cpp \
     $$P/IMAGE/ZimLoad.cpp \
     $$P/FILE/FileRead.cpp \
-    $$P/IMAGE/PNGLoad.cpp
+    $$P/IMAGE/PNGLoad.cpp \
+    $$P/THIN3D/Thin3DGL.cpp \
+    $$P/GFX/GLState.cpp \
+    $$P/GFX/GLExtensions.cpp \
+    $$P/GFX/GfxResourceHolder.cpp
 
 HEADERS += \
     $$P/BASE/NativeApp.h \
@@ -58,4 +47,29 @@ HEADERS += \
     $$P/THIN3D/Thin3D.h \
     $$P/IMAGE/ZimLoad.h \
     $$P/FILE/FileRead.h \
-    $$P/IMAGE/PNGLoad.h
+    $$P/IMAGE/PNGLoad.h \
+    $$P/THIN3D/Thin3DGL.h \
+    $$P/GFX/GLCommon.h \
+    $$P/GFX/GLState.h \
+    $$P/GFX/GLExtensions.h \
+    $$P/GFX/GfxResourceHolder.h
+
+# Zlib
+win32|contains(QT_CONFIG, no-zlib)
+{
+    SOURCES += $$P/EXTERNALS/zlib/*.c \
+    HEADERS += $$P/EXTERNALS/zlib/*.h \
+}
+
+# libpng
+SOURCES += $$P/EXTERNALS/libpng17/*.c
+HEADERS += $$P/EXTERNALS/libpng17/*.h
+
+# jpg
+SOURCES += $$P/EXTERNALS/jpge/*.c
+HEADERS += $$P/EXTERNALS/jpge/*.h
+
+# glew
+SOURCES += $$P/EXTERNALS/glew/glew.c
+HEADERS += $$P/EXTERNALS/glew/GL/*.h
+INCLUDEPATH += $$P/EXTERNALS/glew

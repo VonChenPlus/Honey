@@ -1,6 +1,6 @@
 #include "FileRead.h"
 
-namespace FILE
+namespace _FILE
 {
     // The return is non-const because - why not?
     uint8_t *ReadLocalFile(const char *filename, size_t *size)

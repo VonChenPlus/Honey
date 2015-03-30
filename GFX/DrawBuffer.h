@@ -2,6 +2,7 @@
 #define DRAWBUFFER_H
 
 #include "MATH/Matrix.h"
+#include "THIN3D/Thin3D.h"
 
 namespace GFX
 {
@@ -106,10 +107,10 @@ namespace GFX
 
         MATH::Matrix4x4 drawMatrix_;
 
-        Thin3DContext *t3d_;
-        Thin3DBuffer *vbuf_;
-        Thin3DVertexFormat *vformat_;
-        Thin3DShaderSet *shaderSet_;
+        THIN3D::Thin3DContext *t3d_;
+        THIN3D::Thin3DBuffer *vbuf_;
+        THIN3D::Thin3DVertexFormat *vformat_;
+        THIN3D::Thin3DShaderSet *shaderSet_;
 
         Vertex *verts_;
         int count_;

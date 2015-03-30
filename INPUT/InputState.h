@@ -5,7 +5,7 @@
 #include "MATH/Vector.h"
 #include "BASE/Mutex.h"
 
-namespace Input
+namespace _INPUT
 {
     #ifndef MAX_POINTERS
     #define MAX_POINTERS 10

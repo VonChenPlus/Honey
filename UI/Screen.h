@@ -21,9 +21,9 @@ namespace UI
         virtual void render() {}
         virtual void resized() {}
 
-        virtual bool touch(const Input::TouchInput &touch) { UNUSED(touch); return false;  }
-        virtual bool key(const Input::KeyInput &key) { UNUSED(key); return false; }
-        virtual bool axis(const Input::AxisInput &touch) { UNUSED(touch); return false; }
+        virtual bool touch(const _INPUT::TouchInput &touch) { UNUSED(touch); return false;  }
+        virtual bool key(const _INPUT::KeyInput &key) { UNUSED(key); return false; }
+        virtual bool axis(const _INPUT::AxisInput &touch) { UNUSED(touch); return false; }
 
         virtual void sendMessage(const char *msg, const char *value) { UNUSED(msg); UNUSED(value); }
 

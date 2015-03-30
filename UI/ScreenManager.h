@@ -2,11 +2,13 @@
 #define SCREENMANAGER_H
 
 #include <vector>
-#include "INPUT/InputState.h"
 
 namespace UI
 {
     class Screen;
+    class TouchInput;
+    class KeyInput;
+    class AxisInput;
 
     enum LAYER_FLAG
     {
@@ -29,9 +31,9 @@ namespace UI
         void shutdown();
 
         // Instant touch, separate from the update() mechanism.
-        bool touch(const Input::TouchInput &touch);
-        bool key(const Input::KeyInput &key);
-        bool axis(const Input::AxisInput &touch);
+        bool touch(const TouchInput &touch);
+        bool key(const KeyInput &key);
+        bool axis(const AxisInput &touch);
 
         // Push a dialog box in front. Currently 1-level only.
         void push(Screen *screen, LAYER_FLAG layerFlags = LAYER_DEFAULT);

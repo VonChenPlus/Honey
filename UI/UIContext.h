@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "MATH/Bounds.h"
+#include "THIN3D/Thin3D.h"
 
 namespace UI
 {
@@ -13,7 +14,7 @@ namespace UI
         UIContext();
         ~UIContext();
 
-        void init(Thin3DContext *thin3d, Thin3DShaderSet *uiShaderTex, Thin3DShaderSet *uiShaderNoTex, Thin3DTexture *uitexture, DrawBuffer *uidrawbuffer, DrawBuffer *uidrawbufferTop);
+        void init(THIN3D::Thin3DContext *thin3d, THIN3D::Thin3DShaderSet *uiShaderTex, THIN3D::Thin3DShaderSet *uiShaderNoTex, THIN3D::Thin3DTexture *uitexture, GFX::DrawBuffer *uidrawbuffer, GFX::DrawBuffer *uidrawbufferTop);
 
         void begin();
         void beginNoTex();
@@ -23,19 +24,19 @@ namespace UI
         void rebindTexture() const;
 
         // TODO: Support transformed bounds using stencil
-        void pushScissor(const Bounds &bounds);
+        void pushScissor(const MATH::Bounds &bounds);
         void popScissor();
         MATH::Bounds getScissorBounds();
 
         void activateTopScissor();
 
-        DrawBuffer *draw() const { return uidrawbuffer_; }
-        DrawBuffer *drawTop() const { return uidrawbufferTop_; }
+        GFX::DrawBuffer *draw() const { return uidrawbuffer_; }
+        GFX::DrawBuffer *drawTop() const { return uidrawbufferTop_; }
         const UI::Theme *theme;
 
         // Utility methods
 
-        TextDrawer *text() const { return textDrawer_; }
+        GFX::TextDrawer *text() const { return textDrawer_; }
 
         void setFontStyle(const UI::FontStyle &style);
         const UI::FontStyle &getFontStyle() { return *fontStyle_; }
@@ -49,26 +50,26 @@ namespace UI
         // in dps, like dp_xres and dp_yres
         void setBounds(const Bounds &b) { bounds_ = b; }
         const Bounds &getBounds() const { return bounds_; }
-        Thin3DContext *getThin3DContext() { return thin3d_; }
+        THIN3D::Thin3DContext *getThin3DContext() { return thin3d_; }
 
     private:
-        Thin3DContext *thin3d_;
-        Bounds bounds_;
+        THIN3D::Thin3DContext *thin3d_;
+        MATH::Bounds bounds_;
 
         float fontScaleX_;
         float fontScaleY_;
         UI::FontStyle *fontStyle_;
-        TextDrawer *textDrawer_;
+        GFX::TextDrawer *textDrawer_;
 
-        Thin3DContext *thin3D_;
-        Thin3DDepthStencilState *depth_;
-        Thin3DBlendState *blend_;
-        Thin3DShaderSet *uishader_;
-        Thin3DShaderSet *uishadernotex_;
-        Thin3DTexture *uitexture_;
+        THIN3D::Thin3DContext *thin3D_;
+        THIN3D::Thin3DDepthStencilState *depth_;
+        THIN3D::Thin3DBlendState *blend_;
+        THIN3D::Thin3DShaderSet *uishader_;
+        THIN3D::Thin3DShaderSet *uishadernotex_;
+        THIN3D::Thin3DTexture *uitexture_;
 
-        DrawBuffer *uidrawbuffer_;
-        DrawBuffer *uidrawbufferTop_;
+        GFX::DrawBuffer *uidrawbuffer_;
+        GFX::DrawBuffer *uidrawbufferTop_;
 
         std::vector<Bounds> scissorStack_;
     };

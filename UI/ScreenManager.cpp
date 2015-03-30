@@ -1,9 +1,10 @@
 #include "BASE/BasicTypes.h"
 #include "UI/ScreenManager.h"
 #include "UI/Screen.h"
-using Input::AxisInput;
-using Input::KeyInput;
-using Input::TouchInput;
+#include "INPUT/InputState.h"
+using _INPUT::AxisInput;
+using _INPUT::KeyInput;
+using _INPUT::TouchInput;
 
 namespace UI
 {
