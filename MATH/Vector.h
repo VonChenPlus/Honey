@@ -1,5 +1,5 @@
-#ifndef VECTOR
-#define VECTOR
+#ifndef VECTOR_H
+#define VECTOR_H
 
 #include <math.h>
 #include <string.h>
@@ -150,5 +150,5 @@ namespace MATH
     };
 }
 
-#endif // VECTOR
+#endif // VECTOR_H
 

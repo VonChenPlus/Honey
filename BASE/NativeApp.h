@@ -1,5 +1,5 @@
-#ifndef NATIVEAPP
-#define NATIVEAPP
+#ifndef NATIVEAPP_H
+#define NATIVEAPP_H
 
 #include <string>
 
@@ -14,4 +14,4 @@
 // This functions must NOT call OpenGL. Main thread.
 void NativeInit();
 
-#endif
+#endif // NATIVEAPP_H

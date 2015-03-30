@@ -1,5 +1,5 @@
-#ifndef QUATERNION
-#define QUATERNION
+#ifndef QUATERNION_H
+#define QUATERNION_H
 
 #include "MATH/Vector.h"
 
@@ -98,5 +98,5 @@ namespace MATH
     };
 }
 
-#endif // QUATERNION
+#endif // QUATERNION_H
 

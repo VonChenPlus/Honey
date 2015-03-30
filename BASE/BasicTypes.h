@@ -1,5 +1,5 @@
-#ifndef BASICYPES
-#define BASICYPES
+#ifndef BASICYPES_H
+#define BASICYPES_H
 
 #include <stdio.h>
 #include <stdint.h>
@@ -41,6 +41,8 @@ typedef int8_t int8;
 typedef int16_t int16;
 typedef int32_t int32;
 typedef int64_t int64;
+
+typedef float Size;
 
 #ifdef _WIN32
 
@@ -140,7 +142,7 @@ typedef char TCHAR;
 #endif
 
 #ifndef UNUSED
-#define UNUSED(x) (void)x;
+#define UNUSED(x) (void)x
 #endif
 
 // Implement C99 functions and similar that are missing in MSVC.
@@ -152,4 +154,4 @@ int c99_snprintf(char* str, size_t size, const char* format, ...);
 
 #endif
 
-#endif
+#endif // BASICYPES_H

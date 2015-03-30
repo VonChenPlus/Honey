@@ -1,9 +1,8 @@
-#ifndef INPUTSTATE
-#define INPUTSTATE
+#ifndef INPUTSTATE_H
+#define INPUTSTATE_H
 
 #include "BASE/BasicTypes.h"
 #include "MATH/Vector.h"
-using MATH::Vector3;
 #include "BASE/Mutex.h"
 
 namespace Input
@@ -50,7 +49,7 @@ namespace Input
 
         // Accelerometer
         bool accelerometer_valid;
-        Vector3 acc;
+        MATH::Vector3 acc;
 
         DISALLOW_COPY_AND_ASSIGN(InputState)
     };
@@ -104,5 +103,5 @@ namespace Input
     };
 }
 
-#endif // INPUTSTATE
+#endif // INPUTSTATE_H
 

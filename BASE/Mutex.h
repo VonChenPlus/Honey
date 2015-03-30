@@ -1,5 +1,5 @@
-#ifndef MUTEX
-#define MUTEX
+#ifndef MUTEX_H
+#define MUTEX_H
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -88,5 +88,5 @@ private:
     recursive_mutex(const recursive_mutex &other);
 };
 
-#endif // MUTEX
+#endif // MUTEX_H
 

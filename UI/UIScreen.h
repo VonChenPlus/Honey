@@ -1,5 +1,5 @@
-#ifndef UISCREEN
-#define UISCREEN
+#ifndef UISCREEN_H
+#define UISCREEN_H
 
 #include "UI/Screen.h"
 
@@ -29,5 +29,5 @@ namespace UI
     };
 }
 
-#endif // UISCREEN
+#endif // UISCREEN_H
 

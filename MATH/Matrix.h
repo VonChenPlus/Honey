@@ -1,5 +1,5 @@
-#ifndef MATRIX
-#define MATRIX
+#ifndef MATRIX_H
+#define MATRIX_H
 
 #include "MATH/Vector.h"
 
@@ -193,5 +193,5 @@ namespace MATH
     };
 }
 
-#endif // MATRIX
+#endif // MATRIX_H
 

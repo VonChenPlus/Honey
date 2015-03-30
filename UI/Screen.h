@@ -1,11 +1,8 @@
-#ifndef SCREEN
-#define SCREEN
+#ifndef SCREEN_H
+#define SCREEN_H
 
 #include "BASE/BasicTypes.h"
 #include "INPUT/InputState.h"
-using Input::TouchInput;
-using Input::KeyInput;
-using Input::AxisInput;
 
 namespace UI
 {
@@ -24,11 +21,11 @@ namespace UI
         virtual void render() {}
         virtual void resized() {}
 
-        virtual bool touch(const TouchInput &touch) { UNUSED(touch) return false;  }
-        virtual bool key(const KeyInput &key) { UNUSED(key) return false; }
-        virtual bool axis(const AxisInput &touch) { UNUSED(touch) return false; }
+        virtual bool touch(const Input::TouchInput &touch) { UNUSED(touch); return false;  }
+        virtual bool key(const Input::KeyInput &key) { UNUSED(key); return false; }
+        virtual bool axis(const Input::AxisInput &touch) { UNUSED(touch); return false; }
 
-        virtual void sendMessage(const char *msg, const char *value) { UNUSED(msg) UNUSED(value)}
+        virtual void sendMessage(const char *msg, const char *value) { UNUSED(msg); UNUSED(value); }
 
         ScreenManager *screenManager() { return screenManager_; }
         void setScreenManager(ScreenManager *sm) { screenManager_ = sm; }
@@ -42,5 +39,5 @@ namespace UI
     };
 }
 
-#endif // SCREEN
+#endif // SCREEN_H
 
