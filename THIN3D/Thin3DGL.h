@@ -7,6 +7,7 @@
 #include "GFX/GLCommon.h"
 #include "GFX/GLState.h"
 #include "GFX/GfxResourceHolder.h"
+#include "MATH/Matrix.h"
 
 namespace THIN3D
 {
@@ -188,7 +189,7 @@ namespace THIN3D
 
         void setVector(const char *name, float *value, int n);
 
-        void setMatrix4x4(const char *name, const Matrix4x4 &value) override;
+        void setMatrix4x4(const char *name, const MATH::Matrix4x4 &value) override;
 
         void glLost();
 
@@ -203,73 +204,19 @@ namespace THIN3D
     class Thin3DGLTexture : public Thin3DTexture, GFX::GfxResourceHolder
     {
     public:
-        Thin3DGLTexture() : tex_(0), target_(0)
-        {
-            width_ = 0;
-            height_ = 0;
-            depth_ = 0;
-            glGenTextures(1, &tex_);
-            GFX::register_gl_resource_holder(this);
-        }
-        Thin3DGLTexture(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels) : format_(format), tex_(0), target_(TypeToTarget(type)), mipLevels_(mipLevels)
-        {
-            width_ = width;
-            height_ = height;
-            depth_ = depth;
-            glGenTextures(1, &tex_);
-            GFX::register_gl_resource_holder(this);
-        }
-        ~Thin3DGLTexture()
-        {
-            GFX::unregister_gl_resource_holder(this);
-            destroy();
-        }
+        Thin3DGLTexture();
+        Thin3DGLTexture(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels);
+        ~Thin3DGLTexture();
 
-        bool create(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels)
-        {
-            format_ = format;
-            target_ = TypeToTarget(type);
-            mipLevels_ = mipLevels;
-            width_ = width;
-            height_ = height;
-            depth_ = depth;
-            return true;
-        }
+        bool create(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels);
 
-        void destroy()
-        {
-            if (tex_)
-            {
-                glDeleteTextures(1, &tex_);
-                tex_ = 0;
-            }
-        }
+        void destroy();
         void setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8_t *data) override;
         void autoGenMipmaps() override;
 
-        void bind()
-        {
-            glBindTexture(target_, tex_);
-        }
+        void bind();
 
-        void glLost() {
-            if (!filename_.empty())
-            {
-                if (loadFromFile(filename_.c_str()))
-                {
-                    //ILOG("Reloaded lost texture %s", filename_.c_str());
-                }
-                else
-                {
-                    //ELOG("Failed to reload lost texture %s", filename_.c_str());
-                }
-            }
-            else
-            {
-                //WLOG("Texture %p cannot be restored - has no filename", this);
-                tex_ = 0;
-            }
-        }
+        void glLost();
         void finalize(int zim_flags);
 
     private:
@@ -324,6 +271,7 @@ namespace THIN3D
 
         void setViewports(int count, T3DViewport *viewports) override
         {
+            UNUSED(count);
             // TODO: Add support for multiple viewports.
             GFX::glstate.viewport.set(viewports[0].TopLeftX, viewports[0].TopLeftY, viewports[0].Width, viewports[0].Height);
             GFX::glstate.depthRange.set(viewports[0].MinDepth, viewports[0].MaxDepth);

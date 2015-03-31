@@ -14,28 +14,19 @@
 
 #include "UTF8.h"
 
+#ifdef _WIN32
+#include <Windows.h>
+#undef min
+#undef max
+#endif
+#include <algorithm>
+
+#include "UTF16.h"
+
 namespace UTILS
 {
     namespace TEXT
     {
-        #ifdef _WIN32
-        #include <windows.h>
-        #undef min
-        #undef max
-        #endif
-
-        #include <stdlib.h>
-        #include <stdio.h>
-        #include <string.h>
-        #include <stdarg.h>
-
-        #include <algorithm>
-        #include <string>
-
-        #include "base/basictypes.h"
-        #include "utf8.h"
-        #include "utf16.h"
-
         // is start of UTF sequence
         inline bool isutf(char c)
         {
@@ -454,13 +445,15 @@ namespace UTILS
             return s;
         }
 
-        void ConvertUTF8ToWString(wchar_t *dest, size_t destSize, const std::string &source) {
+        void ConvertUTF8ToWString(wchar_t *dest, size_t destSize, const std::string &source)
+        {
             int len = (int)source.size();
             int size = (int)MultiByteToWideChar(CP_UTF8, 0, source.c_str(), len, NULL, 0);
             MultiByteToWideChar(CP_UTF8, 0, source.c_str(), len, dest, std::min((int)destSize, size));
         }
 
-        std::wstring ConvertUTF8ToWString(const std::string &source) {
+        std::wstring ConvertUTF8ToWString(const std::string &source)
+        {
             int len = (int)source.size();
             int size = (int)MultiByteToWideChar(CP_UTF8, 0, source.c_str(), len, NULL, 0);
             std::wstring str;

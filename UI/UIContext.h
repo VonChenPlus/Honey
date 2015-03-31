@@ -6,10 +6,14 @@
 #include "MATH/Bounds.h"
 #include "THIN3D/Thin3D.h"
 #include "GFX/DrawBuffer.h"
-#include "UI/View.h"
+#include "GFX/DrawText.h"
 
 namespace UI
 {
+    struct Drawable;
+    struct Theme;
+    struct FontStyle;
+
     class UIContext
     {
     public:
@@ -23,7 +27,7 @@ namespace UI
         void flush();
         void end();
 
-        void rebindTexture() const;
+        void reBindTexture() const;
 
         // TODO: Support transformed bounds using stencil
         void pushScissor(const MATH::Bounds &bounds);
@@ -46,12 +50,12 @@ namespace UI
         void measureTextCount(const UI::FontStyle &style, const char *str, int count, float *x, float *y, int align = 0) const;
         void measureText(const UI::FontStyle &style, const char *str, float *x, float *y, int align = 0) const;
         void drawText(const char *str, float x, float y, uint32_t color, int align = 0);
-        void drawTextRect(const char *str, const Bounds &bounds, uint32_t color, int align = 0);
-        void fillRect(const UI::Drawable &drawable, const Bounds &bounds);
+        void drawTextRect(const char *str, const MATH::Bounds &bounds, uint32_t color, int align = 0);
+        void fillRect(const UI::Drawable &drawable, const MATH::Bounds &bounds);
 
         // in dps, like dp_xres and dp_yres
-        void setBounds(const Bounds &b) { bounds_ = b; }
-        const Bounds &getBounds() const { return bounds_; }
+        void setBounds(const MATH::Bounds &b) { bounds_ = b; }
+        const MATH::Bounds &getBounds() const { return bounds_; }
         THIN3D::Thin3DContext *getThin3DContext() { return thin3d_; }
 
     private:
@@ -73,7 +77,7 @@ namespace UI
         GFX::DrawBuffer *uidrawbuffer_;
         GFX::DrawBuffer *uidrawbufferTop_;
 
-        std::vector<Bounds> scissorStack_;
+        std::vector<MATH::Bounds> scissorStack_;
     };
 }
 

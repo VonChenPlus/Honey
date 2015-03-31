@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "BASE/BasicTypes.h"
 #include "GFX/GfxResourceHolder.h"
 
 namespace GFX
@@ -23,7 +24,7 @@ namespace GFX
         void destroy();
 
         // PNG from memory buffer
-        bool loadPNG(const uint8_t *data, size_t size, bool genMips = true);
+        bool loadPNG(const uint8 *data, size_t size, bool genMips = true);
         bool loadZIM(const char *filename);
         bool loadPNG(const char *filename, bool genMips = true);
         bool loadJPEG(const char *filename, bool genMips = true);

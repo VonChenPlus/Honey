@@ -173,7 +173,7 @@ namespace GFX
         // If the GL version >= 4.3, we know it's a true superset of OpenGL ES 3.0 and can thus enable
         // all the same modern paths.
         // Most of it could be enabled on lower GPUs as well, but let's start this way.
-        if (gl_extensions.VersionGEThan(4, 3, 0))
+        if (gl_extensions.versionGEThan(4, 3, 0))
         {
             gl_extensions.GLES3 = true;
         }
@@ -215,7 +215,7 @@ namespace GFX
         gl_extensions.EXT_bgra = strstr(extString, "GL_EXT_bgra") != 0;
         gl_extensions.EXT_gpu_shader4 = strstr(extString, "GL_EXT_gpu_shader4") != 0;
         gl_extensions.NV_framebuffer_blit = strstr(extString, "GL_NV_framebuffer_blit") != 0;
-        if (gl_extensions.gpuVendor == GPU_VENDOR_INTEL || !gl_extensions.VersionGEThan(3, 0, 0)) {
+        if (gl_extensions.gpuVendor == GPU_VENDOR_INTEL || !gl_extensions.versionGEThan(3, 0, 0)) {
             // Force this extension to off on sub 3.0 OpenGL versions as it does not seem reliable
             // Also on Intel, see https://github.com/hrydgard/ppsspp/issues/4867
             gl_extensions.ARB_blend_func_extended = false;

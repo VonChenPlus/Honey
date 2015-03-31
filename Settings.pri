@@ -1,5 +1,4 @@
 VERSION = 1.0.0.0
-DEFINES += USING_QT_UI
 
 # Global specific
 win32:CONFIG(release, debug|release): CONFIG_DIR = $$join(OUT_PWD,,,/release)
@@ -24,10 +23,6 @@ win32-msvc* {
 	QMAKE_CFLAGS_RELEASE ~= s/-O.*/
 	QMAKE_CXXFLAGS_RELEASE ~= s/-O.*/
 	QMAKE_ALLFLAGS_RELEASE += -O3 -ffast-math
-}
-
-contains(QT_CONFIG, opengles.) {
-	DEFINES += USING_GLES2
 }
 
 # Handle flags for both C and C++

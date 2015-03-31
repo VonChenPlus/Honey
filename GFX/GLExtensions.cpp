@@ -1,5 +1,9 @@
 #include "GLExtensions.h"
 
+#include <string>
+
+#include "BASE/NativeApp.h"
+
 extern std::string System_GetProperty(SystemProperty prop);
 
 namespace GFX

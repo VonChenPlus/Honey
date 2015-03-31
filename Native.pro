@@ -29,7 +29,10 @@ SOURCES += $$P/BASE/NativeApp.cpp \
     $$P/GFX/Texture.cpp \
     $$P/GFX/GLDebug.cpp \
     $$P/BASE/Color.cpp \
-    $$P/UTILS/TEXT/UTF8.cpp
+    $$P/UTILS/TEXT/UTF8.cpp \
+    $$P/GFX/DrawText.cpp \
+    $$P/UTILS/HASH/Hash.cpp \
+    BASE/StringUtils.cpp
 
 HEADERS += \
     $$P/BASE/NativeApp.h \
@@ -62,13 +65,18 @@ HEADERS += \
     $$P/BASE/Color.h \
     $$P/MATH/Utils.h \
     $$P/UTILS/TEXT/UTF8.h \
-    UTILS/TEXT/UTF16.h
+    $$P/UTILS/TEXT/UTF16.h \
+    $$P/GFX/DrawText.h \
+    $$P/UTILS/HASH/Hash.h \
+    $$P/UI/UI.h \
+    BASE/StringUtils.h
 
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)
 {
-    SOURCES += $$P/EXTERNALS/zlib/*.c \
-    HEADERS += $$P/EXTERNALS/zlib/*.h \
+    SOURCES += $$P/EXTERNALS/zlib/*.c
+    HEADERS += $$P/EXTERNALS/zlib/*.h
+    INCLUDEPATH += $$P/EXTERNALS/zlib
 }
 
 # libpng

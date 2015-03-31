@@ -4,13 +4,37 @@ using MATH::Bounds;
 
 namespace UI
 {
+    void MeasureBySpec(Size sz, float contentWidth, MeasureSpec spec, float *measured)
+    {
+        *measured = sz;
+        if (sz == WRAP_CONTENT)
+        {
+            if (spec.type == UNSPECIFIED || spec.type == AT_MOST)
+                *measured = contentWidth;
+            else if (spec.type == EXACTLY)
+                *measured = spec.size;
+        }
+        else if (sz == FILL_PARENT)
+        {
+            if (spec.type == UNSPECIFIED)
+                *measured = contentWidth;  // We have no value to set
+            else
+                *measured = spec.size;
+        }
+        else if (spec.type == EXACTLY || (spec.type == AT_MOST && *measured > spec.size))
+        {
+            *measured = spec.size;
+        }
+    }
+
     View::~View()
     {
     }
 
-    void View::measure(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert) {
+    void View::measure(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert)
+    {
         float contentW = 0.0f, contentH = 0.0f;
-        GetContentDimensions(dc, contentW, contentH);
+        getContentDimensions(dc, contentW, contentH);
         MeasureBySpec(layoutParams_->width, contentW, horiz, &measuredWidth_);
         MeasureBySpec(layoutParams_->height, contentH, vert, &measuredHeight_);
     }
@@ -19,6 +43,7 @@ namespace UI
 
     void View::getContentDimensions(const UIContext &dc, float &w, float &h) const
     {
+        UNUSED(dc);
         w = 10.0f;
         h = 10.0f;
     }

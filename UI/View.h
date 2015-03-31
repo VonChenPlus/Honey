@@ -8,6 +8,7 @@
 #include "MATH/Bounds.h"
 #include "MATH/Matrix.h"
 #include "BASE/SmartPtr.h"
+#include "UI/UIContext.h"
 
 namespace UI
 {
@@ -171,21 +172,22 @@ namespace UI
         // Please note that Touch is called ENTIRELY asynchronously from drawing!
         // Can even be called on a different thread! This is to really minimize latency, and decouple
         // touch response from the frame rate. Same with Key and Axis.
-        virtual bool key(const Input::KeyInput &input) { UNUSED(input); return false; }
-        virtual void touch(const Input::TouchInput &input) { UNUSED(input); }
-        virtual void axis(const Input::AxisInput &input) { UNUSED(input); }
-        virtual void update(const Input::InputState &input_state) { UNUSED(input_state); }
+        virtual bool key(const _INPUT::KeyInput &input) { UNUSED(input); return false; }
+        virtual void touch(const _INPUT::TouchInput &input) { UNUSED(input); }
+        virtual void axis(const _INPUT::AxisInput &input) { UNUSED(input); }
+        virtual void update(const _INPUT::InputState &input_state) { UNUSED(input_state); }
 
-        virtual void focusChanged(int focusFlags) {}
+        virtual void focusChanged(int focusFlags) { UNUSED(focusFlags); }
 
-        void move(Bounds bounds) {
+        void move(MATH::Bounds bounds)
+        {
             bounds_ = bounds;
         }
 
         // Views don't do anything here in Layout, only containers implement this.
-        virtual void measure(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert);
+        virtual void measure(const UI::UIContext &dc, MeasureSpec horiz, MeasureSpec vert);
         virtual void layout() {}
-        virtual void draw(UIContext &dc) {}
+        virtual void draw(UIContext &dc) { UNUSED(dc); }
 
         virtual float getMeasuredWidth() const { return measuredWidth_; }
         virtual float getMeasuredHeight() const { return measuredHeight_; }
@@ -194,15 +196,15 @@ namespace UI
         virtual void getContentDimensions(const UIContext &dc, float &w, float &h) const;
 
         // Called when the layout is done.
-        void setBounds(Bounds bounds) { bounds_ = bounds; }
+        void setBounds(MATH::Bounds bounds) { bounds_ = bounds; }
         virtual const LayoutParams *getLayoutParams() const { return layoutParams_.get(); }
         virtual void replaceLayoutParams(LayoutParams *newLayoutParams) { layoutParams_.reset(newLayoutParams); }
-        const Bounds &getBounds() const { return bounds_; }
+        const MATH::Bounds &getBounds() const { return bounds_; }
 
         virtual bool setFocus();
 
         virtual bool canBeFocused() const { return true; }
-        virtual bool subviewFocused(View *view) { return false; }
+        virtual bool subviewFocused(View *view) { UNUSED(view); return false; }
 
         void setEnabled(bool enabled) { enabled_ = enabled; enabledMeansDisabled_ = false; }
         bool isEnabled() const

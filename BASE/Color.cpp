@@ -54,7 +54,7 @@ uint32 RGBAClamp(float r, float g, float b, float a)
     if (b < 0.0f) b = 0.0f;
     if (a < 0.0f) a = 0.0f;
 
-    return rgba(r,g,b,a);
+    return RGBA(r,g,b,a);
 }
 
 /* hsv2rgb.c
@@ -78,7 +78,7 @@ uint32 HSVA(float H, float S, float V, float alpha)
     int	 I;
     if ( S == 0.0 ) {
         // Achromatic case, set level of grey
-        return rgba(V, V, V, alpha);
+        return RGBA(V, V, V, alpha);
     } else {
         /*
         * Determine levels of primary colours.
@@ -103,7 +103,7 @@ uint32 HSVA(float H, float S, float V, float alpha)
         else if (I == 4) { r = K; g = M; b = V; }
         else if (I == 5) { r = V; g = M; b = N; }
         else return 0;
-        return rgba(r, g, b, alpha);
+        return RGBA(r, g, b, alpha);
     }
 }
 

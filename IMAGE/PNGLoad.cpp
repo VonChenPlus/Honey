@@ -1,5 +1,8 @@
 #include "PNGLoad.h"
 
+#include <string.h>
+#include <stdlib.h>
+
 #include "EXTERNALS/libpng17/png.h"
 
 namespace IMAGE
@@ -16,7 +19,7 @@ namespace IMAGE
 
         if (PNG_IMAGE_FAILED(png))
         {
-            ELOG("pngLoad: %s", png.message);
+            //ELOG("pngLoad: %s", png.message);
             return 0;
         }
         *pwidth = png.width;

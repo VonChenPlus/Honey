@@ -1,7 +1,28 @@
 #include "Thin3DGL.h"
+#include "IMAGE/ZimLoad.h"
+using MATH::Matrix4x4;
+using IMAGE::ZIM_CLAMP;
+#include "MATH/Utils.h"
+using MATH::IsPowerOf2;
+using IMAGE::ZIM_HAS_MIPS;
+using IMAGE::ZIM_GEN_MIPS;
 
 namespace THIN3D
 {
+    GLuint TypeToTarget(T3DTextureType type)
+    {
+        switch (type)
+        {
+        case LINEAR1D: return GL_TEXTURE_1D;
+        case LINEAR2D: return GL_TEXTURE_2D;
+        case LINEAR3D: return GL_TEXTURE_3D;
+        case CUBE: return GL_TEXTURE_CUBE_MAP;
+        case ARRAY1D: return GL_TEXTURE_1D_ARRAY;
+        case ARRAY2D: return GL_TEXTURE_2D_ARRAY;
+        default: return GL_NONE;
+        }
+    }
+
     void Thin3DGLBlendState::apply()
     {
         GFX::glstate.blend.set(enabled);
@@ -29,6 +50,7 @@ namespace THIN3D
 
     Thin3DGLBuffer::Thin3DGLBuffer(size_t size, uint32_t flags)
     {
+        UNUSED(size);
         glGenBuffers(1, &buffer_);
         target_ = (flags & T3DBufferUsage::INDEXDATA) ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER;
         usage_ = 0;
@@ -67,9 +89,12 @@ namespace THIN3D
 
     void Thin3DGLBuffer::bind()
     {
-        if (target_ == GL_ARRAY_BUFFER) {
+        if (target_ == GL_ARRAY_BUFFER)
+        {
             GFX::glstate.arrayBuffer.bind(buffer_);
-        } else {
+        }
+        else
+        {
             GFX::glstate.elementArrayBuffer.bind(buffer_);
         }
     }
@@ -125,7 +150,7 @@ namespace THIN3D
         return ok_;
     }
 
-    void Thin3DGLVertexFormat::apply(const void *base = nullptr)
+    void Thin3DGLVertexFormat::apply(const void *base)
     {
         for (int i = 0; i < SEM_MAX; i++)
         {
@@ -151,6 +176,7 @@ namespace THIN3D
                 glVertexAttribPointer(components_[i].semantic, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride_, (void *)(b + (intptr_t)components_[i].offset));
                 break;
             case INVALID:
+                ;
                 //ELOG("Thin3DGLVertexFormat: Invalid component type applied.");
             }
         }
@@ -195,8 +221,8 @@ namespace THIN3D
     bool Thin3DGLShaderSet::link()
     {
         program_ = glCreateProgram();
-        glAttachShader(program_, vshader->GetShader());
-        glAttachShader(program_, fshader->GetShader());
+        glAttachShader(program_, vshader->getShader());
+        glAttachShader(program_, fshader->getShader());
 
         // Bind all the common vertex data points. Mismatching ones will be ignored.
         glBindAttribLocation(program_, SEM_POSITION, "Position");
@@ -285,10 +311,10 @@ namespace THIN3D
         }
     }
 
-    void Thin3DGLShaderSet::setMatrix4x4(const char *name, const Matrix4x4 &value) override
+    void Thin3DGLShaderSet::setMatrix4x4(const char *name, const Matrix4x4 &value)
     {
         glUseProgram(program_);
-        int loc = GetUniformLoc(name);
+        int loc = getUniformLoc(name);
         if (loc != -1)
         {
             glUniformMatrix4fv(loc, 1, false, value.getReadPtr());
@@ -328,20 +354,6 @@ namespace THIN3D
         destroy();
     }
 
-    GLuint TypeToTarget(T3DTextureType type)
-    {
-        switch (type)
-        {
-        case LINEAR1D: return GL_TEXTURE_1D;
-        case LINEAR2D: return GL_TEXTURE_2D;
-        case LINEAR3D: return GL_TEXTURE_3D;
-        case CUBE: return GL_TEXTURE_CUBE_MAP;
-        case ARRAY1D: return GL_TEXTURE_1D_ARRAY;
-        case ARRAY2D: return GL_TEXTURE_2D_ARRAY;
-        default: return GL_NONE;
-        }
-    }
-
     bool Thin3DGLTexture::create(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels)
     {
         format_ = format;
@@ -363,6 +375,13 @@ namespace THIN3D
     }
     void Thin3DGLTexture::setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8_t *data)
     {
+        UNUSED(x);
+        UNUSED(y);
+        UNUSED(z);
+        UNUSED(width);
+        UNUSED(height);
+        UNUSED(depth);
+        UNUSED(stride);
         int internalFormat;
         int format;
         int type;
@@ -428,7 +447,7 @@ namespace THIN3D
     void Thin3DGLTexture::finalize(int zim_flags)
     {
         GLenum wrap = GL_REPEAT;
-        if ((zim_flags & ZIM_CLAMP) || !isPowerOf2(width_) || !isPowerOf2(height_))
+        if ((zim_flags & ZIM_CLAMP) || !IsPowerOf2(width_) || !IsPowerOf2(height_))
             wrap = GL_CLAMP_TO_EDGE;
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
@@ -497,6 +516,7 @@ namespace THIN3D
 
     Thin3DVertexFormat *Thin3DGLContext::createVertexFormat(const std::vector<Thin3DVertexComponent> &components, int stride, Thin3DShader *vshader)
     {
+        UNUSED(vshader);
         Thin3DGLVertexFormat *fmt = new Thin3DGLVertexFormat();
         fmt->components_ = components;
         fmt->stride_ = stride;
@@ -516,6 +536,7 @@ namespace THIN3D
 
     Thin3DShader *Thin3DGLContext::createVertexShader(const char *glsl_source, const char *hlsl_source)
     {
+        UNUSED(hlsl_source);
         Thin3DGLShader *shader = new Thin3DGLShader(false);
         if (shader->compile(glsl_source))
         {
@@ -528,8 +549,9 @@ namespace THIN3D
         }
     }
 
-    Thin3DShader *Thin3DGLContext::CreateFragmentShader(const char *glsl_source, const char *hlsl_source)
+    Thin3DShader *Thin3DGLContext::createFragmentShader(const char *glsl_source, const char *hlsl_source)
     {
+        UNUSED(hlsl_source);
         Thin3DGLShader *shader = new Thin3DGLShader(true);
         if (shader->compile(glsl_source))
         {
@@ -586,6 +608,7 @@ namespace THIN3D
 
     void Thin3DGLContext::drawIndexed(T3DPrimitive prim, Thin3DShaderSet *shaderSet, Thin3DVertexFormat *format, Thin3DBuffer *vdata, Thin3DBuffer *idata, int vertexCount, int offset)
     {
+        UNUSED(vertexCount);
         Thin3DGLShaderSet *ss = static_cast<Thin3DGLShaderSet *>(shaderSet);
         Thin3DGLBuffer *vbuf = static_cast<Thin3DGLBuffer *>(vdata);
         Thin3DGLBuffer *ibuf = static_cast<Thin3DGLBuffer *>(idata);
@@ -616,7 +639,7 @@ namespace THIN3D
         fmt->unApply();
     }
 
-    void Thin3DGLContext::Clear(int mask, uint32_t colorval, float depthVal, int stencilVal)
+    void Thin3DGLContext::clear(int mask, uint32_t colorval, float depthVal, int stencilVal)
     {
         float col[4];
         Uint32ToFloat4(colorval, col);

@@ -1,7 +1,7 @@
 #include "DrawBuffer.h"
 
-#include <algorithm>
 #include <cmath>
+#include <algorithm>
 
 using THIN3D::Thin3DContext;
 using THIN3D::Thin3DVertexComponent;
