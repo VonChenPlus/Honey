@@ -25,7 +25,11 @@ SOURCES += $$P/BASE/NativeApp.cpp \
     $$P/THIN3D/Thin3DGL.cpp \
     $$P/GFX/GLState.cpp \
     $$P/GFX/GLExtensions.cpp \
-    $$P/GFX/GfxResourceHolder.cpp
+    $$P/GFX/GfxResourceHolder.cpp \
+    $$P/GFX/Texture.cpp \
+    $$P/GFX/GLDebug.cpp \
+    $$P/BASE/Color.cpp \
+    $$P/UTILS/TEXT/UTF8.cpp
 
 HEADERS += \
     $$P/BASE/NativeApp.h \
@@ -52,7 +56,13 @@ HEADERS += \
     $$P/GFX/GLCommon.h \
     $$P/GFX/GLState.h \
     $$P/GFX/GLExtensions.h \
-    $$P/GFX/GfxResourceHolder.h
+    $$P/GFX/GfxResourceHolder.h \
+    $$P/GFX/Texture.h \
+    $$P/GFX/GLDebug.h \
+    $$P/BASE/Color.h \
+    $$P/MATH/Utils.h \
+    $$P/UTILS/TEXT/UTF8.h \
+    UTILS/TEXT/UTF16.h
 
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)
@@ -73,3 +83,7 @@ HEADERS += $$P/EXTERNALS/jpge/*.h
 SOURCES += $$P/EXTERNALS/glew/glew.c
 HEADERS += $$P/EXTERNALS/glew/GL/*.h
 INCLUDEPATH += $$P/EXTERNALS/glew
+
+# rg_etc1
+SOURCES += $$P/EXTERNALS/rg_etc1/*.c
+HEADERS += $$P/EXTERNALS/rg_etc1/*.h

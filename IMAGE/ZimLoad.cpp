@@ -6,7 +6,7 @@
 
 #include "EXTERNALS/zlib/zlib.h"
 #include "FILE/FileRead.h"
-using FILE::ReadLocalFile;
+using _FILE::ReadLocalFile;
 
 namespace IMAGE
 {
@@ -59,7 +59,7 @@ namespace IMAGE
         return ret;
     }
 
-    int LoadZIMPtr(const uint8_t *zim, size_t datasize, int *width, int *height, int *flags, uint8 **image)
+    int LoadZIMPtr(const uint8 *zim, size_t datasize, int *width, int *height, int *flags, uint8 **image)
     {
         if (zim[0] != 'Z' || zim[1] != 'I' || zim[2] != 'M' || zim[3] != 'G')
         {
@@ -132,7 +132,7 @@ namespace IMAGE
             }
             if (outlen != total_data_size)
             {
-                ELOG("Wrong size data in ZIM: %i vs %i", (int)outlen, (int)total_data_size);
+                //ELOG("Wrong size data in ZIM: %i vs %i", (int)outlen, (int)total_data_size);
             }
         }
         else
@@ -146,7 +146,7 @@ namespace IMAGE
         return num_levels;
     }
 
-    int LoadZIM(const char *filename, int *width, int *height, int *format, uint8_t **image)
+    int LoadZIM(const char *filename, int *width, int *height, int *format, uint8 **image)
     {
         size_t size;
         uint8_t *buffer = ReadLocalFile(filename, &size);

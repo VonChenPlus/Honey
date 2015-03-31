@@ -1,6 +1,8 @@
 #ifndef ZIMLOAD_H
 #define ZIMLOAD_H
 
+#include "BASE/BasicTypes.h"
+
 namespace IMAGE
 {
     // LoadZIM's responsibility:
@@ -50,8 +52,8 @@ namespace IMAGE
     // Delete the returned pointer using free()
     // Watch out! If the image has mipmaps, multiple values will be written
     // to width, height, and image, as if they were arrays, up to 12 (max texture size is 4096 which is 2^12).
-    int LoadZIM(const char *filename, int *width, int *height, int *flags, uint8_t **image);
-    int LoadZIMPtr(const uint8_t *zim, size_t datasize, int *width, int *height, int *flags, uint8_t **image);
+    int LoadZIM(const char *filename, int *width, int *height, int *flags, uint8 **image);
+    int LoadZIMPtr(const uint8 *zim, size_t datasize, int *width, int *height, int *flags, uint8_t **image);
 }
 
 #endif // ZIMLOAD_H

@@ -5,6 +5,8 @@
 
 #include "MATH/Bounds.h"
 #include "THIN3D/Thin3D.h"
+#include "GFX/DrawBuffer.h"
+#include "UI/View.h"
 
 namespace UI
 {

@@ -23,7 +23,8 @@ namespace UI
         h = 10.0f;
     }
 
-    Point View::getFocusPosition(FocusDirection dir) {
+    Point View::getFocusPosition(FocusDirection dir)
+    {
         // The +2/-2 is some extra fudge factor to cover for views sitting right next to each other.
         // Distance zero yields strange results otherwise.
         switch (dir) {
@@ -33,11 +34,11 @@ namespace UI
         case FOCUS_DOWN: return Point(bounds_.centerX(), bounds_.y2() - 2);
 
         default:
-            return bounds_.Center();
+            return bounds_.center();
         }
     }
 
-    bool View::SetFocus()
+    bool View::setFocus()
     {
         return false;
     }

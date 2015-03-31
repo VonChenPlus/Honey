@@ -89,7 +89,8 @@ namespace THIN3D
     "  return output;\n"
     "}\n";
 
-    void Thin3DContext::createPresets() {
+    void Thin3DContext::createPresets() 
+    {
         // Build prebuilt objects
         T3DBlendStateDesc off = { false };
         T3DBlendStateDesc additive = { true, T3DBlendEquation::ADD, T3DBlendFactor::ONE, T3DBlendFactor::ONE, T3DBlendEquation::ADD, T3DBlendFactor::ONE, T3DBlendFactor::ZERO };

@@ -20,11 +20,14 @@ using std::make_shared;
 using UI::ScreenManager;
 
 shared_ptr<ScreenManager> screenManager;
+float pixel_in_dps = 1.0f;
 
 void NativeInit() 
 {
     setlocale( LC_ALL, "C" );
     screenManager = make_shared<ScreenManager>();
+
+    pixel_in_dps = 1.0f;
 }
 
 std::string System_GetProperty(SystemProperty prop)
