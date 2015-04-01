@@ -1,6 +1,8 @@
 #ifndef PNGLOAD_H
 #define PNGLOAD_H
 
+#include "BASE/BasicTypes.h"
+
 namespace IMAGE
 {
     // *image_data_ptr should be deleted with free()

@@ -2,6 +2,7 @@
 #define GLSTATE_H
 
 #include <string>
+#include <string.h>
 
 #include "GLCommon.h"
 

@@ -13,6 +13,8 @@ using MATH::Bounds;
 #include <QtOpenGL/QGLWidget>
 #endif
 
+namespace GFX
+{
 #if defined(_WIN32) && !defined(USING_QT_UI)
 
 #define WIN32_LEAN_AND_MEAN
@@ -22,8 +24,6 @@ using MATH::Bounds;
 using UTILS::TEXT::ConvertUTF8ToWString;
 #include "BASE/StringUtils.h"
 
-namespace GFX
-{
     enum
     {
         MAX_TEXT_WIDTH = 1024,
@@ -231,13 +231,13 @@ namespace GFX
 
     TextDrawer::~TextDrawer() {
         for (auto iter = cache_.begin(); iter != cache_.end(); ++iter) {
-            iter->second->texture->Release();
+            iter->second->texture->release();
             delete iter->second;
         }
         cache_.clear();
     }
 
-    uint32_t TextDrawer::SetFont(const char *fontName, int size, int flags) {
+    uint32_t TextDrawer::setFont(const char *fontName, int size, int flags) {
     #ifdef USING_QT_UI
         // We will only use the default font
         uint32_t fontHash = 0; //hash::Fletcher((const uint8_t *)fontName, strlen(fontName));
@@ -256,16 +256,17 @@ namespace GFX
         fontHash_ = fontHash;
         return fontHash;
     #else
-        ELOG("System fonts not supported on this platform");
+        //ELOG("System fonts not supported on this platform");
         return 0;
     #endif
     }
 
-    void TextDrawer::SetFont(uint32_t fontHandle) {
+    void TextDrawer::setFont(uint32 fontHandle)
+    {
 
     }
 
-    void TextDrawer::MeasureString(const char *str, float *w, float *h) {
+    void TextDrawer::measureString(const char *str, float *w, float *h) {
     #ifdef USING_QT_UI
         QFont* font = fontMap_.find(fontHash_)->second;
         QFontMetrics fm(*font);
@@ -278,7 +279,7 @@ namespace GFX
     #endif
     }
 
-    void TextDrawer::DrawString(DrawBuffer &target, const char *str, float x, float y, uint32_t color, int align) {
+    void TextDrawer::drawString(DrawBuffer &target, const char *str, float x, float y, uint32 color, int align) {
         if (!strlen(str))
             return;
 

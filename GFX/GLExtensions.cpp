@@ -1,6 +1,7 @@
 #include "GLExtensions.h"
 
 #include <string>
+#include <string.h>
 
 #include "BASE/NativeApp.h"
 

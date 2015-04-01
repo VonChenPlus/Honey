@@ -1,4 +1,7 @@
 #include "Texture.h"
+
+#include <cmath>
+
 #include "GFX/GLState.h"
 #include "IMAGE/ZimLoad.h"
 using IMAGE::ZIM_CLAMP;

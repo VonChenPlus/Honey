@@ -3,7 +3,7 @@
 
 #include "BASE/BasicTypes.h"
 
-namespace _FILE
+namespace IO
 {
     // Direct readers. deallocate using delete [].
     uint8 *ReadLocalFile(const char *filename, size_t *size);

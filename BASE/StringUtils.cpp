@@ -15,30 +15,6 @@
 #include <algorithm>
 #include <iomanip>
 
-#include "base/buffer.h"
-#include "base/stringutil.h"
-
-#ifdef _WIN32
-// Function Cross-Compatibility
-#define strcasecmp _stricmp
-
-void OutputDebugStringUTF8(const char *p) {
-    wchar_t temp[2048];
-    int len = std::min(2047, (int)strlen(p));
-    int size = (int)MultiByteToWideChar(CP_UTF8, 0, p, len, NULL, 0);
-    MultiByteToWideChar(CP_UTF8, 0, p, len, temp, size);
-    temp[size] = 0;
-    OutputDebugString(temp);
-}
-
-#else
-
-void OutputDebugStringUTF8(const char *p) {
-    ILOG("%s", p);
-}
-
-#endif
-
 void StringTrimEndNonAlphaNum(char *str) {
     ssize_t n = strlen(str);
     while (!isalnum(str[n]) && n >= 0) {

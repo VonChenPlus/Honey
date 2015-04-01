@@ -20,7 +20,7 @@ SOURCES += $$P/BASE/NativeApp.cpp \
     $$P/GFX/DrawBuffer.cpp \
     $$P/THIN3D/Thin3D.cpp \
     $$P/IMAGE/ZimLoad.cpp \
-    $$P/FILE/FileRead.cpp \
+    $$P/IO/FileRead.cpp \
     $$P/IMAGE/PNGLoad.cpp \
     $$P/THIN3D/Thin3DGL.cpp \
     $$P/GFX/GLState.cpp \
@@ -32,7 +32,9 @@ SOURCES += $$P/BASE/NativeApp.cpp \
     $$P/UTILS/TEXT/UTF8.cpp \
     $$P/GFX/DrawText.cpp \
     $$P/UTILS/HASH/Hash.cpp \
-    BASE/StringUtils.cpp
+    $$P/BASE/StringUtils.cpp \
+    $$P/BASE/Buffer.cpp \
+    $$P/IO/FDUtil.cpp
 
 HEADERS += \
     $$P/BASE/NativeApp.h \
@@ -53,7 +55,7 @@ HEADERS += \
     $$P/GFX/DrawBuffer.h \
     $$P/THIN3D/Thin3D.h \
     $$P/IMAGE/ZimLoad.h \
-    $$P/FILE/FileRead.h \
+    $$P/IO/FileRead.h \
     $$P/IMAGE/PNGLoad.h \
     $$P/THIN3D/Thin3DGL.h \
     $$P/GFX/GLCommon.h \
@@ -69,7 +71,9 @@ HEADERS += \
     $$P/GFX/DrawText.h \
     $$P/UTILS/HASH/Hash.h \
     $$P/UI/UI.h \
-    BASE/StringUtils.h
+    $$P/BASE/StringUtils.h \
+    $$P/BASE/Buffer.h \
+    $$P/IO/FDUtil.h
 
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)
@@ -84,7 +88,7 @@ SOURCES += $$P/EXTERNALS/libpng17/*.c
 HEADERS += $$P/EXTERNALS/libpng17/*.h
 
 # jpg
-SOURCES += $$P/EXTERNALS/jpge/*.c
+SOURCES += $$P/EXTERNALS/jpge/*.cpp
 HEADERS += $$P/EXTERNALS/jpge/*.h
 
 # glew
@@ -93,5 +97,5 @@ HEADERS += $$P/EXTERNALS/glew/GL/*.h
 INCLUDEPATH += $$P/EXTERNALS/glew
 
 # rg_etc1
-SOURCES += $$P/EXTERNALS/rg_etc1/*.c
+SOURCES += $$P/EXTERNALS/rg_etc1/*.cpp
 HEADERS += $$P/EXTERNALS/rg_etc1/*.h

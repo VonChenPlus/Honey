@@ -3,6 +3,7 @@
 
 #include <map>
 
+#include "BASE/BasicTypes.h"
 #include "THIN3D/Thin3D.h"
 #include "GFX/DrawBuffer.h"
 #include "MATH/Bounds.h"
@@ -37,11 +38,11 @@ namespace GFX
         ~TextDrawer();
 
         uint32_t setFont(const char *fontName, int size, int flags);
-        void setFont(uint32_t fontHandle);  // Shortcut once you've set the font once.
+        void setFont(uint32 fontHandle);  // Shortcut once you've set the font once.
 
         void setFontScale(float xscale, float yscale);
         void measureString(const char *str, float *w, float *h);
-        void drawString(DrawBuffer &target, const char *str, float x, float y, uint32_t color, int align = ALIGN_TOPLEFT);
+        void drawString(DrawBuffer &target, const char *str, float x, float y, uint32 color, int align = ALIGN_TOPLEFT);
         void drawStringRect(DrawBuffer &target, const char *str, const MATH::Bounds &bounds, uint32_t color, int align);
         // Use for housekeeping like throwing out old strings.
         void oncePerFrame();

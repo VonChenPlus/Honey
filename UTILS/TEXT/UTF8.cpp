@@ -20,6 +20,7 @@
 #undef max
 #endif
 #include <algorithm>
+#include <string.h>
 
 #include "UTF16.h"
 

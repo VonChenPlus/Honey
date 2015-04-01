@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "BASE/BasicTypes.h"
+
 namespace GFX
 {
     std::vector<GfxResourceHolder *> *holders;
