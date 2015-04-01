@@ -9,8 +9,8 @@ using IMAGE::ZIM_FORMAT_MASK;
 #include "IMAGE/PNGLoad.h"
 using IMAGE::PNGLoadPtr;
 #include "EXTERNALS/jpge/jpgd.h"
-#include "FILE/FileRead.h"
-using _FILE::ReadLocalFile;
+#include "IO/FileUtil.h"
+using IO::ReadLocalFile;
 
 namespace THIN3D
 {

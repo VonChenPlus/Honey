@@ -82,6 +82,7 @@ namespace GFX
 
     static uint8 *GenerateTexture(const char *filename, int &bpp, int &w, int &h, bool &clamp)
     {
+        UNUSED(clamp);
         char name_and_params[256];
         // security check :)
         if (strlen(filename) > 200)

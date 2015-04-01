@@ -1,19 +1,18 @@
 #ifndef STRINGUTILS_H
 #define STRINGUTILS_H
 
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
+#include <stdlib.h>
+#include <stdio.h>
 #include <string>
-#include <sstream>
-#include <stdarg.h>
+#include <string.h>
 #include <vector>
 
-#include "base/basictypes.h"
+#include "BASE/BasicTypes.h"
 
 #ifdef _MSC_VER
 #pragma warning (disable:4996)
 #define strncasecmp _strnicmp
+#define strcasecmp _strcmpi
 #endif
 
 #ifdef BLACKBERRY
@@ -53,37 +52,43 @@ static inline int vasprintf(char **rResult, const char *aFormat, va_list aAp)
 #endif
 
 // Dumb wrapper around itoa, providing a buffer. Declare this on the stack.
-class ITOA {
+class ITOA
+{
 public:
-  char buffer[16];
-  const char *p(int i) {
-    sprintf(buffer, "%i", i);
-    return &buffer[0];
-  }
+    char buffer[16];
+    const char *p(int i)
+    {
+        sprintf(buffer, "%i", i);
+        return &buffer[0];
+    }
 };
 
 // Other simple string utilities.
 
-inline bool startsWith(const std::string &str, const std::string &what) {
+inline bool StartsWith(const std::string &str, const std::string &what)
+{
     if (str.size() < what.size())
         return false;
     return str.substr(0, what.size()) == what;
 }
 
-inline bool endsWith(const std::string &str, const std::string &what) {
+inline bool EndsWith(const std::string &str, const std::string &what)
+{
     if (str.size() < what.size())
         return false;
   return str.substr(str.size() - what.size()) == what;
 }
 
 // Only use on strings where you're only concerned about ASCII.
-inline bool startsWithNoCase(const std::string &str, const std::string &what) {
+inline bool StartsWithNoCase(const std::string &str, const std::string &what)
+{
     if (str.size() < what.size())
         return false;
     return strncasecmp(str.c_str(), what.c_str(), what.size()) == 0;
 }
 
-inline bool endsWithNoCase(const std::string &str, const std::string &what) {
+inline bool EndsWithNoCase(const std::string &str, const std::string &what)
+{
     if (str.size() < what.size())
         return false;
     const size_t offset = str.size() - what.size();
@@ -91,32 +96,37 @@ inline bool endsWithNoCase(const std::string &str, const std::string &what) {
 }
 
 void DataToHexString(const uint8 *data, size_t size, std::string *output);
-inline void StringToHexString(const std::string &data, std::string *output) {
-  DataToHexString((uint8_t *)(&data[0]), data.size(), output);
+inline void StringToHexString(const std::string &data, std::string *output)
+{
+    DataToHexString((uint8_t *)(&data[0]), data.size(), output);
 }
 
 
 // highly unsafe and not recommended.
-unsigned int parseHex(const char* _szValue);
+unsigned int ParseHex(const char* _szValue);
 
 
 // Suitable for inserting into maps, unlike char*, and cheaper than std::string.
 // Strings must be constant and preferably be stored in the read-only part
 // of the binary.
-class ConstString {
+class ConstString
+{
 public:
-  ConstString(const char *ptr) {
-    ptr_ = ptr;
-  }
-  bool operator <(const ConstString &other) const {
-    return strcmp(ptr_, other.ptr_) < 0;
-  }
-  bool operator ==(const ConstString &other) const {
-    return ptr_ == other.ptr_ || !strcmp(ptr_, other.ptr_);
-  }
+    ConstString(const char *ptr)
+    {
+        ptr_ = ptr;
+    }
+    bool operator <(const ConstString &other) const
+    {
+        return strcmp(ptr_, other.ptr_) < 0;
+    }
+    bool operator ==(const ConstString &other) const
+    {
+        return ptr_ == other.ptr_ || !strcmp(ptr_, other.ptr_);
+    }
     const char *get() const { return ptr_; }
 private:
-  const char *ptr_;
+    const char *ptr_;
 };
 
 std::string StringFromFormat(const char* format, ...);
@@ -150,15 +160,7 @@ void SplitString(const std::string& str, const char delim, std::vector<std::stri
 std::string ReplaceAll(std::string input, const std::string& src, const std::string& dest);
 
 // Compare two strings, ignore the difference between the ignorestr1 and the ignorestr2 in str1 and str2.
-int strcmpIgnore(std::string str1, std::string str2, std::string ignorestr1, std::string ignorestr2);
-
-template <typename N>
-static std::string ValueToString(const N value)
-{
-    std::stringstream string;
-    string << value;
-    return string.str();
-}
+int StrcmpIgnore(std::string str1, std::string str2, std::string ignorestr1, std::string ignorestr2);
 
 void StringTrimEndNonAlphaNum(char *str);
 void SkipSpace(const char **ptr);

@@ -8,48 +8,59 @@
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
-#include <string>
+#include <string.h>
 #include <sstream>
 #include <limits.h>
 
 #include <algorithm>
 #include <iomanip>
 
-void StringTrimEndNonAlphaNum(char *str) {
+#include "BASE/Buffer.h"
+
+void StringTrimEndNonAlphaNum(char *str)
+{
     ssize_t n = strlen(str);
-    while (!isalnum(str[n]) && n >= 0) {
+    while (!isalnum(str[n]) && n >= 0)
+    {
         str[n--] = '\0';
     }
 }
 
-void SkipSpace(const char **ptr) {
-    while (**ptr && isspace(**ptr)) {
+void SkipSpace(const char **ptr)
+{
+    while (**ptr && isspace(**ptr))
+    {
         (*ptr)++;
     }
 }
 
-void StringUpper(char *str) {
-    while (*str) {
+void StringUpper(char *str)
+{
+    while (*str)
+    {
         *str = toupper(*str);
         str++;
     }
 }
 
-void StringUpper(char *str, int len) {
-    while (len--) {
+void StringUpper(char *str, int len)
+{
+    while (len--)
+    {
         *str = toupper(*str);
         str++;
     }
 }
 
 
-unsigned int parseHex(const char *_szValue)
+unsigned int ParseHex(const char *_szValue)
 {
     int Value = 0;
     size_t Finish = strlen(_szValue);
     if (Finish > 8 ) { Finish = 8; }
 
-    for (size_t Count = 0; Count < Finish; Count++) {
+    for (size_t Count = 0; Count < Finish; Count++)
+    {
         Value = (Value << 4);
         switch( _szValue[Count] ) {
         case '0': break;
@@ -82,14 +93,16 @@ unsigned int parseHex(const char *_szValue)
     return Value;
 }
 
-void DataToHexString(const uint8 *data, size_t size, std::string *output) {
+void DataToHexString(const uint8 *data, size_t size, std::string *output)
+{
     Buffer buffer;
-    for (size_t i = 0; i < size; i++) {
-        buffer.Printf("%02x ", data[i]);
+    for (size_t i = 0; i < size; i++)
+    {
+        buffer.printf("%02x ", data[i]);
         if (i && !(i & 15))
-            buffer.Printf("\n");
+            buffer.printf("\n");
     }
-    buffer.TakeAll(output);
+    buffer.takeAll(output);
 }
 
 std::string StringFromFormat(const char* format, ...)
@@ -116,7 +129,8 @@ std::string StringFromFormat(const char* format, ...)
         buf = NULL;
     va_end(args);
 
-    if(buf != NULL) {
+    if(buf != NULL)
+    {
         temp = buf;
         free(buf);
     }
@@ -196,7 +210,8 @@ bool TryParse(const std::string &str, uint32_t *const output)
     if (errno == ERANGE)
         return false;
 
-    if (ULONG_MAX > UINT_MAX) {
+    if (ULONG_MAX > UINT_MAX)
+    {
 #ifdef _MSC_VER
 #pragma warning (disable:4309)
 #endif
@@ -251,7 +266,8 @@ std::string ReplaceAll(std::string result, const std::string& src, const std::st
     return result;
 }
 
-int strcmpIgnore(std::string str1, std::string str2, std::string ignorestr1, std::string ignorestr2) {
+int StrcmpIgnore(std::string str1, std::string str2, std::string ignorestr1, std::string ignorestr2)
+{
     str1 = ReplaceAll(str1, ignorestr1, ignorestr2);
     str2 = ReplaceAll(str2, ignorestr1, ignorestr2);
     return strcmp(str1.c_str(),str2.c_str());

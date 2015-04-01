@@ -5,8 +5,8 @@
 #include <stdlib.h>
 
 #include "EXTERNALS/zlib/zlib.h"
-#include "FILE/FileRead.h"
-using _FILE::ReadLocalFile;
+#include "IO/FileUtil.h"
+using IO::ReadLocalFile;
 
 namespace IMAGE
 {

@@ -1,5 +1,6 @@
 #include "MATH/Quaternion.h"
 #include "MATH/Matrix.h"
+#include "BASE/BasicTypes.h"
 
 namespace MATH
 {
@@ -29,6 +30,7 @@ namespace MATH
 
     Quaternion Quaternion::fromMatrix(Matrix4x4 &m)
     {
+        UNUSED(m);
         // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
         // article "Quaternion Calculus and Fast Animation".
         Quaternion q(0,0,0,1);

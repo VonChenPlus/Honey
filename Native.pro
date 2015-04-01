@@ -20,7 +20,6 @@ SOURCES += $$P/BASE/NativeApp.cpp \
     $$P/GFX/DrawBuffer.cpp \
     $$P/THIN3D/Thin3D.cpp \
     $$P/IMAGE/ZimLoad.cpp \
-    $$P/IO/FileRead.cpp \
     $$P/IMAGE/PNGLoad.cpp \
     $$P/THIN3D/Thin3DGL.cpp \
     $$P/GFX/GLState.cpp \
@@ -34,7 +33,9 @@ SOURCES += $$P/BASE/NativeApp.cpp \
     $$P/UTILS/HASH/Hash.cpp \
     $$P/BASE/StringUtils.cpp \
     $$P/BASE/Buffer.cpp \
-    $$P/IO/FDUtil.cpp
+    $$P/IO/FDUtil.cpp \
+    $$P/IO/FileUtil.cpp \
+    $$P/BASE/TimeUtil.cpp
 
 HEADERS += \
     $$P/BASE/NativeApp.h \
@@ -55,7 +56,6 @@ HEADERS += \
     $$P/GFX/DrawBuffer.h \
     $$P/THIN3D/Thin3D.h \
     $$P/IMAGE/ZimLoad.h \
-    $$P/IO/FileRead.h \
     $$P/IMAGE/PNGLoad.h \
     $$P/THIN3D/Thin3DGL.h \
     $$P/GFX/GLCommon.h \
@@ -73,7 +73,9 @@ HEADERS += \
     $$P/UI/UI.h \
     $$P/BASE/StringUtils.h \
     $$P/BASE/Buffer.h \
-    $$P/IO/FDUtil.h
+    $$P/IO/FDUtil.h \
+    $$P/IO/FileUtil.h \
+    $$P/BASE/TimeUtil.h
 
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)

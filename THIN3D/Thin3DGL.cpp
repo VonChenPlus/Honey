@@ -335,6 +335,7 @@ namespace THIN3D
         width_ = 0;
         height_ = 0;
         depth_ = 0;
+        format_ = IMG_UNKNOWN;
         glGenTextures(1, &tex_);
         GFX::register_gl_resource_holder(this);
     }

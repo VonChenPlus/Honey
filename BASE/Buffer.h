@@ -2,6 +2,7 @@
 #define BUFFER_H
 
 #include <vector>
+#include <string>
 
 #include "BASE/BasicTypes.h"
 

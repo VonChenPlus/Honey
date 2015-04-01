@@ -1,5 +1,23 @@
 #include "Buffer.h"
 
+#include <stdarg.h>
+#include <stdlib.h>
+#include <algorithm>
+#include <string.h>
+
+#ifdef _WIN32
+#include <winsock2.h>
+#undef min
+#undef max
+#else
+#include <sys/socket.h>
+#include <unistd.h>
+#endif
+
+#include "IO/FDUtil.h"
+using IO::WriteLine;
+#include "BASE/TimeUtil.h"
+
 Buffer::Buffer()
 {
 }
@@ -24,14 +42,14 @@ void Buffer::append(const std::string &str)
 void Buffer::append(const char *str)
 {
     size_t len = strlen(str);
-    char *dest = Append(len);
+    char *dest = append(len);
     memcpy(dest, str, len);
 }
 
 void Buffer::append(const Buffer &other)
 {
     size_t len = other.size();
-    char *dest = Append(len);
+    char *dest = append(len);
     memcpy(dest, &other.data_[0], len);
 }
 
@@ -125,18 +143,20 @@ void Buffer::printf(const char *fmt, ...)
         //ELOG("Buffer::Printf failed");
     }
     va_end(vl);
-    char *ptr = Append(retval);
+    char *ptr = append(retval);
     memcpy(ptr, buffer, retval);
 }
 
 bool Buffer::flush(int fd)
 {
-  // Look into using send() directly.
-  bool success = (ssize_t)data_.size() == fd_util::WriteLine(fd, &data_[0], data_.size());
-  if (success) {
-    data_.resize(0);
-  }
-  return success;
+    // Look into using send() directly.
+    bool success = (ssize_t)data_.size() == WriteLine(fd, &data_[0], data_.size());
+    if (success)
+    {
+        data_.resize(0);
+    }
+
+    return success;
 }
 
 bool Buffer::flushToFile(const char *filename)
@@ -144,24 +164,29 @@ bool Buffer::flushToFile(const char *filename)
     FILE *f = fopen(filename, "wb");
     if (!f)
         return false;
-    if (data_.size()) {
+    if (data_.size())
+    {
         fwrite(&data_[0], 1, data_.size(), f);
     }
     fclose(f);
     return true;
 }
 
-bool Buffer::FlushSocket(uintptr_t sock) {
-    for (size_t pos = 0, end = data_.size(); pos < end; ) {
+bool Buffer::flushSocket(uintptr_t sock)
+{
+    for (size_t pos = 0, end = data_.size(); pos < end; )
+    {
         int sent = send(sock, &data_[pos], (int)(end - pos), 0);
-        if (sent < 0) {
-            ELOG("FlushSocket failed");
+        if (sent < 0)
+        {
+            //ELOG("FlushSocket failed");
             return false;
         }
         pos += sent;
 
         // Buffer full, don't spin.
-        if (sent == 0) {
+        if (sent == 0)
+        {
             sleep_ms(1);
         }
     }
@@ -169,50 +194,70 @@ bool Buffer::FlushSocket(uintptr_t sock) {
     return true;
 }
 
-bool Buffer::ReadAll(int fd, int hintSize) {
+bool Buffer::readAll(int fd, int hintSize)
+{
     std::vector<char> buf;
-    if (hintSize >= 65536 * 16) {
+    if (hintSize >= 65536 * 16)
+    {
         buf.resize(65536);
-    } else if (hintSize >= 1024 * 16) {
+    }
+    else if (hintSize >= 1024 * 16)
+    {
         buf.resize(hintSize / 16);
-    } else {
+    }
+    else
+    {
         buf.resize(1024);
     }
 
-    while (true) {
+    while (true)
+    {
         int retval = recv(fd, &buf[0], (int)buf.size(), 0);
-        if (retval == 0) {
+        if (retval == 0)
+        {
             break;
-        } else if (retval < 0) {
-            ELOG("Error reading from buffer: %i", retval);
+        }
+        else if (retval < 0)
+        {
+            //ELOG("Error reading from buffer: %i", retval);
             return false;
         }
-        char *p = Append((size_t)retval);
+        char *p = append((size_t)retval);
         memcpy(p, &buf[0], retval);
     }
     return true;
 }
 
-bool Buffer::ReadAllWithProgress(int fd, int knownSize, float *progress) {
+bool Buffer::readAllWithProgress(int fd, int knownSize, float *progress)
+{
     std::vector<char> buf;
-    if (knownSize >= 65536 * 16) {
+    if (knownSize >= 65536 * 16)
+    {
         buf.resize(65536);
-    } else if (knownSize >= 1024 * 16) {
+    }
+    else if (knownSize >= 1024 * 16)
+    {
         buf.resize(knownSize / 16);
-    } else {
+    }
+    else
+    {
         buf.resize(1024);
     }
 
     int total = 0;
-    while (true) {
+    while (true)
+    {
         int retval = recv(fd, &buf[0], (int)buf.size(), 0);
-        if (retval == 0) {
+        if (retval == 0)
+        {
             return true;
-        } else if (retval < 0) {
-            ELOG("Error reading from buffer: %i", retval);
+        }
+        else if (retval < 0)
+        {
+            //ELOG("Error reading from buffer: %i", retval);
             return false;
         }
-        char *p = Append((size_t)retval);
+        char *p = append((size_t)retval);
         memcpy(p, &buf[0], retval);
         total += retval;
         *progress = (float)total / (float)knownSize;
@@ -220,15 +265,18 @@ bool Buffer::ReadAllWithProgress(int fd, int knownSize, float *progress) {
     return true;
 }
 
-int Buffer::Read(int fd, size_t sz) {
+int Buffer::read(int fd, size_t sz)
+{
     char buf[1024];
     int retval;
     size_t received = 0;
-    while ((retval = recv(fd, buf, (int)std::min(sz, sizeof(buf)), 0)) > 0) {
-        if (retval < 0) {
+    while ((retval = recv(fd, buf, (int)std::min(sz, sizeof(buf)), 0)) > 0)
+    {
+        if (retval < 0)
+        {
             return retval;
         }
-        char *p = Append((size_t)retval);
+        char *p = append((size_t)retval);
         memcpy(p, buf, retval);
         sz -= retval;
         received += retval;
@@ -238,7 +286,8 @@ int Buffer::Read(int fd, size_t sz) {
     return (int)received;
 }
 
-void Buffer::PeekAll(std::string *dest) {
+void Buffer::peekAll(std::string *dest)
+{
     dest->resize(data_.size());
     memcpy(&(*dest)[0], &data_[0], data_.size());
 }

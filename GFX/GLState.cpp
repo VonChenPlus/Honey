@@ -88,7 +88,7 @@ namespace GFX
 
         const char *renderer = (const char *)glGetString(GL_RENDERER);
         const char *versionStr = (const char *)glGetString(GL_VERSION);
-        const char *glslVersionStr = (const char *)glGetString(GL_SHADING_LANGUAGE_VERSION);
+        //const char *glslVersionStr = (const char *)glGetString(GL_SHADING_LANGUAGE_VERSION);
 
         // Check vendor string to try and guess GPU
         const char *cvendor = (char *)glGetString(GL_VENDOR);
@@ -265,7 +265,7 @@ namespace GFX
 
         ProcessGPUFeatures();
 
-        int error = glGetError();
+        //int error = glGetError();
         //if (error)
             //ELOG("GL error in init: %i", error);
     }

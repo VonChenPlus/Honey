@@ -344,6 +344,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
 
     void TextDrawer::setFontScale(float xscale, float yscale)
     {
+        UNUSED(yscale);
         fontScaleX_ = xscale;
         fontScaleY_ = xscale;
     }
