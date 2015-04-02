@@ -126,7 +126,7 @@ namespace GFX
         }
         else
         {
-            data = NULL;
+            data = NULLPTR;
         }
 
         return data;

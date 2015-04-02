@@ -24,7 +24,7 @@ static inline int vasprintf(char **rResult, const char *aFormat, va_list aAp)
     va_list ap;
 
     result = (char *) malloc(16);
-    if (result == NULL) return -1;
+    if (result == NULLPTR) return -1;
 
     va_copy(ap, aAp);
     rVal = vsnprintf(result, 16, aFormat, ap);
@@ -39,7 +39,7 @@ static inline int vasprintf(char **rResult, const char *aFormat, va_list aAp)
     {
         free(result);
         result = (char *) malloc(rVal + 1);
-        if (result == NULL) return -1;
+        if (result == NULLPTR) return -1;
 
         va_copy(ap, aAp);
         rVal = vsnprintf(result, rVal + 1, aFormat, aAp);

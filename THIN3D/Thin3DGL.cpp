@@ -81,7 +81,7 @@ namespace THIN3D
         if (size > knownSize_)
         {
             // Allocate the buffer.
-            glBufferData(target_, size + offset, NULL, usage_);
+            glBufferData(target_, size + offset, NULLPTR, usage_);
             knownSize_ = size + offset;
         }
         glBufferSubData(target_, offset, size, data);
@@ -242,7 +242,7 @@ namespace THIN3D
             if (bufLength)
             {
                 char* buf = new char[bufLength];
-                glGetProgramInfoLog(program_, bufLength, NULL, buf);
+                glGetProgramInfoLog(program_, bufLength, NULLPTR, buf);
                 //ELOG("Could not link program:\n %s", buf);
                 // We've thrown out the source at this point. Might want to do something about that.
                 delete[] buf;
@@ -331,16 +331,20 @@ namespace THIN3D
     Thin3DGLTexture::Thin3DGLTexture()
         : tex_(0)
         , target_(0)
+        , format_(IMG_UNKNOWN)
     {
         width_ = 0;
         height_ = 0;
         depth_ = 0;
-        format_ = IMG_UNKNOWN;
         glGenTextures(1, &tex_);
         GFX::register_gl_resource_holder(this);
     }
 
-    Thin3DGLTexture::Thin3DGLTexture(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels) : format_(format), tex_(0), target_(TypeToTarget(type)), mipLevels_(mipLevels)
+    Thin3DGLTexture::Thin3DGLTexture(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels)
+        : tex_(0)
+        , target_(TypeToTarget(type))
+        , format_(format)
+        , mipLevels_(mipLevels)
     {
         width_ = width;
         height_ = height;
@@ -497,7 +501,7 @@ namespace THIN3D
         if (!vshader || !fshader)
         {
             //ELOG("ShaderSet requires both a valid vertex and a fragment shader: %p %p", vshader, fshader);
-            return NULL;
+            return NULLPTR;
         }
         Thin3DGLShaderSet *shaderSet = new Thin3DGLShaderSet();
         vshader->addRef();
@@ -511,7 +515,7 @@ namespace THIN3D
         else
         {
             delete shaderSet;
-            return NULL;
+            return NULLPTR;
         }
     }
 
@@ -546,7 +550,7 @@ namespace THIN3D
         else
         {
             shader->release();
-            return nullptr;
+            return NULLPTR;
         }
     }
 
@@ -561,7 +565,7 @@ namespace THIN3D
         else
         {
             shader->release();
-            return nullptr;
+            return NULLPTR;
         }
     }
 

@@ -28,7 +28,7 @@ namespace IMAGE
 
         int stride = PNG_IMAGE_ROW_STRIDE(png);
         *image_data_ptr = (unsigned char *)malloc(PNG_IMAGE_SIZE(png));
-        png_image_finish_read(&png, NULL, *image_data_ptr, stride, NULL);
+        png_image_finish_read(&png, NULLPTR, *image_data_ptr, stride, NULLPTR);
 
         return 1;
     }
@@ -52,7 +52,7 @@ namespace IMAGE
 
         int stride = PNG_IMAGE_ROW_STRIDE(png);
         *image_data_ptr = (unsigned char *)malloc(PNG_IMAGE_SIZE(png));
-        png_image_finish_read(&png, NULL, *image_data_ptr, stride, NULL);
+        png_image_finish_read(&png, NULLPTR, *image_data_ptr, stride, NULLPTR);
 
         return 1;
     }

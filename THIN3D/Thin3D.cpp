@@ -229,7 +229,7 @@ namespace THIN3D
     bool Thin3DTexture::loadFromFileData(const uint8_t *data, size_t dataSize, T3DImageType type)
     {
         int width[16], height[16];
-        uint8_t *image[16] = { nullptr };
+        uint8_t *image[16] = { NULLPTR };
 
         int num_levels;
         int zim_flags;
@@ -285,7 +285,7 @@ namespace THIN3D
         if (!tex->loadFromFile(filename, type))
         {
             tex->release();
-            return NULL;
+            return NULLPTR;
         }
         return tex;
     }
@@ -297,11 +297,11 @@ namespace THIN3D
         int num_levels = 0;
         int zim_flags = 0;
         T3DImageFormat fmt;
-        uint8_t *image[16] = { nullptr };
+        uint8_t *image[16] = { NULLPTR };
 
         if (!LoadTextureLevels(data, size, type, width, height, &num_levels, &fmt, image, &zim_flags))
         {
-            return NULL;
+            return NULLPTR;
         }
 
         Thin3DTexture *tex = createTexture(LINEAR2D, fmt, width[0], height[0], 1, num_levels);

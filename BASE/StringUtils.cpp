@@ -108,7 +108,7 @@ void DataToHexString(const uint8 *data, size_t size, std::string *output)
 std::string StringFromFormat(const char* format, ...)
 {
     va_list args;
-    char *buf = NULL;
+    char *buf = NULLPTR;
     std::string temp = "";
 #ifdef _WIN32
     int required = 0;
@@ -126,10 +126,10 @@ std::string StringFromFormat(const char* format, ...)
 #else
     va_start(args, format);
     if(vasprintf(&buf, format, args) < 0)
-        buf = NULL;
+        buf = NULLPTR;
     va_end(args);
 
-    if(buf != NULL)
+    if(buf != NULLPTR)
     {
         temp = buf;
         free(buf);
@@ -195,7 +195,7 @@ std::string ArrayToString(const uint8_t *data, uint32_t size, int line_len, bool
 
 bool TryParse(const std::string &str, uint32_t *const output)
 {
-    char *endptr = NULL;
+    char *endptr = NULLPTR;
 
     // Holy crap this is ugly.
 

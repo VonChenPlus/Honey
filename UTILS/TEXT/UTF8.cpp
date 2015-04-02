@@ -288,28 +288,30 @@ namespace UTILS
             do {
               digs[dno++] = str[i++];
             } while (octal_digit(str[i]) && dno < 3);
-            ch = strtol(digs, NULL, 8);
+            ch = strtol(digs, NULLPTR, 8);
           }
           else if (str[0] == 'x') {
-            while (hex_digit(str[i]) && dno < 2) {
+            while (hex_digit(str[i]) && dno < 2)
+            {
               digs[dno++] = str[i++];
             }
             if (dno > 0)
-              ch = strtol(digs, NULL, 16);
+              ch = strtol(digs, NULLPTR, 16);
           }
           else if (str[0] == 'u') {
-            while (hex_digit(str[i]) && dno < 4) {
+            while (hex_digit(str[i]) && dno < 4)
+            {
               digs[dno++] = str[i++];
             }
             if (dno > 0)
-              ch = strtol(digs, NULL, 16);
+              ch = strtol(digs, NULLPTR, 16);
           }
           else if (str[0] == 'U') {
             while (hex_digit(str[i]) && dno < 8) {
               digs[dno++] = str[i++];
             }
             if (dno > 0)
-              ch = strtol(digs, NULL, 16);
+              ch = strtol(digs, NULLPTR, 16);
           }
           *dest = (uint32_t)ch;
 
@@ -360,7 +362,7 @@ namespace UTILS
             lasti = i;
             (*charn)++;
           }
-          return NULL;
+          return NULLPTR;
         }
 
         const char *u8_memchr(const char *s, uint32_t ch, size_t sz, int *charn)
@@ -385,7 +387,7 @@ namespace UTILS
             lasti = i;
             (*charn)++;
           }
-          return NULL;
+          return NULLPTR;
         }
 
         int u8_is_locale_utf8(const char *locale)
@@ -424,24 +426,28 @@ namespace UTILS
 
         #ifdef _WIN32
 
-        std::string ConvertWStringToUTF8(const wchar_t *wstr) {
+        std::string ConvertWStringToUTF8(const wchar_t *wstr)
+        {
             int len = (int)wcslen(wstr);
-            int size = (int)WideCharToMultiByte(CP_UTF8, 0, wstr, len, 0, 0, NULL, NULL);
+            int size = (int)WideCharToMultiByte(CP_UTF8, 0, wstr, len, 0, 0, NULLPTR, NULLPTR);
             std::string s;
             s.resize(size);
-            if (size > 0) {
-                WideCharToMultiByte(CP_UTF8, 0, wstr, len, &s[0], size, NULL, NULL);
+            if (size > 0)
+            {
+                WideCharToMultiByte(CP_UTF8, 0, wstr, len, &s[0], size, NULLPTR, NULLPTR);
             }
             return s;
         }
 
-        std::string ConvertWStringToUTF8(const std::wstring &wstr) {
+        std::string ConvertWStringToUTF8(const std::wstring &wstr)
+        {
             int len = (int)wstr.size();
-            int size = (int)WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), len, 0, 0, NULL, NULL);
+            int size = (int)WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), len, 0, 0, NULLPTR, NULLPTR);
             std::string s;
             s.resize(size);
-            if (size > 0) {
-                WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), len, &s[0], size, NULL, NULL);
+            if (size > 0)
+            {
+                WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), len, &s[0], size, NULLPTR, NULLPTR);
             }
             return s;
         }
@@ -449,17 +455,18 @@ namespace UTILS
         void ConvertUTF8ToWString(wchar_t *dest, size_t destSize, const std::string &source)
         {
             int len = (int)source.size();
-            int size = (int)MultiByteToWideChar(CP_UTF8, 0, source.c_str(), len, NULL, 0);
+            int size = (int)MultiByteToWideChar(CP_UTF8, 0, source.c_str(), len, NULLPTR, 0);
             MultiByteToWideChar(CP_UTF8, 0, source.c_str(), len, dest, std::min((int)destSize, size));
         }
 
         std::wstring ConvertUTF8ToWString(const std::string &source)
         {
             int len = (int)source.size();
-            int size = (int)MultiByteToWideChar(CP_UTF8, 0, source.c_str(), len, NULL, 0);
+            int size = (int)MultiByteToWideChar(CP_UTF8, 0, source.c_str(), len, NULLPTR, 0);
             std::wstring str;
             str.resize(size);
-            if (size > 0) {
+            if (size > 0)
+            {
                 MultiByteToWideChar(CP_UTF8, 0, source.c_str(), len, &str[0], size);
             }
             return str;

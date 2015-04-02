@@ -42,13 +42,13 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         int *pBitmapBits;
     };
 
-    TextDrawer::TextDrawer(Thin3DContext *thin3d) : thin3d_(thin3d), ctx_(NULL)
+    TextDrawer::TextDrawer(Thin3DContext *thin3d) : thin3d_(thin3d), ctx_(NULLPTR)
     {
         fontScaleX_ = 1.0f;
         fontScaleY_ = 1.0f;
 
         ctx_ = new TextDrawerContext();
-        ctx_->hDC = CreateCompatibleDC(NULL);
+        ctx_->hDC = CreateCompatibleDC(NULLPTR);
 
         BITMAPINFO bmi;
         ZeroMemory( &bmi.bmiHeader,  sizeof(BITMAPINFOHEADER) );
@@ -59,7 +59,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         bmi.bmiHeader.biCompression = BI_RGB;
         bmi.bmiHeader.biBitCount    = 32;
 
-        ctx_->hbmBitmap = CreateDIBSection(ctx_->hDC, &bmi, DIB_RGB_COLORS, (VOID**)&ctx_->pBitmapBits, NULL, 0);
+        ctx_->hbmBitmap = CreateDIBSection(ctx_->hDC, &bmi, DIB_RGB_COLORS, (VOID**)&ctx_->pBitmapBits, NULLPTR, 0);
         SetMapMode(ctx_->hDC, MM_TEXT);
 
         SelectObject(ctx_->hDC, ctx_->hbmBitmap);
@@ -186,7 +186,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
             rc.right = size.cx + 4;
             rc.bottom = size.cy + 4;
             FillRect(ctx_->hDC, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
-            //ExtTextOut(ctx_->hDC, 0, 0, ETO_OPAQUE | ETO_CLIPPED, NULL, wstr.c_str(), (int)wstr.size(), NULL);
+            //ExtTextOut(ctx_->hDC, 0, 0, ETO_OPAQUE | ETO_CLIPPED, NULLPTR, wstr.c_str(), (int)wstr.size(), NULLPTR);
             DrawTextExW(ctx_->hDC, (LPWSTR)wstr.c_str(), (int)wstr.size(), &rc, DT_HIDEPREFIX|DT_TOP|DT_LEFT, 0);
 
             entry = new TextStringEntry();
@@ -224,20 +224,24 @@ using UTILS::TEXT::ConvertUTF8ToWString;
 
     #else
 
-    TextDrawer::TextDrawer(Thin3DContext *thin3d) : thin3d_(thin3d), ctx_(NULL) {
+    TextDrawer::TextDrawer(Thin3DContext *thin3d) : thin3d_(thin3d), ctx_(NULLPTR)
+    {
         fontScaleX_ = 1.0f;
         fontScaleY_ = 1.0f;
     }
 
-    TextDrawer::~TextDrawer() {
-        for (auto iter = cache_.begin(); iter != cache_.end(); ++iter) {
+    TextDrawer::~TextDrawer()
+    {
+        for (auto iter = cache_.begin(); iter != cache_.end(); ++iter)
+        {
             iter->second->texture->release();
             delete iter->second;
         }
         cache_.clear();
     }
 
-    uint32_t TextDrawer::setFont(const char *fontName, int size, int flags) {
+    uint32_t TextDrawer::setFont(const char *fontName, int size, int flags)
+    {
     #ifdef USING_QT_UI
         // We will only use the default font
         uint32_t fontHash = 0; //hash::Fletcher((const uint8_t *)fontName, strlen(fontName));

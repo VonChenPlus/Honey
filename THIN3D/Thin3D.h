@@ -257,7 +257,7 @@ namespace THIN3D
 
     struct Thin3DVertexComponent
     {
-        Thin3DVertexComponent() : name(nullptr), type(T3DVertexDataType::INVALID), semantic(255), offset(255) {}
+        Thin3DVertexComponent() : name(NULLPTR), type(T3DVertexDataType::INVALID), semantic(255), offset(255) {}
         Thin3DVertexComponent(const char *name, T3DSemantic semantic, T3DVertexDataType dataType, uint8_t offset)
         {
             this->name = name;

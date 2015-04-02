@@ -95,7 +95,7 @@ namespace IO
         FD_ZERO(&fds);
         FD_SET(fd, &fds);
         // First argument to select is the highest socket in the set + 1.
-        int rval = select(fd + 1, &fds, NULL, NULL, &tv);
+        int rval = select(fd + 1, &fds, NULLPTR, NULLPTR, &tv);
         if (rval < 0)
         {
             // Error calling select.

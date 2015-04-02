@@ -4,6 +4,7 @@
 #include "GL/wglew.h"
 #endif
 
+#include "BASE/BasicTypes.h"
 #include "GFX/GLExtensions.h"
 
 namespace GFX
@@ -162,13 +163,13 @@ namespace GFX
             if (buffer[i] == '.')
             {
                 buffer[i] = 0;
-                gl_extensions.ver[numVer++] = strtol(lastNumStart, NULL, 10);
+                gl_extensions.ver[numVer++] = strtol(lastNumStart, NULLPTR, 10);
                 i++;
                 lastNumStart = buffer + i;
             }
         }
         if (numVer < 3)
-            gl_extensions.ver[numVer++] = strtol(lastNumStart, NULL, 10);
+            gl_extensions.ver[numVer++] = strtol(lastNumStart, NULLPTR, 10);
 
         // If the GL version >= 4.3, we know it's a true superset of OpenGL ES 3.0 and can thus enable
         // all the same modern paths.

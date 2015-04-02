@@ -67,7 +67,7 @@ double real_time_now()
 #else
     static time_t start;
     struct timeval tv;
-    gettimeofday(&tv, NULL);
+    gettimeofday(&tv, NULLPTR);
     if (start == 0)
     {
         start = tv.tv_sec;

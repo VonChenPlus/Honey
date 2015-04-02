@@ -41,8 +41,9 @@ namespace IO
         struct dirent *readdir_entry;
 
         readdir_entry = readdir(dirp);
-        if (readdir_entry == NULL) {
-            *result = NULL;
+        if (readdir_entry == NULLPTR)
+        {
+            *result = NULLPTR;
             return errno;
         }
 
@@ -327,7 +328,7 @@ namespace IO
     #else
         struct dirent_large { struct dirent entry; char padding[FILENAME_MAX+1]; };
         struct dirent_large diren;
-        struct dirent *result = NULL;
+        struct dirent *result = NULLPTR;
 
         //std::string directoryWithSlash = directory;
         //if (directoryWithSlash.back() != '/')
@@ -464,7 +465,7 @@ namespace IO
     {
         std::vector<std::string> drives;
 
-        const DWORD buffsize = GetLogicalDriveStrings(0, NULL);
+        const DWORD buffsize = GetLogicalDriveStrings(0, NULLPTR);
         std::vector<TCHAR> buff(buffsize);
         if (GetLogicalDriveStrings(buffsize, buff.data()) == buffsize - 1)
         {
