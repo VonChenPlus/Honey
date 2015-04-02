@@ -16,8 +16,7 @@ public:
 
     // Write max [length] bytes to the returned pointer.
     // Any other operation on this Buffer invalidates the pointer.
-    char *append(ssize_t length);
-    char *append(size_t length) { return append((ssize_t)length); }
+    char *append(Size length);
 
     // These work pretty much like you'd expect.
     void append(const char *str);  // str null-terminated. The null is not copied.
@@ -37,15 +36,15 @@ public:
 
     // Takers
 
-    void take(size_t length, std::string *dest);
-    void take(size_t length, char *dest);
+    void take(Size length, std::string *dest);
+    void take(Size length, char *dest);
     void takeAll(std::string *dest) { take(size(), dest); }
     // On failure, return value < 0 and *dest is unchanged.
     // Strips off the actual CRLF from the result.
     int takeLineCRLF(std::string *dest);
 
     // Skippers
-    void skip(size_t length);
+    void skip(Size length);
     // Returns -1 on failure (no CRLF within sight).
     // Otherwise returns the length of the line skipped, not including CRLF. Can be 0.
     int skipLineCRLF();
@@ -71,10 +70,10 @@ public:
 
     // < 0: error
     // >= 0: number of bytes read
-    int read(int fd, size_t sz);
+    int read(int fd, Size sz);
 
     // Utilities. Try to avoid checking for size.
-    size_t size() const { return data_.size(); }
+    Size size() const { return data_.size(); }
     bool empty() const { return size() == 0; }
     void clear() { data_.resize(0); }
 

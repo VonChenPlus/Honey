@@ -46,7 +46,7 @@ namespace GFX
     struct GradientStop
     {
         float t;
-        uint32_t color;
+        uint32 color;
     };
 
     class DrawBuffer
@@ -151,7 +151,7 @@ namespace GFX
         {
             float x, y, z;
             float u, v;
-            uint32_t rgba;
+            uint32 rgba;
         };
 
         MATH::Matrix4x4 drawMatrix_;

@@ -35,7 +35,7 @@ uint32 AlphaMul(uint32 color, float alphaMul)
 
 uint32 RGBA(float r, float g, float b, float alpha)
 {
-    uint32_t color = (int)(alpha*255)<<24;
+    uint32 color = (int)(alpha*255)<<24;
     color |= (int)(b*255)<<16;
     color |= (int)(g*255)<<8;
     color |= (int)(r*255);

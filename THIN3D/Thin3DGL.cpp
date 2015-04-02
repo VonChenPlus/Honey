@@ -48,7 +48,7 @@ namespace THIN3D
         GFX::glstate.stencilTest.disable();
     }
 
-    Thin3DGLBuffer::Thin3DGLBuffer(size_t size, uint32_t flags)
+    Thin3DGLBuffer::Thin3DGLBuffer(Size size, uint32 flags)
     {
         UNUSED(size);
         glGenBuffers(1, &buffer_);
@@ -68,14 +68,14 @@ namespace THIN3D
         glDeleteBuffers(1, &buffer_);
     }
 
-    void Thin3DGLBuffer::setData(const uint8_t *data, size_t size)
+    void Thin3DGLBuffer::setData(const uint8 *data, Size size)
     {
         bind();
         glBufferData(target_, size, data, usage_);
         knownSize_ = size;
     }
 
-    void Thin3DGLBuffer::subData(const uint8_t *data, size_t offset, size_t size)
+    void Thin3DGLBuffer::subData(const uint8 *data, Size offset, Size size)
     {
         bind();
         if (size > knownSize_)
@@ -160,7 +160,7 @@ namespace THIN3D
             }
         }
         intptr_t b = (intptr_t)base;
-        for (size_t i = 0; i < components_.size(); i++)
+        for (Size i = 0; i < components_.size(); i++)
         {
             switch (components_[i].type) {
             case FLOATx2:
@@ -378,7 +378,7 @@ namespace THIN3D
             tex_ = 0;
         }
     }
-    void Thin3DGLTexture::setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8_t *data)
+    void Thin3DGLTexture::setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8 *data)
     {
         UNUSED(x);
         UNUSED(y);
@@ -491,7 +491,7 @@ namespace THIN3D
         return bs;
     }
 
-    Thin3DBuffer *Thin3DGLContext::createBuffer(size_t size, uint32_t usageFlags)
+    Thin3DBuffer *Thin3DGLContext::createBuffer(Size size, uint32 usageFlags)
     {
         return new Thin3DGLBuffer(size, usageFlags);
     }
@@ -580,7 +580,7 @@ namespace THIN3D
         glActiveTexture(GL_TEXTURE0);
     }
 
-    void Thin3DGLContext::setRenderState(T3DRenderState rs, uint32_t value)
+    void Thin3DGLContext::setRenderState(T3DRenderState rs, uint32 value)
     {
         switch (rs)
         {
@@ -644,7 +644,7 @@ namespace THIN3D
         fmt->unApply();
     }
 
-    void Thin3DGLContext::clear(int mask, uint32_t colorval, float depthVal, int stencilVal)
+    void Thin3DGLContext::clear(int mask, uint32 colorval, float depthVal, int stencilVal)
     {
         float col[4];
         Uint32ToFloat4(colorval, col);

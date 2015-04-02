@@ -26,9 +26,9 @@ Buffer::~Buffer()
 {
 }
 
-char *Buffer::append(ssize_t length)
+char *Buffer::append(Size length)
 {
-    size_t old_size = data_.size();
+    Size old_size = data_.size();
     data_.resize(old_size + length);
     return &data_[0] + old_size;
 }
@@ -41,14 +41,14 @@ void Buffer::append(const std::string &str)
 
 void Buffer::append(const char *str)
 {
-    size_t len = strlen(str);
+    Size len = strlen(str);
     char *dest = append(len);
     memcpy(dest, str, len);
 }
 
 void Buffer::append(const Buffer &other)
 {
-    size_t len = other.size();
+    Size len = other.size();
     char *dest = append(len);
     memcpy(dest, &other.data_[0], len);
 }
@@ -61,7 +61,7 @@ void Buffer::appendValue(int value)
     append(buf);
 }
 
-void Buffer::take(size_t length, std::string *dest)
+void Buffer::take(Size length, std::string *dest)
 {
     if (length > data_.size())
     {
@@ -75,7 +75,7 @@ void Buffer::take(size_t length, std::string *dest)
     }
 }
 
-void Buffer::take(size_t length, char *dest)
+void Buffer::take(Size length, char *dest)
 {
     memcpy(dest, &data_[0], length);
     data_.erase(data_.begin(), data_.begin() + length);
@@ -94,7 +94,7 @@ int Buffer::takeLineCRLF(std::string *dest)
     }
 }
 
-void Buffer::skip(size_t length)
+void Buffer::skip(Size length)
 {
     if (length > data_.size())
     {
@@ -133,8 +133,8 @@ void Buffer::printf(const char *fmt, ...)
     char buffer[2048];
     va_list vl;
     va_start(vl, fmt);
-    ssize_t retval = vsnprintf(buffer, sizeof(buffer), fmt, vl);
-    if (retval >= (ssize_t)sizeof(buffer))
+    int retval = vsnprintf(buffer, sizeof(buffer), fmt, vl);
+    if (retval >= (int)sizeof(buffer))
     {
         // Output was truncated. TODO: Do something.
         //ELOG("Buffer::Printf truncated output");
@@ -150,7 +150,7 @@ void Buffer::printf(const char *fmt, ...)
 bool Buffer::flush(int fd)
 {
     // Look into using send() directly.
-    bool success = (ssize_t)data_.size() == WriteLine(fd, &data_[0], data_.size());
+    bool success = data_.size() == WriteLine(fd, &data_[0], data_.size());
     if (success)
     {
         data_.resize(0);
@@ -174,7 +174,7 @@ bool Buffer::flushToFile(const char *filename)
 
 bool Buffer::flushSocket(uintptr_t sock)
 {
-    for (size_t pos = 0, end = data_.size(); pos < end; )
+    for (Size pos = 0, end = data_.size(); pos < end; )
     {
         int sent = send(sock, &data_[pos], (int)(end - pos), 0);
         if (sent < 0)
@@ -222,7 +222,7 @@ bool Buffer::readAll(int fd, int hintSize)
             //ELOG("Error reading from buffer: %i", retval);
             return false;
         }
-        char *p = append((size_t)retval);
+        char *p = append((Size)retval);
         memcpy(p, &buf[0], retval);
     }
     return true;
@@ -257,7 +257,7 @@ bool Buffer::readAllWithProgress(int fd, int knownSize, float *progress)
             //ELOG("Error reading from buffer: %i", retval);
             return false;
         }
-        char *p = append((size_t)retval);
+        char *p = append((Size)retval);
         memcpy(p, &buf[0], retval);
         total += retval;
         *progress = (float)total / (float)knownSize;
@@ -265,18 +265,18 @@ bool Buffer::readAllWithProgress(int fd, int knownSize, float *progress)
     return true;
 }
 
-int Buffer::read(int fd, size_t sz)
+int Buffer::read(int fd, Size sz)
 {
     char buf[1024];
     int retval;
-    size_t received = 0;
+    Size received = 0;
     while ((retval = recv(fd, buf, (int)std::min(sz, sizeof(buf)), 0)) > 0)
     {
         if (retval < 0)
         {
             return retval;
         }
-        char *p = append((size_t)retval);
+        char *p = append((Size)retval);
         memcpy(p, buf, retval);
         sz -= retval;
         received += retval;

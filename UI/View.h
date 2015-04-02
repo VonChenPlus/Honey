@@ -23,19 +23,19 @@ namespace UI
     struct Drawable
     {
         Drawable() : type(DRAW_NOTHING), image(-1), color(0xFFFFFFFF) {}
-        explicit Drawable(uint32_t col) : type(DRAW_SOLID_COLOR), image(-1), color(col) {}
-        Drawable(DrawableType t, int img, uint32_t col = 0xFFFFFFFF) : type(t), image(img), color(col) {}
+        explicit Drawable(uint32 col) : type(DRAW_SOLID_COLOR), image(-1), color(col) {}
+        Drawable(DrawableType t, int img, uint32 col = 0xFFFFFFFF) : type(t), image(img), color(col) {}
 
         DrawableType type;
-        uint32_t image;
-        uint32_t color;
+        uint32 image;
+        uint32 color;
     };
 
     struct Style
     {
         Style() : fgColor(0xFFFFFFFF), background(0xFF303030), image(-1) {}
 
-        uint32_t fgColor;
+        uint32 fgColor;
         Drawable background;
         int image;  // where applicable.
     };
@@ -132,11 +132,11 @@ namespace UI
     public:
         LayoutParams(LayoutParamsType type = LP_PLAIN)
             : width(WRAP_CONTENT), height(WRAP_CONTENT), type_(type) {}
-        LayoutParams(Size w, Size h, LayoutParamsType type = LP_PLAIN)
+        LayoutParams(float w, float h, LayoutParamsType type = LP_PLAIN)
             : width(w), height(h), type_(type) {}
         virtual ~LayoutParams() {}
-        Size width;
-        Size height;
+        float width;
+        float height;
 
         // Fake RTTI
         bool is(LayoutParamsType type) const { return type_ == type; }

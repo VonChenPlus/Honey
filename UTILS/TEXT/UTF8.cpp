@@ -34,13 +34,13 @@ namespace UTILS
             return (c & 0xC0) != 0x80;
         }
 
-        static const uint32_t offsetsFromUTF8[6] =
+        static const uint32 offsetsFromUTF8[6] =
         {
           0x00000000UL, 0x00003080UL, 0x000E2080UL,
           0x03C82080UL, 0xFA082080UL, 0x82082080UL
         };
 
-        static const uint8_t trailingBytesForUTF8[256] =
+        static const uint8 trailingBytesForUTF8[256] =
         {
           0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
           0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -68,9 +68,9 @@ namespace UTILS
            for all the characters.
            if sz = srcsz+1 (i.e. 4*srcsz+4 bytes), there will always be enough space.
         */
-        int u8_toucs(uint32_t *dest, int sz, const char *src, int srcsz)
+        int u8_toucs(uint32 *dest, int sz, const char *src, int srcsz)
         {
-          uint32_t ch;
+          uint32 ch;
           const char *src_end = src + srcsz;
           int nb;
           int i=0;
@@ -113,9 +113,9 @@ namespace UTILS
            the NUL as well.
            the destination string will never be bigger than the source string.
         */
-        int u8_toutf8(char *dest, int sz, uint32_t *src, int srcsz)
+        int u8_toutf8(char *dest, int sz, uint32 *src, int srcsz)
         {
-          uint32_t ch;
+          uint32 ch;
           int i = 0;
           char *dest_end = dest + sz;
 
@@ -155,7 +155,7 @@ namespace UTILS
           return i;
         }
 
-        int u8_wc_toutf8(char *dest, uint32_t ch)
+        int u8_wc_toutf8(char *dest, uint32 ch)
         {
           if (ch < 0x80) {
             dest[0] = (char)ch;
@@ -221,9 +221,9 @@ namespace UTILS
         }
 
         /* reads the next utf-8 sequence out of a string, updating an index */
-        uint32_t u8_nextchar(const char *s, int *i)
+        uint32 u8_nextchar(const char *s, int *i)
         {
-          uint32_t ch = 0;
+          uint32 ch = 0;
           int sz = 0;
 
           do {
@@ -262,13 +262,13 @@ namespace UTILS
 
         /* assumes that src points to the character after a backslash
            returns number of input characters processed */
-        int u8_read_escape_sequence(const char *str, uint32_t *dest)
+        int u8_read_escape_sequence(const char *str, uint32 *dest)
         {
           long ch;
           char digs[9]="\0\0\0\0\0\0\0\0";
           int dno=0, i=1;
 
-          ch = (uint32_t)str[0];  /* take literal character */
+          ch = (uint32)str[0];  /* take literal character */
           if (str[0] == 'n')
             ch = L'\n';
           else if (str[0] == 't')
@@ -313,7 +313,7 @@ namespace UTILS
             if (dno > 0)
               ch = strtol(digs, NULLPTR, 16);
           }
-          *dest = (uint32_t)ch;
+          *dest = (uint32)ch;
 
           return i;
         }
@@ -324,7 +324,7 @@ namespace UTILS
         int u8_unescape(char *buf, int sz, char *src)
         {
           int c=0, amt;
-          uint32_t ch;
+          uint32 ch;
           char temp[4];
 
           while (*src && c < sz) {
@@ -333,7 +333,7 @@ namespace UTILS
               amt = u8_read_escape_sequence(src, &ch);
             }
             else {
-              ch = (uint32_t)*src;
+              ch = (uint32)*src;
               amt = 1;
             }
             src += amt;
@@ -348,10 +348,10 @@ namespace UTILS
           return c;
         }
 
-        const char *u8_strchr(const char *s, uint32_t ch, int *charn)
+        const char *u8_strchr(const char *s, uint32 ch, int *charn)
         {
           int i = 0, lasti=0;
-          uint32_t c;
+          uint32 c;
 
           *charn = 0;
           while (s[i]) {
@@ -365,10 +365,10 @@ namespace UTILS
           return NULLPTR;
         }
 
-        const char *u8_memchr(const char *s, uint32_t ch, size_t sz, int *charn)
+        const char *u8_memchr(const char *s, uint32 ch, Size sz, int *charn)
         {
-          size_t i = 0, lasti=0;
-          uint32_t c;
+          Size i = 0, lasti=0;
+          uint32 c;
           int csz;
 
           *charn = 0;
@@ -452,7 +452,7 @@ namespace UTILS
             return s;
         }
 
-        void ConvertUTF8ToWString(wchar_t *dest, size_t destSize, const std::string &source)
+        void ConvertUTF8ToWString(wchar_t *dest, Size destSize, const std::string &source)
         {
             int len = (int)source.size();
             int size = (int)MultiByteToWideChar(CP_UTF8, 0, source.c_str(), len, NULLPTR, 0);
@@ -474,24 +474,28 @@ namespace UTILS
 
         #else
 
-        static size_t ConvertUTF8ToWStringInternal(wchar_t *dest, size_t destSize, const std::string &source) {
+        static Size ConvertUTF8ToWStringInternal(wchar_t *dest, Size destSize, const std::string &source) {
             const wchar_t *const orig = dest;
             const wchar_t *const destEnd = dest + destSize;
 
             UTF8 utf(source.c_str());
 
             if (sizeof(wchar_t) == 2) {
-                uint16_t *destw = (uint16_t *)dest;
-                const uint16_t *const destwEnd = destw + destSize;
-                while (uint32_t c = utf.next()) {
-                    if (destw + UTF16LE::encodeUnits(c) >= destwEnd) {
+                uint16 *destw = (uint16 *)dest;
+                const uint16 *const destwEnd = destw + destSize;
+                while (uint32 c = utf.next())
+                {
+                    if (destw + UTF16LE::encodeUnits(c) >= destwEnd)
+                    {
                         break;
                     }
                     destw += UTF16LE::encode(destw, c);
                 }
             } else {
-                while (uint32_t c = utf.next()) {
-                    if (dest + 1 >= destEnd) {
+                while (uint32 c = utf.next())
+                {
+                    if (dest + 1 >= destEnd)
+                    {
                         break;
                     }
                     *dest++ = c;
@@ -506,7 +510,7 @@ namespace UTILS
             return dest - orig;
         }
 
-        void ConvertUTF8ToWString(wchar_t *dest, size_t destSize, const std::string &source) {
+        void ConvertUTF8ToWString(wchar_t *dest, Size destSize, const std::string &source) {
             ConvertUTF8ToWStringInternal(dest, destSize, source);
         }
 
@@ -514,7 +518,7 @@ namespace UTILS
             std::wstring dst;
             // utf-8 won't be less bytes than there are characters.  But need +1 for terminator.
             dst.resize(source.size() + 1, 0);
-            size_t realLen = ConvertUTF8ToWStringInternal(&dst[0], source.size() + 1, source);
+            Size realLen = ConvertUTF8ToWStringInternal(&dst[0], source.size() + 1, source);
             dst.resize(realLen);
             return dst;
         }

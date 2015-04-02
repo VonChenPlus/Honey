@@ -77,7 +77,7 @@ namespace THIN3D
     "precision mediump float;\n"
     "#endif\n";
 
-    static inline void Uint32ToFloat4(uint32_t u, float f[4])
+    static inline void Uint32ToFloat4(uint32 u, float f[4])
     {
         f[0] = ((u >> 0) & 0xFF) * (1.0f / 255.0f);
         f[1] = ((u >> 8) & 0xFF) * (1.0f / 255.0f);
@@ -94,7 +94,7 @@ namespace THIN3D
         bool logicEnabled;
         GLuint logicOp;
         // int maskBits;
-        // uint32_t fixedColor;
+        // uint32 fixedColor;
 
         void apply();
     };
@@ -113,12 +113,12 @@ namespace THIN3D
     class Thin3DGLBuffer : public Thin3DBuffer, GFX::GfxResourceHolder
     {
     public:
-        Thin3DGLBuffer(size_t size, uint32_t flags);
+        Thin3DGLBuffer(Size size, uint32 flags);
         ~Thin3DGLBuffer() override;
 
-        void setData(const uint8_t *data, size_t size) override;
+        void setData(const uint8 *data, Size size) override;
 
-        void subData(const uint8_t *data, size_t offset, size_t size) override;
+        void subData(const uint8 *data, Size offset, Size size) override;
 
         void bind();
 
@@ -129,7 +129,7 @@ namespace THIN3D
         GLuint target_;
         GLuint usage_;
 
-        size_t knownSize_;
+        Size knownSize_;
     };
 
     // Not registering this as a resource holder, instead ShaderSet is registered. It will
@@ -211,7 +211,7 @@ namespace THIN3D
         bool create(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels);
 
         void destroy();
-        void setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8_t *data) override;
+        void setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8 *data) override;
         void autoGenMipmaps() override;
 
         void bind();
@@ -235,7 +235,7 @@ namespace THIN3D
 
         Thin3DDepthStencilState *createDepthStencilState(bool depthTestEnabled, bool depthWriteEnabled, T3DComparison depthCompare) override;
         Thin3DBlendState *createBlendState(const T3DBlendStateDesc &desc) override;
-        Thin3DBuffer *createBuffer(size_t size, uint32_t usageFlags) override;
+        Thin3DBuffer *createBuffer(Size size, uint32 usageFlags) override;
         Thin3DShaderSet *createShaderSet(Thin3DShader *vshader, Thin3DShader *fshader) override;
         Thin3DVertexFormat *createVertexFormat(const std::vector<Thin3DVertexComponent> &components, int stride, Thin3DShader *vshader) override;
         Thin3DTexture *createTexture(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels) override;
@@ -279,13 +279,13 @@ namespace THIN3D
 
         void setTextures(int start, int count, Thin3DTexture **textures) override;
 
-        void setRenderState(T3DRenderState rs, uint32_t value) override;
+        void setRenderState(T3DRenderState rs, uint32 value) override;
 
         // TODO: Add more sophisticated draws.
         void draw(T3DPrimitive prim, Thin3DShaderSet *shaderSet, Thin3DVertexFormat *format, Thin3DBuffer *vdata, int vertexCount, int offset) override;
         void drawIndexed(T3DPrimitive prim, Thin3DShaderSet *shaderSet, Thin3DVertexFormat *format, Thin3DBuffer *vdata, Thin3DBuffer *idata, int vertexCount, int offset) override;
         void drawUP(T3DPrimitive prim, Thin3DShaderSet *shaderSet, Thin3DVertexFormat *format, const void *vdata, int vertexCount) override;
-        void clear(int mask, uint32_t colorval, float depthVal, int stencilVal) override;
+        void clear(int mask, uint32 colorval, float depthVal, int stencilVal) override;
 
         const char *getInfoString(T3DInfo info) const override
         {

@@ -91,14 +91,14 @@ inline bool EndsWithNoCase(const std::string &str, const std::string &what)
 {
     if (str.size() < what.size())
         return false;
-    const size_t offset = str.size() - what.size();
+    const Size offset = str.size() - what.size();
     return strncasecmp(str.c_str() + offset, what.c_str(), what.size()) == 0;
 }
 
-void DataToHexString(const uint8 *data, size_t size, std::string *output);
+void DataToHexString(const uint8 *data, Size size, std::string *output);
 inline void StringToHexString(const std::string &data, std::string *output)
 {
-    DataToHexString((uint8_t *)(&data[0]), data.size(), output);
+    DataToHexString((uint8 *)(&data[0]), data.size(), output);
 }
 
 
@@ -133,13 +133,13 @@ std::string StringFromFormat(const char* format, ...);
 std::string StringFromInt(int value);
 std::string StringFromBool(bool value);
 
-std::string ArrayToString(const uint8_t *data, uint32_t size, int line_len = 20, bool spaces = true);
+std::string ArrayToString(const uint8 *data, uint32 size, int line_len = 20, bool spaces = true);
 
 std::string StripSpaces(const std::string &s);
 std::string StripQuotes(const std::string &s);
 
 bool TryParse(const std::string &str, bool *const output);
-bool TryParse(const std::string &str, uint32_t *const output);
+bool TryParse(const std::string &str, uint32 *const output);
 
 template <typename N>
 static bool TryParse(const std::string &str, N *const output)

@@ -59,7 +59,7 @@ namespace IMAGE
         return ret;
     }
 
-    int LoadZIMPtr(const uint8 *zim, size_t datasize, int *width, int *height, int *flags, uint8 **image)
+    int LoadZIMPtr(const uint8 *zim, Size datasize, int *width, int *height, int *flags, uint8 **image)
     {
         if (zim[0] != 'Z' || zim[1] != 'I' || zim[2] != 'M' || zim[3] != 'G')
         {
@@ -138,7 +138,7 @@ namespace IMAGE
         else
         {
             memcpy(*image, zim + 16, datasize - 16);
-            if (datasize - 16 != (size_t)total_data_size)
+            if (datasize - 16 != (Size)total_data_size)
             {
                 //ELOG("Wrong size data in ZIM: %i vs %i", (int)(datasize-16), (int)total_data_size);
             }
@@ -148,8 +148,8 @@ namespace IMAGE
 
     int LoadZIM(const char *filename, int *width, int *height, int *format, uint8 **image)
     {
-        size_t size;
-        uint8_t *buffer = ReadLocalFile(filename, &size);
+        Size size;
+        uint8 *buffer = ReadLocalFile(filename, &size);
         if (!buffer)
         {
             return 0;

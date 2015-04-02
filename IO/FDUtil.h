@@ -7,12 +7,12 @@
 namespace IO
 {
     // Slow as hell and should only be used for prototyping.
-    ssize_t ReadLine(int fd, char *buffer, size_t buf_size);
+    Size ReadLine(int fd, char *buffer, Size buf_size);
 
     // Decently fast.
-    ssize_t WriteLine(int fd, const char *buffer, size_t buf_size);
-    ssize_t WriteLine(int fd, const char *buffer);
-    ssize_t Write(int fd, const std::string &str);
+    Size WriteLine(int fd, const char *buffer, Size buf_size);
+    Size WriteLine(int fd, const char *buffer);
+    Size Write(int fd, const std::string &str);
 
     // Returns true if the fd became ready, false if it didn't or
     // if there was another error.

@@ -4,7 +4,7 @@ using MATH::Bounds;
 
 namespace UI
 {
-    void MeasureBySpec(Size sz, float contentWidth, MeasureSpec spec, float *measured)
+    void MeasureBySpec(float sz, float contentWidth, MeasureSpec spec, float *measured)
     {
         *measured = sz;
         if (sz == WRAP_CONTENT)

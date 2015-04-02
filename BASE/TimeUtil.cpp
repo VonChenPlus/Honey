@@ -56,8 +56,8 @@ double real_time_now()
             _starttime = eglGetSystemTimeNV();
         }
 
-        uint64_t cur = eglGetSystemTimeNV();
-        int64_t diff = cur - _starttime;
+        uint64 cur = eglGetSystemTimeNV();
+        int64 diff = cur - _starttime;
 
         return (double)diff / (double)_frequency;
     }

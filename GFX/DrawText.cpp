@@ -88,7 +88,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         delete ctx_;
     }
 
-    uint32_t TextDrawer::setFont(const char *fontName, int size, int flags)
+    uint32 TextDrawer::setFont(const char *fontName, int size, int flags)
     {
         std::wstring fname;
         if (fontName)
@@ -96,7 +96,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         else
             fname = L"Tahoma";
 
-        uint32_t fontHash = Fletcher((const uint8_t *)fontName, strlen(fontName));
+        uint32 fontHash = Fletcher((const uint8 *)fontName, strlen(fontName));
         fontHash ^= size;
         fontHash ^= flags << 10;
 
@@ -121,7 +121,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         return fontHash;
     }
 
-    void TextDrawer::setFont(uint32_t fontHandle)
+    void TextDrawer::setFont(uint32 fontHandle)
     {
         auto iter = fontMap_.find(fontHandle);
         if (iter != fontMap_.end()) {
@@ -143,13 +143,13 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         *h = size.cy * fontScaleY_;
     }
 
-    void TextDrawer::drawString(DrawBuffer &target, const char *str, float x, float y, uint32_t color, int align)
+    void TextDrawer::drawString(DrawBuffer &target, const char *str, float x, float y, uint32 color, int align)
     {
         if (!strlen(str))
             return;
 
-        uint32_t stringHash = Fletcher((const uint8_t *)str, strlen(str));
-        uint32_t entryHash = stringHash ^ fontHash_;
+        uint32 stringHash = Fletcher((const uint8 *)str, strlen(str));
+        uint32 entryHash = stringHash ^ fontHash_;
 
         target.flush(true);
 
@@ -198,14 +198,14 @@ using UTILS::TEXT::ConvertUTF8ToWString;
             entry->texture = thin3d_->createTexture(LINEAR2D, RGBA4444, entry->bmWidth, entry->bmHeight, 1, 1);
 
             // Convert the bitmap to a gl-compatible array of pixels.
-            uint16_t *bitmapData = new uint16_t[entry->bmWidth * entry->bmHeight];
+            uint16 *bitmapData = new uint16[entry->bmWidth * entry->bmHeight];
             for (int y = 0; y < entry->bmHeight; y++) {
                 for (int x = 0; x < entry->bmWidth; x++) {
                     BYTE bAlpha = (BYTE)((ctx_->pBitmapBits[MAX_TEXT_WIDTH * y + x] & 0xff) >> 4);
                     bitmapData[entry->bmWidth * y + x] = (bAlpha) | 0xfff0; // ^ rand();
                 }
             }
-            entry->texture->setImageData(0, 0, 0, entry->bmWidth, entry->bmHeight, 1, 0, entry->bmWidth * 2, (const uint8_t *)bitmapData);
+            entry->texture->setImageData(0, 0, 0, entry->bmWidth, entry->bmHeight, 1, 0, entry->bmWidth * 2, (const uint8 *)bitmapData);
             entry->texture->finalize(0);
             delete [] bitmapData;
 
@@ -240,11 +240,11 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         cache_.clear();
     }
 
-    uint32_t TextDrawer::setFont(const char *fontName, int size, int flags)
+    uint32 TextDrawer::setFont(const char *fontName, int size, int flags)
     {
     #ifdef USING_QT_UI
         // We will only use the default font
-        uint32_t fontHash = 0; //hash::Fletcher((const uint8_t *)fontName, strlen(fontName));
+        uint32 fontHash = 0; //hash::Fletcher((const uint8 *)fontName, strlen(fontName));
         fontHash ^= size;
         fontHash ^= flags << 10;
 
@@ -288,8 +288,8 @@ using UTILS::TEXT::ConvertUTF8ToWString;
             return;
 
     #ifdef USING_QT_UI
-        uint32_t stringHash = hash::Fletcher((const uint8_t *)str, strlen(str));
-        uint32_t entryHash = stringHash ^ fontHash_;
+        uint32 stringHash = hash::Fletcher((const uint8 *)str, strlen(str));
+        uint32 entryHash = stringHash ^ fontHash_;
 
         target.Flush(true);
 
@@ -323,13 +323,13 @@ using UTILS::TEXT::ConvertUTF8ToWString;
             entry->lastUsedFrame = frameCount_;
             entry->texture = thin3d_->CreateTexture(LINEAR2D, RGBA4444, entry->bmWidth, entry->bmHeight, 1, 0);
 
-            uint16_t *bitmapData = new uint16_t[entry->bmWidth * entry->bmHeight];
+            uint16 *bitmapData = new uint16[entry->bmWidth * entry->bmHeight];
             for (int x = 0; x < entry->bmWidth; x++) {
                 for (int y = 0; y < entry->bmHeight; y++) {
                     bitmapData[entry->bmWidth * y + x] = 0xfff0 | image.pixel(x, y) >> 28;
                 }
             }
-            entry->texture->SetImageData(0, 0, 0, entry->bmWidth, entry->bmHeight, 1, 0, entry->bmWidth * 2, (const uint8_t *)bitmapData);
+            entry->texture->SetImageData(0, 0, 0, entry->bmWidth, entry->bmHeight, 1, 0, entry->bmWidth * 2, (const uint8 *)bitmapData);
             entry->texture->Finalize(0);
 
             delete [] bitmapData;
@@ -353,7 +353,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         fontScaleY_ = xscale;
     }
 
-    void TextDrawer::drawStringRect(DrawBuffer &target, const char *str, const Bounds &bounds, uint32_t color, int align)
+    void TextDrawer::drawStringRect(DrawBuffer &target, const char *str, const Bounds &bounds, uint32 color, int align)
     {
         float x = bounds.x;
         float y = bounds.y;

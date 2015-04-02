@@ -49,8 +49,8 @@ namespace UI
         void setFontScale(float scaleX, float scaleY);
         void measureTextCount(const UI::FontStyle &style, const char *str, int count, float *x, float *y, int align = 0) const;
         void measureText(const UI::FontStyle &style, const char *str, float *x, float *y, int align = 0) const;
-        void drawText(const char *str, float x, float y, uint32_t color, int align = 0);
-        void drawTextRect(const char *str, const MATH::Bounds &bounds, uint32_t color, int align = 0);
+        void drawText(const char *str, float x, float y, uint32 color, int align = 0);
+        void drawTextRect(const char *str, const MATH::Bounds &bounds, uint32 color, int align = 0);
         void fillRect(const UI::Drawable &drawable, const MATH::Bounds &bounds);
 
         // in dps, like dp_xres and dp_yres

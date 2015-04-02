@@ -35,7 +35,7 @@ namespace GFX
         }
         if (holders)
         {
-            for (size_t i = 0; i < holders->size(); i++)
+            for (Size i = 0; i < holders->size(); i++)
             {
                 if ((*holders)[i] == holder) {
                     holders->erase(holders->begin() + i);
@@ -62,7 +62,7 @@ namespace GFX
 
         // TODO: We should really do this when we get the context back, not during gl_lost...
         //ILOG("gl_lost() restoring %i items:", (int)holders->size());
-        for (size_t i = 0; i < holders->size(); i++)
+        for (Size i = 0; i < holders->size(); i++)
         {
             //ILOG("GLLost(%i / %i, %p)", (int)(i + 1), (int) holders->size(), (*holders)[i]);
             (*holders)[i]->glLost();

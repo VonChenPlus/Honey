@@ -34,15 +34,15 @@ namespace UTILS
         class UTF8
         {
         public:
-            static const uint32 INVALID = (uint32_t)-1;
+            static const uint32 INVALID = (uint32)-1;
             UTF8(const char *c) : c_(c), index_(0) {}
             UTF8(const char *c, int index) : c_(c), index_(index) {}
             bool end() const { return c_[index_] == 0; }
-            uint32_t next()
+            uint32 next()
             {
                 return u8_nextchar(c_, &index_);
             }
-            uint32_t peek()
+            uint32 peek()
             {
                 int tempIndex = index_;
                 return u8_nextchar(c_, &tempIndex);
@@ -63,11 +63,11 @@ namespace UTILS
             {
                 return index_;
             }
-            static int encode(char *dest, uint32_t ch)
+            static int encode(char *dest, uint32 ch)
             {
                 return u8_wc_toutf8(dest, ch);
             }
-            static int encodeUnits(uint32_t ch)
+            static int encodeUnits(uint32 ch)
             {
                 if (ch < 0x80) {
                     return 1;
@@ -97,7 +97,7 @@ namespace UTILS
         #endif
 
         // Dest size in units, not bytes.
-        void ConvertUTF8ToWString(wchar_t *dest, size_t destSize, const std::string &source);
+        void ConvertUTF8ToWString(wchar_t *dest, Size destSize, const std::string &source);
         std::wstring ConvertUTF8ToWString(const std::string &source);
 
     }

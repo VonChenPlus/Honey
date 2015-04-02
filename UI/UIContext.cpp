@@ -217,7 +217,7 @@ namespace UI
         }
     }
 
-    void UIContext::drawText(const char *str, float x, float y, uint32_t color, int align)
+    void UIContext::drawText(const char *str, float x, float y, uint32 color, int align)
     {
         if (!textDrawer_ || (align & FLAG_DYNAMIC_ASCII)) {
             float sizeFactor = (float)fontStyle_->sizePts / 24.0f;
@@ -232,7 +232,7 @@ namespace UI
         }
     }
 
-    void UIContext::drawTextRect(const char *str, const Bounds &bounds, uint32_t color, int align)
+    void UIContext::drawTextRect(const char *str, const Bounds &bounds, uint32 color, int align)
     {
         if (!textDrawer_ || (align & FLAG_DYNAMIC_ASCII)) {
             float sizeFactor = (float)fontStyle_->sizePts / 24.0f;

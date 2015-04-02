@@ -8,10 +8,10 @@ namespace UTILS
     namespace TEXT
     {
         // Should optimize out.
-        #define UTF16_IS_LITTLE_ENDIAN (*(const uint16_t *)"\0\xff" >= 0x100)
+        #define UTF16_IS_LITTLE_ENDIAN (*(const uint16 *)"\0\xff" >= 0x100)
 
         template <bool is_little>
-        uint16_t UTF16_Swap(uint16_t u)
+        uint16 UTF16_Swap(uint16 u)
         {
             if (is_little)
             {
@@ -27,13 +27,13 @@ namespace UTILS
         struct UTF16_Type
         {
         public:
-            static const uint32_t INVALID = (uint32_t)-1;
+            static const uint32 INVALID = (uint32)-1;
 
-            UTF16_Type(const uint16_t *c) : c_(c), index_(0) {}
+            UTF16_Type(const uint16 *c) : c_(c), index_(0) {}
 
-            uint32_t next()
+            uint32 next()
             {
-                const uint32_t u = UTF16_Swap<is_little>(c_[index_++]);
+                const uint32 u = UTF16_Swap<is_little>(c_[index_++]);
 
                 // Surrogate pair.  UTF-16 is so simple.  We assume it's valid.
                 if ((u & 0xF800) == 0xD800)
@@ -61,7 +61,7 @@ namespace UTILS
                 return index_;
             }
 
-            static int encode(uint16_t *dest, uint32_t u)
+            static int encode(uint16 *dest, uint32 u)
             {
                 if (u >= 0x10000)
                 {
@@ -72,12 +72,12 @@ namespace UTILS
                 }
                 else
                 {
-                    *dest = UTF16_Swap<is_little>((uint16_t)u);
+                    *dest = UTF16_Swap<is_little>((uint16)u);
                     return 1;
                 }
             }
 
-            static int encodeUnits(uint32_t u)
+            static int encodeUnits(uint32 u)
             {
                 if (u >= 0x10000) {
                     return 2;
@@ -87,7 +87,7 @@ namespace UTILS
             }
 
         private:
-            const uint16_t *c_;
+            const uint16 *c_;
             int index_;
         };
 

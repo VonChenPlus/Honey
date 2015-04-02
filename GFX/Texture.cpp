@@ -89,7 +89,7 @@ namespace GFX
             return 0;
         sscanf(filename, "gen:%i:%i:%s", &w, &h, name_and_params);
 
-        uint8_t *data;
+        uint8 *data;
         if (!strcmp(name_and_params, "vignette"))
         {
             bpp = 1;
@@ -111,7 +111,7 @@ namespace GFX
         {
             bpp = 1;
             // TODO
-            data = new uint8_t[w*h];
+            data = new uint8[w*h];
             for (int y = 0; y < h; ++y)
             {
                 for (int x = 0; x < w; x++) {
@@ -139,7 +139,7 @@ namespace GFX
         {
             int bpp, w, h;
             bool clamp;
-            uint8_t *data = GenerateTexture(filename, bpp, w, h, clamp);
+            uint8 *data = GenerateTexture(filename, bpp, w, h, clamp);
             if (!data)
                 return false;
             glGenTextures(1, &id_);
@@ -164,7 +164,7 @@ namespace GFX
         // Currently here are a bunch of project-specific workarounds.
         // They shouldn't really hurt anything else very much though.
 
-        size_t len = strlen(filename);
+        Size len = strlen(filename);
         char fn[1024];
         strncpy(fn, filename, sizeof(fn));
         fn[1023] = 0;
@@ -301,7 +301,7 @@ namespace GFX
         return true;
     }
 
-    bool Texture::loadPNG(const uint8_t *data, size_t size, bool genMips)
+    bool Texture::loadPNG(const uint8 *data, Size size, bool genMips)
     {
         unsigned char *image_data;
         if (1 != PNGLoadPtr(data, size, &width_, &height_, &image_data))
@@ -364,16 +364,16 @@ namespace GFX
     }
 
     // Allocates using new[], doesn't free.
-    static uint8_t *ETC1ToRGBA(uint8_t *etc1, int width, int height)
+    static uint8 *ETC1ToRGBA(uint8 *etc1, int width, int height)
     {
-        uint8_t *rgba = new uint8_t[width * height * 4];
+        uint8 *rgba = new uint8[width * height * 4];
         memset(rgba, 0xFF, width * height * 4);
         for (int y = 0; y < height; y += 4)
         {
             for (int x = 0; x < width; x += 4)
             {
                 rg_etc1::unpack_etc1_block(etc1 + ((y / 4) * width/4 + (x / 4)) * 8,
-                    (uint32_t *)rgba + (y * width + x), width, false);
+                    (uint32 *)rgba + (y * width + x), width, false);
             }
         }
         return rgba;
@@ -381,7 +381,7 @@ namespace GFX
 
     bool Texture::loadZIM(const char *filename)
     {
-        uint8_t *image_data[ZIM_MAX_MIP_LEVELS];
+        uint8 *image_data[ZIM_MAX_MIP_LEVELS];
         int width[ZIM_MAX_MIP_LEVELS];
         int height[ZIM_MAX_MIP_LEVELS];
 

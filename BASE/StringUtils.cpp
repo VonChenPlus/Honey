@@ -19,8 +19,8 @@
 
 void StringTrimEndNonAlphaNum(char *str)
 {
-    ssize_t n = strlen(str);
-    while (!isalnum(str[n]) && n >= 0)
+    Size n = strlen(str);
+    while (!isalnum(str[n]) && n > 0)
     {
         str[n--] = '\0';
     }
@@ -56,10 +56,10 @@ void StringUpper(char *str, int len)
 unsigned int ParseHex(const char *_szValue)
 {
     int Value = 0;
-    size_t Finish = strlen(_szValue);
+    Size Finish = strlen(_szValue);
     if (Finish > 8 ) { Finish = 8; }
 
-    for (size_t Count = 0; Count < Finish; Count++)
+    for (Size Count = 0; Count < Finish; Count++)
     {
         Value = (Value << 4);
         switch( _szValue[Count] ) {
@@ -93,10 +93,10 @@ unsigned int ParseHex(const char *_szValue)
     return Value;
 }
 
-void DataToHexString(const uint8 *data, size_t size, std::string *output)
+void DataToHexString(const uint8 *data, Size size, std::string *output)
 {
     Buffer buffer;
-    for (size_t i = 0; i < size; i++)
+    for (Size i = 0; i < size; i++)
     {
         buffer.printf("%02x ", data[i]);
         if (i && !(i & 15))
@@ -153,7 +153,7 @@ std::string StringFromBool(bool value)
 // Turns "  hej " into "hej". Also handles tabs.
 std::string StripSpaces(const std::string &str)
 {
-    const size_t s = str.find_first_not_of(" \t\r\n");
+    const Size s = str.find_first_not_of(" \t\r\n");
 
     if (str.npos != s)
         return str.substr(s, str.find_last_not_of(" \t\r\n") - s + 1);
@@ -173,7 +173,7 @@ std::string StripQuotes(const std::string& s)
 }
 
 // For Debugging. Read out an u8 array.
-std::string ArrayToString(const uint8_t *data, uint32_t size, int line_len, bool spaces)
+std::string ArrayToString(const uint8 *data, uint32 size, int line_len, bool spaces)
 {
     std::ostringstream oss;
     oss << std::setfill('0') << std::hex;
@@ -193,7 +193,7 @@ std::string ArrayToString(const uint8_t *data, uint32_t size, int line_len, bool
     return oss.str();
 }
 
-bool TryParse(const std::string &str, uint32_t *const output)
+bool TryParse(const std::string &str, uint32 *const output)
 {
     char *endptr = NULLPTR;
 
@@ -221,7 +221,7 @@ bool TryParse(const std::string &str, uint32_t *const output)
             return false;
     }
 
-    *output = static_cast<uint32_t>(value);
+    *output = static_cast<uint32>(value);
     return true;
 }
 
@@ -250,7 +250,7 @@ void SplitString(const std::string& str, const char delim, std::vector<std::stri
 
 std::string ReplaceAll(std::string result, const std::string& src, const std::string& dest)
 {
-    size_t pos = 0;
+    Size pos = 0;
 
     if (src == dest)
         return result;

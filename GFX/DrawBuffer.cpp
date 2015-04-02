@@ -107,7 +107,7 @@ namespace GFX
 
         shaderSet_->setMatrix4x4("WorldViewProj", drawMatrix_);
     #ifdef USE_VBO
-        vbuf_->subData((const uint8_t *)verts_, 0, sizeof(Vertex) * count_);
+        vbuf_->subData((const uint8 *)verts_, 0, sizeof(Vertex) * count_);
         int offset = 0;
         t3d_->draw(mode_ == DBMODE_NORMAL ? PRIM_TRIANGLES : PRIM_LINES, shaderSet_, vformat_, vbuf_, count_, offset);
     #else
@@ -180,7 +180,7 @@ namespace GFX
         for (int i = 0; i < numStops - 1; i++)
         {
             float t0 = stops[i].t, t1 = stops[i+1].t;
-            uint32_t c0 = stops[i].t, c1 = stops[i+1].t;
+            uint32 c0 = stops[i].t, c1 = stops[i+1].t;
             rectVGradient(x, y + h * t0, w, h * (t1 - t0), c0, c1);
         }
     }
@@ -435,7 +435,7 @@ namespace GFX
 
     void DrawBuffer::drawTextShadow(int font, const char *text, float x, float y, Color color, int flags)
     {
-        uint32_t alpha = (color >> 1) & 0xFF000000;
+        uint32 alpha = (color >> 1) & 0xFF000000;
         drawText(font, text, x + 2, y + 2, alpha, flags);
         drawText(font, text, x, y, color, flags);
     }

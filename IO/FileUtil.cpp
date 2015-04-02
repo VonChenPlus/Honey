@@ -67,7 +67,7 @@ namespace IO
         FILE *f = OpenCFile(filename, text_file ? "w" : "wb");
         if (!f)
             return false;
-        size_t len = str.size();
+        Size len = str.size();
         if (len != fwrite(str.data(), 1, str.size(), f))
         {
             fclose(f);
@@ -82,7 +82,7 @@ namespace IO
         FILE *f = OpenCFile(filename, text_file ? "w" : "wb");
         if (!f)
             return false;
-        size_t len = size;
+        Size len = size;
         if (len != fwrite(data, 1, len, f))
         {
             fclose(f);
@@ -92,7 +92,7 @@ namespace IO
         return true;
     }
 
-    uint64_t GetSize(FILE *f)
+    uint64 GetSize(FILE *f)
     {
         // This will only support 64-bit when large file support is available.
         // That won't be the case on some versions of Android, at least.
@@ -129,7 +129,7 @@ namespace IO
         FILE *f = OpenCFile(filename, text_file ? "r" : "rb");
         if (!f)
             return false;
-        size_t len = (size_t)GetSize(f);
+        Size len = (Size)GetSize(f);
         char *buf = new char[len + 1];
         buf[fread(buf, 1, len, f)] = 0;
         str = std::string(buf, len);
@@ -144,7 +144,7 @@ namespace IO
         FILE *f = OpenCFile(filename, text_file ? "r" : "rb");
         if (!f)
             return false;
-        size_t len = (size_t)GetSize(f);
+        Size len = (Size)GetSize(f);
         if(len < size) {
             fclose(f);
             return false;
@@ -155,16 +155,16 @@ namespace IO
     }
 
     // The return is non-const because - why not?
-    uint8 *ReadLocalFile(const char *filename, size_t *size)
+    uint8 *ReadLocalFile(const char *filename, Size *size)
     {
         FILE *file = fopen(filename, "rb");
         if (!file) {
             return 0;
         }
         fseek(file, 0, SEEK_END);
-        size_t f_size = ftell(file);
+        Size f_size = ftell(file);
         fseek(file, 0, SEEK_SET);
-        uint8_t *contents = new uint8_t[f_size+1];
+        uint8 *contents = new uint8[f_size+1];
         fread(contents, 1, f_size, file);
         fclose(file);
         contents[f_size] = 0;
@@ -183,7 +183,7 @@ namespace IO
     {
         if (fname.length() > 1)
         {
-            size_t i = fname.length() - 1;
+            Size i = fname.length() - 1;
             while (fname[i] == DIR_SEP_CHR)
                 fname[i--] = '\0';
         }
@@ -230,7 +230,7 @@ namespace IO
             fileInfo->exists = false;
             return false;
         }
-        fileInfo->size = (uint64_t)attrs.nFileSizeLow | ((uint64_t)attrs.nFileSizeHigh << 32);
+        fileInfo->size = (uint64)attrs.nFileSizeLow | ((uint64)attrs.nFileSizeHigh << 32);
         fileInfo->isDirectory = (attrs.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
         fileInfo->isWritable = (attrs.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0;
         fileInfo->exists = true;
@@ -265,7 +265,7 @@ namespace IO
         int pos = (int)fn.rfind(".");
         if (pos < 0) return "";
         std::string ext = fn.substr(pos+1);
-        for (size_t i = 0; i < ext.size(); i++)
+        for (Size i = 0; i < ext.size(); i++)
         {
             ext[i] = tolower(ext[i]);
         }
@@ -284,9 +284,9 @@ namespace IO
             return false;
     }
 
-    size_t GetFilesInDir(const char *directory, std::vector<FileInfo> *files, const char *filter, int flags)
+    Size GetFilesInDir(const char *directory, std::vector<FileInfo> *files, const char *filter, int flags)
     {
-        size_t foundEntries = 0;
+        Size foundEntries = 0;
         std::set<std::string> filters;
         std::string tmp;
         if (filter)
@@ -357,7 +357,7 @@ namespace IO
             std::string dir = directory;
 
             // Only append a slash if there isn't one on the end.
-            size_t lastSlash = dir.find_last_of("/");
+            Size lastSlash = dir.find_last_of("/");
             if (lastSlash != (dir.length() - 1))
                 dir.append("/");
 
@@ -428,7 +428,7 @@ namespace IO
         while (n >= 0 && path[n] != '\\' && path[n] != '/')
             n--;
         std::string cutpath = n > 0 ? path.substr(0, n) : "";
-        for (size_t i = 0; i < cutpath.size(); i++)
+        for (Size i = 0; i < cutpath.size(); i++)
         {
             if (cutpath[i] == '\\') cutpath[i] = '/';
         }
@@ -443,7 +443,7 @@ namespace IO
 
     std::string GetFilename(std::string path)
     {
-        size_t off = GetDir(path).size() + 1;
+        Size off = GetDir(path).size() + 1;
         if (off < path.size())
             return path.substr(off);
         else

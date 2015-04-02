@@ -18,14 +18,14 @@ namespace IO
     // Slow as hell and should only be used for prototyping.
     // Reads from a socket, up to an '\n'. This means that if the line ends
     // with '\r', the '\r' will be returned.
-    ssize_t ReadLine(int fd, char *vptr, size_t buf_size)
+    Size ReadLine(int fd, char *vptr, Size buf_size)
     {
         char *buffer = vptr;
-        size_t n;
+        Size n;
         for (n = 1; n < buf_size; n++)
         {
             char c;
-            ssize_t rc;
+            int rc;
             if ((rc = read(fd, &c, 1)) == 1)
             {
                 *buffer++ = c;
@@ -52,10 +52,10 @@ namespace IO
     }
 
     // Misnamed, it just writes raw data in a retry loop.
-    ssize_t WriteLine(int fd, const char *vptr, size_t n)
+    Size WriteLine(int fd, const char *vptr, Size n)
     {
         const char *buffer = vptr;
-        size_t nleft = n;
+        Size nleft = n;
 
         while (nleft > 0)
         {
@@ -75,12 +75,12 @@ namespace IO
         return n;
     }
 
-    ssize_t WriteLine(int fd, const char *buffer)
+    Size WriteLine(int fd, const char *buffer)
     {
         return WriteLine(fd, buffer, strlen(buffer));
     }
 
-    ssize_t Write(int fd, const std::string &str)
+    Size Write(int fd, const std::string &str)
     {
         return WriteLine(fd, str.c_str(), str.size());
     }

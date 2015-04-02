@@ -232,18 +232,18 @@ namespace THIN3D
     class Thin3DBuffer : public Thin3DObject
     {
     public:
-        virtual void setData(const uint8_t *data, size_t size) = 0;
-        virtual void subData(const uint8_t *data, size_t offset, size_t size) = 0;
+        virtual void setData(const uint8 *data, Size size) = 0;
+        virtual void subData(const uint8 *data, Size offset, Size size) = 0;
     };
 
     class Thin3DTexture : public Thin3DObject
     {
     public:
         bool loadFromFile(const std::string &filename, T3DImageType type = T3DImageType::DETECT);
-        bool loadFromFileData(const uint8_t *data, size_t dataSize, T3DImageType type = T3DImageType::DETECT);
+        bool loadFromFileData(const uint8 *data, Size dataSize, T3DImageType type = T3DImageType::DETECT);
 
         virtual bool create(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels) = 0;
-        virtual void setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8_t *data) = 0;
+        virtual void setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8 *data) = 0;
         virtual void autoGenMipmaps() = 0;
         virtual void finalize(int zim_flags) = 0;  // TODO: Tidy up
 
@@ -258,7 +258,7 @@ namespace THIN3D
     struct Thin3DVertexComponent
     {
         Thin3DVertexComponent() : name(NULLPTR), type(T3DVertexDataType::INVALID), semantic(255), offset(255) {}
-        Thin3DVertexComponent(const char *name, T3DSemantic semantic, T3DVertexDataType dataType, uint8_t offset)
+        Thin3DVertexComponent(const char *name, T3DSemantic semantic, T3DVertexDataType dataType, uint8 offset)
         {
             this->name = name;
             this->semantic = semantic;
@@ -267,8 +267,8 @@ namespace THIN3D
         }
         const char *name;
         T3DVertexDataType type;
-        uint8_t semantic;
-        uint8_t offset;
+        uint8 semantic;
+        uint8 offset;
     };
 
     class Thin3DVertexFormat : public Thin3DObject
@@ -311,7 +311,7 @@ namespace THIN3D
 
         virtual Thin3DDepthStencilState *createDepthStencilState(bool depthTestEnabled, bool depthWriteEnabled, T3DComparison depthCompare) = 0;
         virtual Thin3DBlendState *createBlendState(const T3DBlendStateDesc &desc) = 0;
-        virtual Thin3DBuffer *createBuffer(size_t size, uint32_t usageFlags) = 0;
+        virtual Thin3DBuffer *createBuffer(Size size, uint32 usageFlags) = 0;
         virtual Thin3DShaderSet *createShaderSet(Thin3DShader *vshader, Thin3DShader *fshader) = 0;
         virtual Thin3DVertexFormat *createVertexFormat(const std::vector<Thin3DVertexComponent> &components, int stride, Thin3DShader *vshader) = 0;
 
@@ -320,7 +320,7 @@ namespace THIN3D
 
         // Common Thin3D function, uses CreateTexture
         Thin3DTexture *createTextureFromFile(const char *filename, T3DImageType fileType);
-        Thin3DTexture *createTextureFromFileData(const uint8_t *data, int size, T3DImageType fileType);
+        Thin3DTexture *createTextureFromFileData(const uint8 *data, int size, T3DImageType fileType);
 
         // Note that these DO NOT AddRef so you must not ->Release presets unless you manually AddRef them.
         Thin3DBlendState *getBlendStatePreset(T3DBlendStatePreset preset) { return bsPresets_[preset]; }
@@ -347,13 +347,13 @@ namespace THIN3D
         virtual void setViewports(int count, T3DViewport *viewports) = 0;
 
         // Single render states that aren't worth state blocks. May have to convert some of these state blocks on D3D11 though...
-        virtual void setRenderState(T3DRenderState rs, uint32_t value) = 0;
+        virtual void setRenderState(T3DRenderState rs, uint32 value) = 0;
 
         // TODO: Add more sophisticated draws with buffer offsets, and multidraws.
         virtual void draw(T3DPrimitive prim, Thin3DShaderSet *pipeline, Thin3DVertexFormat *format, Thin3DBuffer *vdata, int vertexCount, int offset) = 0;
         virtual void drawIndexed(T3DPrimitive prim, Thin3DShaderSet *pipeline, Thin3DVertexFormat *format, Thin3DBuffer *vdata, Thin3DBuffer *idata, int vertexCount, int offset) = 0;
         virtual void drawUP(T3DPrimitive prim, Thin3DShaderSet *pipeline, Thin3DVertexFormat *format, const void *vdata, int vertexCount) = 0;
-        virtual void clear(int mask, uint32_t colorval, float depthVal, int stencilVal) = 0;
+        virtual void clear(int mask, uint32 colorval, float depthVal, int stencilVal) = 0;
 
         // Necessary to correctly flip scissor rectangles etc for OpenGL.
         void setTargetSize(int w, int h)

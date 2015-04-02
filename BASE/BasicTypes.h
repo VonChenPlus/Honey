@@ -41,12 +41,10 @@ typedef int8_t int8;
 typedef int16_t int16;
 typedef int32_t int32;
 typedef int64_t int64;
-
-typedef float Size;
+typedef size_t Size;
+typedef intptr_t SSize;
 
 #ifdef _WIN32
-
-typedef intptr_t ssize_t;
 
 #include <tchar.h>
 
@@ -148,7 +146,7 @@ typedef char TCHAR;
 // Implement C99 functions and similar that are missing in MSVC.
 #if defined(_MSC_VER) && _MSC_VER < 1900
 
-int c99_snprintf(char* str, size_t size, const char* format, ...);
+int c99_snprintf(char* str, Size size, const char* format, ...);
 #define snprintf c99_snprintf
 #define vscprintf _vscprintf
 

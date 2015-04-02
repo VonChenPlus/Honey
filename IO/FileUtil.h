@@ -16,7 +16,7 @@ namespace IO
     bool ReadDataFromFile(bool text_file, unsigned char* &data, const unsigned int size, const char *filename);
 
     // Direct readers. deallocate using delete [].
-    uint8 *ReadLocalFile(const char *filename, size_t *size);
+    uint8 *ReadLocalFile(const char *filename, Size *size);
     // Beginnings of a directory utility system. TODO: Improve.
 
     struct FileInfo
@@ -26,7 +26,7 @@ namespace IO
         bool exists;
         bool isDirectory;
         bool isWritable;
-        uint64_t size;
+        uint64 size;
 
         bool operator <(const FileInfo &other) const;
     };
@@ -41,7 +41,7 @@ namespace IO
         GETFILES_GETHIDDEN = 1
     };
 
-    size_t GetFilesInDir(const char *directory, std::vector<FileInfo> *files, const char *filter = 0, int flags = 0);
+    Size GetFilesInDir(const char *directory, std::vector<FileInfo> *files, const char *filter = 0, int flags = 0);
     void DeleteFile(const char *file);
     void DeleteDir(const char *file);
     bool Exists(const std::string &filename);

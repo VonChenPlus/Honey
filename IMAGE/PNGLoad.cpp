@@ -33,7 +33,7 @@ namespace IMAGE
         return 1;
     }
 
-    int PNGLoadPtr(const unsigned char *input_ptr, size_t input_len, int *pwidth, int *pheight, unsigned char **image_data_ptr)
+    int PNGLoadPtr(const unsigned char *input_ptr, Size input_len, int *pwidth, int *pheight, unsigned char **image_data_ptr)
     {
         png_image png;
         memset(&png, 0, sizeof(png));

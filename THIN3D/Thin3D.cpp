@@ -155,7 +155,7 @@ namespace THIN3D
         }
     }
 
-    static T3DImageType DetectImageFileType(const uint8_t *data, size_t size)
+    static T3DImageType DetectImageFileType(const uint8 *data, Size size)
     {
         UNUSED(size);
         if (!memcmp(data, "ZIMG", 4))
@@ -174,7 +174,7 @@ namespace THIN3D
         return TYPE_UNKNOWN;
     }
 
-    static bool LoadTextureLevels(const uint8_t *data, size_t size, T3DImageType type, int width[16], int height[16], int *num_levels, T3DImageFormat *fmt, uint8_t *image[16], int *zim_flags)
+    static bool LoadTextureLevels(const uint8 *data, Size size, T3DImageType type, int width[16], int height[16], int *num_levels, T3DImageFormat *fmt, uint8 *image[16], int *zim_flags)
     {
         if (type == DETECT)
         {
@@ -193,7 +193,7 @@ namespace THIN3D
         {
         case ZIM:
             {
-                *num_levels = LoadZIMPtr((const uint8_t *)data, size, width, height, zim_flags, image);
+                *num_levels = LoadZIMPtr((const uint8 *)data, size, width, height, zim_flags, image);
                 *fmt = ZimToT3DFormat(*zim_flags & ZIM_FORMAT_MASK);
             }
             break;
@@ -214,7 +214,7 @@ namespace THIN3D
                 {
                     *num_levels = 1;
                     *fmt = RGBA8888;
-                    image[0] = (uint8_t *)jpegBuf;
+                    image[0] = (uint8 *)jpegBuf;
                 }
             }
             break;
@@ -226,10 +226,10 @@ namespace THIN3D
         return *num_levels > 0;
     }
 
-    bool Thin3DTexture::loadFromFileData(const uint8_t *data, size_t dataSize, T3DImageType type)
+    bool Thin3DTexture::loadFromFileData(const uint8 *data, Size dataSize, T3DImageType type)
     {
         int width[16], height[16];
-        uint8_t *image[16] = { NULLPTR };
+        uint8 *image[16] = { NULLPTR };
 
         int num_levels;
         int zim_flags;
@@ -260,8 +260,8 @@ namespace THIN3D
     bool Thin3DTexture::loadFromFile(const std::string &filename, T3DImageType type)
     {
         filename_ = "";
-        size_t fileSize;
-        uint8_t *buffer = ReadLocalFile(filename.c_str(), &fileSize);
+        Size fileSize;
+        uint8 *buffer = ReadLocalFile(filename.c_str(), &fileSize);
         if (!buffer)
         {
             return false;
@@ -291,13 +291,13 @@ namespace THIN3D
     }
 
     // TODO: Remove the code duplication between this and LoadFromFileData
-    Thin3DTexture *Thin3DContext::createTextureFromFileData(const uint8_t *data, int size, T3DImageType type)
+    Thin3DTexture *Thin3DContext::createTextureFromFileData(const uint8 *data, int size, T3DImageType type)
     {
         int width[16], height[16];
         int num_levels = 0;
         int zim_flags = 0;
         T3DImageFormat fmt;
-        uint8_t *image[16] = { NULLPTR };
+        uint8 *image[16] = { NULLPTR };
 
         if (!LoadTextureLevels(data, size, type, width, height, &num_levels, &fmt, image, &zim_flags))
         {
