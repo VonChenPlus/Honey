@@ -89,8 +89,7 @@ namespace THIN3D
     "  return output;\n"
     "}\n";
 
-    void Thin3DContext::createPresets() 
-    {
+    void Thin3DContext::createPresets() {
         // Build prebuilt objects
         T3DBlendStateDesc off = { false };
         T3DBlendStateDesc additive = { true, T3DBlendEquation::ADD, T3DBlendFactor::ONE, T3DBlendFactor::ONE, T3DBlendEquation::ADD, T3DBlendFactor::ONE, T3DBlendFactor::ZERO };
@@ -112,42 +111,31 @@ namespace THIN3D
         ssPresets_[SS_COLOR_2D] = createShaderSet(vsPresets_[VS_COLOR_2D], fsPresets_[FS_COLOR_2D]);
     }
 
-    Thin3DContext::~Thin3DContext()
-    {
-        for (int i = 0; i < VS_MAX_PRESET; i++)
-        {
-            if (vsPresets_[i])
-            {
+    Thin3DContext::~Thin3DContext() {
+        for (int i = 0; i < VS_MAX_PRESET; i++) {
+            if (vsPresets_[i]) {
                 vsPresets_[i]->release();
             }
         }
-        for (int i = 0; i < FS_MAX_PRESET; i++)
-        {
-            if (fsPresets_[i])
-            {
+        for (int i = 0; i < FS_MAX_PRESET; i++) {
+            if (fsPresets_[i]) {
                 fsPresets_[i]->release();
             }
         }
-        for (int i = 0; i < BS_MAX_PRESET; i++)
-        {
-            if (bsPresets_[i])
-            {
+        for (int i = 0; i < BS_MAX_PRESET; i++) {
+            if (bsPresets_[i]) {
                 bsPresets_[i]->release();
             }
         }
-        for (int i = 0; i < SS_MAX_PRESET; i++)
-        {
-            if (ssPresets_[i])
-            {
+        for (int i = 0; i < SS_MAX_PRESET; i++) {
+            if (ssPresets_[i]) {
                 ssPresets_[i]->release();
             }
         }
     }
 
-    static T3DImageFormat ZimToT3DFormat(int zim)
-    {
-        switch (zim)
-        {
+    static T3DImageFormat ZimToT3DFormat(int zim) {
+        switch (zim) {
         case ZIM_ETC1: return T3DImageFormat::ETC1;
         case ZIM_LUMINANCE: return T3DImageFormat::LUMINANCE;
         case ZIM_RGBA8888:
@@ -155,33 +143,26 @@ namespace THIN3D
         }
     }
 
-    static T3DImageType DetectImageFileType(const uint8 *data, Size size)
-    {
+    static T3DImageType DetectImageFileType(const uint8 *data, Size size) {
         UNUSED(size);
-        if (!memcmp(data, "ZIMG", 4))
-        {
+        if (!memcmp(data, "ZIMG", 4)) {
             return ZIM;
         }
-        else if (!memcmp(data, "\x89\x50\x4E\x47", 4))
-        {
+        else if (!memcmp(data, "\x89\x50\x4E\x47", 4)) {
             return PNG;
         }
-        else if (!memcmp(data, "\xff\xd8\xff\xe0", 4))
-        {
+        else if (!memcmp(data, "\xff\xd8\xff\xe0", 4)) {
             return JPEG;
         }
 
         return TYPE_UNKNOWN;
     }
 
-    static bool LoadTextureLevels(const uint8 *data, Size size, T3DImageType type, int width[16], int height[16], int *num_levels, T3DImageFormat *fmt, uint8 *image[16], int *zim_flags)
-    {
-        if (type == DETECT)
-        {
+    static bool LoadTextureLevels(const uint8 *data, Size size, T3DImageType type, int width[16], int height[16], int *num_levels, T3DImageFormat *fmt, uint8 *image[16], int *zim_flags) {
+        if (type == DETECT) {
             type = DetectImageFileType(data, size);
         }
-        if (type == TYPE_UNKNOWN)
-        {
+        if (type == TYPE_UNKNOWN) {
             //ELOG("File has unknown format");
             return false;
         }
@@ -189,29 +170,23 @@ namespace THIN3D
         *num_levels = 0;
         *zim_flags = 0;
 
-        switch (type)
-        {
-        case ZIM:
-            {
+        switch (type) {
+        case ZIM: {
                 *num_levels = LoadZIMPtr((const uint8 *)data, size, width, height, zim_flags, image);
                 *fmt = ZimToT3DFormat(*zim_flags & ZIM_FORMAT_MASK);
             }
             break;
-        case PNG:
-            {
-                if (1 == PNGLoadPtr((const unsigned char *)data, size, &width[0], &height[0], &image[0]))
-                {
+        case PNG: {
+                if (1 == PNGLoadPtr((const unsigned char *)data, size, &width[0], &height[0], &image[0])) {
                     *num_levels = 1;
                     *fmt = RGBA8888;
                 }
             }
             break;
-        case JPEG:
-            {
+        case JPEG: {
                 int actual_components = 0;
                 unsigned char *jpegBuf = jpgd::decompress_jpeg_image_from_memory(data, (int)size, &width[0], &height[0], &actual_components, 4);
-                if (jpegBuf)
-                {
+                if (jpegBuf) {
                     *num_levels = 1;
                     *fmt = RGBA8888;
                     image[0] = (uint8 *)jpegBuf;
@@ -226,8 +201,7 @@ namespace THIN3D
         return *num_levels > 0;
     }
 
-    bool Thin3DTexture::loadFromFileData(const uint8 *data, Size dataSize, T3DImageType type)
-    {
+    bool Thin3DTexture::loadFromFileData(const uint8 *data, Size dataSize, T3DImageType type) {
         int width[16], height[16];
         uint8 *image[16] = { NULLPTR };
 
@@ -235,20 +209,17 @@ namespace THIN3D
         int zim_flags;
         T3DImageFormat fmt;
 
-        if (!LoadTextureLevels(data, dataSize, type, width, height, &num_levels, &fmt, image, &zim_flags))
-        {
+        if (!LoadTextureLevels(data, dataSize, type, width, height, &num_levels, &fmt, image, &zim_flags)) {
             return false;
         }
 
         create(LINEAR2D, fmt, width[0], height[0], 1, num_levels);
-        for (int i = 0; i < num_levels; i++)
-        {
-            if (image[i])
-            {
+        for (int i = 0; i < num_levels; i++) {
+            if (image[i]) {
                 setImageData(0, 0, 0, width[i], height[i], 1, i, width[i] * 4, image[i]);
                 free(image[i]);
-            } else
-            {
+            }
+            else {
                 //ELOG("Missing image level %i", i);
             }
         }
@@ -257,33 +228,27 @@ namespace THIN3D
         return true;
     }
 
-    bool Thin3DTexture::loadFromFile(const std::string &filename, T3DImageType type)
-    {
+    bool Thin3DTexture::loadFromFile(const std::string &filename, T3DImageType type) {
         filename_ = "";
         Size fileSize;
         uint8 *buffer = ReadLocalFile(filename.c_str(), &fileSize);
-        if (!buffer)
-        {
+        if (!buffer) {
             return false;
         }
         bool retval = loadFromFileData(buffer, fileSize, type);
-        if (retval)
-        {
+        if (retval) {
             filename_ = filename;
         }
-        else
-        {
+        else {
             //ELOG("%s: Failed to load texture %s", __FUNCTION__, filename.c_str());
         }
         delete[] buffer;
         return retval;
     }
 
-    Thin3DTexture *Thin3DContext::createTextureFromFile(const char *filename, T3DImageType type)
-    {
+    Thin3DTexture *Thin3DContext::createTextureFromFile(const char *filename, T3DImageType type) {
         Thin3DTexture *tex = createTexture();
-        if (!tex->loadFromFile(filename, type))
-        {
+        if (!tex->loadFromFile(filename, type)) {
             tex->release();
             return NULLPTR;
         }
@@ -291,22 +256,19 @@ namespace THIN3D
     }
 
     // TODO: Remove the code duplication between this and LoadFromFileData
-    Thin3DTexture *Thin3DContext::createTextureFromFileData(const uint8 *data, int size, T3DImageType type)
-    {
+    Thin3DTexture *Thin3DContext::createTextureFromFileData(const uint8 *data, int size, T3DImageType type) {
         int width[16], height[16];
         int num_levels = 0;
         int zim_flags = 0;
         T3DImageFormat fmt;
         uint8 *image[16] = { NULLPTR };
 
-        if (!LoadTextureLevels(data, size, type, width, height, &num_levels, &fmt, image, &zim_flags))
-        {
+        if (!LoadTextureLevels(data, size, type, width, height, &num_levels, &fmt, image, &zim_flags)) {
             return NULLPTR;
         }
 
         Thin3DTexture *tex = createTexture(LINEAR2D, fmt, width[0], height[0], 1, num_levels);
-        for (int i = 0; i < num_levels; i++)
-        {
+        for (int i = 0; i < num_levels; i++) {
             tex->setImageData(0, 0, 0, width[i], height[i], 1, i, width[i] * 4, image[i]);
             free(image[i]);
         }

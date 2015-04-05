@@ -25,29 +25,24 @@ using IMAGE::PNGLoadPtr;
 
 namespace GFX
 {
-    Texture::Texture() : id_(0)
-    {
+    Texture::Texture() : id_(0) {
         CheckGLExtensions();
         register_gl_resource_holder(this);
     }
 
-    Texture::~Texture()
-    {
+    Texture::~Texture() {
         unregister_gl_resource_holder(this);
         destroy();
     }
 
-    void Texture::destroy()
-    {
-        if (id_)
-        {
+    void Texture::destroy() {
+        if (id_) {
             glDeleteTextures(1, &id_);
             id_ = 0;
         }
     }
 
-    void Texture::glLost()
-    {
+    void Texture::glLost() {
         if (!filename_.empty())
         {
             load(filename_.c_str());
@@ -60,8 +55,7 @@ namespace GFX
         }
     }
 
-    static void SetTextureParameters(int zim_flags)
-    {
+    static void SetTextureParameters(int zim_flags) {
         GLenum wrap = GL_REPEAT;
         if (zim_flags & ZIM_CLAMP)
             wrap = GL_CLAMP_TO_EDGE;
@@ -80,8 +74,7 @@ namespace GFX
         GL_CHECK();
     }
 
-    static uint8 *GenerateTexture(const char *filename, int &bpp, int &w, int &h, bool &clamp)
-    {
+    static uint8 *GenerateTexture(const char *filename, int &bpp, int &w, int &h, bool &clamp) {
         UNUSED(clamp);
         char name_and_params[256];
         // security check :)
@@ -90,30 +83,10 @@ namespace GFX
         sscanf(filename, "gen:%i:%i:%s", &w, &h, name_and_params);
 
         uint8 *data;
-        if (!strcmp(name_and_params, "vignette"))
-        {
+        if (!strcmp(name_and_params, "vignette")) {
             bpp = 1;
             data = new uint8[w*h];
-            for (int y = 0; y < h; ++y)
-            {
-                for (int x = 0; x < w; x++)
-                {
-                    float dx = (float)(x - w/2) / (w/2);
-                    float dy = (float)(y - h/2) / (h/2);
-                    float dist = sqrtf(dx * dx + dy * dy);
-                    dist /= 1.414f;
-                    float val = 1.0 - powf(dist, 1.4f);
-                    data[y*w + x] = val * 255;
-                }
-            }
-        }
-        else if (!strcmp(name_and_params, "circle"))
-        {
-            bpp = 1;
-            // TODO
-            data = new uint8[w*h];
-            for (int y = 0; y < h; ++y)
-            {
+            for (int y = 0; y < h; ++y) {
                 for (int x = 0; x < w; x++) {
                     float dx = (float)(x - w/2) / (w/2);
                     float dy = (float)(y - h/2) / (h/2);
@@ -124,19 +97,31 @@ namespace GFX
                 }
             }
         }
-        else
-        {
+        else if (!strcmp(name_and_params, "circle")) {
+            bpp = 1;
+            // TODO
+            data = new uint8[w*h];
+            for (int y = 0; y < h; ++y) {
+                for (int x = 0; x < w; x++) {
+                    float dx = (float)(x - w/2) / (w/2);
+                    float dy = (float)(y - h/2) / (h/2);
+                    float dist = sqrtf(dx * dx + dy * dy);
+                    dist /= 1.414f;
+                    float val = 1.0 - powf(dist, 1.4f);
+                    data[y*w + x] = val * 255;
+                }
+            }
+        }
+        else {
             data = NULLPTR;
         }
 
         return data;
     }
 
-    bool Texture::load(const char *filename)
-    {
+    bool Texture::load(const char *filename) {
         // hook for generated textures
-        if (!memcmp(filename, "gen:", 4))
-        {
+        if (!memcmp(filename, "gen:", 4)) {
             int bpp, w, h;
             bool clamp;
             uint8 *data = GenerateTexture(filename, bpp, w, h, clamp);
@@ -147,8 +132,7 @@ namespace GFX
             if (bpp == 1) {
                 glTexImage2D(GL_TEXTURE_2D, 0, 1, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
             }
-            else
-            {
+            else {
                 //FLOG("unsupported");
             }
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
@@ -169,19 +153,16 @@ namespace GFX
         strncpy(fn, filename, sizeof(fn));
         fn[1023] = 0;
         bool zim = false;
-        if (!strcmp("dds", &filename[len-3]))
-        {
+        if (!strcmp("dds", &filename[len-3])) {
             strcpy(&fn[len-3], "zim");
             zim = true;
         }
-        if (!strcmp("6TX", &filename[len-3]) || !strcmp("6tx", &filename[len-3]))
-        {
+        if (!strcmp("6TX", &filename[len-3]) || !strcmp("6tx", &filename[len-3])) {
             //ILOG("Detected 6TX %s", filename);
             strcpy(&fn[len-3], "zim");
             zim = true;
         }
-        for (int i = 0; i < (int)strlen(fn); i++)
-        {
+        for (int i = 0; i < (int)strlen(fn); i++) {
             if (fn[i] == '\\') fn[i] = '/';
         }
 
@@ -189,10 +170,8 @@ namespace GFX
         const char *name = fn;
         if (zim && 0==memcmp(name, "Media/textures/", strlen("Media/textures"))) name += strlen("Media/textures/");
         len = strlen(name);
-        if (!strcmp("png", &name[len-3]) || !strcmp("PNG", &name[len-3]))
-        {
-            if (!loadPNG(fn))
-            {
+        if (!strcmp("png", &name[len-3]) || !strcmp("PNG", &name[len-3])) {
+            if (!loadPNG(fn)) {
                 //WLOG("WARNING: Failed to load .png %s, falling back to ugly gray XOR pattern!", fn);
                 loadXOR();
                 return false;
@@ -200,24 +179,19 @@ namespace GFX
 
             return true;
         }
-        else if (!strcmp("zim", &name[len-3]))
-        {
-            if (loadZIM(name))
-            {
+        else if (!strcmp("zim", &name[len-3])) {
+            if (loadZIM(name)) {
                 return true;
             }
-            else
-            {
+            else {
                 //WLOG("WARNING: Failed to load .zim texture %s, falling back to ugly gray XOR pattern!", fn);
                 loadXOR();
                 return false;
             }
         }
         else if (!strcmp("jpg", &name[len-3]) || !strcmp("JPG", &name[len-3]) ||
-                !strcmp("jpeg", &name[len-4]) || !strcmp("JPEG", &name[len-4]))
-        {
-            if (!loadJPEG(fn))
-            {
+                !strcmp("jpeg", &name[len-4]) || !strcmp("JPEG", &name[len-4])) {
+            if (!loadJPEG(fn)) {
                 //WLOG("WARNING: Failed to load jpeg %s, falling back to ugly gray XOR pattern!", fn);
                 loadXOR();
                 return false;
@@ -225,23 +199,19 @@ namespace GFX
 
             return true;
         }
-        else if (!name || !strlen(name))
-        {
+        else if (!name || !strlen(name)) {
             //ELOG("Failed to identify image file %s by extension", name);
         }
-        else
-        {
+        else {
             //ELOG("Cannot load a texture with an empty filename");
         }
         loadXOR();
         return false;
     }
 
-    bool Texture::loadPNG(const char *filename, bool genMips)
-    {
+    bool Texture::loadPNG(const char *filename, bool genMips) {
         unsigned char *image_data;
-        if (1 != PNGLoad(filename, &width_, &height_, &image_data))
-        {
+        if (1 != PNGLoad(filename, &width_, &height_, &image_data)) {
             return false;
         }
         GL_CHECK();
@@ -250,14 +220,11 @@ namespace GFX
         SetTextureParameters(genMips ? ZIM_GEN_MIPS : ZIM_CLAMP);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-        if (genMips)
-        {
-            if (gl_extensions.FBO_ARB)
-            {
+        if (genMips) {
+            if (gl_extensions.FBO_ARB) {
                 glGenerateMipmap(GL_TEXTURE_2D);
             }
-            else
-            {
+            else {
                 glGenerateMipmapEXT(GL_TEXTURE_2D);
             }
         }
@@ -266,14 +233,12 @@ namespace GFX
         return true;
     }
 
-    bool Texture::loadJPEG(const char *filename, bool genMips)
-    {
+    bool Texture::loadJPEG(const char *filename, bool genMips) {
         //ILOG("Loading jpeg %s", filename);
         unsigned char *image_data;
         int actual_comps;
         image_data = jpgd::decompress_jpeg_image_from_file(filename, &width_, &height_, &actual_comps, 4);
-        if (!image_data)
-        {
+        if (!image_data) {
             //ELOG("jpeg: image data returned was 0");
             return false;
         }
@@ -285,14 +250,11 @@ namespace GFX
         glBindTexture(GL_TEXTURE_2D, id_);
         SetTextureParameters(genMips ? ZIM_GEN_MIPS : ZIM_CLAMP);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-        if (genMips)
-        {
-            if (gl_extensions.FBO_ARB)
-            {
+        if (genMips) {
+            if (gl_extensions.FBO_ARB) {
                 glGenerateMipmap(GL_TEXTURE_2D);
             }
-            else
-            {
+            else {
                 glGenerateMipmapEXT(GL_TEXTURE_2D);
             }
         }
@@ -301,11 +263,9 @@ namespace GFX
         return true;
     }
 
-    bool Texture::loadPNG(const uint8 *data, Size size, bool genMips)
-    {
+    bool Texture::loadPNG(const uint8 *data, Size size, bool genMips) {
         unsigned char *image_data;
-        if (1 != PNGLoadPtr(data, size, &width_, &height_, &image_data))
-        {
+        if (1 != PNGLoadPtr(data, size, &width_, &height_, &image_data)) {
             return false;
         }
         GL_CHECK();
@@ -314,14 +274,11 @@ namespace GFX
         glBindTexture(GL_TEXTURE_2D, id_);
         SetTextureParameters(genMips ? ZIM_GEN_MIPS : ZIM_CLAMP);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-        if (genMips)
-        {
-            if (gl_extensions.FBO_ARB)
-            {
+        if (genMips) {
+            if (gl_extensions.FBO_ARB) {
                 glGenerateMipmap(GL_TEXTURE_2D);
             }
-            else
-            {
+            else {
                 glGenerateMipmapEXT(GL_TEXTURE_2D);
             }
         }
@@ -330,14 +287,11 @@ namespace GFX
         return true;
     }
 
-    bool Texture::loadXOR()
-    {
+    bool Texture::loadXOR() {
         width_ = height_ = 256;
         unsigned char *buf = new unsigned char[width_*height_*4];
-        for (int y = 0; y < 256; y++)
-        {
-            for (int x = 0; x < 256; x++)
-            {
+        for (int y = 0; y < 256; y++) {
+            for (int x = 0; x < 256; x++) {
                 buf[(y*width_ + x)*4 + 0] = x^y;
                 buf[(y*width_ + x)*4 + 1] = x^y;
                 buf[(y*width_ + x)*4 + 2] = x^y;
@@ -350,12 +304,10 @@ namespace GFX
         SetTextureParameters(ZIM_GEN_MIPS);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, buf);
-        if(gl_extensions.FBO_ARB)
-        {
+        if(gl_extensions.FBO_ARB) {
             glGenerateMipmap(GL_TEXTURE_2D);
         }
-        else
-        {
+        else {
             glGenerateMipmapEXT(GL_TEXTURE_2D);
         }
         GL_CHECK();
@@ -364,14 +316,11 @@ namespace GFX
     }
 
     // Allocates using new[], doesn't free.
-    static uint8 *ETC1ToRGBA(uint8 *etc1, int width, int height)
-    {
+    static uint8 *ETC1ToRGBA(uint8 *etc1, int width, int height) {
         uint8 *rgba = new uint8[width * height * 4];
         memset(rgba, 0xFF, width * height * 4);
-        for (int y = 0; y < height; y += 4)
-        {
-            for (int x = 0; x < width; x += 4)
-            {
+        for (int y = 0; y < height; y += 4) {
+            for (int x = 0; x < width; x += 4) {
                 rg_etc1::unpack_etc1_block(etc1 + ((y / 4) * width/4 + (x / 4)) * 8,
                     (uint32 *)rgba + (y * width + x), width, false);
             }
@@ -379,8 +328,7 @@ namespace GFX
         return rgba;
     }
 
-    bool Texture::loadZIM(const char *filename)
-    {
+    bool Texture::loadZIM(const char *filename) {
         uint8 *image_data[ZIM_MAX_MIP_LEVELS];
         int width[ZIM_MAX_MIP_LEVELS];
         int height[ZIM_MAX_MIP_LEVELS];
@@ -397,8 +345,7 @@ namespace GFX
         int colors = GL_RGBA;
         int storage = GL_RGBA;
         bool compressed = false;
-        switch (flags & ZIM_FORMAT_MASK)
-        {
+        switch (flags & ZIM_FORMAT_MASK) {
         case ZIM_RGBA8888:
             data_type = GL_UNSIGNED_BYTE;
             break;
@@ -421,10 +368,8 @@ namespace GFX
         glBindTexture(GL_TEXTURE_2D, id_);
         SetTextureParameters(flags);
 
-        if (compressed)
-        {
-            for (int l = 0; l < num_levels; l++)
-            {
+        if (compressed) {
+            for (int l = 0; l < num_levels; l++) {
                 int data_w = width[l];
                 int data_h = height[l];
                 if (data_w < 4) data_w = 4;
@@ -439,21 +384,16 @@ namespace GFX
             GL_CHECK();
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, num_levels - 2);
         }
-        else
-        {
-            for (int l = 0; l < num_levels; l++)
-            {
+        else {
+            for (int l = 0; l < num_levels; l++) {
                 glTexImage2D(GL_TEXTURE_2D, l, storage, width[l], height[l], 0,
                     colors, data_type, image_data[l]);
             }
-            if (num_levels == 1 && (flags & ZIM_GEN_MIPS))
-            {
-                if(gl_extensions.FBO_ARB)
-                {
+            if (num_levels == 1 && (flags & ZIM_GEN_MIPS)) {
+                if(gl_extensions.FBO_ARB) {
                     glGenerateMipmap(GL_TEXTURE_2D);
                 }
-                else
-                {
+                else {
     #ifndef USING_GLES2
                     glGenerateMipmapEXT(GL_TEXTURE_2D);
     #endif
@@ -468,8 +408,7 @@ namespace GFX
         return true;
     }
 
-    void Texture::bind(int stage)
-    {
+    void Texture::bind(int stage) {
         GL_CHECK();
         if (stage != -1)
             glActiveTexture(GL_TEXTURE0 + stage);
@@ -477,8 +416,7 @@ namespace GFX
         GL_CHECK();
     }
 
-    void Texture::unBind(int stage)
-    {
+    void Texture::unBind(int stage) {
         GL_CHECK();
         if (stage != -1)
             glActiveTexture(GL_TEXTURE0 + stage);
@@ -486,32 +424,25 @@ namespace GFX
         GL_CHECK();
     }
 
-    const AtlasFont *Atlas::getFontByName(const char *name) const
-    {
-        for (int i = 0; i < num_fonts; i++)
-        {
+    const AtlasFont *Atlas::getFontByName(const char *name) const {
+        for (int i = 0; i < num_fonts; i++) {
             if (!strcmp(name, fonts[i]->name))
                 return fonts[i];
         }
         return 0;
     }
 
-    const AtlasImage *Atlas::getImageByName(const char *name) const
-    {
-        for (int i = 0; i < num_images; i++)
-        {
+    const AtlasImage *Atlas::getImageByName(const char *name) const {
+        for (int i = 0; i < num_images; i++) {
             if (!strcmp(name, images[i].name))
                 return &images[i];
         }
         return 0;
     }
 
-    const AtlasChar *AtlasFont::getChar(int utf32) const
-    {
-        for (int i = 0; i < numRanges; i++)
-        {
-            if (utf32 >= ranges[i].start && utf32 < ranges[i].end)
-            {
+    const AtlasChar *AtlasFont::getChar(int utf32) const {
+        for (int i = 0; i < numRanges; i++) {
+            if (utf32 >= ranges[i].start && utf32 < ranges[i].end) {
                 const AtlasChar *c = &charData[ranges[i].start_index + utf32 - ranges[i].start];
                 if (c->ex == 0 && c->ey == 0)
                     return 0;

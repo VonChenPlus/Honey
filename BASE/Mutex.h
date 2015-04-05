@@ -30,8 +30,7 @@ class recursive_mutex
     typedef pthread_mutex_t mutexType;
 #endif
 public:
-    recursive_mutex()
-    {
+    recursive_mutex() {
 #ifdef _WIN32
         InitializeCriticalSection(&mut_);
 #else
@@ -42,8 +41,7 @@ public:
         pthread_mutex_init(&mut_, &attr);
 #endif
     }
-    ~recursive_mutex()
-    {
+    ~recursive_mutex() {
 #ifdef _WIN32
         DeleteCriticalSection(&mut_);
 #else
@@ -51,8 +49,7 @@ public:
 #endif
     }
 
-    bool trylock()
-    {
+    bool trylock() {
 #ifdef _WIN32
         return TryEnterCriticalSection(&mut_) != FALSE;
 #else
@@ -60,8 +57,7 @@ public:
 #endif
     }
 
-    void lock()
-    {
+    void lock() {
 #ifdef _WIN32
         EnterCriticalSection(&mut_);
 #else
@@ -69,8 +65,7 @@ public:
 #endif
     }
 
-    void unlock()
-    {
+    void unlock() {
 #ifdef _WIN32
         LeaveCriticalSection(&mut_);
 #else
@@ -78,8 +73,7 @@ public:
 #endif
     }
 
-    mutexType &native_handle()
-    {
+    mutexType &native_handle() {
         return mut_;
     }
 

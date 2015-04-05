@@ -42,8 +42,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         int *pBitmapBits;
     };
 
-    TextDrawer::TextDrawer(Thin3DContext *thin3d) : thin3d_(thin3d), ctx_(NULLPTR)
-    {
+    TextDrawer::TextDrawer(Thin3DContext *thin3d) : thin3d_(thin3d), ctx_(NULLPTR) {
         fontScaleX_ = 1.0f;
         fontScaleY_ = 1.0f;
 
@@ -65,18 +64,15 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         SelectObject(ctx_->hDC, ctx_->hbmBitmap);
     }
 
-    TextDrawer::~TextDrawer()
-    {
-        for (auto iter = cache_.begin(); iter != cache_.end(); ++iter)
-        {
+    TextDrawer::~TextDrawer() {
+        for (auto iter = cache_.begin(); iter != cache_.end(); ++iter) {
             if (iter->second->texture)
                 iter->second->texture->release();
             delete iter->second;
         }
         cache_.clear();
 
-        for (auto iter = fontMap_.begin(); iter != fontMap_.end(); ++iter)
-        {
+        for (auto iter = fontMap_.begin(); iter != fontMap_.end(); ++iter) {
             DeleteObject(iter->second->hFont);
             delete iter->second;
         }
@@ -88,8 +84,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         delete ctx_;
     }
 
-    uint32 TextDrawer::setFont(const char *fontName, int size, int flags)
-    {
+    uint32 TextDrawer::setFont(const char *fontName, int size, int flags) {
         std::wstring fname;
         if (fontName)
             fname = ConvertUTF8ToWString(fontName);
@@ -121,16 +116,14 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         return fontHash;
     }
 
-    void TextDrawer::setFont(uint32 fontHandle)
-    {
+    void TextDrawer::setFont(uint32 fontHandle) {
         auto iter = fontMap_.find(fontHandle);
         if (iter != fontMap_.end()) {
             fontHash_ = fontHandle;
         }
     }
 
-    void TextDrawer::measureString(const char *str, float *w, float *h)
-    {
+    void TextDrawer::measureString(const char *str, float *w, float *h) {
         auto iter = fontMap_.find(fontHash_);
         if (iter != fontMap_.end()) {
             SelectObject(ctx_->hDC, iter->second->hFont);
@@ -143,8 +136,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         *h = size.cy * fontScaleY_;
     }
 
-    void TextDrawer::drawString(DrawBuffer &target, const char *str, float x, float y, uint32 color, int align)
-    {
+    void TextDrawer::drawString(DrawBuffer &target, const char *str, float x, float y, uint32 color, int align) {
         if (!strlen(str))
             return;
 
@@ -156,13 +148,11 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         TextStringEntry *entry;
 
         auto iter = cache_.find(entryHash);
-        if (iter != cache_.end())
-        {
+        if (iter != cache_.end()) {
             entry = iter->second;
             entry->lastUsedFrame = frameCount_;
         }
-        else
-        {
+        else {
             // Render the string to our bitmap and save to a GL texture.
             std::wstring wstr = ConvertUTF8ToWString(ReplaceAll(str, "\n", "\r\n"));
             SIZE size;
@@ -224,14 +214,12 @@ using UTILS::TEXT::ConvertUTF8ToWString;
 
     #else
 
-    TextDrawer::TextDrawer(Thin3DContext *thin3d) : thin3d_(thin3d), ctx_(NULLPTR)
-    {
+    TextDrawer::TextDrawer(Thin3DContext *thin3d) : thin3d_(thin3d), ctx_(NULLPTR) {
         fontScaleX_ = 1.0f;
         fontScaleY_ = 1.0f;
     }
 
-    TextDrawer::~TextDrawer()
-    {
+    TextDrawer::~TextDrawer() {
         for (auto iter = cache_.begin(); iter != cache_.end(); ++iter)
         {
             iter->second->texture->release();
@@ -240,8 +228,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
         cache_.clear();
     }
 
-    uint32 TextDrawer::setFont(const char *fontName, int size, int flags)
-    {
+    uint32 TextDrawer::setFont(const char *fontName, int size, int flags) {
     #ifdef USING_QT_UI
         // We will only use the default font
         uint32 fontHash = 0; //hash::Fletcher((const uint8 *)fontName, strlen(fontName));
@@ -265,8 +252,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
     #endif
     }
 
-    void TextDrawer::setFont(uint32 fontHandle)
-    {
+    void TextDrawer::setFont(uint32 fontHandle) {
 
     }
 
@@ -300,7 +286,8 @@ using UTILS::TEXT::ConvertUTF8ToWString;
             entry = iter->second;
             entry->lastUsedFrame = frameCount_;
             thin3d_->SetTexture(0, entry->texture);
-        } else {
+        }
+        else {
             QFont *font = fontMap_.find(fontHash_)->second;
             QFontMetrics fm(*font);
             QSize size = fm.size(0, QString::fromUtf8(str));
@@ -346,25 +333,25 @@ using UTILS::TEXT::ConvertUTF8ToWString;
 
     #endif
 
-    void TextDrawer::setFontScale(float xscale, float yscale)
-    {
+    void TextDrawer::setFontScale(float xscale, float yscale){
         UNUSED(yscale);
         fontScaleX_ = xscale;
         fontScaleY_ = xscale;
     }
 
-    void TextDrawer::drawStringRect(DrawBuffer &target, const char *str, const Bounds &bounds, uint32 color, int align)
-    {
+    void TextDrawer::drawStringRect(DrawBuffer &target, const char *str, const Bounds &bounds, uint32 color, int align) {
         float x = bounds.x;
         float y = bounds.y;
         if (align & ALIGN_HCENTER) {
             x = bounds.centerX();
-        } else if (align & ALIGN_RIGHT) {
+        }
+        else if (align & ALIGN_RIGHT) {
             x = bounds.x2();
         }
         if (align & ALIGN_VCENTER) {
             y = bounds.centerY();
-        } else if (align & ALIGN_BOTTOM) {
+        }
+        else if (align & ALIGN_BOTTOM) {
             y = bounds.y2();
         }
 
@@ -375,19 +362,15 @@ using UTILS::TEXT::ConvertUTF8ToWString;
     {
         frameCount_++;
         // Use a prime number to reduce clashing with other rhythms
-        if (frameCount_ % 23 == 0)
-        {
-            for (auto iter = cache_.begin(); iter != cache_.end();)
-            {
-                if (frameCount_ - iter->second->lastUsedFrame > 100)
-                {
+        if (frameCount_ % 23 == 0) {
+            for (auto iter = cache_.begin(); iter != cache_.end();) {
+                if (frameCount_ - iter->second->lastUsedFrame > 100) {
                     if (iter->second->texture)
                         iter->second->texture->release();
                     delete iter->second;
                     cache_.erase(iter++);
                 }
-                else
-                {
+                else {
                     iter++;
                 }
             }

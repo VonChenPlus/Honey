@@ -6,8 +6,7 @@ namespace UTILS
     {
         // WARNING - may read one more byte! Fine if the input is a null-terminated string.
         // Implementation from Wikipedia.
-        uint32 Fletcher(const uint8 *data_uint8, Size length)
-        {
+        uint32 Fletcher(const uint8 *data_uint8, Size length) {
           const uint16 *data = (const uint16 *)data_uint8;
           Size len = (length + 1) / 2;
           uint32 sum1 = 0xffff, sum2 = 0xffff;
@@ -16,8 +15,7 @@ namespace UTILS
             Size tlen = len > 360 ? 360 : len;
             len -= tlen;
 
-            do
-            {
+            do {
               sum1 += *data++;
               sum2 += sum1;
             } while (--tlen);
@@ -36,11 +34,9 @@ namespace UTILS
         // Slightly slower than Fletcher above, but slighly more reliable.
         #define MOD_ADLER 65521
         // data: Pointer to the data to be summed; len is in bytes
-        uint32 Adler32(const uint8 *data, Size len)
-        {
+        uint32 Adler32(const uint8 *data, Size len) {
           uint32 a = 1, b = 0;
-          while (len)
-          {
+          while (len) {
             Size tlen = len > 5550 ? 5550 : len;
             len -= tlen;
             do {
@@ -53,8 +49,7 @@ namespace UTILS
           }
 
           // It can be shown that a <= 0x1013a here, so a single subtract will do.
-          if (a >= MOD_ADLER)
-          {
+          if (a >= MOD_ADLER) {
             a -= MOD_ADLER;
           }
 

@@ -4,8 +4,7 @@
 
 namespace MATH
 {
-    void Quaternion::toMatrix(Matrix4x4 *out) const
-    {
+    void Quaternion::toMatrix(Matrix4x4 *out) const {
         Matrix4x4 temp;
         temp.setIdentity();
         float ww, xx, yy, zz, wx, wy, wz, xy, xz, yz;
@@ -28,8 +27,7 @@ namespace MATH
         *out = temp;
     }
 
-    Quaternion Quaternion::fromMatrix(Matrix4x4 &m)
-    {
+    Quaternion Quaternion::fromMatrix(Matrix4x4 &m) {
         UNUSED(m);
         // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
         // article "Quaternion Calculus and Fast Animation".
@@ -82,33 +80,28 @@ namespace MATH
     }
 
     // TODO: Allegedly, lerp + normalize can achieve almost as good results.
-    Quaternion Quaternion::slerp(const Quaternion &to, const float a) const
-    {
+    Quaternion Quaternion::slerp(const Quaternion &to, const float a) const {
         Quaternion to2;
         float angle, cos_angle, scale_from, scale_to, sin_angle;
 
         cos_angle = (x * to.x) + (y * to.y) + (z * to.z) + (w * to.w);	//4D dot product
 
-        if (cos_angle < 0.0f)
-        {
+        if (cos_angle < 0.0f) {
             cos_angle = -cos_angle;
             to2.w = -to.w; to2.x = -to.x; to2.y = -to.y; to2.z = -to.z;
         }
-        else
-        {
+        else {
             to2 = to;
         }
 
-        if ((1.0f - fabsf(cos_angle)) > 0.00001f)
-        {
+        if ((1.0f - fabsf(cos_angle)) > 0.00001f) {
             /* spherical linear interpolation (SLERP) */
             angle = acosf(cos_angle);
             sin_angle	= sinf(angle);
             scale_from = sinf((1.0f - a) * angle) / sin_angle;
             scale_to	 = sinf(a				 * angle) / sin_angle;
         }
-        else
-        {
+        else {
             /* to prevent divide-by-zero, resort to linear interpolation */
             // This is okay in 99% of cases anyway, maybe should be the default?
             scale_from = 1.0f - a;
@@ -123,8 +116,7 @@ namespace MATH
             );
     }
 
-    Quaternion Quaternion::multiply(const Quaternion &q) const
-    {
+    Quaternion Quaternion::multiply(const Quaternion &q) const {
         return Quaternion((w * q.x) + (x * q.w) + (y * q.z) - (z * q.y),
             (w * q.y) + (y * q.w) + (z * q.x) - (x * q.z),
             (w * q.z) + (z * q.w) + (x * q.y) - (y * q.x),

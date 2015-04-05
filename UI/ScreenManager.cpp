@@ -8,20 +8,16 @@ using _INPUT::TouchInput;
 
 namespace UI
 {
-    ScreenManager::ScreenManager()
-    {
+    ScreenManager::ScreenManager() {
         nextScreen_ = NULLPTR;
     }
 
-    ScreenManager::~ScreenManager()
-    {
+    ScreenManager::~ScreenManager() {
         shutdown();
     }
 
-    void ScreenManager::switchScreen(Screen *screen)
-    {
-        if (screen == nextScreen_)
-        {
+    void ScreenManager::switchScreen(Screen *screen) {
+        if (screen == nextScreen_) {
             //ELOG("Already switching to this screen");
             return;
         }
@@ -29,57 +25,45 @@ namespace UI
         // will only become apparent if the dialog is closed. The previous screen will stick around
         // until that switch.
         // TODO: is this still true?
-        if (nextScreen_ != NULLPTR)
-        {
+        if (nextScreen_ != NULLPTR) {
             //FLOG("Already had a nextScreen_");
         }
-        if (screen == NULLPTR)
-        {
+        if (screen == NULLPTR) {
             //WLOG("Swiching to a zero screen, this can't be good");
         }
-        if (stack_.empty() || screen != stack_.back().screen)
-        {
+        if (stack_.empty() || screen != stack_.back().screen) {
             nextScreen_ = screen;
             nextScreen_->setScreenManager(this);
         }
     }
 
-    void ScreenManager::update()
-    {
-        if (nextScreen_)
-        {
+    void ScreenManager::update() {
+        if (nextScreen_) {
             switchToNext();
         }
 
-        if (stack_.size())
-        {
+        if (stack_.size()) {
             stack_.back().screen->update();
         }
     }
 
-    void ScreenManager::resized()
-    {
+    void ScreenManager::resized() {
         // Have to notify the whole stack, otherwise there will be problems when going back
         // to non-top screens.
         for (const auto &iter : stack_ )
             iter.screen->resized();
     }
 
-    void ScreenManager::render()
-    {
-        if (!stack_.empty())
-        {
-            switch (stack_.back().flags)
-            {
+    void ScreenManager::render() {
+        if (!stack_.empty()) {
+            switch (stack_.back().flags) {
             case LAYER_SIDEMENU:
             case LAYER_TRANSPARENT:
-                if (stack_.size() == 1)
-                {
+                if (stack_.size() == 1) {
                     //ELOG("Can't have sidemenu over nothing");
                     break;
                 }
-                else
-                {
+                else {
                     auto iter = stack_.end();
                     iter-=2;
                     Layer backback = *iter;
@@ -93,20 +77,17 @@ namespace UI
                 break;
             }
         }
-        else
-        {
+        else {
             //ELOG("No current screen!");
         }
     }
 
-    void ScreenManager::sendMessage(const char *msg, const char *value)
-    {
+    void ScreenManager::sendMessage(const char *msg, const char *value) {
         if (!stack_.empty())
             stack_.back().screen->sendMessage(msg, value);
     }
 
-    void ScreenManager::shutdown()
-    {
+    void ScreenManager::shutdown() {
         for (const auto &iter : stack_)
             delete iter.screen;
         stack_.clear();
@@ -114,8 +95,7 @@ namespace UI
         nextScreen_ = 0;
     }
 
-    bool ScreenManager::touch(const TouchInput &touch)
-    {
+    bool ScreenManager::touch(const TouchInput &touch) {
         if (!stack_.empty())
         {
             return stack_.back().screen->touch(touch);
@@ -124,36 +104,29 @@ namespace UI
         return false;
     }
 
-    bool ScreenManager::key(const KeyInput &key)
-    {
-        if (!stack_.empty())
-        {
+    bool ScreenManager::key(const KeyInput &key) {
+        if (!stack_.empty()) {
             return stack_.back().screen->key(key);
         }
 
         return false;
     }
 
-    bool ScreenManager::axis(const AxisInput &axis)
-    {
-        if (!stack_.empty())
-        {
+    bool ScreenManager::axis(const AxisInput &axis) {
+        if (!stack_.empty()) {
             return stack_.back().screen->axis(axis);
         }
 
         return false;
     }
 
-    void ScreenManager::push(Screen *screen, LAYER_FLAG layerFlags)
-    {
-        if (nextScreen_ && stack_.empty())
-        {
+    void ScreenManager::push(Screen *screen, LAYER_FLAG layerFlags) {
+        if (nextScreen_ && stack_.empty()) {
             // we're during init, this is OK
             switchToNext();
         }
         screen->setScreenManager(this);
-        if (screen->isTransparent())
-        {
+        if (screen->isTransparent()) {
             layerFlags = LAYER_TRANSPARENT;
         }
 
@@ -161,37 +134,29 @@ namespace UI
         stack_.push_back(layer);
     }
 
-    void ScreenManager::pop()
-    {
-        if (stack_.size())
-        {
+    void ScreenManager::pop() {
+        if (stack_.size()) {
             delete stack_.back().screen;
             stack_.pop_back();
         }
-        else
-        {
+        else {
             //ELOG("Can't pop when stack empty");
         }
     }
 
-
-    void ScreenManager::switchToNext()
-    {
-        if (!nextScreen_)
-        {
+    void ScreenManager::switchToNext() {
+        if (!nextScreen_) {
             //ELOG("switchToNext: No nextScreen_!");
         }
 
         Layer temp = {0, LAYER_DEFAULT};
-        if (!stack_.empty())
-        {
+        if (!stack_.empty()) {
             temp = stack_.back();
             stack_.pop_back();
         }
         Layer newLayer = {nextScreen_, LAYER_DEFAULT};
         stack_.push_back(newLayer);
-        if (temp.screen)
-        {
+        if (temp.screen) {
             delete temp.screen;
         }
         nextScreen_ = 0;

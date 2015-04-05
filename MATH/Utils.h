@@ -10,8 +10,7 @@ namespace MATH
     #define M_PI 3.141592653589793f
     #endif
 
-    inline bool IsPowerOf2(int n)
-    {
+    inline bool IsPowerOf2(int n) {
         return n == 1 || (n & (n - 1)) == 0;
     }
 }

@@ -13,8 +13,7 @@ namespace MATH
         float x;
         float y;
 
-        float distanceTo(const Point &other) const
-        {
+        float distanceTo(const Point &other) const {
             float dx = other.x - x, dy = other.y - y;
             return sqrtf(dx*dx + dy*dy);
         }

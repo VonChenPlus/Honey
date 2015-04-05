@@ -33,21 +33,18 @@ namespace GFX
 
     DrawBuffer::DrawBuffer()
         : count_(0)
-        , atlas(0)
-    {
+        , atlas(0) {
         verts_ = new Vertex[MAX_VERTS];
         fontscalex = 1.0f;
         fontscaley = 1.0f;
         inited_ = false;
     }
 
-    DrawBuffer::~DrawBuffer()
-    {
+    DrawBuffer::~DrawBuffer() {
         delete [] verts_;
     }
 
-    void DrawBuffer::init(Thin3DContext *t3d)
-    {
+    void DrawBuffer::init(Thin3DContext *t3d) {
         if (inited_)
             return;
 
@@ -69,10 +66,8 @@ namespace GFX
         vformat_ = t3d_->createVertexFormat(components, 24, vshader);
     }
 
-    void DrawBuffer::shutdown()
-    {
-        if (vbuf_)
-        {
+    void DrawBuffer::shutdown() {
+        if (vbuf_) {
             vbuf_->release();
         }
         vformat_->release();
@@ -80,24 +75,20 @@ namespace GFX
         inited_ = false;
     }
 
-    void DrawBuffer::begin(Thin3DShaderSet *program, DrawBufferPrimitiveMode dbmode)
-    {
+    void DrawBuffer::begin(Thin3DShaderSet *program, DrawBufferPrimitiveMode dbmode) {
         shaderSet_ = program;
         count_ = 0;
         mode_ = dbmode;
     }
 
-    void DrawBuffer::end()
-    {
+    void DrawBuffer::end() {
         // Currently does nothing, but call it!
     }
 
-    void DrawBuffer::flush(bool set_blend_state)
-    {
+    void DrawBuffer::flush(bool set_blend_state) {
         UNUSED(set_blend_state);
 
-        if (!shaderSet_)
-        {
+        if (!shaderSet_) {
             //ELOG("No program set!");
             return;
         }
@@ -116,10 +107,8 @@ namespace GFX
         count_ = 0;
     }
 
-    void DrawBuffer::v(float x, float y, float z, uint32 color, float u, float v)
-    {
-        if (count_ >= MAX_VERTS)
-        {
+    void DrawBuffer::v(float x, float y, float z, uint32 color, float u, float v) {
+        if (count_ >= MAX_VERTS) {
             //FLOG("Overflowed the DrawBuffer");
             return;
         }
@@ -133,29 +122,24 @@ namespace GFX
         vert->v = v;
     }
 
-    void DrawBuffer::rect(float x, float y, float w, float h, uint32 color, int align)
-    {
+    void DrawBuffer::rect(float x, float y, float w, float h, uint32 color, int align) {
         doAlign(align, &x, &y, &w, &h);
         rectVGradient(x, y, w, h, color, color);
     }
 
-    void DrawBuffer::hLine(float x1, float y, float x2, uint32 color)
-    {
+    void DrawBuffer::hLine(float x1, float y, float x2, uint32 color) {
         rect(x1, y, x2 - x1, pixel_in_dps, color);
     }
 
-    void DrawBuffer::vLine(float x, float y1, float y2, uint32 color)
-    {
+    void DrawBuffer::vLine(float x, float y1, float y2, uint32 color) {
         rect(x, y1, pixel_in_dps, y2 - y1, color);
     }
 
-    void DrawBuffer::vLineAlpha50(float x, float y1, float y2, uint32 color)
-    {
+    void DrawBuffer::vLineAlpha50(float x, float y1, float y2, uint32 color) {
         rect(x, y1, pixel_in_dps, y2 - y1, (color | 0xFF000000) & 0x7F000000);
     }
 
-    void DrawBuffer::rectVGradient(float x, float y, float w, float h, uint32 colorTop, uint32 colorBottom)
-    {
+    void DrawBuffer::rectVGradient(float x, float y, float w, float h, uint32 colorTop, uint32 colorBottom) {
         v(x,		 y,     0, colorTop,    0, 0);
         v(x + w, y,		 0, colorTop,    1, 0);
         v(x + w, y + h, 0, colorBottom, 1, 1);
@@ -164,8 +148,7 @@ namespace GFX
         v(x,		 y + h, 0, colorBottom, 0, 1);
     }
 
-    void DrawBuffer::rectOutline(float x, float y, float w, float h, uint32 color, int align)
-    {
+    void DrawBuffer::rectOutline(float x, float y, float w, float h, uint32 color, int align) {
         UNUSED(align);
 
         hLine(x, y, x + w + pixel_in_dps, color);
@@ -175,10 +158,8 @@ namespace GFX
         vLine(x + w, y, y + h + pixel_in_dps, color);
     }
 
-    void DrawBuffer::multiVGradient(float x, float y, float w, float h, GradientStop *stops, int numStops)
-    {
-        for (int i = 0; i < numStops - 1; i++)
-        {
+    void DrawBuffer::multiVGradient(float x, float y, float w, float h, GradientStop *stops, int numStops) {
+        for (int i = 0; i < numStops - 1; i++) {
             float t0 = stops[i].t, t1 = stops[i+1].t;
             uint32 c0 = stops[i].t, c1 = stops[i+1].t;
             rectVGradient(x, y + h * t0, w, h * (t1 - t0), c0, c1);
@@ -187,8 +168,7 @@ namespace GFX
 
     void DrawBuffer::rect(float x, float y, float w, float h,
         float u, float _v, float uw, float uh,
-        uint32 color)
-    {
+        uint32 color) {
             v(x,	   y,     0, color, u, _v);
             v(x + w, y,	   0, color, u + uw, _v);
             v(x + w, y + h, 0, color, u + uw, _v + uh);
@@ -197,8 +177,7 @@ namespace GFX
             v(x,	   y + h, 0, color, u, _v + uh);
     }
 
-    void DrawBuffer::line(int atlas_image, float x1, float y1, float x2, float y2, float thickness, uint32 color)
-    {
+    void DrawBuffer::line(int atlas_image, float x1, float y1, float x2, float y2, float thickness, uint32 color) {
         const AtlasImage &image = atlas->images[atlas_image];
 
         // No caps yet!
@@ -223,15 +202,13 @@ namespace GFX
         v(x[3],	y[3], color, image.u2, image.v2);
     }
 
-    void DrawBuffer::measureImage(ImageID atlas_image, float *w, float *h)
-    {
+    void DrawBuffer::measureImage(ImageID atlas_image, float *w, float *h) {
         const AtlasImage &image = atlas->images[atlas_image];
         *w = (float)image.w;
         *h = (float)image.h;
     }
 
-    void DrawBuffer::drawImage(ImageID atlas_image, float x, float y, float scale, Color color, int align)
-    {
+    void DrawBuffer::drawImage(ImageID atlas_image, float x, float y, float scale, Color color, int align) {
         const AtlasImage &image = atlas->images[atlas_image];
         float w = (float)image.w * scale;
         float h = (float)image.h * scale;
@@ -242,8 +219,7 @@ namespace GFX
         drawImageStretch(atlas_image, x, y, x + w, y + h, color);
     }
 
-    void DrawBuffer::drawImageStretch(ImageID atlas_image, float x1, float y1, float x2, float y2, Color color)
-    {
+    void DrawBuffer::drawImageStretch(ImageID atlas_image, float x1, float y1, float x2, float y2, Color color) {
         const AtlasImage &image = atlas->images[atlas_image];
         v(x1,	y1, color, image.u1, image.v1);
         v(x2,	y1, color, image.u2, image.v1);
@@ -253,8 +229,7 @@ namespace GFX
         v(x1,	y2, color, image.u1, image.v2);
     }
 
-    static inline void Rotated(float *v, float angle, float xc, float yc)
-    {
+    static inline void Rotated(float *v, float angle, float xc, float yc) {
         const float x = v[0] - xc;
         const float y = v[1] - yc;
         const float sa = sinf(angle);
@@ -263,8 +238,7 @@ namespace GFX
         v[1] = x * sa + y *  ca + yc;
     }
 
-    void DrawBuffer::drawImageRotated(ImageID atlas_image, float x, float y, float scale, float angle, Color color, bool mirror_h)
-    {
+    void DrawBuffer::drawImageRotated(ImageID atlas_image, float x, float y, float scale, float angle, Color color, bool mirror_h) {
         const AtlasImage &image = atlas->images[atlas_image];
         float w = (float)image.w * scale;
         float h = (float)image.h * scale;
@@ -272,8 +246,7 @@ namespace GFX
         float x2 = x + w / 2;
         float y1 = y - h / 2;
         float y2 = y + h / 2;
-        float _v[6][2] =
-        {
+        float _v[6][2] = {
             {x1, y1},
             {x2, y1},
             {x2, y2},
@@ -283,14 +256,12 @@ namespace GFX
         };
         float u1 = image.u1;
         float u2 = image.u2;
-        if (mirror_h)
-        {
+        if (mirror_h) {
             float temp = u1;
             u1 = u2;
             u2 = temp;
         }
-        const float uv[6][2] =
-        {
+        const float uv[6][2] = {
             {u1, image.v1},
             {u2, image.v1},
             {u2, image.v2},
@@ -298,16 +269,14 @@ namespace GFX
             {u2, image.v2},
             {u1, image.v2},
         };
-        for (int i = 0; i < 6; i++)
-        {
+        for (int i = 0; i < 6; i++) {
             Rotated(_v[i], angle, x, y);
             v(_v[i][0], _v[i][1], 0, color, uv[i][0], uv[i][1]);
         }
     }
 
     // TODO: add arc support
-    void DrawBuffer::circle(float xc, float yc, float radius, float thickness, int segments, float startAngle, uint32 color, float u_mul)
-    {
+    void DrawBuffer::circle(float xc, float yc, float radius, float thickness, int segments, float startAngle, uint32 color, float u_mul) {
         UNUSED(startAngle);
 
         float angleDelta = PI * 2 / segments;
@@ -315,8 +284,7 @@ namespace GFX
         float t2 = thickness / 2.0f;
         float r1 = radius + t2;
         float r2 = radius - t2;
-        for (int i = 0; i < segments + 1; i++)
-        {
+        for (int i = 0; i < segments + 1; i++) {
             float angle1 = i * angleDelta;
             float angle2 = (i + 1) * angleDelta;
             float u1 = u_mul * i * uDelta;
@@ -334,8 +302,7 @@ namespace GFX
         }
     }
 
-    void DrawBuffer::drawTexRect(float x1, float y1, float x2, float y2, float u1, float v1, float u2, float v2, Color color)
-    {
+    void DrawBuffer::drawTexRect(float x1, float y1, float x2, float y2, float u1, float v1, float u2, float v2, Color color) {
         v(x1,	y1, color, u1, v1);
         v(x2,	y1, color, u2, v1);
         v(x2,	y2, color, u2, v2);
@@ -344,8 +311,7 @@ namespace GFX
         v(x1,	y2, color, u1, v2);
     }
 
-    void DrawBuffer::drawImage4Grid(ImageID atlas_image, float x1, float y1, float x2, float y2, Color color, float corner_scale)
-    {
+    void DrawBuffer::drawImage4Grid(ImageID atlas_image, float x1, float y1, float x2, float y2, Color color, float corner_scale) {
         const AtlasImage &image = atlas->images[atlas_image];
 
         float u1 = image.u1, v1 = image.v1, u2 = image.u2, v2 = image.v2;
@@ -371,8 +337,7 @@ namespace GFX
         drawTexRect(xb, yb, x2, y2, um, vm, u2, v2, color);
     }
 
-    void DrawBuffer::drawImage2GridH(ImageID atlas_image, float x1, float y1, float x2, Color color, float corner_scale)
-    {
+    void DrawBuffer::drawImage2GridH(ImageID atlas_image, float x1, float y1, float x2, Color color, float corner_scale) {
         const AtlasImage &image = atlas->images[atlas_image];
         float um = (image.u1 + image.u2) * 0.5f;
         float iw2 = (image.w * 0.5f) * corner_scale;
@@ -385,8 +350,7 @@ namespace GFX
         drawTexRect(xb, y1, x2, y2, um, v1, u2, v2, color);
     }
 
-    void DrawBuffer::measureTextCount(int font, const char *text, int count, float *w, float *h)
-    {
+    void DrawBuffer::measureTextCount(int font, const char *text, int count, float *w, float *h) {
         const AtlasFont &atlasfont = *atlas->fonts[font];
 
         unsigned int cval;
@@ -394,33 +358,28 @@ namespace GFX
         float maxX = 0.0f;
         int lines = 1;
         UTF8 utf(text);
-        while (true)
-        {
+        while (true) {
             if (utf.end())
                 break;
             if (utf.byteIndex() >= count)
                 break;
             cval = utf.next();
             // Translate non-breaking space to space.
-            if (cval == 0xA0)
-            {
+            if (cval == 0xA0) {
                 cval = ' ';
             }
-            if (cval == '\n')
-            {
+            if (cval == '\n') {
                 maxX = std::max(maxX, wacc);
                 wacc = 0;
                 lines++;
                 continue;
             }
-            else if (cval == '&' && utf.peek() != '&')
-            {
+            else if (cval == '&' && utf.peek() != '&') {
                 // Ignore lone ampersands
                 continue;
             }
             const AtlasChar *c = atlasfont.getChar(cval);
-            if (c)
-            {
+            if (c) {
                 wacc += c->wx * fontscalex;
             }
         }
@@ -428,20 +387,17 @@ namespace GFX
         if (h) *h = atlasfont.height * fontscaley * lines;
     }
 
-    void DrawBuffer::measureText(int font, const char *text, float *w, float *h)
-    {
+    void DrawBuffer::measureText(int font, const char *text, float *w, float *h) {
         return measureTextCount(font, text, (int)strlen(text), w, h);
     }
 
-    void DrawBuffer::drawTextShadow(int font, const char *text, float x, float y, Color color, int flags)
-    {
+    void DrawBuffer::drawTextShadow(int font, const char *text, float x, float y, Color color, int flags) {
         uint32 alpha = (color >> 1) & 0xFF000000;
         drawText(font, text, x + 2, y + 2, alpha, flags);
         drawText(font, text, x, y, color, flags);
     }
 
-    void DrawBuffer::doAlign(int flags, float *x, float *y, float *w, float *h)
-    {
+    void DrawBuffer::doAlign(int flags, float *x, float *y, float *w, float *h) {
         if (flags & ALIGN_HCENTER) *x -= *w / 2;
         if (flags & ALIGN_RIGHT) *x -= *w;
         if (flags & ALIGN_VCENTER) *y -= *h / 2;
@@ -455,8 +411,7 @@ namespace GFX
 
 
     // TODO: Actually use the rect properly, take bounds.
-    void DrawBuffer::drawTextRect(int font, const char *text, float x, float y, float w, float h, Color color, int align)
-    {
+    void DrawBuffer::drawTextRect(int font, const char *text, float x, float y, float w, float h, Color color, int align) {
         if (align & ALIGN_HCENTER)
         {
             x += w / 2;
@@ -478,11 +433,9 @@ namespace GFX
     }
 
     // ROTATE_* doesn't yet work right.
-    void DrawBuffer::drawText(int font, const char *text, float x, float y, Color color, int align)
-    {
+    void DrawBuffer::drawText(int font, const char *text, float x, float y, Color color, int align) {
         // rough estimate
-        if (count_ + strlen(text) * 6 > MAX_VERTS)
-        {
+        if (count_ + strlen(text) * 6 > MAX_VERTS) {
             flush(true);
         }
 
@@ -494,8 +447,7 @@ namespace GFX
             doAlign(align, &x, &y, &w, &h);
         }
 
-        if (align & ROTATE_90DEG_LEFT)
-        {
+        if (align & ROTATE_90DEG_LEFT) {
             x -= atlasfont.ascend*fontscaley;
             // y += h;
         }
@@ -503,24 +455,20 @@ namespace GFX
             y += atlasfont.ascend*fontscaley;
         float sx = x;
         UTF8 utf(text);
-        while (true)
-        {
+        while (true) {
             if (utf.end())
                 break;
             cval = utf.next();
             // Translate non-breaking space to space.
-            if (cval == 0xA0)
-            {
+            if (cval == 0xA0) {
                 cval = ' ';
             }
-            if (cval == '\n')
-            {
+            if (cval == '\n') {
                 y += atlasfont.height * fontscaley;
                 x = sx;
                 continue;
             }
-            else if (cval == '&' && utf.peek() != '&')
-            {
+            else if (cval == '&' && utf.peek() != '&') {
                 // Ignore lone ampersands
                 continue;
             }

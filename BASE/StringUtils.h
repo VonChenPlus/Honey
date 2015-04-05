@@ -17,8 +17,7 @@
 
 #ifdef BLACKBERRY
 // QNX Does not have an implementation of vasprintf
-static inline int vasprintf(char **rResult, const char *aFormat, va_list aAp)
-{
+static inline int vasprintf(char **rResult, const char *aFormat, va_list aAp) {
     int rVal;
     char *result;
     va_list ap;
@@ -30,13 +29,11 @@ static inline int vasprintf(char **rResult, const char *aFormat, va_list aAp)
     rVal = vsnprintf(result, 16, aFormat, ap);
     va_end(ap);
 
-    if (rVal == -1)
-    {
+    if (rVal == -1) {
         free(result);
         return rVal;
     }
-    else if (rVal >= 16)
-    {
+    else if (rVal >= 16) {
         free(result);
         result = (char *) malloc(rVal + 1);
         if (result == NULLPTR) return -1;
@@ -56,8 +53,7 @@ class ITOA
 {
 public:
     char buffer[16];
-    const char *p(int i)
-    {
+    const char *p(int i) {
         sprintf(buffer, "%i", i);
         return &buffer[0];
     }
@@ -65,30 +61,26 @@ public:
 
 // Other simple string utilities.
 
-inline bool StartsWith(const std::string &str, const std::string &what)
-{
+inline bool StartsWith(const std::string &str, const std::string &what) {
     if (str.size() < what.size())
         return false;
     return str.substr(0, what.size()) == what;
 }
 
-inline bool EndsWith(const std::string &str, const std::string &what)
-{
+inline bool EndsWith(const std::string &str, const std::string &what) {
     if (str.size() < what.size())
         return false;
   return str.substr(str.size() - what.size()) == what;
 }
 
 // Only use on strings where you're only concerned about ASCII.
-inline bool StartsWithNoCase(const std::string &str, const std::string &what)
-{
+inline bool StartsWithNoCase(const std::string &str, const std::string &what) {
     if (str.size() < what.size())
         return false;
     return strncasecmp(str.c_str(), what.c_str(), what.size()) == 0;
 }
 
-inline bool EndsWithNoCase(const std::string &str, const std::string &what)
-{
+inline bool EndsWithNoCase(const std::string &str, const std::string &what) {
     if (str.size() < what.size())
         return false;
     const Size offset = str.size() - what.size();
@@ -96,8 +88,7 @@ inline bool EndsWithNoCase(const std::string &str, const std::string &what)
 }
 
 void DataToHexString(const uint8 *data, Size size, std::string *output);
-inline void StringToHexString(const std::string &data, std::string *output)
-{
+inline void StringToHexString(const std::string &data, std::string *output) {
     DataToHexString((uint8 *)(&data[0]), data.size(), output);
 }
 

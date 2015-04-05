@@ -38,44 +38,39 @@ namespace UTILS
             UTF8(const char *c) : c_(c), index_(0) {}
             UTF8(const char *c, int index) : c_(c), index_(index) {}
             bool end() const { return c_[index_] == 0; }
-            uint32 next()
-            {
+            uint32 next() {
                 return u8_nextchar(c_, &index_);
             }
-            uint32 peek()
-            {
+            uint32 peek() {
                 int tempIndex = index_;
                 return u8_nextchar(c_, &tempIndex);
             }
-            void fwd()
-            {
+            void fwd() {
                 u8_inc(c_, &index_);
             }
-            void bwd()
-            {
+            void bwd() {
                 u8_dec(c_, &index_);
             }
-            int length() const
-            {
+            int length() const {
                 return u8_strlen(c_);
             }
-            int byteIndex() const
-            {
+            int byteIndex() const {
                 return index_;
             }
-            static int encode(char *dest, uint32 ch)
-            {
+            static int encode(char *dest, uint32 ch) {
                 return u8_wc_toutf8(dest, ch);
             }
-            static int encodeUnits(uint32 ch)
-            {
+            static int encodeUnits(uint32 ch) {
                 if (ch < 0x80) {
                     return 1;
-                } else if (ch < 0x800) {
+                }
+                else if (ch < 0x800) {
                     return 2;
-                } else if (ch < 0x10000) {
+                }
+                else if (ch < 0x10000) {
                     return 3;
-                } else if (ch < 0x110000) {
+                }
+                else if (ch < 0x110000) {
                     return 4;
                 }
                 return 0;

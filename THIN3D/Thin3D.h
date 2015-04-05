@@ -258,8 +258,7 @@ namespace THIN3D
     struct Thin3DVertexComponent
     {
         Thin3DVertexComponent() : name(NULLPTR), type(T3DVertexDataType::INVALID), semantic(255), offset(255) {}
-        Thin3DVertexComponent(const char *name, T3DSemantic semantic, T3DVertexDataType dataType, uint8 offset)
-        {
+        Thin3DVertexComponent(const char *name, T3DSemantic semantic, T3DVertexDataType dataType, uint8 offset) {
             this->name = name;
             this->semantic = semantic;
             this->type = dataType;
@@ -356,8 +355,7 @@ namespace THIN3D
         virtual void clear(int mask, uint32 colorval, float depthVal, int stencilVal) = 0;
 
         // Necessary to correctly flip scissor rectangles etc for OpenGL.
-        void setTargetSize(int w, int h)
-        {
+        void setTargetSize(int w, int h) {
             targetWidth_ = w;
             targetHeight_ = h;
         }

@@ -77,8 +77,7 @@ namespace THIN3D
     "precision mediump float;\n"
     "#endif\n";
 
-    static inline void Uint32ToFloat4(uint32 u, float f[4])
-    {
+    static inline void Uint32ToFloat4(uint32 u, float f[4]) {
         f[0] = ((u >> 0) & 0xFF) * (1.0f / 255.0f);
         f[1] = ((u >> 8) & 0xFF) * (1.0f / 255.0f);
         f[2] = ((u >> 16) & 0xFF) * (1.0f / 255.0f);
@@ -242,15 +241,13 @@ namespace THIN3D
         Thin3DTexture *createTexture() override;
 
         // Bound state objects
-        void setBlendState(Thin3DBlendState *state) override
-        {
+        void setBlendState(Thin3DBlendState *state) override {
             Thin3DGLBlendState *s = static_cast<Thin3DGLBlendState *>(state);
             s->apply();
         }
 
         // Bound state objects
-        void setDepthStencilState(Thin3DDepthStencilState *state) override
-        {
+        void setDepthStencilState(Thin3DDepthStencilState *state) override {
             Thin3DGLDepthStencilState *s = static_cast<Thin3DGLDepthStencilState *>(state);
             s->apply();
         }
@@ -259,18 +256,15 @@ namespace THIN3D
         Thin3DShader *createVertexShader(const char *glsl_source, const char *hlsl_source);
         Thin3DShader *createFragmentShader(const char *glsl_source, const char *hlsl_source);
 
-        void setScissorEnabled(bool enable) override
-        {
+        void setScissorEnabled(bool enable) override {
             GFX::glstate.scissorTest.set(enable);
         }
 
-        void setScissorRect(int left, int top, int width, int height) override
-        {
+        void setScissorRect(int left, int top, int width, int height) override {
             GFX::glstate.scissorRect.set(left, targetHeight_ - (top + height), width, height);
         }
 
-        void setViewports(int count, T3DViewport *viewports) override
-        {
+        void setViewports(int count, T3DViewport *viewports) override {
             UNUSED(count);
             // TODO: Add support for multiple viewports.
             GFX::glstate.viewport.set(viewports[0].TopLeftX, viewports[0].TopLeftY, viewports[0].Width, viewports[0].Height);
@@ -287,11 +281,9 @@ namespace THIN3D
         void drawUP(T3DPrimitive prim, Thin3DShaderSet *shaderSet, Thin3DVertexFormat *format, const void *vdata, int vertexCount) override;
         void clear(int mask, uint32 colorval, float depthVal, int stencilVal) override;
 
-        const char *getInfoString(T3DInfo info) const override
-        {
+        const char *getInfoString(T3DInfo info) const override {
             // TODO: Make these actually query the right information
-            switch (info)
-            {
+            switch (info) {
                 case APINAME:
                     return "OpenGL";
                 case VENDOR: return (const char *)glGetString(GL_VENDOR);

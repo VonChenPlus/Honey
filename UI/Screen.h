@@ -12,8 +12,7 @@ namespace UI
     {
     public:
         Screen() : screenManager_(NULLPTR) { }
-        virtual ~Screen()
-        {
+        virtual ~Screen() {
             screenManager_ = NULLPTR;
         }
 

@@ -36,8 +36,7 @@ namespace IO
 
     // Hack
     #ifdef __SYMBIAN32__
-    static inline int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
-    {
+    static inline int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result) {
         struct dirent *readdir_entry;
 
         readdir_entry = readdir(dirp);
@@ -53,8 +52,7 @@ namespace IO
     }
     #endif
 
-    static FILE *OpenCFile(const std::string &filename, const char *mode)
-    {
+    static FILE *OpenCFile(const std::string &filename, const char *mode) {
     #if defined(_WIN32) && defined(UNICODE)
         return _wfopen(ConvertUTF8ToWString(filename).c_str(), ConvertUTF8ToWString(mode).c_str());
     #else
@@ -62,8 +60,7 @@ namespace IO
     #endif
     }
 
-    bool WriteStringToFile(bool text_file, const std::string &str, const char *filename)
-    {
+    bool WriteStringToFile(bool text_file, const std::string &str, const char *filename) {
         FILE *f = OpenCFile(filename, text_file ? "w" : "wb");
         if (!f)
             return false;
@@ -77,14 +74,12 @@ namespace IO
         return true;
     }
 
-    bool WriteDataToFile(bool text_file, const void* data, const unsigned int size, const char *filename)
-    {
+    bool WriteDataToFile(bool text_file, const void* data, const unsigned int size, const char *filename) {
         FILE *f = OpenCFile(filename, text_file ? "w" : "wb");
         if (!f)
             return false;
         Size len = size;
-        if (len != fwrite(data, 1, len, f))
-        {
+        if (len != fwrite(data, 1, len, f)) {
             fclose(f);
             return false;
         }
@@ -92,8 +87,7 @@ namespace IO
         return true;
     }
 
-    uint64 GetSize(FILE *f)
-    {
+    uint64 GetSize(FILE *f) {
         // This will only support 64-bit when large file support is available.
         // That won't be the case on some versions of Android, at least.
     #if defined(ANDROID) || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS < 64)
@@ -101,22 +95,19 @@ namespace IO
 
         off64_t pos = lseek64(fd, 0, SEEK_CUR);
         off64_t size = lseek64(fd, 0, SEEK_END);
-        if (size != pos && lseek64(fd, pos, SEEK_SET) != pos)
-        {
+        if (size != pos && lseek64(fd, pos, SEEK_SET) != pos) {
             // Should error here.
             return 0;
         }
         return size;
     #else
         uint64_t pos = ftello(f);
-        if (fseek(f, 0, SEEK_END) != 0)
-        {
+        if (fseek(f, 0, SEEK_END) != 0) {
             return 0;
         }
         uint64_t size = ftello(f);
         // Reset the seek position to where it was when we started.
-        if (size != pos && fseeko(f, pos, SEEK_SET) != 0)
-        {
+        if (size != pos && fseeko(f, pos, SEEK_SET) != 0) {
             // Should error here.
             return 0;
         }
@@ -124,8 +115,7 @@ namespace IO
     #endif
     }
 
-    bool ReadFileToString(bool text_file, const char *filename, std::string &str)
-    {
+    bool ReadFileToString(bool text_file, const char *filename, std::string &str) {
         FILE *f = OpenCFile(filename, text_file ? "r" : "rb");
         if (!f)
             return false;
@@ -139,8 +129,7 @@ namespace IO
     }
 
 
-    bool ReadDataFromFile(bool text_file, unsigned char* &data, const unsigned int size, const char *filename)
-    {
+    bool ReadDataFromFile(bool text_file, unsigned char* &data, const unsigned int size, const char *filename) {
         FILE *f = OpenCFile(filename, text_file ? "r" : "rb");
         if (!f)
             return false;
@@ -155,8 +144,7 @@ namespace IO
     }
 
     // The return is non-const because - why not?
-    uint8 *ReadLocalFile(const char *filename, Size *size)
-    {
+    uint8 *ReadLocalFile(const char *filename, Size *size) {
         FILE *file = fopen(filename, "rb");
         if (!file) {
             return 0;
@@ -179,10 +167,8 @@ namespace IO
 
     // Remove any ending forward slashes from directory paths
     // Modifies argument.
-    static void StripTailDirSlashes(std::string &fname)
-    {
-        if (fname.length() > 1)
-        {
+    static void StripTailDirSlashes(std::string &fname) {
+        if (fname.length() > 1) {
             Size i = fname.length() - 1;
             while (fname[i] == DIR_SEP_CHR)
                 fname[i--] = '\0';
@@ -191,8 +177,7 @@ namespace IO
     }
 
     // Returns true if file filename exists
-    bool Exists(const std::string &filename)
-    {
+    bool Exists(const std::string &filename) {
     #ifdef _WIN32
         std::wstring wstr = ConvertUTF8ToWString(filename);
         return GetFileAttributes(wstr.c_str()) != 0xFFFFFFFF;
@@ -209,22 +194,19 @@ namespace IO
     }
 
     // Returns true if filename is a directory
-    bool IsDirectory(const std::string &filename)
-    {
+    bool IsDirectory(const std::string &filename) {
         FileInfo info;
         GetFileInfo(filename.c_str(), &info);
         return info.isDirectory;
     }
 
-    bool GetFileInfo(const char *path, FileInfo *fileInfo)
-    {
+    bool GetFileInfo(const char *path, FileInfo *fileInfo) {
         // TODO: Expand relative paths?
         fileInfo->fullName = path;
 
     #ifdef _WIN32
         WIN32_FILE_ATTRIBUTE_DATA attrs;
-        if (!GetFileAttributesExW(ConvertUTF8ToWString(path).c_str(), GetFileExInfoStandard, &attrs))
-        {
+        if (!GetFileAttributesExW(ConvertUTF8ToWString(path).c_str(), GetFileExInfoStandard, &attrs)) {
             fileInfo->size = 0;
             fileInfo->isDirectory = false;
             fileInfo->exists = false;
@@ -242,8 +224,7 @@ namespace IO
 
         int result = stat64(copy.c_str(), &file_info);
 
-        if (result < 0)
-        {
+        if (result < 0) {
             //WLOG("IsDirectory: stat failed on %s", path);
             fileInfo->exists = false;
             return false;
@@ -260,8 +241,7 @@ namespace IO
         return true;
     }
 
-    std::string GetFileExtension(const std::string &fn)
-    {
+    std::string GetFileExtension(const std::string &fn) {
         int pos = (int)fn.rfind(".");
         if (pos < 0) return "";
         std::string ext = fn.substr(pos+1);
@@ -272,8 +252,7 @@ namespace IO
         return ext;
     }
 
-    bool FileInfo::operator <(const FileInfo &other) const
-    {
+    bool FileInfo::operator <(const FileInfo &other) const {
         if (isDirectory && !other.isDirectory)
             return true;
         else if (!isDirectory && other.isDirectory)
@@ -284,22 +263,17 @@ namespace IO
             return false;
     }
 
-    Size GetFilesInDir(const char *directory, std::vector<FileInfo> *files, const char *filter, int flags)
-    {
+    Size GetFilesInDir(const char *directory, std::vector<FileInfo> *files, const char *filter, int flags) {
         Size foundEntries = 0;
         std::set<std::string> filters;
         std::string tmp;
-        if (filter)
-        {
-            while (*filter)
-            {
-                if (*filter == ':')
-                {
+        if (filter) {
+            while (*filter) {
+                if (*filter == ':') {
                     filters.insert(tmp);
                     tmp = "";
                 }
-                else
-                {
+                else {
                     tmp.push_back(*filter);
                 }
                 filter++;
@@ -316,14 +290,12 @@ namespace IO
     #else
         HANDLE hFind = FindFirstFile((std::string(directory) + "\\*").c_str(), &ffd);
     #endif
-        if (hFind == INVALID_HANDLE_VALUE)
-        {
+        if (hFind == INVALID_HANDLE_VALUE) {
             FindClose(hFind);
             return 0;
         }
         // windows loop
-        do
-        {
+        do {
             const std::string virtualName = ConvertWStringToUTF8(ffd.cFileName);
     #else
         struct dirent_large { struct dirent entry; char padding[FILENAME_MAX+1]; };
@@ -338,8 +310,7 @@ namespace IO
         if (!dirp)
             return 0;
         // non windows loop
-        while (!readdir_r(dirp, (dirent*) &diren, &result) && result)
-        {
+        while (!readdir_r(dirp, (dirent*) &diren, &result) && result) {
             const std::string virtualName(result->d_name);
     #endif
             // check for "." and ".."
@@ -365,11 +336,9 @@ namespace IO
             info.isDirectory = IsDirectory(info.fullName);
             info.exists = true;
             info.size = 0;
-            if (!info.isDirectory)
-            {
+            if (!info.isDirectory) {
                 std::string ext = GetFileExtension(info.fullName);
-                if (filter)
-                {
+                if (filter) {
                     if (filters.find(ext) == filters.end())
                         continue;
                 }
@@ -393,21 +362,18 @@ namespace IO
     void DeleteFile(const char *file)
     {
     #ifdef _WIN32
-        if (!::DeleteFile(ConvertUTF8ToWString(file).c_str()))
-        {
+        if (!::DeleteFile(ConvertUTF8ToWString(file).c_str())) {
             //ELOG("Error deleting %s: %i", file, GetLastError());
         }
     #else
         int err = unlink(file);
-        if (err)
-        {
+        if (err) {
             //ELOG("Error unlinking %s: %i", file, err);
         }
     #endif
     }
 
-    void DeleteDir(const char *dir)
-    {
+    void DeleteDir(const char *dir) {
     #ifdef _WIN32
         if (!RemoveDirectory(ConvertUTF8ToWString(dir).c_str()))
         {
@@ -420,8 +386,7 @@ namespace IO
 
     #endif
 
-    std::string GetDir(const std::string &path)
-    {
+    std::string GetDir(const std::string &path) {
         if (path == "/")
             return path;
         int n = (int)path.size() - 1;
@@ -433,16 +398,14 @@ namespace IO
             if (cutpath[i] == '\\') cutpath[i] = '/';
         }
     #ifndef _WIN32
-        if (!cutpath.size())
-        {
+        if (!cutpath.size()) {
             return "/";
         }
     #endif
         return cutpath;
     }
 
-    std::string GetFilename(std::string path)
-    {
+    std::string GetFilename(std::string path) {
         Size off = GetDir(path).size() + 1;
         if (off < path.size())
             return path.substr(off);
@@ -450,8 +413,7 @@ namespace IO
             return path;
     }
 
-    void MakeDir(const std::string &path)
-    {
+    void MakeDir(const std::string &path) {
     #ifdef _WIN32
         mkdir(path.c_str());
     #else
@@ -461,17 +423,14 @@ namespace IO
 
     #ifdef _WIN32
     // Returns a vector with the device names
-    std::vector<std::string> GetWindowsDrives()
-    {
+    std::vector<std::string> GetWindowsDrives() {
         std::vector<std::string> drives;
 
         const DWORD buffsize = GetLogicalDriveStrings(0, NULLPTR);
         std::vector<TCHAR> buff(buffsize);
-        if (GetLogicalDriveStrings(buffsize, buff.data()) == buffsize - 1)
-        {
+        if (GetLogicalDriveStrings(buffsize, buff.data()) == buffsize - 1) {
             auto drive = buff.data();
-            while (*drive)
-            {
+            while (*drive) {
                 std::string str(ConvertWStringToUTF8(drive));
                 str.pop_back();	// we don't want the final backslash
                 str += "/";

@@ -26,8 +26,7 @@ namespace IMAGE
         if (err != Z_OK) return err;
 
         int nExtraChunks = 0;
-        do
-        {
+        do {
             stream.next_out = pDest;
             stream.avail_out = destlen;
             err = inflate(&stream, Z_FINISH);
@@ -50,8 +49,7 @@ namespace IMAGE
         return nExtraChunks ? Z_BUF_ERROR : Z_OK;
     }
 
-    static unsigned int log2i(unsigned int val)
-    {
+    static unsigned int log2i(unsigned int val) {
         unsigned int ret = -1;
         while (val != 0) {
             val >>= 1; ret++;
@@ -59,10 +57,8 @@ namespace IMAGE
         return ret;
     }
 
-    int LoadZIMPtr(const uint8 *zim, Size datasize, int *width, int *height, int *flags, uint8 **image)
-    {
-        if (zim[0] != 'Z' || zim[1] != 'I' || zim[2] != 'M' || zim[3] != 'G')
-        {
+    int LoadZIMPtr(const uint8 *zim, Size datasize, int *width, int *height, int *flags, uint8 **image) {
+        if (zim[0] != 'Z' || zim[1] != 'I' || zim[2] != 'M' || zim[3] != 'G') {
             //ELOG("Not a ZIM file");
             return 0;
         }
@@ -72,20 +68,16 @@ namespace IMAGE
 
         int num_levels = 1;
         int image_data_size[ZIM_MAX_MIP_LEVELS];
-        if (*flags & ZIM_HAS_MIPS)
-        {
+        if (*flags & ZIM_HAS_MIPS) {
             num_levels = log2i(*width < *height ? *width : *height) + 1;
         }
         int total_data_size = 0;
-        for (int i = 0; i < num_levels; i++)
-        {
-            if (i > 0)
-            {
+        for (int i = 0; i < num_levels; i++) {
+            if (i > 0) {
                 width[i] = width[i-1] / 2;
                 height[i] = height[i-1] / 2;
             }
-            switch (*flags & ZIM_FORMAT_MASK)
-            {
+            switch (*flags & ZIM_FORMAT_MASK) {
             case ZIM_RGBA8888:
                 image_data_size[i] = width[i] * height[i] * 4;
                 break;
@@ -93,8 +85,7 @@ namespace IMAGE
             case ZIM_RGB565:
                 image_data_size[i] = width[i] * height[i] * 2;
                 break;
-            case ZIM_ETC1:
-                {
+            case ZIM_ETC1: {
                     int data_width = width[i];
                     int data_height = height[i];
                     if (data_width < 4) data_width = 4;
@@ -109,54 +100,44 @@ namespace IMAGE
             total_data_size += image_data_size[i];
         }
 
-        if (total_data_size == 0)
-        {
+        if (total_data_size == 0) {
             //ELOG("Invalid ZIM data size 0");
             return 0;
         }
 
         image[0] = (uint8 *)malloc(total_data_size);
-        for (int i = 1; i < num_levels; i++)
-        {
+        for (int i = 1; i < num_levels; i++) {
             image[i] = image[i-1] + image_data_size[i-1];
         }
 
-        if (*flags & ZIM_ZLIB_COMPRESSED)
-        {
+        if (*flags & ZIM_ZLIB_COMPRESSED) {
             long outlen = (long)total_data_size;
-            if (Z_OK != ezuncompress(*image, &outlen, (unsigned char *)(zim + 16), (long)datasize - 16))
-            {
+            if (Z_OK != ezuncompress(*image, &outlen, (unsigned char *)(zim + 16), (long)datasize - 16)) {
                 free(*image);
                 *image = 0;
                 return 0;
             }
-            if (outlen != total_data_size)
-            {
+            if (outlen != total_data_size) {
                 //ELOG("Wrong size data in ZIM: %i vs %i", (int)outlen, (int)total_data_size);
             }
         }
-        else
-        {
+        else {
             memcpy(*image, zim + 16, datasize - 16);
-            if (datasize - 16 != (Size)total_data_size)
-            {
+            if (datasize - 16 != (Size)total_data_size) {
                 //ELOG("Wrong size data in ZIM: %i vs %i", (int)(datasize-16), (int)total_data_size);
             }
         }
         return num_levels;
     }
 
-    int LoadZIM(const char *filename, int *width, int *height, int *format, uint8 **image)
-    {
+    int LoadZIM(const char *filename, int *width, int *height, int *format, uint8 **image) {
         Size size;
         uint8 *buffer = ReadLocalFile(filename, &size);
-        if (!buffer)
-        {
+        if (!buffer) {
             return 0;
         }
         int retval = LoadZIMPtr(buffer, (int)size, width, height, format, image);
-        if (!retval)
-        {
+        if (!retval) {
             //ELOG("Not a valid ZIM file: %s", filename);
         }
         delete [] buffer;

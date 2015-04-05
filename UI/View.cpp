@@ -4,35 +4,29 @@ using MATH::Bounds;
 
 namespace UI
 {
-    void MeasureBySpec(float sz, float contentWidth, MeasureSpec spec, float *measured)
-    {
+    void MeasureBySpec(float sz, float contentWidth, MeasureSpec spec, float *measured) {
         *measured = sz;
-        if (sz == WRAP_CONTENT)
-        {
+        if (sz == WRAP_CONTENT) {
             if (spec.type == UNSPECIFIED || spec.type == AT_MOST)
                 *measured = contentWidth;
             else if (spec.type == EXACTLY)
                 *measured = spec.size;
         }
-        else if (sz == FILL_PARENT)
-        {
+        else if (sz == FILL_PARENT) {
             if (spec.type == UNSPECIFIED)
                 *measured = contentWidth;  // We have no value to set
             else
                 *measured = spec.size;
         }
-        else if (spec.type == EXACTLY || (spec.type == AT_MOST && *measured > spec.size))
-        {
+        else if (spec.type == EXACTLY || (spec.type == AT_MOST && *measured > spec.size)) {
             *measured = spec.size;
         }
     }
 
-    View::~View()
-    {
+    View::~View() {
     }
 
-    void View::measure(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert)
-    {
+    void View::measure(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert) {
         float contentW = 0.0f, contentH = 0.0f;
         getContentDimensions(dc, contentW, contentH);
         MeasureBySpec(layoutParams_->width, contentW, horiz, &measuredWidth_);
@@ -41,15 +35,13 @@ namespace UI
 
     // Default values
 
-    void View::getContentDimensions(const UIContext &dc, float &w, float &h) const
-    {
+    void View::getContentDimensions(const UIContext &dc, float &w, float &h) const {
         UNUSED(dc);
         w = 10.0f;
         h = 10.0f;
     }
 
-    Point View::getFocusPosition(FocusDirection dir)
-    {
+    Point View::getFocusPosition(FocusDirection dir) {
         // The +2/-2 is some extra fudge factor to cover for views sitting right next to each other.
         // Distance zero yields strange results otherwise.
         switch (dir) {
@@ -63,8 +55,7 @@ namespace UI
         }
     }
 
-    bool View::setFocus()
-    {
+    bool View::setFocus() {
         return false;
     }
 }

@@ -7,17 +7,14 @@ class scoped_ptr
 public:
     scoped_ptr() : ptr_(0) {}
     scoped_ptr(T *p) : ptr_(p) {}
-    ~scoped_ptr()
-    {
+    ~scoped_ptr() {
         delete ptr_;
     }
-    void reset(T *p)
-    {
+    void reset(T *p) {
         delete ptr_;
         ptr_ = p;
     }
-    T *release()
-    {
+    T *release() {
         T *p = ptr_;
         ptr_ = 0;
         return p;

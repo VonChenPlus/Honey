@@ -22,8 +22,7 @@ namespace _INPUT
             pad_buttons_down(0),
             pad_buttons_up(0),
             mouse_valid(false),
-            accelerometer_valid(false)
-        {
+            accelerometer_valid(false) {
             memset(pointer_down, 0, sizeof(pointer_down));
         }
 

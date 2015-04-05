@@ -11,8 +11,7 @@ namespace MATH
         Bounds() : x(0), y(0), w(0), h(0) {}
         Bounds(float x_, float y_, float w_, float h_) : x(x_), y(y_), w(w_), h(h_) {}
 
-        bool contains(float px, float py) const
-        {
+        bool contains(float px, float py) const {
             return (px >= x && py >= y && px < x + w && py < y + h);
         }
 
@@ -41,16 +40,13 @@ namespace MATH
         float y2() const { return y + h; }
         float centerX() const { return x + w * 0.5f; }
         float centerY() const { return y + h * 0.5f; }
-        Point center() const
-        {
+        Point center() const {
             return Point(centerX(), centerY());
         }
-        Bounds expand(float amount) const
-        {
+        Bounds expand(float amount) const {
             return Bounds(x - amount, y - amount, w + amount * 2, h + amount * 2);
         }
-        Bounds offset(float xAmount, float yAmount) const
-        {
+        Bounds offset(float xAmount, float yAmount) const {
             return Bounds(x + xAmount, y + yAmount, w, h);
         }
 

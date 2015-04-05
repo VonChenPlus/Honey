@@ -1,7 +1,6 @@
 #include "Color.h"
 
-uint32 WhiteAlpha(float alpha)
-{
+uint32 WhiteAlpha(float alpha) {
     if (alpha < 0.0f) alpha = 0.0f;
     if (alpha > 1.0f) alpha = 1.0f;
     uint32 color = (int)(alpha*255) << 24;
@@ -9,22 +8,19 @@ uint32 WhiteAlpha(float alpha)
     return color;
 }
 
-uint32 BlackAlpha(float alpha)
-{
+uint32 BlackAlpha(float alpha) {
     if (alpha < 0.0f) alpha = 0.0f;
     if (alpha > 1.0f) alpha = 1.0f;
     return (int)(alpha*255)<<24;
 }
 
-uint32 ColorAlpha(uint32 rgb, float alpha)
-{
+uint32 ColorAlpha(uint32 rgb, float alpha) {
     if (alpha < 0.0f) alpha = 0.0f;
     if (alpha > 1.0f) alpha = 1.0f;
     return ((int)(alpha*255)<<24) | (rgb & 0xFFFFFF);
 }
 
-uint32 AlphaMul(uint32 color, float alphaMul)
-{
+uint32 AlphaMul(uint32 color, float alphaMul) {
     uint32 rgb = color & 0xFFFFFF;
     uint32 alpha = color >> 24;
     alpha *= alphaMul;
@@ -33,8 +29,7 @@ uint32 AlphaMul(uint32 color, float alphaMul)
     return ((int)(alpha)<<24) | (rgb & 0xFFFFFF);
 }
 
-uint32 RGBA(float r, float g, float b, float alpha)
-{
+uint32 RGBA(float r, float g, float b, float alpha) {
     uint32 color = (int)(alpha*255)<<24;
     color |= (int)(b*255)<<16;
     color |= (int)(g*255)<<8;
@@ -42,8 +37,7 @@ uint32 RGBA(float r, float g, float b, float alpha)
     return color;
 }
 
-uint32 RGBAClamp(float r, float g, float b, float a)
-{
+uint32 RGBAClamp(float r, float g, float b, float a) {
     if (r > 1.0f) r = 1.0f;
     if (g > 1.0f) g = 1.0f;
     if (b > 1.0f) b = 1.0f;
@@ -67,8 +61,7 @@ uint32 RGBAClamp(float r, float g, float b, float a)
 * Procedural Elements for Computer Graphics
 * McGraw Hill 1985
 */
-uint32 HSVA(float H, float S, float V, float alpha)
-{
+uint32 HSVA(float H, float S, float V, float alpha) {
     /*
     * Purpose:
     * Convert HSV values to RGB values

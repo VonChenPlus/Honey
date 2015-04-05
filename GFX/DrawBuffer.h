@@ -76,8 +76,7 @@ namespace GFX
         void rectOutline(float x, float y, float w, float h, uint32 color, int align = ALIGN_TOPLEFT);
 
         void rectVGradient(float x, float y, float w, float h, uint32 colorTop, uint32 colorBottom);
-        void rectVDarkFaded(float x, float y, float w, float h, uint32 colorTop)
-        {
+        void rectVDarkFaded(float x, float y, float w, float h, uint32 colorTop) {
             rectVGradient(x, y, w, h, colorTop, DarkenColor(colorTop));
         }
 
@@ -89,8 +88,7 @@ namespace GFX
         void rect(float x, float y, float w, float h, float u, float v, float uw, float uh, uint32 color);
 
         void v(float x, float y, float z, uint32 color, float u, float v);
-        void v(float x, float y, uint32 color, float u, float _v)
-        {
+        void v(float x, float y, uint32 color, float u, float _v) {
             v(x, y, 0.0f, color, u, _v);
         }
 
@@ -99,22 +97,19 @@ namespace GFX
         // New drawing APIs
 
         // Must call this before you use any functions with atlas_image etc.
-        void setAtlas(const Atlas *_atlas)
-        {
+        void setAtlas(const Atlas *_atlas) {
             atlas = _atlas;
         }
         const Atlas *getAtlas() const { return atlas; }
         void measureImage(ImageID atlas_image, float *w, float *h);
         void drawImage(ImageID atlas_image, float x, float y, float scale, Color color = COLOR(0xFFFFFF), int align = ALIGN_TOPLEFT);
         void drawImageStretch(ImageID atlas_image, float x1, float y1, float x2, float y2, Color color = COLOR(0xFFFFFF));
-        void drawImageStretch(int atlas_image, const MATH::Bounds &bounds, Color color = COLOR(0xFFFFFF))
-        {
+        void drawImageStretch(int atlas_image, const MATH::Bounds &bounds, Color color = COLOR(0xFFFFFF)) {
             drawImageStretch(atlas_image, bounds.x, bounds.y, bounds.x2(), bounds.y2(), color);
         }
         void drawImageRotated(ImageID atlas_image, float x, float y, float scale, float angle, Color color = COLOR(0xFFFFFF), bool mirror_h = false);	// Always centers
         void drawTexRect(float x1, float y1, float x2, float y2, float u1, float v1, float u2, float v2, Color color);
-        void drawTexRect(const MATH::Bounds &bounds, float u1, float v1, float u2, float v2, Color color)
-        {
+        void drawTexRect(const MATH::Bounds &bounds, float u1, float v1, float u2, float v2, Color color) {
             drawTexRect(bounds.x, bounds.y, bounds.x2(), bounds.y2(), u1, v1, u2, v2, color);
         }
         // Results in 18 triangles. Kind of expensive for a button.
@@ -133,16 +128,14 @@ namespace GFX
 
         void rotateSprite(ImageID atlas_image, float x, float y, float angle, float scale, Color color);
 
-        void setFontScale(float xs, float ys)
-        {
+        void setFontScale(float xs, float ys) {
             fontscalex = xs;
             fontscaley = ys;
         }
 
         static void doAlign(int flags, float *x, float *y, float *w, float *h);
 
-        void setDrawMatrix(const MATH::Matrix4x4 &m)
-        {
+        void setDrawMatrix(const MATH::Matrix4x4 &m) {
             drawMatrix_ = m;
         }
 

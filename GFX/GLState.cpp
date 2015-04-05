@@ -16,8 +16,7 @@ namespace GFX
 
     int OpenGLState::state_count = 0;
 
-    void OpenGLState::initialize()
-    {
+    void OpenGLState::initialize() {
         if (initialized)
             return;
         initialized = true;
@@ -25,8 +24,7 @@ namespace GFX
         restore();
     }
 
-    void OpenGLState::restore()
-    {
+    void OpenGLState::restore() {
         int count = 0;
 
         blend.restore(); count++;
@@ -68,8 +66,7 @@ namespace GFX
         }
     }
 
-    void OpenGLState::setVSyncInterval(int interval)
-    {
+    void OpenGLState::setVSyncInterval(int interval) {
     #ifdef _WIN32
         if (wglSwapIntervalEXT)
             wglSwapIntervalEXT(interval);
@@ -78,8 +75,7 @@ namespace GFX
 
     // http://stackoverflow.com/questions/16147700/opengl-es-using-tegra-specific-extensions-gl-ext-texture-array
 
-    void CheckGLExtensions()
-    {
+    void CheckGLExtensions() {
         // Make sure to only do this once. It's okay to call CheckGLExtensions from wherever.
         static bool done = false;
         if (done)
@@ -94,74 +90,61 @@ namespace GFX
         // Check vendor string to try and guess GPU
         const char *cvendor = (char *)glGetString(GL_VENDOR);
         // TODO: move this stuff to gpu_features.cpp
-        if (cvendor)
-        {
+        if (cvendor) {
             const std::string vendor(cvendor);
             if (vendor == "NVIDIA Corporation"
                 || vendor == "Nouveau"
-                || vendor == "nouveau")
-            {
+                || vendor == "nouveau") {
                 gl_extensions.gpuVendor = GPU_VENDOR_NVIDIA;
             }
             else if (vendor == "Advanced Micro Devices, Inc."
-                || vendor == "ATI Technologies Inc.")
-            {
+                || vendor == "ATI Technologies Inc.") {
                 gl_extensions.gpuVendor = GPU_VENDOR_AMD;
             }
             else if (vendor == "Intel"
                 || vendor == "Intel Inc."
                 || vendor == "Intel Corporation"
-                || vendor == "Tungsten Graphics, Inc")
-            { // We'll assume this last one means Intel
+                || vendor == "Tungsten Graphics, Inc") {
+                // We'll assume this last one means Intel
                 gl_extensions.gpuVendor = GPU_VENDOR_INTEL;
             }
-            else if (vendor == "ARM")
-            {
+            else if (vendor == "ARM") {
                 gl_extensions.gpuVendor = GPU_VENDOR_ARM;
             }
-            else if (vendor == "Imagination Technologies")
-            {
+            else if (vendor == "Imagination Technologies") {
                 gl_extensions.gpuVendor = GPU_VENDOR_POWERVR;
             }
-            else if (vendor == "Qualcomm")
-            {
+            else if (vendor == "Qualcomm") {
                 gl_extensions.gpuVendor = GPU_VENDOR_ADRENO;
             }
-            else if (vendor == "Broadcom")
-            {
+            else if (vendor == "Broadcom") {
                 gl_extensions.gpuVendor = GPU_VENDOR_BROADCOM;
                 // Just for reference: Galaxy Y has renderer == "VideoCore IV HW"
             }
-            else
-            {
+            else {
                 gl_extensions.gpuVendor = GPU_VENDOR_UNKNOWN;
             }
         }
-        else
-        {
+        else {
             gl_extensions.gpuVendor = GPU_VENDOR_UNKNOWN;
         }
 
         //ILOG("GPU Vendor : %s ; renderer: %s version str: %s ; GLSL version str: %s", cvendor, renderer ? renderer : "N/A", versionStr ? versionStr : "N/A", glslVersionStr ? glslVersionStr : "N/A");
 
-        if (renderer)
-        {
+        if (renderer) {
             strncpy(gl_extensions.model, renderer, sizeof(gl_extensions.model));
             gl_extensions.model[sizeof(gl_extensions.model) - 1] = 0;
         }
 
         char buffer[64] = { 0 };
-        if (versionStr)
-        {
+        if (versionStr) {
             strncpy(buffer, versionStr, 63);
         }
         const char *lastNumStart = buffer;
         int numVer = 0;
         int len = (int)strlen(buffer);
-        for (int i = 0; i < len && numVer < 3; i++)
-        {
-            if (buffer[i] == '.')
-            {
+        for (int i = 0; i < len && numVer < 3; i++) {
+            if (buffer[i] == '.') {
                 buffer[i] = 0;
                 gl_extensions.ver[numVer++] = strtol(lastNumStart, NULLPTR, 10);
                 i++;
@@ -174,18 +157,15 @@ namespace GFX
         // If the GL version >= 4.3, we know it's a true superset of OpenGL ES 3.0 and can thus enable
         // all the same modern paths.
         // Most of it could be enabled on lower GPUs as well, but let's start this way.
-        if (gl_extensions.versionGEThan(4, 3, 0))
-        {
+        if (gl_extensions.versionGEThan(4, 3, 0)) {
             gl_extensions.GLES3 = true;
         }
 
         const char *extString = (const char *)glGetString(GL_EXTENSIONS);
-        if (extString)
-        {
+        if (extString) {
             g_all_gl_extensions = extString;
         }
-        else
-        {
+        else {
             g_all_gl_extensions = "";
             extString = "";
         }
@@ -194,13 +174,11 @@ namespace GFX
         const char *wglString = 0;
         if (wglGetExtensionsStringEXT)
             wglString = wglGetExtensionsStringEXT();
-        if (wglString)
-        {
+        if (wglString) {
             gl_extensions.EXT_swap_control_tear = strstr(wglString, "WGL_EXT_swap_control_tear") != 0;
             g_all_egl_extensions = wglString;
         }
-        else
-        {
+        else {
             g_all_egl_extensions = "";
         }
     #endif
@@ -227,26 +205,20 @@ namespace GFX
         gl_extensions.EXT_unpack_subimage = true;
 
         // GLES 3 subsumes many ES2 extensions.
-        if (gl_extensions.GLES3)
-        {
+        if (gl_extensions.GLES3) {
             gl_extensions.EXT_unpack_subimage = true;
         }
 
-        if (strstr(extString, "GL_ARB_ES2_compatibility"))
-        {
-            const GLint precisions[6] =
-            {
+        if (strstr(extString, "GL_ARB_ES2_compatibility")) {
+            const GLint precisions[6] = {
                 GL_LOW_FLOAT, GL_MEDIUM_FLOAT, GL_HIGH_FLOAT,
                 GL_LOW_INT, GL_MEDIUM_INT, GL_HIGH_INT
             };
-            GLint shaderTypes[2] =
-            {
+            GLint shaderTypes[2] = {
                 GL_VERTEX_SHADER, GL_FRAGMENT_SHADER
             };
-            for (int st = 0; st < 2; st++)
-            {
-                for (int p = 0; p < 6; p++)
-                {
+            for (int st = 0; st < 2; st++) {
+                for (int p = 0; p < 6; p++) {
                     glGetShaderPrecisionFormat(shaderTypes[st], precisions[p], gl_extensions.range[st][p], &gl_extensions.precision[st][p]);
                 }
             }
@@ -256,8 +228,7 @@ namespace GFX
         gl_extensions.FBO_EXT = false;
         gl_extensions.PBO_ARB = true;
         gl_extensions.PBO_NV = true;
-        if (strlen(extString) != 0)
-        {
+        if (strlen(extString) != 0) {
             gl_extensions.FBO_ARB = strstr(extString, "GL_ARB_framebuffer_object") != 0;
             gl_extensions.FBO_EXT = strstr(extString, "GL_EXT_framebuffer_object") != 0;
             gl_extensions.PBO_ARB = strstr(extString, "GL_ARB_pixel_buffer_object") != 0;

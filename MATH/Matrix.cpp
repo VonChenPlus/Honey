@@ -14,16 +14,14 @@ namespace MATH
     {
         #if defined(_M_IX86) || defined(_M_X64)
         #include <emmintrin.h>
-        void fast_matrix_mul_4x4_sse(float *dest, const float *a, const float *b)
-        {
+        void fast_matrix_mul_4x4_sse(float *dest, const float *a, const float *b) {
             int i;
             __m128 a_col_1 = _mm_loadu_ps(a);
             __m128 a_col_2 = _mm_loadu_ps(&a[4]);
             __m128 a_col_3 = _mm_loadu_ps(&a[8]);
             __m128 a_col_4 = _mm_loadu_ps(&a[12]);
 
-            for (i = 0; i < 16; i += 4)
-            {
+            for (i = 0; i < 16; i += 4) {
                 __m128 r_col = _mm_mul_ps(a_col_1, _mm_set1_ps(b[i]));
                 r_col = _mm_add_ps(r_col, _mm_mul_ps(a_col_2, _mm_set1_ps(b[i + 1])));
                 r_col = _mm_add_ps(r_col, _mm_mul_ps(a_col_3, _mm_set1_ps(b[i + 2])));
@@ -52,8 +50,7 @@ namespace MATH
         #define wz 14
         #define ww 15
 
-        void fast_matrix_mul_4x4_c(float *dest, const float *a, const float *b)
-        {
+        void fast_matrix_mul_4x4_c(float *dest, const float *a, const float *b) {
             dest[xx] = b[xx] * a[xx] + b[xy] * a[yx] + b[xz] * a[zx] + b[xw] * a[wx];
             dest[xy] = b[xx] * a[xy] + b[xy] * a[yy] + b[xz] * a[zy] + b[xw] * a[wy];
             dest[xz] = b[xx] * a[xz] + b[xy] * a[yz] + b[xz] * a[zz] + b[xw] * a[wz];
@@ -96,8 +93,7 @@ namespace MATH
         #endif
     }
 
-    Matrix4x4 Matrix4x4::simpleInverse() const
-    {
+    Matrix4x4 Matrix4x4::simpleInverse() const {
         Matrix4x4 out;
         out.xx = xx;
         out.xy = yx;
@@ -123,8 +119,7 @@ namespace MATH
         return out;
     }
 
-    Matrix4x4 Matrix4x4::transpose() const
-    {
+    Matrix4x4 Matrix4x4::transpose() const {
         Matrix4x4 out;
         out.xx = xx;out.xy = yx;out.xz = zx;out.xw = wx;
         out.yx = xy;out.yy = yy;out.yz = zy;out.yw = wy;
@@ -133,15 +128,13 @@ namespace MATH
         return out;
     }
 
-    Matrix4x4 Matrix4x4::operator * (const Matrix4x4 &other) const
-    {
+    Matrix4x4 Matrix4x4::operator * (const Matrix4x4 &other) const {
         Matrix4x4 temp;
         FAST::fast_matrix_mul_4x4(temp.m, other.m, this->m);
         return temp;
     }
 
-    Matrix4x4 Matrix4x4::inverse() const
-    {
+    Matrix4x4 Matrix4x4::inverse() const {
         Matrix4x4 temp;
         float dW = 1.0f / (xx*(yy*zz - yz*zy) - xy*(yx*zz - yz*zx) - xz*(yy*zx - yx*zy));
 
@@ -168,16 +161,14 @@ namespace MATH
         return temp;
     }
 
-    void Matrix4x4::setViewLookAt(const Vector3 &vFrom, const Vector3 &vAt, const Vector3 &vWorldUp)
-    {
+    void Matrix4x4::setViewLookAt(const Vector3 &vFrom, const Vector3 &vAt, const Vector3 &vWorldUp) {
         Vector3 vView = vFrom - vAt;	// OpenGL, sigh...
         vView.normalize();
         float DotProduct = vWorldUp * vView;
         Vector3 vUp = vWorldUp - vView * DotProduct;
         float Length = vUp.length();
 
-        if (1e-6f > Length)
-        {
+        if (1e-6f > Length) {
             // EMERGENCY
             vUp = Vector3(0.0f, 1.0f, 0.0f) - vView * vView.y;
             // If we still have near-zero length, resort to a different axis.
@@ -204,16 +195,14 @@ namespace MATH
         ww = 1.0f;
     }
 
-    void Matrix4x4::setViewLookAtD3D(const Vector3 &vFrom, const Vector3 &vAt, const Vector3 &vWorldUp)
-    {
+    void Matrix4x4::setViewLookAtD3D(const Vector3 &vFrom, const Vector3 &vAt, const Vector3 &vWorldUp) {
         Vector3 vView = vAt - vFrom;
         vView.normalize();
         float DotProduct = vWorldUp * vView;
         Vector3 vUp = vWorldUp - vView * DotProduct;
         float Length = vUp.length();
 
-        if (1e-6f > Length)
-        {
+        if (1e-6f > Length) {
             vUp = Vector3(0.0f, 1.0f, 0.0f) - vView * vView.y;
             // If we still have near-zero length, resort to a different axis.
             Length = vUp.length();
@@ -240,8 +229,7 @@ namespace MATH
     }
 
 
-    void Matrix4x4::setViewFrame(const Vector3 &pos, const Vector3 &vRight, const Vector3 &vView, const Vector3 &vUp)
-    {
+    void Matrix4x4::setViewFrame(const Vector3 &pos, const Vector3 &vRight, const Vector3 &vView, const Vector3 &vUp) {
         xx = vRight.x; xy = vUp.x; xz=vView.x; xw = 0.0f;
         yx = vRight.y; yy = vUp.y; yz=vView.y; yw = 0.0f;
         zx = vRight.z; zy = vUp.z; zz=vView.z; zw = 0.0f;
@@ -253,8 +241,7 @@ namespace MATH
     }
 
     //YXZ euler angles
-    void Matrix4x4::setRotation(float x,float y, float z)
-    {
+    void Matrix4x4::setRotation(float x,float y, float z) {
         setRotationY(y);
         Matrix4x4 temp;
         temp.setRotationX(x);
@@ -263,8 +250,7 @@ namespace MATH
         *this *= temp;
     }
 
-    void Matrix4x4::setProjection(float near, float far, float fov_horiz, float aspect)
-    {
+    void Matrix4x4::setProjection(float near, float far, float fov_horiz, float aspect) {
         // Now OpenGL style.
         empty();
 
@@ -277,8 +263,7 @@ namespace MATH
         wz = -(2*far*near)/(far-near);
     }
 
-    void Matrix4x4::setProjectionD3D(float near_plane, float far_plane, float fov_horiz, float aspect)
-    {
+    void Matrix4x4::setProjectionD3D(float near_plane, float far_plane, float fov_horiz, float aspect) {
         empty();
         float Q, f;
 
@@ -292,8 +277,7 @@ namespace MATH
         zw = 1.0f;
     }
 
-    void Matrix4x4::setOrtho(float left, float right, float bottom, float top, float near, float far)
-    {
+    void Matrix4x4::setOrtho(float left, float right, float bottom, float top, float near, float far) {
         setIdentity();
         xx = 2.0f / (right - left);
         yy = 2.0f / (top - bottom);
@@ -303,8 +287,7 @@ namespace MATH
         wz = -(far + near) / (far - near);
     }
 
-    void Matrix4x4::setOrthoD3D(float left, float right, float bottom, float top, float near, float far)
-    {
+    void Matrix4x4::setOrthoD3D(float left, float right, float bottom, float top, float near, float far) {
         setIdentity();
         xx = 2.0f / (right - left);
         yy = 2.0f / (top - bottom);
@@ -314,8 +297,7 @@ namespace MATH
         wz = -near / (far - near);
     }
 
-    void Matrix4x4::setProjectionInf(const float near_plane, const float fov_horiz, const float aspect)
-    {
+    void Matrix4x4::setProjectionInf(const float near_plane, const float fov_horiz, const float aspect) {
         empty();
         float f = fov_horiz*0.5f;
         xx = 1.0f / tanf(f);
@@ -325,16 +307,14 @@ namespace MATH
         zw = 1.0f;
     }
 
-    void Matrix4x4::setRotationAxisAngle(const Vector3 &axis, float angle)
-    {
+    void Matrix4x4::setRotationAxisAngle(const Vector3 &axis, float angle) {
         Quaternion quat;
         quat.setRotation(axis, angle);
         quat.toMatrix(this);
     }
 
     // from a (Position, Rotation, Scale) Vector3 quat Vector3 tuple
-    Matrix4x4 Matrix4x4::fromPRS(const Vector3 &positionv, const Quaternion &rotv, const Vector3 &scalev)
-    {
+    Matrix4x4 Matrix4x4::fromPRS(const Vector3 &positionv, const Quaternion &rotv, const Vector3 &scalev) {
         Matrix4x4 newM;
         newM.setIdentity();
         Matrix4x4 rot, scale;
@@ -347,8 +327,7 @@ namespace MATH
         return newM;
     }
 
-    void Matrix4x4::toText(char *buffer, int len) const
-    {
+    void Matrix4x4::toText(char *buffer, int len) const {
         snprintf(buffer, len, "%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n",
             xx,xy,xz,xw,
             yx,yy,yz,yw,
@@ -357,8 +336,7 @@ namespace MATH
         buffer[len - 1] = '\0';
     }
 
-    void Matrix4x4::print() const
-    {
+    void Matrix4x4::print() const {
         char buffer[256];
         toText(buffer, 256);
         puts(buffer);

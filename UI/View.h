@@ -162,8 +162,7 @@ namespace UI
             , measuredHeight_(0)
             , enabledPtr_(0)
             , enabled_(true)
-            , enabledMeansDisabled_(false)
-        {
+            , enabledMeansDisabled_(false) {
             if (!layoutParams)
                 layoutParams_.reset(new LayoutParams());
         }
@@ -179,8 +178,7 @@ namespace UI
 
         virtual void focusChanged(int focusFlags) { UNUSED(focusFlags); }
 
-        void move(MATH::Bounds bounds)
-        {
+        void move(MATH::Bounds bounds) {
             bounds_ = bounds;
         }
 
@@ -207,8 +205,7 @@ namespace UI
         virtual bool subviewFocused(View *view) { UNUSED(view); return false; }
 
         void setEnabled(bool enabled) { enabled_ = enabled; enabledMeansDisabled_ = false; }
-        bool isEnabled() const
-        {
+        bool isEnabled() const {
             if (enabledPtr_)
                 return *enabledPtr_ != enabledMeansDisabled_;
             else
