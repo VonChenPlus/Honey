@@ -152,4 +152,6 @@ int c99_snprintf(char* str, Size size, const char* format, ...);
 
 #endif
 
+#include "BASE/NException.h"
+
 #endif // BASICYPES_H

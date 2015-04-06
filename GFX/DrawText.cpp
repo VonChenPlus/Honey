@@ -248,8 +248,7 @@ using UTILS::STRING::ReplaceAll;
         fontHash_ = fontHash;
         return fontHash;
     #else
-        //ELOG("System fonts not supported on this platform");
-        return 0;
+        throw _NException_Normal("System fonts not supported on this platform");
     #endif
     }
 

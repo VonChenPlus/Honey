@@ -27,6 +27,8 @@ using UTILS::TEXT::ConvertUTF8ToWString;
 #ifdef _WIN32
 using UTILS::TEXT::ConvertWStringToUTF8;
 #endif
+#include "UTILS/STRING/String.h"
+using UTILS::STRING::StringFromFormat;
 
 namespace IO
 {
@@ -146,9 +148,8 @@ namespace IO
     // The return is non-const because - why not?
     uint8 *ReadLocalFile(const char *filename, Size *size) {
         FILE *file = fopen(filename, "rb");
-        if (!file) {
-            return 0;
-        }
+        if (!file)
+            throw _NException_("fopen failed", NException::IO);
         fseek(file, 0, SEEK_END);
         Size f_size = ftell(file);
         fseek(file, 0, SEEK_SET);
@@ -363,21 +364,20 @@ namespace IO
     {
     #ifdef _WIN32
         if (!::DeleteFile(ConvertUTF8ToWString(file).c_str())) {
-            //ELOG("Error deleting %s: %i", file, GetLastError());
+            throw _NException_(StringFromFormat("Error deleting %s: %i", file, GetLastError()), NException::IO);
         }
     #else
         int err = unlink(file);
         if (err) {
-            //ELOG("Error unlinking %s: %i", file, err);
+            throw _NException_(StringFromFormat("Error unlinking %s: %i", file, err), NException::IO);
         }
     #endif
     }
 
     void DeleteDir(const char *dir) {
     #ifdef _WIN32
-        if (!RemoveDirectory(ConvertUTF8ToWString(dir).c_str()))
-        {
-            //ELOG("Error deleting directory %s: %i", dir, GetLastError());
+        if (!RemoveDirectory(ConvertUTF8ToWString(dir).c_str())) {
+            throw _NException_(StringFromFormat("Error deleting directory %s: %i", dir, GetLastError()), NException::IO);
         }
     #else
         rmdir(dir);

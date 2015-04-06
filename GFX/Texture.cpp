@@ -22,6 +22,8 @@ using IMAGE::PNGLoadPtr;
 #include "EXTERNALS/jpge/jpgd.h"
 #include "EXTERNALS/rg_etc1/rg_etc1.h"
 #include "GFX/GLExtensions.h"
+#include "UTILS/STRING/String.h"
+using UTILS::STRING::StringFromFormat;
 
 namespace GFX
 {
@@ -119,14 +121,14 @@ namespace GFX
         return data;
     }
 
-    bool Texture::load(const char *filename) {
+    void Texture::load(const char *filename) {
         // hook for generated textures
         if (!memcmp(filename, "gen:", 4)) {
             int bpp, w, h;
             bool clamp;
             uint8 *data = GenerateTexture(filename, bpp, w, h, clamp);
             if (!data)
-                return false;
+                throw _NException_("GenerateTexture failed", NException::GFX);
             glGenTextures(1, &id_);
             glBindTexture(GL_TEXTURE_2D, id_);
             if (bpp == 1) {
@@ -140,7 +142,6 @@ namespace GFX
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             delete [] data;
-            return true;
         }
 
         filename_ = filename;
@@ -171,49 +172,26 @@ namespace GFX
         if (zim && 0==memcmp(name, "Media/textures/", strlen("Media/textures"))) name += strlen("Media/textures/");
         len = strlen(name);
         if (!strcmp("png", &name[len-3]) || !strcmp("PNG", &name[len-3])) {
-            if (!loadPNG(fn)) {
-                //WLOG("WARNING: Failed to load .png %s, falling back to ugly gray XOR pattern!", fn);
-                loadXOR();
-                return false;
-            }
-
-            return true;
+            loadPNG(fn);
         }
         else if (!strcmp("zim", &name[len-3])) {
-            if (loadZIM(name)) {
-                return true;
-            }
-            else {
-                //WLOG("WARNING: Failed to load .zim texture %s, falling back to ugly gray XOR pattern!", fn);
-                loadXOR();
-                return false;
-            }
+            loadZIM(name);
         }
         else if (!strcmp("jpg", &name[len-3]) || !strcmp("JPG", &name[len-3]) ||
                 !strcmp("jpeg", &name[len-4]) || !strcmp("JPEG", &name[len-4])) {
-            if (!loadJPEG(fn)) {
-                //WLOG("WARNING: Failed to load jpeg %s, falling back to ugly gray XOR pattern!", fn);
-                loadXOR();
-                return false;
-            }
-
-            return true;
+            loadJPEG(fn);
         }
         else if (!name || !strlen(name)) {
-            //ELOG("Failed to identify image file %s by extension", name);
+            throw _NException_(StringFromFormat("Failed to identify image file %s by extension", name), NException::GFX);
         }
         else {
-            //ELOG("Cannot load a texture with an empty filename");
+            throw _NException_("Cannot load a texture with an empty filename", NException::GFX);
         }
-        loadXOR();
-        return false;
     }
 
-    bool Texture::loadPNG(const char *filename, bool genMips) {
+    void Texture::loadPNG(const char *filename, bool genMips) {
         unsigned char *image_data;
-        if (1 != PNGLoad(filename, &width_, &height_, &image_data)) {
-            return false;
-        }
+        PNGLoad(filename, &width_, &height_, &image_data);
         GL_CHECK();
         glGenTextures(1, &id_);
         glBindTexture(GL_TEXTURE_2D, id_);
@@ -230,20 +208,16 @@ namespace GFX
         }
         GL_CHECK();
         free(image_data);
-        return true;
     }
 
-    bool Texture::loadJPEG(const char *filename, bool genMips) {
+    void Texture::loadJPEG(const char *filename, bool genMips) {
         //ILOG("Loading jpeg %s", filename);
         unsigned char *image_data;
         int actual_comps;
         image_data = jpgd::decompress_jpeg_image_from_file(filename, &width_, &height_, &actual_comps, 4);
         if (!image_data) {
-            //ELOG("jpeg: image data returned was 0");
-            return false;
+            throw _NException_("jpeg: image data returned was 0", NException::IO);
         }
-        //ILOG("Jpeg decoder failed to get RGB, got: %i x %i x %i", actual_comps, width_, height_);
-        //ILOG("First four bytes: %i %i %i %i", image_data[0], image_data[1], image_data[2], image_data[3]);
 
         GL_CHECK();
         glGenTextures(1, &id_);
@@ -260,14 +234,11 @@ namespace GFX
         }
         GL_CHECK();
         free(image_data);
-        return true;
     }
 
-    bool Texture::loadPNG(const uint8 *data, Size size, bool genMips) {
+    void Texture::loadPNG(const uint8 *data, Size size, bool genMips) {
         unsigned char *image_data;
-        if (1 != PNGLoadPtr(data, size, &width_, &height_, &image_data)) {
-            return false;
-        }
+        PNGLoadPtr(data, size, &width_, &height_, &image_data);
         GL_CHECK();
         // TODO: should check for power of 2 tex size and disallow genMips when not.
         glGenTextures(1, &id_);
@@ -284,10 +255,9 @@ namespace GFX
         }
         GL_CHECK();
         free(image_data);
-        return true;
     }
 
-    bool Texture::loadXOR() {
+    void Texture::loadXOR() {
         width_ = height_ = 256;
         unsigned char *buf = new unsigned char[width_*height_*4];
         for (int y = 0; y < 256; y++) {
@@ -312,7 +282,6 @@ namespace GFX
         }
         GL_CHECK();
         delete [] buf;
-        return true;
     }
 
     // Allocates using new[], doesn't free.
@@ -328,17 +297,15 @@ namespace GFX
         return rgba;
     }
 
-    bool Texture::loadZIM(const char *filename) {
+    void Texture::loadZIM(const char *filename) {
         uint8 *image_data[ZIM_MAX_MIP_LEVELS];
         int width[ZIM_MAX_MIP_LEVELS];
         int height[ZIM_MAX_MIP_LEVELS];
 
         int flags;
         int num_levels = LoadZIM(filename, &width[0], &height[0], &flags, &image_data[0]);
-        if (!num_levels)
-            return false;
         if (num_levels >= ZIM_MAX_MIP_LEVELS)
-            return false;
+            throw _NException_Normal("num_levels >= ZIM_MAX_MIP_LEVELS");
         width_ = width[0];
         height_ = height[0];
         int data_type = GL_UNSIGNED_BYTE;
@@ -405,7 +372,6 @@ namespace GFX
         GL_CHECK();
         // Only free the top level, since the allocation is used for all of them.
         free(image_data[0]);
-        return true;
     }
 
     void Texture::bind(int stage) {

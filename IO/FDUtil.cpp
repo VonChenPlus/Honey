@@ -101,8 +101,7 @@ namespace IO
         #ifndef _WIN32
         int opts = fcntl(sock, F_GETFL);
         if (opts < 0) {
-            perror("fcntl(F_GETFL)");
-            //ELOG("Error getting socket status while changing nonblocking status");
+            throw _NException_Normal("Error getting socket status while changing nonblocking status");
         }
         if (non_blocking) {
             opts = (opts | O_NONBLOCK);
@@ -112,8 +111,7 @@ namespace IO
         }
 
         if (fcntl(sock, F_SETFL, opts) < 0) {
-            perror("fcntl(F_SETFL)");
-            //ELOG("Error setting socket nonblocking status");
+            throw _NException_Normal("Error setting socket nonblocking status");
         }
         #else
         UNUSED(sock);

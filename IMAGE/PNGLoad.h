@@ -7,10 +7,10 @@ namespace IMAGE
 {
     // *image_data_ptr should be deleted with free()
     // return value of 1 == success.
-    int PNGLoad(const char *file, int *pwidth,
+    void PNGLoad(const char *file, int *pwidth,
                 int *pheight, unsigned char **image_data_ptr);
 
-    int PNGLoadPtr(const unsigned  char *input_ptr, Size input_len, int *pwidth,
+    void PNGLoadPtr(const unsigned  char *input_ptr, Size input_len, int *pwidth,
                 int *pheight, unsigned char **image_data_ptr);
 }
 

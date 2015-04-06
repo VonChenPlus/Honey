@@ -15,8 +15,12 @@ namespace UTILS
     {
         #ifdef _MSC_VER
         #pragma warning (disable:4996)
+        #ifndef strncasecmp
         #define strncasecmp _strnicmp
+        #endif
+        #ifndef strcasecmp
         #define strcasecmp _strcmpi
+        #endif
         #endif
 
         #ifdef BLACKBERRY

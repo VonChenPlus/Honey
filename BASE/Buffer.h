@@ -61,12 +61,12 @@ public:
     // Writes the entire buffer to the file descriptor. Also resets the
     // size to zero. On failure, data remains in buffer and nothing is
     // written.
-    bool flush(int fd);
-    bool flushToFile(const char *filename);
-    bool flushSocket(uintptr_t sock);  // Windows portability
+    void flush(int fd);
+    void flushToFile(const char *filename);
+    void flushSocket(uintptr_t sock);  // Windows portability
 
-    bool readAll(int fd, int hintSize = 0);
-    bool readAllWithProgress(int fd, int knownSize, float *progress);
+    void readAll(int fd, int hintSize = 0);
+    void readAllWithProgress(int fd, int knownSize, float *progress);
 
     // < 0: error
     // >= 0: number of bytes read

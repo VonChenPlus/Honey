@@ -18,6 +18,8 @@
 using IO::WriteLine;
 #include "UTILS/TIME/Time.h"
 using UTILS::TIME::sleep_ms;
+#include "UTILS/STRING/String.h"
+using UTILS::STRING::StringFromFormat;
 
 Buffer::Buffer() {
 }
@@ -57,8 +59,7 @@ void Buffer::appendValue(int value) {
 
 void Buffer::take(Size length, std::string *dest) {
     if (length > data_.size()) {
-        //ELOG("Truncating length in Buffer::Take()");
-        length = data_.size();
+        throw _NException_Normal("truncating length");
     }
     dest->resize(length);
     if (length > 0) {
@@ -84,8 +85,7 @@ int Buffer::takeLineCRLF(std::string *dest) {
 
 void Buffer::skip(Size length) {
     if (length > data_.size()) {
-        //ELOG("Truncating length in Buffer::Skip()");
-        length = data_.size();
+        throw _NException_Normal("truncating length");
     }
     data_.erase(data_.begin(), data_.begin() + length);
 }
@@ -118,46 +118,39 @@ void Buffer::printf(const char *fmt, ...) {
     int retval = vsnprintf(buffer, sizeof(buffer), fmt, vl);
     if (retval >= (int)sizeof(buffer)) {
         // Output was truncated. TODO: Do something.
-        //ELOG("Buffer::Printf truncated output");
+        throw _NException_Normal("vsnprintf truncated output");
     }
     if (retval < 0) {
-        //ELOG("Buffer::Printf failed");
+        throw _NException_Normal("vsnprintf failed");
     }
     va_end(vl);
     char *ptr = append(retval);
     memcpy(ptr, buffer, retval);
 }
 
-bool Buffer::flush(int fd)
-{
+void Buffer::flush(int fd) {
     // Look into using send() directly.
-    bool success = data_.size() == WriteLine(fd, &data_[0], data_.size());
-    if (success) {
+    if (data_.size() == WriteLine(fd, &data_[0], data_.size())) {
         data_.resize(0);
+        throw _NException_("WriteLine failed", NException::IO);
     }
-
-    return success;
 }
 
-bool Buffer::flushToFile(const char *filename)
-{
+void Buffer::flushToFile(const char *filename) {
     FILE *f = fopen(filename, "wb");
     if (!f)
-        return false;
+        throw _NException_("fopen failed", NException::IO);
     if (data_.size()) {
         fwrite(&data_[0], 1, data_.size(), f);
     }
     fclose(f);
-    return true;
 }
 
-bool Buffer::flushSocket(uintptr_t sock)
-{
+void Buffer::flushSocket(uintptr_t sock) {
     for (Size pos = 0, end = data_.size(); pos < end; ) {
         int sent = send(sock, &data_[pos], (int)(end - pos), 0);
         if (sent < 0) {
-            //ELOG("FlushSocket failed");
-            return false;
+            throw _NException_("send failed", NException::IO);
         }
         pos += sent;
 
@@ -167,10 +160,9 @@ bool Buffer::flushSocket(uintptr_t sock)
         }
     }
     data_.resize(0);
-    return true;
 }
 
-bool Buffer::readAll(int fd, int hintSize) {
+void Buffer::readAll(int fd, int hintSize) {
     std::vector<char> buf;
     if (hintSize >= 65536 * 16) {
         buf.resize(65536);
@@ -188,16 +180,14 @@ bool Buffer::readAll(int fd, int hintSize) {
             break;
         }
         else if (retval < 0) {
-            //ELOG("Error reading from buffer: %i", retval);
-            return false;
+            throw _NException_(StringFromFormat("error reading from buffer: %i", retval), NException::IO);
         }
         char *p = append((Size)retval);
         memcpy(p, &buf[0], retval);
     }
-    return true;
 }
 
-bool Buffer::readAllWithProgress(int fd, int knownSize, float *progress) {
+void Buffer::readAllWithProgress(int fd, int knownSize, float *progress) {
     std::vector<char> buf;
     if (knownSize >= 65536 * 16) {
         buf.resize(65536);
@@ -213,18 +203,16 @@ bool Buffer::readAllWithProgress(int fd, int knownSize, float *progress) {
     while (true) {
         int retval = recv(fd, &buf[0], (int)buf.size(), 0);
         if (retval == 0) {
-            return true;
+            return;
         }
         else if (retval < 0) {
-            //ELOG("Error reading from buffer: %i", retval);
-            return false;
+            throw _NException_(StringFromFormat("error reading from buffer: %i", retval), NException::IO);
         }
         char *p = append((Size)retval);
         memcpy(p, &buf[0], retval);
         total += retval;
         *progress = (float)total / (float)knownSize;
     }
-    return true;
 }
 
 int Buffer::read(int fd, Size sz) {

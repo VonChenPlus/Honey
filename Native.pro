@@ -35,7 +35,8 @@ SOURCES += $$P/BASE/NativeApp.cpp \
     $$P/BASE/Buffer.cpp \
     $$P/IO/FDUtil.cpp \
     $$P/IO/FileUtil.cpp \
-    $$P/UTILS/TIME/Time.cpp
+    $$P/UTILS/TIME/Time.cpp \
+    $$P/BASE/NException.cpp
 
 HEADERS += \
     $$P/BASE/NativeApp.h \
@@ -75,7 +76,8 @@ HEADERS += \
     $$P/BASE/Buffer.h \
     $$P/IO/FDUtil.h \
     $$P/IO/FileUtil.h \
-    $$P/UTILS/TIME/Time.h
+    $$P/UTILS/TIME/Time.h \
+    $$P/BASE/NException.h
 
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)

@@ -19,18 +19,18 @@ namespace GFX
         // If filename begins with "gen:", will defer to texture_gen.cpp/h.
         // When format is known, it's fine to use LoadZIM etc directly.
         // Those will NOT auto-fall back to xor texture however!
-        bool load(const char *filename);
+        void load(const char *filename);
         void bind(int stage = -1);
         void destroy();
 
         // PNG from memory buffer
-        bool loadPNG(const uint8 *data, Size size, bool genMips = true);
-        bool loadZIM(const char *filename);
-        bool loadPNG(const char *filename, bool genMips = true);
-        bool loadJPEG(const char *filename, bool genMips = true);
+        void loadPNG(const uint8 *data, Size size, bool genMips = true);
+        void loadZIM(const char *filename);
+        void loadPNG(const char *filename, bool genMips = true);
+        void loadJPEG(const char *filename, bool genMips = true);
+        void loadXOR();	// Loads a placeholder texture.
 
-        unsigned int handle() const
-        {
+        unsigned int handle() const {
             return id_;
         }
 
@@ -43,8 +43,6 @@ namespace GFX
         int height() const { return height_; }
 
     private:
-        bool loadXOR();	// Loads a placeholder texture.
-
         std::string filename_;
         unsigned int id_;
         int width_, height_;

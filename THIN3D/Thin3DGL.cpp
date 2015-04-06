@@ -6,6 +6,8 @@ using IMAGE::ZIM_CLAMP;
 using MATH::IsPowerOf2;
 using IMAGE::ZIM_HAS_MIPS;
 using IMAGE::ZIM_GEN_MIPS;
+#include "UTILS/STRING/String.h"
+using UTILS::STRING::StringFromFormat;
 
 namespace THIN3D
 {
@@ -153,8 +155,7 @@ namespace THIN3D
                 glVertexAttribPointer(components_[i].semantic, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride_, (void *)(b + (intptr_t)components_[i].offset));
                 break;
             case INVALID:
-                ;
-                //ELOG("Thin3DGLVertexFormat: Invalid component type applied.");
+                throw _NException_Normal("Thin3DGLVertexFormat: Invalid component type applied");
             }
         }
     }
@@ -188,7 +189,7 @@ namespace THIN3D
         glDeleteProgram(program_);
     }
 
-    bool Thin3DGLShaderSet::link() {
+    void Thin3DGLShaderSet::link() {
         program_ = glCreateProgram();
         glAttachShader(program_, vshader->getShader());
         glAttachShader(program_, fshader->getShader());
@@ -210,11 +211,11 @@ namespace THIN3D
             if (bufLength) {
                 char* buf = new char[bufLength];
                 glGetProgramInfoLog(program_, bufLength, NULLPTR, buf);
-                //ELOG("Could not link program:\n %s", buf);
-                // We've thrown out the source at this point. Might want to do something about that.
+                std::string log = StringFromFormat("Could not link program:\n %s", buf);
                 delete[] buf;
+                // We've thrown out the source at this point. Might want to do something about that.
+                throw _NException_(log, NException::GFX);
             }
-            return false;
         }
 
         // Auto-initialize samplers.
@@ -230,7 +231,6 @@ namespace THIN3D
 
         // Here we could (using glGetAttribLocation) save a bitmask about which pieces of vertex data are used in the shader
         // and then AND it with the vertex format bitmask later...
-        return true;
     }
 
     void Thin3DGLShaderSet::apply() {
@@ -359,8 +359,7 @@ namespace THIN3D
             glTexImage2D(GL_TEXTURE_2D, level, internalFormat, width_, height_, 0, format, type, data);
             break;
         default:
-            //ELOG("Thin3D GL: Targets other than GL_TEXTURE_2D not yet supported");
-            break;
+            throw _NException_Normal("Targets other than GL_TEXTURE_2D not yet supported");
         }
     }
 
@@ -375,16 +374,10 @@ namespace THIN3D
 
     void Thin3DGLTexture::glLost() {
         if (!filename_.empty()) {
-            if (loadFromFile(filename_.c_str())) {
-                //ILOG("Reloaded lost texture %s", filename_.c_str());
-            }
-            else {
-                //ELOG("Failed to reload lost texture %s", filename_.c_str());
-            }
+            loadFromFile(filename_.c_str());
         }
         else {
-            //WLOG("Texture %p cannot be restored - has no filename", this);
-            tex_ = 0;
+            throw _NException_Normal(StringFromFormat("Texture %p cannot be restored - has no filename", this));
         }
     }
 
@@ -431,21 +424,15 @@ namespace THIN3D
 
     Thin3DShaderSet *Thin3DGLContext::createShaderSet(Thin3DShader *vshader, Thin3DShader *fshader) {
         if (!vshader || !fshader) {
-            //ELOG("ShaderSet requires both a valid vertex and a fragment shader: %p %p", vshader, fshader);
-            return NULLPTR;
+            throw _NException_Normal(StringFromFormat("ShaderSet requires both a valid vertex and a fragment shader: %p %p", vshader, fshader));
         }
         Thin3DGLShaderSet *shaderSet = new Thin3DGLShaderSet();
         vshader->addRef();
         fshader->addRef();
         shaderSet->vshader = static_cast<Thin3DGLShader *>(vshader);
         shaderSet->fshader = static_cast<Thin3DGLShader *>(fshader);
-        if (shaderSet->link()) {
-            return shaderSet;
-        }
-        else {
-            delete shaderSet;
-            return NULLPTR;
-        }
+        shaderSet->link();
+        return shaderSet;
     }
 
     Thin3DVertexFormat *Thin3DGLContext::createVertexFormat(const std::vector<Thin3DVertexComponent> &components, int stride, Thin3DShader *vshader) {

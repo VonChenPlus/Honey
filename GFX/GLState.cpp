@@ -6,6 +6,8 @@
 
 #include "BASE/BasicTypes.h"
 #include "GFX/GLExtensions.h"
+#include "UTILS/STRING/String.h"
+using UTILS::STRING::StringFromFormat;
 
 namespace GFX
 {
@@ -237,8 +239,8 @@ namespace GFX
 
         ProcessGPUFeatures();
 
-        //int error = glGetError();
-        //if (error)
-            //ELOG("GL error in init: %i", error);
+        int error = glGetError();
+        if (error)
+            throw _NException_(StringFromFormat("GL error in init: %i", error), NException::GFX);
     }
 }

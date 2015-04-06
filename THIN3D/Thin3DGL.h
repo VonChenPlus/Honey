@@ -178,7 +178,7 @@ namespace THIN3D
     public:
         Thin3DGLShaderSet();
         ~Thin3DGLShaderSet();
-        bool link();
+        void link();
 
         void apply();
 

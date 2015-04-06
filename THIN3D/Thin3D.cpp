@@ -11,6 +11,8 @@ using IMAGE::PNGLoadPtr;
 #include "EXTERNALS/jpge/jpgd.h"
 #include "IO/FileUtil.h"
 using IO::ReadLocalFile;
+#include "UTILS/STRING/String.h"
+using UTILS::STRING::StringFromFormat;
 
 namespace THIN3D
 {
@@ -158,13 +160,12 @@ namespace THIN3D
         return TYPE_UNKNOWN;
     }
 
-    static bool LoadTextureLevels(const uint8 *data, Size size, T3DImageType type, int width[16], int height[16], int *num_levels, T3DImageFormat *fmt, uint8 *image[16], int *zim_flags) {
+    static void LoadTextureLevels(const uint8 *data, Size size, T3DImageType type, int width[16], int height[16], int *num_levels, T3DImageFormat *fmt, uint8 *image[16], int *zim_flags) {
         if (type == DETECT) {
             type = DetectImageFileType(data, size);
         }
         if (type == TYPE_UNKNOWN) {
-            //ELOG("File has unknown format");
-            return false;
+            throw _NException_Normal("File has unknown format");
         }
 
         *num_levels = 0;
@@ -177,10 +178,9 @@ namespace THIN3D
             }
             break;
         case PNG: {
-                if (1 == PNGLoadPtr((const unsigned char *)data, size, &width[0], &height[0], &image[0])) {
-                    *num_levels = 1;
-                    *fmt = RGBA8888;
-                }
+                PNGLoadPtr((const unsigned char *)data, size, &width[0], &height[0], &image[0]);
+                *num_levels = 1;
+                *fmt = RGBA8888;
             }
             break;
         case JPEG: {
@@ -194,14 +194,11 @@ namespace THIN3D
             }
             break;
         default:
-            //ELOG("Unknown image format");
-            return false;
+            throw _NException_Normal("File has unknown format");
         }
-
-        return *num_levels > 0;
     }
 
-    bool Thin3DTexture::loadFromFileData(const uint8 *data, Size dataSize, T3DImageType type) {
+    void Thin3DTexture::loadFromFileData(const uint8 *data, Size dataSize, T3DImageType type) {
         int width[16], height[16];
         uint8 *image[16] = { NULLPTR };
 
@@ -209,9 +206,7 @@ namespace THIN3D
         int zim_flags;
         T3DImageFormat fmt;
 
-        if (!LoadTextureLevels(data, dataSize, type, width, height, &num_levels, &fmt, image, &zim_flags)) {
-            return false;
-        }
+        LoadTextureLevels(data, dataSize, type, width, height, &num_levels, &fmt, image, &zim_flags);
 
         create(LINEAR2D, fmt, width[0], height[0], 1, num_levels);
         for (int i = 0; i < num_levels; i++) {
@@ -220,38 +215,25 @@ namespace THIN3D
                 free(image[i]);
             }
             else {
-                //ELOG("Missing image level %i", i);
+                throw _NException_Normal(StringFromFormat("Missing image level %i", i));
             }
         }
 
         finalize(zim_flags);
-        return true;
     }
 
-    bool Thin3DTexture::loadFromFile(const std::string &filename, T3DImageType type) {
+    void Thin3DTexture::loadFromFile(const std::string &filename, T3DImageType type) {
         filename_ = "";
         Size fileSize;
         uint8 *buffer = ReadLocalFile(filename.c_str(), &fileSize);
-        if (!buffer) {
-            return false;
-        }
-        bool retval = loadFromFileData(buffer, fileSize, type);
-        if (retval) {
-            filename_ = filename;
-        }
-        else {
-            //ELOG("%s: Failed to load texture %s", __FUNCTION__, filename.c_str());
-        }
+        loadFromFileData(buffer, fileSize, type);
+        filename_ = filename;
         delete[] buffer;
-        return retval;
     }
 
     Thin3DTexture *Thin3DContext::createTextureFromFile(const char *filename, T3DImageType type) {
         Thin3DTexture *tex = createTexture();
-        if (!tex->loadFromFile(filename, type)) {
-            tex->release();
-            return NULLPTR;
-        }
+        tex->loadFromFile(filename, type);
         return tex;
     }
 
@@ -263,9 +245,7 @@ namespace THIN3D
         T3DImageFormat fmt;
         uint8 *image[16] = { NULLPTR };
 
-        if (!LoadTextureLevels(data, size, type, width, height, &num_levels, &fmt, image, &zim_flags)) {
-            return NULLPTR;
-        }
+       LoadTextureLevels(data, size, type, width, height, &num_levels, &fmt, image, &zim_flags);
 
         Thin3DTexture *tex = createTexture(LINEAR2D, fmt, width[0], height[0], 1, num_levels);
         for (int i = 0; i < num_levels; i++) {

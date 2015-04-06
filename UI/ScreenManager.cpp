@@ -18,8 +18,7 @@ namespace UI
 
     void ScreenManager::switchScreen(Screen *screen) {
         if (screen == nextScreen_) {
-            //ELOG("Already switching to this screen");
-            return;
+            throw _NException_Normal("Already switching to this screen");
         }
         // Note that if a dialog is found, this will be a silent background switch that
         // will only become apparent if the dialog is closed. The previous screen will stick around
@@ -60,8 +59,7 @@ namespace UI
             case LAYER_SIDEMENU:
             case LAYER_TRANSPARENT:
                 if (stack_.size() == 1) {
-                    //ELOG("Can't have sidemenu over nothing");
-                    break;
+                    throw _NException_Normal("Can't have sidemenu over nothing");
                 }
                 else {
                     auto iter = stack_.end();
@@ -78,7 +76,7 @@ namespace UI
             }
         }
         else {
-            //ELOG("No current screen!");
+            throw _NException_Normal("No current screen");
         }
     }
 
@@ -140,13 +138,14 @@ namespace UI
             stack_.pop_back();
         }
         else {
+            throw _NException_Normal("Can't pop when stack empty");
             //ELOG("Can't pop when stack empty");
         }
     }
 
     void ScreenManager::switchToNext() {
         if (!nextScreen_) {
-            //ELOG("switchToNext: No nextScreen_!");
+            throw _NException_Normal("switchToNext: No nextScreen_");
         }
 
         Layer temp = {0, LAYER_DEFAULT};

@@ -19,42 +19,33 @@ namespace GFX
         private:
             bool _value;
         public:
-            BoolState() : _value(init)
-            {
+            BoolState() : _value(init) {
                 OpenGLState::state_count++;
             }
 
-            inline void set(bool value)
-            {
-                if(value && value != _value)
-                {
+            inline void set(bool value) {
+                if(value && value != _value) {
                     _value = value;
                     glEnable(cap);
                 }
-                if(!value && value != _value)
-                {
+                if(!value && value != _value) {
                     _value = value;
                     glDisable(cap);
                 }
             }
-            inline void enable()
-            {
+            inline void enable() {
                 set(true);
             }
-            inline void disable()
-            {
+            inline void disable() {
                 set(false);
             }
-            operator bool() const
-            {
+            operator bool() const {
                 return isset();
             }
-            inline bool isset()
-            {
+            inline bool isset() {
                 return _value;
             }
-            void restore()
-            {
+            void restore() {
                 if(_value)
                     glEnable(cap);
                 else

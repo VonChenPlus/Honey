@@ -239,8 +239,8 @@ namespace THIN3D
     class Thin3DTexture : public Thin3DObject
     {
     public:
-        bool loadFromFile(const std::string &filename, T3DImageType type = T3DImageType::DETECT);
-        bool loadFromFileData(const uint8 *data, Size dataSize, T3DImageType type = T3DImageType::DETECT);
+        void loadFromFile(const std::string &filename, T3DImageType type = T3DImageType::DETECT);
+        void loadFromFileData(const uint8 *data, Size dataSize, T3DImageType type = T3DImageType::DETECT);
 
         virtual bool create(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels) = 0;
         virtual void setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8 *data) = 0;
