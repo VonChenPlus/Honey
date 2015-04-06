@@ -16,7 +16,8 @@
 
 #include "IO/FDUtil.h"
 using IO::WriteLine;
-#include "BASE/TimeUtil.h"
+#include "UTILS/TIME/Time.h"
+using UTILS::TIME::sleep_ms;
 
 Buffer::Buffer() {
 }

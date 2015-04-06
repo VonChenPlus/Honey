@@ -31,11 +31,11 @@ SOURCES += $$P/BASE/NativeApp.cpp \
     $$P/UTILS/TEXT/UTF8.cpp \
     $$P/GFX/DrawText.cpp \
     $$P/UTILS/HASH/Hash.cpp \
-    $$P/BASE/StringUtils.cpp \
+    $$P/UTILS/STRING/String.cpp \
     $$P/BASE/Buffer.cpp \
     $$P/IO/FDUtil.cpp \
     $$P/IO/FileUtil.cpp \
-    $$P/BASE/TimeUtil.cpp
+    $$P/UTILS/TIME/Time.cpp
 
 HEADERS += \
     $$P/BASE/NativeApp.h \
@@ -71,11 +71,11 @@ HEADERS += \
     $$P/GFX/DrawText.h \
     $$P/UTILS/HASH/Hash.h \
     $$P/UI/UI.h \
-    $$P/BASE/StringUtils.h \
+    $$P/UTILS/STRING/String.h \
     $$P/BASE/Buffer.h \
     $$P/IO/FDUtil.h \
     $$P/IO/FileUtil.h \
-    $$P/BASE/TimeUtil.h
+    $$P/UTILS/TIME/Time.h
 
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)

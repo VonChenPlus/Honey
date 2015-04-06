@@ -22,7 +22,8 @@ namespace GFX
 
 #include "UTILS/TEXT/UTF8.h"
 using UTILS::TEXT::ConvertUTF8ToWString;
-#include "BASE/StringUtils.h"
+#include "UTILS/STRING/String.h"
+using UTILS::STRING::ReplaceAll;
 
     enum
     {
