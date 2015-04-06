@@ -17,9 +17,9 @@
   #define NOEXCEPT throw()
 #endif  /*  NOEXCEPT    */
 
-#define _NException_Unknown( msg) NException( (msg), (NException::Unknown), __FILE__, __LINE__ )
-#define _NException_Normal( msg) NException( (msg), (NException::Normal), __FILE__, __LINE__ )
 #define _NException_( msg, type) NException( (msg), (type), __FILE__, __LINE__ )
+#define _NException_Unknown( msg) _NException_( (msg), (NException::Unknown) )
+#define _NException_Normal( msg) _NException_( (msg), (NException::Normal) )
 
 class NException : std::exception
 {
