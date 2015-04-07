@@ -55,109 +55,95 @@ namespace IO
     #endif
 
     static FILE *OpenCFile(const std::string &filename, const char *mode) {
+        FILE *file = NULLPTR;
     #if defined(_WIN32) && defined(UNICODE)
-        return _wfopen(ConvertUTF8ToWString(filename).c_str(), ConvertUTF8ToWString(mode).c_str());
+        file = _wfopen(ConvertUTF8ToWString(filename).c_str(), ConvertUTF8ToWString(mode).c_str());
     #else
-        return fopen(filename.c_str(), mode);
+        file =  fopen(filename.c_str(), mode);
     #endif
+        if (file == NULLPTR)
+            throw _NException_("OpenCFile failed", NException::IO);
+        return file;
     }
 
-    bool WriteStringToFile(bool text_file, const std::string &str, const char *filename) {
-        FILE *f = OpenCFile(filename, text_file ? "w" : "wb");
-        if (!f)
-            return false;
+    void WriteStringToFile(bool text_file, const std::string &str, const char *filename) {
+        FILE *file = OpenCFile(filename, text_file ? "w" : "wb");
         Size len = str.size();
-        if (len != fwrite(str.data(), 1, str.size(), f))
+        if (len != fwrite(str.data(), 1, str.size(), file))
         {
-            fclose(f);
-            return false;
+            fclose(file);
+            throw _NException_("fwrite failed", NException::IO);
         }
-        fclose(f);
-        return true;
+        fclose(file);
     }
 
-    bool WriteDataToFile(bool text_file, const void* data, const unsigned int size, const char *filename) {
-        FILE *f = OpenCFile(filename, text_file ? "w" : "wb");
-        if (!f)
-            return false;
+    void WriteDataToFile(bool text_file, const void* data, const unsigned int size, const char *filename) {
+        FILE *file = OpenCFile(filename, text_file ? "w" : "wb");
         Size len = size;
-        if (len != fwrite(data, 1, len, f)) {
-            fclose(f);
-            return false;
+        if (len != fwrite(data, 1, len, file)) {
+            fclose(file);
+            throw _NException_("fwrite failed", NException::IO);
         }
-        fclose(f);
-        return true;
+        fclose(file);
     }
 
-    uint64 GetSize(FILE *f) {
+    uint64 GetSize(FILE *file) {
         // This will only support 64-bit when large file support is available.
         // That won't be the case on some versions of Android, at least.
     #if defined(ANDROID) || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS < 64)
-        int fd = fileno(f);
+        int fd = fileno(file);
 
         off64_t pos = lseek64(fd, 0, SEEK_CUR);
         off64_t size = lseek64(fd, 0, SEEK_END);
         if (size != pos && lseek64(fd, pos, SEEK_SET) != pos) {
-            // Should error here.
-            return 0;
+            throw _NException_("lseek64 failed", NException::IO);
         }
         return size;
     #else
-        uint64_t pos = ftello(f);
-        if (fseek(f, 0, SEEK_END) != 0) {
-            return 0;
+        uint64_t pos = ftello(file);
+        if (fseek(file, 0, SEEK_END) != 0) {
+            throw _NException_("fseek failed", NException::IO);
         }
-        uint64_t size = ftello(f);
+        uint64_t size = ftello(file);
         // Reset the seek position to where it was when we started.
-        if (size != pos && fseeko(f, pos, SEEK_SET) != 0) {
-            // Should error here.
-            return 0;
+        if (size != pos && fseeko(file, pos, SEEK_SET) != 0) {
+            throw _NException_("fseeko failed", NException::IO);
         }
         return size;
     #endif
     }
 
-    bool ReadFileToString(bool text_file, const char *filename, std::string &str) {
-        FILE *f = OpenCFile(filename, text_file ? "r" : "rb");
-        if (!f)
-            return false;
-        Size len = (Size)GetSize(f);
+    void ReadFileToString(bool text_file, const char *filename, std::string &str) {
+        FILE *file = OpenCFile(filename, text_file ? "r" : "rb");
+        Size len = (Size)GetSize(file);
         char *buf = new char[len + 1];
-        buf[fread(buf, 1, len, f)] = 0;
+        buf[fread(buf, 1, len, file)] = 0;
         str = std::string(buf, len);
-        fclose(f);
-        delete [] buf;
-        return true;
+        fclose(file);
+        delete[] buf;
     }
 
 
-    bool ReadDataFromFile(bool text_file, unsigned char* &data, const unsigned int size, const char *filename) {
-        FILE *f = OpenCFile(filename, text_file ? "r" : "rb");
-        if (!f)
-            return false;
-        Size len = (Size)GetSize(f);
-        if(len < size) {
-            fclose(f);
-            return false;
+    void ReadDataFromFile(bool text_file, unsigned char* &data, const unsigned int size, const char *filename) {
+        FILE *file = OpenCFile(filename, text_file ? "r" : "rb");
+        Size len = (Size)GetSize(file);
+        if(len > size) {
+            fclose(file);
+            throw _NException_Normal("truncating length");
         }
-        data[fread(data, 1, size, f)] = 0;
-        fclose(f);
-        return true;
+        data[fread(data, 1, size, file)] = 0;
+        fclose(file);
     }
 
     // The return is non-const because - why not?
     uint8 *ReadLocalFile(const char *filename, Size *size) {
-        FILE *file = fopen(filename, "rb");
-        if (!file)
-            throw _NException_("fopen failed", NException::IO);
-        fseek(file, 0, SEEK_END);
-        Size f_size = ftell(file);
-        fseek(file, 0, SEEK_SET);
-        uint8 *contents = new uint8[f_size+1];
-        fread(contents, 1, f_size, file);
+        FILE *file = OpenCFile(filename, "rb");
+        Size fSize = (Size)GetSize(file);
+        uint8 *contents = new uint8[fSize+1];
+        fread(contents, 1, fSize, file);
         fclose(file);
-        contents[f_size] = 0;
-        *size = f_size;
+        contents[fSize] = 0;
+        *size = fSize;
         return contents;
     }
 
@@ -201,17 +187,14 @@ namespace IO
         return info.isDirectory;
     }
 
-    bool GetFileInfo(const char *path, FileInfo *fileInfo) {
+    void GetFileInfo(const char *path, FileInfo *fileInfo) {
         // TODO: Expand relative paths?
         fileInfo->fullName = path;
 
     #ifdef _WIN32
         WIN32_FILE_ATTRIBUTE_DATA attrs;
         if (!GetFileAttributesExW(ConvertUTF8ToWString(path).c_str(), GetFileExInfoStandard, &attrs)) {
-            fileInfo->size = 0;
-            fileInfo->isDirectory = false;
-            fileInfo->exists = false;
-            return false;
+            throw _NException_Normal("GetFileAttributes failed");
         }
         fileInfo->size = (uint64)attrs.nFileSizeLow | ((uint64)attrs.nFileSizeHigh << 32);
         fileInfo->isDirectory = (attrs.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
@@ -226,9 +209,7 @@ namespace IO
         int result = stat64(copy.c_str(), &file_info);
 
         if (result < 0) {
-            //WLOG("IsDirectory: stat failed on %s", path);
-            fileInfo->exists = false;
-            return false;
+            throw _NException_Normal("GetFileAttributes failed");
         }
 
         fileInfo->isDirectory = S_ISDIR(file_info.st_mode);
@@ -239,7 +220,6 @@ namespace IO
         if (file_info.st_mode & 0200)
             fileInfo->isWritable = true;
     #endif
-        return true;
     }
 
     std::string GetFileExtension(const std::string &fn) {

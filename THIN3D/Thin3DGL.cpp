@@ -104,7 +104,7 @@ namespace THIN3D
         glDeleteShader(shader_);
     }
 
-    bool Thin3DGLShader::compile(const char *source) {
+    void Thin3DGLShader::compile(const char *source) {
         source_ = source;
         shader_ = glCreateShader(type_);
 
@@ -127,10 +127,8 @@ namespace THIN3D
             infoLog[len] = '\0';
             glDeleteShader(shader_);
             shader_ = 0;
-            //ILOG("%s Shader compile error:\n%s", type_ == GL_FRAGMENT_SHADER ? "Fragment" : "Vertex", infoLog);
+            throw _NException_(StringFromFormat("%s Shader compile error:\n%s", type_ == GL_FRAGMENT_SHADER ? "Fragment" : "Vertex", infoLog), NException::GFX);
         }
-        ok_ = success != 0;
-        return ok_;
     }
 
     void Thin3DGLVertexFormat::apply(const void *base) {
@@ -311,14 +309,13 @@ namespace THIN3D
         destroy();
     }
 
-    bool Thin3DGLTexture::create(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels) {
+    void Thin3DGLTexture::create(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels) {
         format_ = format;
         target_ = TypeToTarget(type);
         mipLevels_ = mipLevels;
         width_ = width;
         height_ = height;
         depth_ = depth;
-        return true;
     }
 
     void Thin3DGLTexture::destroy() {
@@ -455,25 +452,15 @@ namespace THIN3D
     Thin3DShader *Thin3DGLContext::createVertexShader(const char *glsl_source, const char *hlsl_source) {
         UNUSED(hlsl_source);
         Thin3DGLShader *shader = new Thin3DGLShader(false);
-        if (shader->compile(glsl_source)) {
-            return shader;
-        }
-        else {
-            shader->release();
-            return NULLPTR;
-        }
+        shader->compile(glsl_source);
+        return shader;
     }
 
     Thin3DShader *Thin3DGLContext::createFragmentShader(const char *glsl_source, const char *hlsl_source) {
         UNUSED(hlsl_source);
         Thin3DGLShader *shader = new Thin3DGLShader(true);
-        if (shader->compile(glsl_source)) {
-            return shader;
-        }
-        else {
-            shader->release();
-            return NULLPTR;
-        }
+        shader->compile(glsl_source);
+        return shader;
     }
 
     void Thin3DGLContext::setTextures(int start, int count, Thin3DTexture **textures) {

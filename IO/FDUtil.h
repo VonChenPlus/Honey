@@ -16,7 +16,7 @@ namespace IO
 
     // Returns true if the fd became ready, false if it didn't or
     // if there was another error.
-    bool WaitUntilReady(int fd, double timeout);
+    void WaitUntilReady(int fd, double timeout);
 
     void SetNonBlocking(int fd, bool non_blocking);
 }

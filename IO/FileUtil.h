@@ -9,11 +9,11 @@
 namespace IO
 {
     // Whole-file reading/writing
-    bool WriteStringToFile(bool text_file, const std::string &str, const char *filename);
-    bool ReadFileToString(bool text_file, const char *filename, std::string &str);
+    void WriteStringToFile(bool text_file, const std::string &str, const char *filename);
+    void ReadFileToString(bool text_file, const char *filename, std::string &str);
 
-    bool WriteDataToFile(bool text_file, const void* data, const unsigned int size, const char *filename);
-    bool ReadDataFromFile(bool text_file, unsigned char* &data, const unsigned int size, const char *filename);
+    void WriteDataToFile(bool text_file, const void* data, const unsigned int size, const char *filename);
+    void ReadDataFromFile(bool text_file, unsigned char* &data, const unsigned int size, const char *filename);
 
     // Direct readers. deallocate using delete [].
     uint8 *ReadLocalFile(const char *filename, Size *size);
@@ -34,7 +34,7 @@ namespace IO
     std::string GetFileExtension(const std::string &fn);
     std::string GetDir(const std::string &path);
     std::string GetFilename(std::string path);
-    bool GetFileInfo(const char *path, FileInfo *fileInfo);
+    void GetFileInfo(const char *path, FileInfo *fileInfo);
 
     enum
     {

@@ -138,7 +138,7 @@ namespace THIN3D
     public:
         Thin3DGLShader(bool isFragmentShader);
 
-        bool compile(const char *source);
+        void compile(const char *source);
 
         GLuint getShader() const { return shader_; }
         const std::string &getSource() const { return source_; }
@@ -207,7 +207,7 @@ namespace THIN3D
         Thin3DGLTexture(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels);
         ~Thin3DGLTexture();
 
-        bool create(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels);
+        void create(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels);
 
         void destroy();
         void setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8 *data) override;

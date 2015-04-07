@@ -75,7 +75,7 @@ namespace IO
         return WriteLine(fd, str.c_str(), str.size());
     }
 
-    bool WaitUntilReady(int fd, double timeout) {
+    void WaitUntilReady(int fd, double timeout) {
         struct timeval tv;
         tv.tv_sec = floor(timeout);
         tv.tv_usec = (timeout - floor(timeout)) * 1000000.0;
@@ -86,15 +86,10 @@ namespace IO
         // First argument to select is the highest socket in the set + 1.
         int rval = select(fd + 1, &fds, NULLPTR, NULLPTR, &tv);
         if (rval < 0) {
-            // Error calling select.
-            return false;
+            throw _NException_("Error calling select", NException::IO);
         } else if (rval == 0) {
-            // Timeout.
-            return false;
+            throw _NException_("Timeout", NException::IO);
         }
-
-        // Socket is ready.
-        return true;
     }
 
     void SetNonBlocking(int sock, bool non_blocking) {

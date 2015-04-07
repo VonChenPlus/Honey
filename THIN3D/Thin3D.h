@@ -242,7 +242,7 @@ namespace THIN3D
         void loadFromFile(const std::string &filename, T3DImageType type = T3DImageType::DETECT);
         void loadFromFileData(const uint8 *data, Size dataSize, T3DImageType type = T3DImageType::DETECT);
 
-        virtual bool create(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels) = 0;
+        virtual void create(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels) = 0;
         virtual void setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8 *data) = 0;
         virtual void autoGenMipmaps() = 0;
         virtual void finalize(int zim_flags) = 0;  // TODO: Tidy up
