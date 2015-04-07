@@ -15,44 +15,43 @@ using GFX::FLAG_DYNAMIC_ASCII;
 using UI::UIState;
 #include "UI/View.h"
 
+namespace GLOBAL
+{
+    extern UIState &uiState();
+    extern DrawBuffer &drawBuffer2D();
+    extern DrawBuffer &drawBuffer2DFront();
+    extern int dpXRes();
+    extern int dpYRes();
+    extern float dpiScale();
+}
+
 namespace UI
 {
-    // This is the drawbuffer used for UI. Remember to flush it at the end of the frame.
-    // TODO: One should probably pass it in through UIInit.
-    extern DrawBuffer ui_draw2d;
-    extern DrawBuffer ui_draw2d_front;	// for things that need to be on top of the rest
-    // This needs to be extern so that additional UI controls can be developed outside this file.
-    extern UIState uistate;
-
-    extern int dp_xres;
-    extern int dp_yres;
-    extern float g_dpi_scale;
-
     static void UIBegin(Thin3DShaderSet *shaderSet) {
         for (int i = 0; i < MAX_POINTERS; i++)
-            uistate.hotitem[i] = 0;
-        ui_draw2d.begin(shaderSet);
-        ui_draw2d_front.begin(shaderSet);
+            GLOBAL::uiState().hotitem[i] = 0;
+        GLOBAL::drawBuffer2D().begin(shaderSet);
+        GLOBAL::drawBuffer2DFront().begin(shaderSet);
     }
 
     static void UIEnd() {
         for (int i = 0; i < MAX_POINTERS; i++) {
-            if (uistate.mousedown[i] == 0) {
-                uistate.activeitem[i] = 0;
+            if (GLOBAL::uiState().mousedown[i] == 0) {
+                GLOBAL::uiState().activeitem[i] = 0;
             }
             else {
-                if (uistate.activeitem[i] == 0) {
-                    uistate.activeitem[i] = -1;
+                if (GLOBAL::uiState().activeitem[i] == 0) {
+                    GLOBAL::uiState().activeitem[i] = -1;
                 }
             }
         }
-        ui_draw2d.end();
-        ui_draw2d_front.end();
+        GLOBAL::drawBuffer2D().end();
+        GLOBAL::drawBuffer2DFront().end();
 
-        if (uistate.ui_tick > 0)
-            uistate.ui_tick--;
-        ui_draw2d.flush();
-        ui_draw2d_front.flush();
+        if (GLOBAL::uiState().ui_tick > 0)
+            GLOBAL::uiState().ui_tick--;
+        GLOBAL::drawBuffer2D().flush();
+        GLOBAL::drawBuffer2DFront().flush();
     }
 
     UIContext::UIContext()
@@ -63,7 +62,7 @@ namespace UI
         fontScaleX_ = 1.0f;
         fontScaleY_ = 1.0f;
         fontStyle_ = new FontStyle();
-        bounds_ = Bounds(0, 0, dp_xres, dp_yres);
+        bounds_ = Bounds(0, 0, GLOBAL::dpXRes(), GLOBAL::dpYRes());
     }
 
     UIContext::~UIContext() {
@@ -146,7 +145,7 @@ namespace UI
     void UIContext::activateTopScissor() {
         if (scissorStack_.size()) {
             const Bounds &bounds = scissorStack_.back();
-            float scale = 1.0f / g_dpi_scale;
+            float scale = 1.0f / GLOBAL::dpiScale();
             int x = scale * bounds.x;
             int y = scale * bounds.y;
             int w = scale * bounds.w;

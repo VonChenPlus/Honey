@@ -241,35 +241,20 @@ namespace THIN3D
         Thin3DTexture *createTexture() override;
 
         // Bound state objects
-        void setBlendState(Thin3DBlendState *state) override {
-            Thin3DGLBlendState *s = static_cast<Thin3DGLBlendState *>(state);
-            s->apply();
-        }
+        void setBlendState(Thin3DBlendState *state) override;
 
         // Bound state objects
-        void setDepthStencilState(Thin3DDepthStencilState *state) override {
-            Thin3DGLDepthStencilState *s = static_cast<Thin3DGLDepthStencilState *>(state);
-            s->apply();
-        }
+        void setDepthStencilState(Thin3DDepthStencilState *state) override;
 
         // The implementation makes the choice of which shader code to use.
         Thin3DShader *createVertexShader(const char *glsl_source, const char *hlsl_source);
         Thin3DShader *createFragmentShader(const char *glsl_source, const char *hlsl_source);
 
-        void setScissorEnabled(bool enable) override {
-            GFX::glstate.scissorTest.set(enable);
-        }
+        void setScissorEnabled(bool enable) override;
 
-        void setScissorRect(int left, int top, int width, int height) override {
-            GFX::glstate.scissorRect.set(left, targetHeight_ - (top + height), width, height);
-        }
+        void setScissorRect(int left, int top, int width, int height) override;
 
-        void setViewports(int count, T3DViewport *viewports) override {
-            UNUSED(count);
-            // TODO: Add support for multiple viewports.
-            GFX::glstate.viewport.set(viewports[0].TopLeftX, viewports[0].TopLeftY, viewports[0].Width, viewports[0].Height);
-            GFX::glstate.depthRange.set(viewports[0].MinDepth, viewports[0].MaxDepth);
-        }
+        void setViewports(int count, T3DViewport *viewports) override;
 
         void setTextures(int start, int count, Thin3DTexture **textures) override;
 

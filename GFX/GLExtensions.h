@@ -88,8 +88,6 @@ namespace GFX
         bool versionGEThan(int major, int minor, int sub = 0);
     };
 
-    extern GLExtensions gl_extensions;
-
     // Call this after filling out vendor etc to lookup the bugs etc.
     // Only needs to be called ones. Currently called by CheckGLExtensions().
     void ProcessGPUFeatures();

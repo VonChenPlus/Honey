@@ -9,6 +9,11 @@ using IMAGE::ZIM_GEN_MIPS;
 #include "UTILS/STRING/String.h"
 using UTILS::STRING::StringFromFormat;
 
+namespace GLOBAL
+{
+    extern GFX::OpenGLState &glState();
+}
+
 namespace THIN3D
 {
     GLuint TypeToTarget(T3DTextureType type) {
@@ -24,25 +29,25 @@ namespace THIN3D
     }
 
     void Thin3DGLBlendState::apply() {
-        GFX::glstate.blend.set(enabled);
-        GFX::glstate.blendEquationSeparate.set(eqCol, eqAlpha);
-        GFX::glstate.blendFuncSeparate.set(srcCol, dstCol, srcAlpha, dstAlpha);
-        GFX::glstate.colorMask.set(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        GLOBAL::glState().blend.set(enabled);
+        GLOBAL::glState().blendEquationSeparate.set(eqCol, eqAlpha);
+        GLOBAL::glState().blendFuncSeparate.set(srcCol, dstCol, srcAlpha, dstAlpha);
+        GLOBAL::glState().colorMask.set(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         // glstate.blendColor.set(fixedColor);
 
-        GFX::glstate.colorLogicOp.set(logicEnabled);
+        GLOBAL::glState().colorLogicOp.set(logicEnabled);
         if (logicEnabled) {
-            GFX::glstate.logicOp.set(logicOp);
+            GLOBAL::glState().logicOp.set(logicOp);
         }
 
         // glstate.colorMask.set(maskBits & 1, (maskBits >> 1) & 1, (maskBits >> 2) & 1, (maskBits >> 3) & 1);
     }
 
     void Thin3DGLDepthStencilState::apply() {
-        GFX::glstate.depthTest.set(depthTestEnabled);
-        GFX::glstate.depthFunc.set(depthComp);
-        GFX::glstate.depthWrite.set(depthWriteEnabled);
-        GFX::glstate.stencilTest.disable();
+        GLOBAL::glState().depthTest.set(depthTestEnabled);
+        GLOBAL::glState().depthFunc.set(depthComp);
+        GLOBAL::glState().depthWrite.set(depthWriteEnabled);
+        GLOBAL::glState().stencilTest.disable();
     }
 
     Thin3DGLBuffer::Thin3DGLBuffer(Size size, uint32 flags) {
@@ -81,10 +86,10 @@ namespace THIN3D
 
     void Thin3DGLBuffer::bind() {
         if (target_ == GL_ARRAY_BUFFER) {
-            GFX::glstate.arrayBuffer.bind(buffer_);
+            GLOBAL::glState().arrayBuffer.bind(buffer_);
         }
         else {
-            GFX::glstate.elementArrayBuffer.bind(buffer_);
+            GLOBAL::glState().elementArrayBuffer.bind(buffer_);
         }
     }
 
@@ -449,6 +454,16 @@ namespace THIN3D
         return new Thin3DGLTexture();
     }
 
+    void Thin3DGLContext::setBlendState(Thin3DBlendState *state) {
+        Thin3DGLBlendState *s = static_cast<Thin3DGLBlendState *>(state);
+        s->apply();
+    }
+
+    void Thin3DGLContext::setDepthStencilState(Thin3DDepthStencilState *state) {
+        Thin3DGLDepthStencilState *s = static_cast<Thin3DGLDepthStencilState *>(state);
+        s->apply();
+    }
+
     Thin3DShader *Thin3DGLContext::createVertexShader(const char *glsl_source, const char *hlsl_source) {
         UNUSED(hlsl_source);
         Thin3DGLShader *shader = new Thin3DGLShader(false);
@@ -461,6 +476,21 @@ namespace THIN3D
         Thin3DGLShader *shader = new Thin3DGLShader(true);
         shader->compile(glsl_source);
         return shader;
+    }
+
+    void Thin3DGLContext::setScissorEnabled(bool enable) {
+        GLOBAL::glState().scissorTest.set(enable);
+    }
+
+    void Thin3DGLContext::setScissorRect(int left, int top, int width, int height) {
+        GLOBAL::glState().scissorRect.set(left, targetHeight_ - (top + height), width, height);
+    }
+
+    void Thin3DGLContext::setViewports(int count, T3DViewport *viewports) {
+        UNUSED(count);
+        // TODO: Add support for multiple viewports.
+        GLOBAL::glState().viewport.set(viewports[0].TopLeftX, viewports[0].TopLeftY, viewports[0].Width, viewports[0].Height);
+        GLOBAL::glState().depthRange.set(viewports[0].MinDepth, viewports[0].MaxDepth);
     }
 
     void Thin3DGLContext::setTextures(int start, int count, Thin3DTexture **textures) {
@@ -476,9 +506,9 @@ namespace THIN3D
         switch (rs) {
         case T3DRenderState::CULL_MODE:
             switch (value) {
-            case T3DCullMode::NO_CULL: GFX::glstate.cullFace.disable(); break;
-            case T3DCullMode::CCW: GFX::glstate.cullFace.enable(); GFX::glstate.cullFaceMode.set(GL_CCW); break;
-            case T3DCullMode::CW: GFX::glstate.cullFace.enable(); GFX::glstate.cullFaceMode.set(GL_CW); break;
+            case T3DCullMode::NO_CULL: GLOBAL::glState().cullFace.disable(); break;
+            case T3DCullMode::CCW: GLOBAL::glState().cullFace.enable(); GLOBAL::glState().cullFaceMode.set(GL_CCW); break;
+            case T3DCullMode::CW: GLOBAL::glState().cullFace.enable(); GLOBAL::glState().cullFaceMode.set(GL_CW); break;
             }
             break;
         }

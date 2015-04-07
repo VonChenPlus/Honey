@@ -25,6 +25,11 @@ using IMAGE::PNGLoadPtr;
 #include "UTILS/STRING/String.h"
 using UTILS::STRING::StringFromFormat;
 
+namespace GLOBAL
+{
+    extern GFX::GLExtensions &glExtensions();
+}
+
 namespace GFX
 {
     Texture::Texture() : id_(0) {
@@ -199,7 +204,7 @@ namespace GFX
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, image_data);
         if (genMips) {
-            if (gl_extensions.FBO_ARB) {
+            if (GLOBAL::glExtensions().FBO_ARB) {
                 glGenerateMipmap(GL_TEXTURE_2D);
             }
             else {
@@ -225,7 +230,7 @@ namespace GFX
         SetTextureParameters(genMips ? ZIM_GEN_MIPS : ZIM_CLAMP);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
         if (genMips) {
-            if (gl_extensions.FBO_ARB) {
+            if (GLOBAL::glExtensions().FBO_ARB) {
                 glGenerateMipmap(GL_TEXTURE_2D);
             }
             else {
@@ -246,7 +251,7 @@ namespace GFX
         SetTextureParameters(genMips ? ZIM_GEN_MIPS : ZIM_CLAMP);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
         if (genMips) {
-            if (gl_extensions.FBO_ARB) {
+            if (GLOBAL::glExtensions().FBO_ARB) {
                 glGenerateMipmap(GL_TEXTURE_2D);
             }
             else {
@@ -274,7 +279,7 @@ namespace GFX
         SetTextureParameters(ZIM_GEN_MIPS);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, buf);
-        if(gl_extensions.FBO_ARB) {
+        if(GLOBAL::glExtensions().FBO_ARB) {
             glGenerateMipmap(GL_TEXTURE_2D);
         }
         else {
@@ -357,7 +362,7 @@ namespace GFX
                     colors, data_type, image_data[l]);
             }
             if (num_levels == 1 && (flags & ZIM_GEN_MIPS)) {
-                if(gl_extensions.FBO_ARB) {
+                if(GLOBAL::glExtensions().FBO_ARB) {
                     glGenerateMipmap(GL_TEXTURE_2D);
                 }
                 else {

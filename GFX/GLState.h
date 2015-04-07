@@ -238,11 +238,7 @@ namespace GFX
     };
 
     #undef STATE1
-    #undef STATE2
-
-    extern OpenGLState glstate;
-    extern std::string g_all_gl_extensions;
-    extern std::string g_all_egl_extensions;
+    #undef STATE2    
 
     void CheckGLExtensions();
 }

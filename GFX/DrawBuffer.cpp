@@ -19,7 +19,11 @@ using THIN3D::VS_TEXTURE_COLOR_2D;
 #include "MATH/Utils.h"
 #include "UTILS/TEXT/UTF8.h"
 using UTILS::TEXT::UTF8;
-extern float pixel_in_dps;
+
+namespace GLOBAL
+{
+    extern float pixelInDPS();
+}
 
 namespace GFX
 {
@@ -127,15 +131,15 @@ namespace GFX
     }
 
     void DrawBuffer::hLine(float x1, float y, float x2, uint32 color) {
-        rect(x1, y, x2 - x1, pixel_in_dps, color);
+        rect(x1, y, x2 - x1, GLOBAL::pixelInDPS(), color);
     }
 
     void DrawBuffer::vLine(float x, float y1, float y2, uint32 color) {
-        rect(x, y1, pixel_in_dps, y2 - y1, color);
+        rect(x, y1, GLOBAL::pixelInDPS(), y2 - y1, color);
     }
 
     void DrawBuffer::vLineAlpha50(float x, float y1, float y2, uint32 color) {
-        rect(x, y1, pixel_in_dps, y2 - y1, (color | 0xFF000000) & 0x7F000000);
+        rect(x, y1, GLOBAL::pixelInDPS(), y2 - y1, (color | 0xFF000000) & 0x7F000000);
     }
 
     void DrawBuffer::rectVGradient(float x, float y, float w, float h, uint32 colorTop, uint32 colorBottom) {
@@ -150,11 +154,11 @@ namespace GFX
     void DrawBuffer::rectOutline(float x, float y, float w, float h, uint32 color, int align) {
         UNUSED(align);
 
-        hLine(x, y, x + w + pixel_in_dps, color);
-        hLine(x, y + h, x + w + pixel_in_dps, color);
+        hLine(x, y, x + w + GLOBAL::pixelInDPS(), color);
+        hLine(x, y + h, x + w + GLOBAL::pixelInDPS(), color);
 
-        vLine(x, y, y + h + pixel_in_dps, color);
-        vLine(x + w, y, y + h + pixel_in_dps, color);
+        vLine(x, y, y + h + GLOBAL::pixelInDPS(), color);
+        vLine(x + w, y, y + h + GLOBAL::pixelInDPS(), color);
     }
 
     void DrawBuffer::multiVGradient(float x, float y, float w, float h, GradientStop *stops, int numStops) {
