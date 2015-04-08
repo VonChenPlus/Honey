@@ -3,11 +3,12 @@
 
 #include <vector>
 #include "INPUT/InputState.h"
+#include "UI/UIContext.h"
+#include "THIN3D/Thin3D.h"
+#include "UI/Screen.h"
 
 namespace UI
 {
-    class Screen;
-
     enum LAYER_FLAG
     {
         LAYER_DEFAULT = 0,
@@ -22,11 +23,24 @@ namespace UI
         virtual ~ScreenManager();
 
         void switchScreen(Screen *screen);
-        void update();
+        void update(_INPUT::InputState &input);
+
+        void setUIContext(UIContext *context) { uiContext_ = context; }
+        UIContext *getUIContext() { return uiContext_; }
+
+        void setThin3DContext(THIN3D::Thin3DContext *context) { thin3DContext_ = context; }
+        THIN3D::Thin3DContext *getThin3DContext() { return thin3DContext_; }
 
         void render();
         void resized();
+        void deviceLost();
         void shutdown();
+
+        // Recreate all views
+        void recreateAllViews();
+
+        // Pops the dialog away.
+        void finishDialog(Screen *dialog, DialogResult result = DR_OK);
 
         // Instant touch, separate from the update() mechanism.
         bool touch(const _INPUT::TouchInput &touch);
@@ -39,11 +53,18 @@ namespace UI
         // Generic facility for gross hacks :P
         void sendMessage(const char *msg, const char *value);
 
+        Screen *topScreen() const;
     private:
         void pop();
         void switchToNext();
+        void processFinishDialog();
 
         Screen *nextScreen_;
+        UIContext *uiContext_;
+        THIN3D::Thin3DContext *thin3DContext_;
+
+        const Screen *dialogFinished_;
+        DialogResult dialogResult_;
 
         struct Layer
         {

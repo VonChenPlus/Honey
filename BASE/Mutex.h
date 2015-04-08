@@ -82,5 +82,14 @@ private:
     recursive_mutex(const recursive_mutex &other);
 };
 
+class lock_guard {
+public:
+    lock_guard(recursive_mutex &mtx) : mtx_(mtx) {mtx_.lock();}
+    ~lock_guard() {mtx_.unlock();}
+
+private:
+    recursive_mutex &mtx_;
+};
+
 #endif // MUTEX_H
 

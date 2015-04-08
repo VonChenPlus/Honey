@@ -46,6 +46,8 @@ namespace GLOBAL
     // This needs to be extern so that additional UI controls can be developed outside this file.
     shared_ptr<UIState> _UIState;
     UIState &uiState() { return *_UIState; }
+    shared_ptr<UIState> _UIStatesaved;
+    UIState &uiStateSaved() { return *_UIStatesaved; }
 
     int _DPXRes;
     int dpXRes() { return _DPXRes; }

@@ -5,9 +5,14 @@
 using _INPUT::AxisInput;
 using _INPUT::KeyInput;
 using _INPUT::TouchInput;
+#include "UI/View.h"
 
 namespace UI
 {
+    extern void SetFocusedView(View *view, bool force);
+    extern void UIDisableBegin();
+    extern void UIDisableEnd();
+
     ScreenManager::ScreenManager() {
         nextScreen_ = NULLPTR;
     }
@@ -36,13 +41,13 @@ namespace UI
         }
     }
 
-    void ScreenManager::update() {
+    void ScreenManager::update(_INPUT::InputState &input) {
         if (nextScreen_) {
             switchToNext();
         }
 
         if (stack_.size()) {
-            stack_.back().screen->update();
+            stack_.back().screen->update(input);
         }
     }
 
@@ -65,8 +70,10 @@ namespace UI
                     auto iter = stack_.end();
                     iter-=2;
                     Layer backback = *iter;
+                    UIDisableBegin();
                     // Also shift to the right somehow...
                     backback.screen->render();
+                    UIDisableEnd();
                     stack_.back().screen->render();
                     break;
                 }
@@ -78,9 +85,13 @@ namespace UI
         else {
             throw _NException_Normal("No current screen");
         }
+
+        processFinishDialog();
     }
 
     void ScreenManager::sendMessage(const char *msg, const char *value) {
+        if (!strcmp(msg, "recreateviews"))
+            recreateAllViews();
         if (!stack_.empty())
             stack_.back().screen->sendMessage(msg, value);
     }
@@ -91,6 +102,24 @@ namespace UI
         stack_.clear();
         delete nextScreen_;
         nextScreen_ = 0;
+    }
+
+    void ScreenManager::recreateAllViews() {
+        for (auto it = stack_.begin(); it != stack_.end(); ++it) {
+            it->screen->recreateViews();
+        }
+    }
+
+    void ScreenManager::finishDialog(Screen *dialog, DialogResult result) {
+        if (stack_.empty()) {
+            throw _NException_Normal("Must be in a dialog to finishDialog");
+        }
+        if (dialog != stack_.back().screen) {
+            throw _NException_Normal("Wrong dialog being finished!");
+        }
+        dialog->onFinish(result);
+        dialogFinished_ = dialog;
+        dialogResult_ = result;
     }
 
     bool ScreenManager::touch(const TouchInput &touch) {
@@ -128,6 +157,7 @@ namespace UI
             layerFlags = LAYER_TRANSPARENT;
         }
 
+        SetFocusedView(0, false);
         Layer layer = {screen, layerFlags};
         stack_.push_back(layer);
     }
@@ -139,7 +169,6 @@ namespace UI
         }
         else {
             throw _NException_Normal("Can't pop when stack empty");
-            //ELOG("Can't pop when stack empty");
         }
     }
 
@@ -159,5 +188,35 @@ namespace UI
             delete temp.screen;
         }
         nextScreen_ = 0;
+        SetFocusedView(0, false);
+    }
+
+    void ScreenManager::processFinishDialog() {
+        if (dialogFinished_) {
+            // Another dialog may have been pushed before the render, so search for it.
+            Screen *caller = 0;
+            for (size_t i = 0; i < stack_.size(); ++i) {
+                if (stack_[i].screen != dialogFinished_) {
+                    continue;
+                }
+
+                stack_.erase(stack_.begin() + i);
+                // The previous screen was the caller (not necessarily the topmost.)
+                if (i > 0) {
+                    caller = stack_[i - 1].screen;
+                }
+            }
+
+            if (!caller) {
+                throw _NException_Normal("ERROR: no top screen when finishing dialog");
+            } else if (caller != topScreen()) {
+                // The caller may get confused if we call dialogFinished() now.
+                //WLOG("Skipping non-top dialog when finishing dialog.");
+            } else {
+                caller->dialogFinished(dialogFinished_, dialogResult_);
+            }
+            delete dialogFinished_;
+            dialogFinished_ = 0;
+        }
     }
 }

@@ -8,6 +8,15 @@ namespace UI
 {
     class ScreenManager;
 
+    enum DialogResult
+    {
+        DR_OK,
+        DR_CANCEL,
+        DR_YES,
+        DR_NO,
+        DR_BACK,
+    };
+
     class Screen
     {
     public:
@@ -16,18 +25,27 @@ namespace UI
             screenManager_ = NULLPTR;
         }
 
-        virtual void update() {}
+        virtual void onFinish(DialogResult) {}
+        virtual void update(_INPUT::InputState &) {}
         virtual void render() {}
         virtual void resized() {}
-
-        virtual bool touch(const _INPUT::TouchInput &touch) { UNUSED(touch); return false;  }
-        virtual bool key(const _INPUT::KeyInput &key) { UNUSED(key); return false; }
-        virtual bool axis(const _INPUT::AxisInput &touch) { UNUSED(touch); return false; }
+        virtual void dialogFinished(const Screen *, DialogResult) {}
+        virtual bool touch(const _INPUT::TouchInput &) { return false;  }
+        virtual bool key(const _INPUT::KeyInput &) { return false; }
+        virtual bool axis(const _INPUT::AxisInput &) { return false; }
 
         virtual void sendMessage(const char *msg, const char *value) { UNUSED(msg); UNUSED(value); }
 
+        virtual void recreateViews() {}
+
         ScreenManager *screenManager() { return screenManager_; }
         void setScreenManager(ScreenManager *sm) { screenManager_ = sm; }
+
+        // This one is icky to use because you can't know what's in it until you know
+        // what screen it is.
+        virtual void *dialogData() { return 0; }
+
+        virtual std::string tag() const { return std::string(""); }
 
         virtual bool isTransparent() const { return false; }
         virtual bool isTopLevel() const { return false; }

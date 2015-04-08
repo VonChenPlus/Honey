@@ -7,6 +7,59 @@
 
 namespace _INPUT
 {
+    // Default device IDs
+
+    enum
+    {
+        DEVICE_ID_DEFAULT = 0,  // Old Android
+        DEVICE_ID_KEYBOARD = 1,  // PC keyboard, android keyboards
+        DEVICE_ID_MOUSE = 2,  // PC mouse only (not touchscreen!)
+        DEVICE_ID_PAD_0 = 10,  // Generic joypads
+        DEVICE_ID_PAD_1 = 11,  // these should stay as contiguous numbers
+        DEVICE_ID_PAD_2 = 12,
+        DEVICE_ID_PAD_3 = 13,
+        DEVICE_ID_PAD_4 = 14,
+        DEVICE_ID_PAD_5 = 15,
+        DEVICE_ID_PAD_6 = 16,
+        DEVICE_ID_PAD_7 = 17,
+        DEVICE_ID_PAD_8 = 18,
+        DEVICE_ID_PAD_9 = 19,
+        DEVICE_ID_X360_0 = 20,  // XInput joypads
+        DEVICE_ID_ACCELEROMETER = 30,
+    };
+    enum
+    {
+        PAD_BUTTON_A = 1,
+        PAD_BUTTON_B = 2,
+        PAD_BUTTON_X = 4,
+        PAD_BUTTON_Y = 8,
+        PAD_BUTTON_LBUMPER = 16,
+        PAD_BUTTON_RBUMPER = 32,
+        PAD_BUTTON_START = 64,
+        PAD_BUTTON_SELECT = 128,
+        PAD_BUTTON_UP = 256,
+        PAD_BUTTON_DOWN = 512,
+        PAD_BUTTON_LEFT = 1024,
+        PAD_BUTTON_RIGHT = 2048,
+
+        PAD_BUTTON_MENU = 4096,
+        PAD_BUTTON_BACK = 8192,
+
+        // For Blackberry and Qt
+        PAD_BUTTON_JOY_UP = 1<<14,
+        PAD_BUTTON_JOY_DOWN = 1<<15,
+        PAD_BUTTON_JOY_LEFT = 1<<16,
+        PAD_BUTTON_JOY_RIGHT = 1<<17,
+
+        PAD_BUTTON_LEFT_THUMB = 1 << 18,   // Click left thumb stick on X360
+        PAD_BUTTON_RIGHT_THUMB = 1 << 19,   // Click right thumb stick on X360
+
+        PAD_BUTTON_LEFT_TRIGGER = 1 << 21,   // Click left thumb stick on X360
+        PAD_BUTTON_RIGHT_TRIGGER = 1 << 22,   // Click left thumb stick on X360
+
+        PAD_BUTTON_UNTHROTTLE = 1 << 20, // Click Tab to unthrottle
+    };
+
     #ifndef MAX_POINTERS
     #define MAX_POINTERS 10
     #endif

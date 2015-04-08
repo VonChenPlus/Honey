@@ -36,7 +36,10 @@ SOURCES += $$P/BASE/NativeApp.cpp \
     $$P/IO/FDUtil.cpp \
     $$P/IO/FileUtil.cpp \
     $$P/UTILS/TIME/Time.cpp \
-    $$P/BASE/NException.cpp
+    $$P/BASE/NException.cpp \
+    $$P/UI/ViewGroup.cpp \
+    $$P/UI/UIScreen.cpp \
+    $$P/UI/UIControl.cpp
 
 HEADERS += \
     $$P/BASE/NativeApp.h \
@@ -77,7 +80,9 @@ HEADERS += \
     $$P/IO/FDUtil.h \
     $$P/IO/FileUtil.h \
     $$P/UTILS/TIME/Time.h \
-    $$P/BASE/NException.h
+    $$P/BASE/NException.h \
+    $$P/UI/ViewGroup.h \
+    $$P/INPUT/KeyCodes.h
 
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)

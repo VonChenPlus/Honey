@@ -1,9 +1,18 @@
 #include "View.h"
+
+#include <queue>
+
 using MATH::Point;
 using MATH::Bounds;
 
 namespace UI
 {
+    extern void EventTriggered(Event *e, EventParams params);
+    extern void RemoveQueuedEvents(View *v);
+    extern View *GetFocusedView();
+    extern void SetFocusedView(View *view, bool force);
+    extern bool IsFocusMovementEnabled();
+
     void MeasureBySpec(float sz, float contentWidth, MeasureSpec spec, float *measured) {
         *measured = sz;
         if (sz == WRAP_CONTENT) {
@@ -24,6 +33,9 @@ namespace UI
     }
 
     View::~View() {
+        if (hasFocus())
+                SetFocusedView(0, false);
+        RemoveQueuedEvents(this);
     }
 
     void View::measure(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert) {
@@ -56,6 +68,38 @@ namespace UI
     }
 
     bool View::setFocus() {
+        if (IsFocusMovementEnabled()) {
+            if (canBeFocused()) {
+                SetFocusedView(this, false);
+                return true;
+            }
+        }
         return false;
+    }
+
+    bool View::hasFocus() const {
+        return GetFocusedView() == this;
+    }
+
+    void Event::add(std::function<EventReturn(EventParams&)> func) {
+        HandlerRegistration reg;
+        reg.func = func;
+        handlers_.push_back(reg);
+    }
+
+    // Call this from input thread or whatever, it doesn't matter
+    void Event::trigger(EventParams &e) {
+        EventTriggered(this, e);
+    }
+
+    // Call this from UI thread
+    EventReturn Event::dispatch(EventParams &e) {
+        for (auto iter = handlers_.begin(); iter != handlers_.end(); ++iter) {
+            if ((iter->func)(e) == UI::EVENT_DONE) {
+                // Event is handled, stop looping immediately. This event might even have gotten deleted.
+                return UI::EVENT_DONE;
+            }
+        }
+        return UI::EVENT_SKIPPED;
     }
 }
