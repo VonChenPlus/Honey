@@ -13,8 +13,6 @@ using MATH::Bounds;
 #include <QtOpenGL/QGLWidget>
 #endif
 
-namespace GFX
-{
 #if defined(_WIN32) && !defined(USING_QT_UI)
 
 #define WIN32_LEAN_AND_MEAN
@@ -24,6 +22,11 @@ namespace GFX
 using UTILS::TEXT::ConvertUTF8ToWString;
 #include "UTILS/STRING/String.h"
 using UTILS::STRING::ReplaceAll;
+#endif
+
+namespace GFX
+{
+#if defined(_WIN32) && !defined(USING_QT_UI)
 
     enum
     {

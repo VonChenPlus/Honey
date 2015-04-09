@@ -11,6 +11,8 @@ using MATH::Bounds;
 #include "UTILS/TIME/Time.h"
 using UTILS::TIME::time_now_d;
 #include "UI/UI.h"
+#include "MATH/Point.h"
+using MATH::Point;
 
 namespace GLOBAL
 {
@@ -282,5 +284,122 @@ namespace UI
     void UIDisableEnd()
     {
         GLOBAL::uiState() = GLOBAL::uiStateSaved();
+    }
+
+    static float HorizontalOverlap(const Bounds &a, const Bounds &b) {
+        if (a.x2() < b.x || b.x2() < a.x)
+            return 0.0f;
+        // okay they do overlap. Let's clip.
+        float maxMin = std::max(a.x, b.x);
+        float minMax = std::min(a.x2(), b.x2());
+        float overlap = minMax - maxMin;
+        if (overlap < 0.0f)
+            return 0.0f;
+        else
+            return std::min(1.0f, overlap / std::min(a.w, b.w));
+    }
+
+    // Returns the percentage the smaller one overlaps the bigger one.
+    static float VerticalOverlap(const Bounds &a, const Bounds &b) {
+        if (a.y2() < b.y || b.y2() < a.y)
+            return 0.0f;
+        // okay they do overlap. Let's clip.
+        float maxMin = std::max(a.y, b.y);
+        float minMax = std::min(a.y2(), b.y2());
+        float overlap = minMax - maxMin;
+        if (overlap < 0.0f)
+            return 0.0f;
+        else
+            return std::min(1.0f, overlap / std::min(a.h, b.h));
+    }
+
+    float GetDirectionScore(View *origin, View *destination, FocusDirection direction) {
+        // Skip labels and things like that.
+        if (!destination->canBeFocused())
+            return 0.0f;
+        if (destination->isEnabled() == false)
+            return 0.0f;
+        if (destination->getVisibility() != V_VISIBLE)
+            return 0.0f;
+
+        Point originPos = origin->getFocusPosition(direction);
+        Point destPos = destination->getFocusPosition(Opposite(direction));
+
+        float dx = destPos.x - originPos.x;
+        float dy = destPos.y - originPos.y;
+
+        float distance = sqrtf(dx*dx + dy*dy);
+        float overlap = 0.0f;
+        float dirX = dx / distance;
+        float dirY = dy / distance;
+
+        bool wrongDirection = false;
+        bool vertical = false;
+        float horizOverlap = HorizontalOverlap(origin->getBounds(), destination->getBounds());
+        float vertOverlap = VerticalOverlap(origin->getBounds(), destination->getBounds());
+        if (horizOverlap == 1.0f && vertOverlap == 1.0f) {
+            return 0.0;
+        }
+        float originSize = 0.0f;
+        switch (direction) {
+        case FOCUS_LEFT:
+            overlap = vertOverlap;
+            originSize = origin->getBounds().w;
+            if (dirX > 0.0f) {
+                wrongDirection = true;
+            }
+            break;
+        case FOCUS_UP:
+            overlap = horizOverlap;
+            originSize = origin->getBounds().h;
+            if (dirY > 0.0f) {
+                wrongDirection = true;
+            }
+            vertical = true;
+            break;
+        case FOCUS_RIGHT:
+            overlap = vertOverlap;
+            originSize = origin->getBounds().w;
+            if (dirX < 0.0f) {
+                wrongDirection = true;
+            }
+            break;
+        case FOCUS_DOWN:
+            overlap = horizOverlap;
+            originSize = origin->getBounds().h;
+            if (dirY < 0.0f) {
+                wrongDirection = true;
+            }
+            vertical = true;
+            break;
+        case FOCUS_PREV:
+        case FOCUS_NEXT:
+            throw _NException_Normal("Invalid focus direction");
+            break;
+        }
+
+        // Add a small bonus if the views are the same size. This prioritizes moving to the next item
+        // upwards in a scroll view instead of moving up to the top bar.
+        float distanceBonus = 0.0f;
+        if (vertical) {
+            float widthDifference = origin->getBounds().w - destination->getBounds().w;
+            if (widthDifference == 0) {
+                distanceBonus = 40;
+            }
+        } else {
+            float heightDifference = origin->getBounds().h - destination->getBounds().h;
+            if (heightDifference == 0) {
+                distanceBonus = 40;
+            }
+        }
+
+        // At large distances, ignore overlap.
+        if (distance > 2 * originSize)
+            overlap = 0;
+
+        if (wrongDirection)
+            return 0.0f;
+        else
+            return 10.0f / std::max(1.0f, distance - distanceBonus) + overlap;
     }
 }

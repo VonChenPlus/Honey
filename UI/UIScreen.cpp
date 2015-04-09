@@ -110,17 +110,17 @@ namespace UI
         return (pressed & (PAD_BUTTON_LEFT | PAD_BUTTON_RIGHT | PAD_BUTTON_UP | PAD_BUTTON_DOWN)) != 0;
     }
 
-    UI::EventReturn UIScreen::OnBack(UI::EventParams &e) {
+    UI::EventReturn UIScreen::OnBack(UI::EventParams &) {
         screenManager()->finishDialog(this, DR_BACK);
         return UI::EVENT_DONE;
     }
 
-    UI::EventReturn UIScreen::OnOK(UI::EventParams &e) {
+    UI::EventReturn UIScreen::OnOK(UI::EventParams &) {
         screenManager()->finishDialog(this, DR_OK);
         return UI::EVENT_DONE;
     }
 
-    UI::EventReturn UIScreen::OnCancel(UI::EventParams &e) {
+    UI::EventReturn UIScreen::OnCancel(UI::EventParams &) {
         screenManager()->finishDialog(this, DR_CANCEL);
         return UI::EVENT_DONE;
     }

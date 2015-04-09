@@ -132,6 +132,18 @@ namespace UI
         FOCUS_PREV,
     };
 
+    inline FocusDirection Opposite(FocusDirection d) {
+        switch (d) {
+        case FOCUS_UP: return FOCUS_DOWN;
+        case FOCUS_DOWN: return FOCUS_UP;
+        case FOCUS_LEFT: return FOCUS_RIGHT;
+        case FOCUS_RIGHT: return FOCUS_LEFT;
+        case FOCUS_PREV: return FOCUS_NEXT;
+        case FOCUS_NEXT: return FOCUS_PREV;
+        }
+        return d;
+    }
+
     enum FocusFlags
     {
         FF_LOSTFOCUS = 1,

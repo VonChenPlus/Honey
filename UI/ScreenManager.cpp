@@ -96,6 +96,12 @@ namespace UI
             stack_.back().screen->sendMessage(msg, value);
     }
 
+    Screen *ScreenManager::topScreen() const {
+        if (!stack_.empty())
+            return stack_.back().screen;
+        else
+            return NULLPTR;
+    }
     void ScreenManager::shutdown() {
         for (const auto &iter : stack_)
             delete iter.screen;

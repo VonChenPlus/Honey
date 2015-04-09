@@ -258,7 +258,7 @@ namespace _INPUT
         NKCODE_EXT_MOUSEBUTTON_3 = 1004,
         NKCODE_EXT_MOUSEWHEEL_UP = 1008,
         NKCODE_EXT_MOUSEWHEEL_DOWN = 1009
-    } keycode_t;
+    };
 
     enum AndroidJoystickAxis {
         // Field descriptor #15 I
