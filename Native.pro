@@ -29,7 +29,6 @@ SOURCES += $$P/BASE/NativeApp.cpp \
     $$P/GFX/GLDebug.cpp \
     $$P/BASE/Color.cpp \
     $$P/UTILS/TEXT/UTF8.cpp \
-    $$P/GFX/DrawText.cpp \
     $$P/UTILS/HASH/Hash.cpp \
     $$P/UTILS/STRING/String.cpp \
     $$P/BASE/Buffer.cpp \
@@ -39,7 +38,9 @@ SOURCES += $$P/BASE/NativeApp.cpp \
     $$P/BASE/NException.cpp \
     $$P/UI/ViewGroup.cpp \
     $$P/UI/UIScreen.cpp \
-    $$P/UI/UIControl.cpp
+    $$P/UI/UIControl.cpp \
+    $$P/UI/LogoScreen.cpp \
+    $$P/GFX/Atlas.cpp
 
 HEADERS += \
     $$P/BASE/NativeApp.h \
@@ -82,7 +83,9 @@ HEADERS += \
     $$P/UTILS/TIME/Time.h \
     $$P/BASE/NException.h \
     $$P/UI/ViewGroup.h \
-    $$P/INPUT/KeyCodes.h
+    $$P/INPUT/KeyCodes.h \
+    $$P/UI/LogoScreen.h \
+    $$P/GFX/Atlas.h
 
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)

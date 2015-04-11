@@ -14,6 +14,19 @@
 // This functions must NOT call OpenGL. Main thread.
 void NativeInit();
 
+// Runs after NativeInit() at some point. May (and probably should) call OpenGL.
+// Should not initialize anything screen-size-dependent - do that in NativeResized.
+void NativeInitGraphics();
+
+// Called when it's time to shutdown. After this has been called,
+// no more calls to any other function will be made from the framework
+// before process exit.
+// The graphics context should still be active when calling this, as freeing
+// of graphics resources happens here.
+// Main thread.
+void NativeShutdownGraphics();
+void NativeShutdown();
+
 enum SystemProperty
 {
     SYSPROP_NAME,

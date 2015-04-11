@@ -26,11 +26,20 @@ using GFX::OpenGLState;
 using GFX::DrawBuffer;
 #include "UI/UI.h"
 using UI::UIState;
+#include "UI/LogoScreen.h"
+using UI::LogoScreen;
+#include "GFX/GfxResourceHolder.h"
+using GFX::gl_lost_manager_init;
+#include "THIN3D/Thin3D.h"
+using THIN3D::T3DCreateGLContext;
+using THIN3D::Thin3DContext;
+#include "GFX/Texture.h"
+using GFX::Atlas;
 
 namespace GLOBAL
 {
     shared_ptr<ScreenManager> _ScreenManager;
-    const ScreenManager &screenManager() { return *_ScreenManager; }
+    ScreenManager &screenManager() { return *_ScreenManager; }
     shared_ptr<GLExtensions> _GLExtensions;
     GLExtensions &glExtensions() { return *_GLExtensions; }
     shared_ptr<OpenGLState> _GLState;
@@ -48,6 +57,8 @@ namespace GLOBAL
     UIState &uiState() { return *_UIState; }
     shared_ptr<UIState> _UIStatesaved;
     UIState &uiStateSaved() { return *_UIStatesaved; }
+    shared_ptr<Thin3DContext> _Thin3D;
+    Thin3DContext &thin3DContext() { return *_Thin3D; }
 
     int _DPXRes;
     int dpXRes() { return _DPXRes; }
@@ -69,6 +80,17 @@ void NativeInit()
     GLOBAL::_UIState = make_shared<UIState>();
     GLOBAL::_DPIScale = 1.0f;
     GLOBAL::_PixelInDPS = 1.0f;
+
+    GLOBAL::screenManager().switchScreen(new LogoScreen());
+
+    // We do this here, instead of in NativeInitGraphics, because the display may be reset.
+    // When it's reset we don't want to forget all our managed things.
+    gl_lost_manager_init();
+}
+
+void NativeInitGraphics()
+{
+    GLOBAL::_Thin3D = shared_ptr<Thin3DContext>(T3DCreateGLContext());
 }
 
 std::string System_GetProperty(SystemProperty prop)
