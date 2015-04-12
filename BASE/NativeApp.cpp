@@ -33,9 +33,18 @@ using GFX::gl_lost_manager_init;
 #include "THIN3D/Thin3D.h"
 using THIN3D::T3DCreateGLContext;
 using THIN3D::Thin3DContext;
+using THIN3D::T3DViewport;
+using THIN3D::T3DClear;
 #include "GFX/Texture.h"
 using GFX::Atlas;
 using GFX::AtlasImage;
+using UI::Theme;
+#include "UI/UIContext.h"
+using UI::UIContext;
+#include "MATH/Bounds.h"
+using MATH::Bounds;
+#include "MATH/Matrix.h"
+using MATH::Matrix4x4;
 
 namespace GLOBAL
 {
@@ -61,19 +70,37 @@ namespace GLOBAL
     shared_ptr<Thin3DContext> _Thin3D;
     Thin3DContext &thin3DContext() { return *_Thin3D; }
     shared_ptr<Atlas> _UIAtlas;
-    Atlas &uiAtlas() { return *_UIAtlas; }
     shared_ptr<AtlasImage> _UIAtlasImage[34];
+    Atlas &uiAtlas() { return *_UIAtlas; }
     shared_ptr<AtlasImage> *uiAtlasImage() { return _UIAtlasImage; }
+    shared_ptr<Theme> _UITheme;
+    Theme &uiTheme() { return *_UITheme; }
+    shared_ptr<UIContext> _UIContext;
+    UIContext &uiContext() { return *_UIContext; }
 
     int _DPXRes;
-    int dpXRes() { return _DPXRes; }
+    int &dpXRes() { return _DPXRes; }
     int _DPYRes;
-    int dpYRes() { return _DPYRes; }
+    int &dpYRes() { return _DPYRes; }
+    int _PixelXRes;
+    int &pixelXRes() { return _PixelXRes; }
+    int _PixelYRes;
+    int &pixelYRes() { return _PixelYRes; }
+    int _DPI;
+    int &dpi() { return _DPI; }
     float _DPIScale = 1.0f;
-    float dpiScale() { return _DPIScale; }
+    float &dpiScale() { return _DPIScale; }
     float _PixelInDPS = 1.0f;
-    float pixelInDPS() { return _PixelInDPS; }
+    float &pixelInDPS() { return _PixelInDPS; }
 }
+
+static bool resized = false;
+static recursive_mutex pendingMutex;
+struct PendingMessage {
+    std::string msg;
+    std::string value;
+};
+static std::vector<PendingMessage> pendingMessages;
 
 void NativeInit() 
 {
@@ -88,19 +115,125 @@ void NativeInitGraphics()
 {
     GLOBAL::_GLExtensions = make_shared<GLExtensions>();
     GLOBAL::_GLState = make_shared<OpenGLState>();
-    GLOBAL::_DrawBuf2D = make_shared<DrawBuffer>();
-    GLOBAL::_DrawBuf2DFront = make_shared<DrawBuffer>();
     GLOBAL::_UIState = make_shared<UIState>();
+    GLOBAL::_UIStatesaved = make_shared<UIState>();
     GLOBAL::_Thin3D = shared_ptr<Thin3DContext>(T3DCreateGLContext());
     GLOBAL::_UIAtlas = make_shared<Atlas>();
     for (int index = 0; index < 34; index++)
         GLOBAL::_UIAtlasImage[index] = make_shared<AtlasImage>();
+    GLOBAL::_UITheme = make_shared<Theme>();
+    GLOBAL::_UIContext = make_shared<UIContext>();
+    GLOBAL::_DrawBuf2D = make_shared<DrawBuffer>();
+    GLOBAL::_DrawBuf2DFront = make_shared<DrawBuffer>();
 
+    // init
     GLOBAL::drawBuffer2D().setAtlas(&GLOBAL::uiAtlas());
+    GLOBAL::drawBuffer2DFront().setAtlas(&GLOBAL::uiAtlas());
+    GLOBAL::drawBuffer2D().init(&GLOBAL::thin3DContext());
+    GLOBAL::drawBuffer2DFront().init(&GLOBAL::thin3DContext());
+
+    GLOBAL::uiContext().theme = &GLOBAL::uiTheme();
+    if (GLOBAL::uiContext().text())
+        GLOBAL::uiContext().text()->setFont("Tahoma", 20, 0);
+
+    GLOBAL::screenManager().setUIContext(&GLOBAL::uiContext());
+    GLOBAL::screenManager().setThin3DContext(&GLOBAL::thin3DContext());
+
+    GLOBAL::uiTheme().checkOn = I_CHECKEDBOX;
+    GLOBAL::uiTheme().checkOff = I_SQUARE;
+    GLOBAL::uiTheme().whiteImage = I_SOLIDWHITE;
+    GLOBAL::uiTheme().sliderKnob = I_CIRCLE;
+    GLOBAL::uiTheme().dropShadow4Grid = I_DROP_SHADOW;
+
+    GLOBAL::uiTheme().itemStyle.background = UI::Drawable(0x55000000);
+    GLOBAL::uiTheme().itemStyle.fgColor = 0xFFFFFFFF;
+    GLOBAL::uiTheme().itemFocusedStyle.background = UI::Drawable(0xFFedc24c);
+    GLOBAL::uiTheme().itemDownStyle.background = UI::Drawable(0xFFbd9939);
+    GLOBAL::uiTheme().itemDownStyle.fgColor = 0xFFFFFFFF;
+    GLOBAL::uiTheme().itemDisabledStyle.background = UI::Drawable(0x55E0D4AF);
+    GLOBAL::uiTheme().itemDisabledStyle.fgColor = 0x80EEEEEE;
+    GLOBAL::uiTheme().itemHighlightedStyle.background = UI::Drawable(0x55bdBB39);
+    GLOBAL::uiTheme().itemHighlightedStyle.fgColor = 0xFFFFFFFF;
+
+    GLOBAL::uiTheme().buttonStyle = GLOBAL::uiTheme().itemStyle;
+    GLOBAL::uiTheme().buttonFocusedStyle = GLOBAL::uiTheme().itemFocusedStyle;
+    GLOBAL::uiTheme().buttonDownStyle = GLOBAL::uiTheme().itemDownStyle;
+    GLOBAL::uiTheme().buttonDisabledStyle = GLOBAL::uiTheme().itemDisabledStyle;
+    GLOBAL::uiTheme().buttonHighlightedStyle = GLOBAL::uiTheme().itemHighlightedStyle;
+
+    GLOBAL::uiTheme().popupTitle.fgColor = 0xFFE3BE59;
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
     // We do this here, instead of in NativeInitGraphics, because the display may be reset.
     // When it's reset we don't want to forget all our managed things.
     gl_lost_manager_init();
+}
+
+void NativeResized()
+{
+    // Modifying the bounds here can be used to "inset" the whole image to gain borders for TV overscan etc.
+    // The UI now supports any offset but not the EmuScreen yet.
+    GLOBAL::uiContext().setBounds(Bounds(0, 0, GLOBAL::dpXRes(), GLOBAL::dpYRes()));
+}
+
+void NativeUpdate(_INPUT::InputState &input) {
+    {
+        lock_guard lock(pendingMutex);
+        for (size_t i = 0; i < pendingMessages.size(); i++) {
+            GLOBAL::screenManager().sendMessage(pendingMessages[i].msg.c_str(), pendingMessages[i].value.c_str());
+        }
+        pendingMessages.clear();
+    }
+
+    GLOBAL::screenManager().update(input);
+}
+
+void NativeTouch(const _INPUT::TouchInput &touch) {
+    GLOBAL::screenManager().touch(touch);
+}
+
+bool NativeKey(const _INPUT::KeyInput &key) {
+    return GLOBAL::screenManager().key(key);
+}
+
+void NativeRender() {
+    GLOBAL::thin3DContext().clear(T3DClear::COLOR | T3DClear::DEPTH | T3DClear::STENCIL, 0xFF000000, 0.0f, 0);
+
+    T3DViewport viewport;
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = GLOBAL::pixelXRes();
+    viewport.Height = GLOBAL::pixelYRes();
+    viewport.MaxDepth = 1.0;
+    viewport.MinDepth = 0.0;
+    GLOBAL::thin3DContext().setViewports(1, &viewport);
+
+    GLOBAL::glState().depthWrite.set(GL_TRUE);
+    GLOBAL::glState().colorMask.set(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    GLOBAL::glState().restore();
+
+    GLOBAL::thin3DContext().setTargetSize(GLOBAL::pixelXRes(), GLOBAL::pixelYRes());
+
+    float xres = GLOBAL::dpXRes();
+    float yres = GLOBAL::dpYRes();
+
+    // Apply the UIContext bounds as a 2D transformation matrix.
+    Matrix4x4 ortho;
+    ortho.setOrtho(0.0f, xres, yres, 0.0f, -1.0f, 1.0f);
+
+    GLOBAL::drawBuffer2D().setDrawMatrix(ortho);
+    GLOBAL::drawBuffer2DFront().setDrawMatrix(ortho);
+
+    GLOBAL::screenManager().render();
+    if (GLOBAL::screenManager().getUIContext()->text()) {
+        GLOBAL::screenManager().getUIContext()->text()->oncePerFrame();
+    }
+
+    GLOBAL::thin3DContext().setScissorEnabled(false);
 }
 
 std::string System_GetProperty(SystemProperty prop)

@@ -6,6 +6,7 @@
 #include "THIN3D/Thin3D.h"
 #include "GFX/Texture.h"
 #include "BASE/Color.h"
+#include "GFX/Atlas.h"
 
 namespace GFX
 {

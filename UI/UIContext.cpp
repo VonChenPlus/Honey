@@ -20,9 +20,9 @@ namespace GLOBAL
     extern UIState &uiState();
     extern DrawBuffer &drawBuffer2D();
     extern DrawBuffer &drawBuffer2DFront();
-    extern int dpXRes();
-    extern int dpYRes();
-    extern float dpiScale();
+    extern int &dpXRes();
+    extern int &dpYRes();
+    extern float &dpiScale();
 }
 
 namespace UI

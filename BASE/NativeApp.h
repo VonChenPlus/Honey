@@ -2,6 +2,7 @@
 #define NATIVEAPP_H
 
 #include <string>
+#include "INPUT/InputState.h"
 
 // The Native App API.
 //
@@ -17,6 +18,26 @@ void NativeInit();
 // Runs after NativeInit() at some point. May (and probably should) call OpenGL.
 // Should not initialize anything screen-size-dependent - do that in NativeResized.
 void NativeInitGraphics();
+
+// If you want to change DPI stuff (such as modifying dp_xres and dp_yres), this is the
+// place to do it. You should only read g_dpi_scale and pixel_xres and pixel_yres in this,
+// and only write dp_xres and dp_yres.
+void NativeResized();
+
+// Called ~sixty times a second, delivers the current input state.
+// Main thread.
+void NativeUpdate(_INPUT::InputState &input);
+
+// Delivers touch events "instantly", without waiting for the next frame so that NativeUpdate can deliver.
+// Useful for triggering audio events, saving a few ms.
+// If you don't care about touch latency, just do a no-op implementation of this.
+// time is not yet implemented. finger can be from 0 to 7, inclusive.
+void NativeTouch(const _INPUT::TouchInput &touch);
+bool NativeKey(const _INPUT::KeyInput &key);
+
+// Called when it's time to render. If the device can keep up, this
+// will also be called sixty times per second. Main thread.
+void NativeRender();
 
 // Called when it's time to shutdown. After this has been called,
 // no more calls to any other function will be made from the framework

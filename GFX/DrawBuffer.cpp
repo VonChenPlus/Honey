@@ -22,7 +22,7 @@ using UTILS::TEXT::UTF8;
 
 namespace GLOBAL
 {
-    extern float pixelInDPS();
+    extern float &pixelInDPS();
 }
 
 namespace GFX
