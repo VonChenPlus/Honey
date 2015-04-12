@@ -16,6 +16,10 @@ namespace GLOBAL
 
 namespace THIN3D
 {
+    Thin3DContext *T3DCreateGLContext() {
+        return new Thin3DGLContext();
+    }
+
     GLuint TypeToTarget(T3DTextureType type) {
         switch (type) {
         case LINEAR1D: return GL_TEXTURE_1D;
@@ -396,6 +400,13 @@ namespace THIN3D
         else {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         }
+    }
+
+    Thin3DGLContext::Thin3DGLContext() {
+        createPresets();
+    }
+
+    Thin3DGLContext::~Thin3DGLContext() {
     }
 
     Thin3DDepthStencilState *Thin3DGLContext::createDepthStencilState(bool depthTestEnabled, bool depthWriteEnabled, T3DComparison depthCompare) {

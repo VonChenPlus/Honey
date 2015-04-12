@@ -235,7 +235,7 @@ namespace GFX
     uint32 TextDrawer::setFont(const char *fontName, int size, int flags) {
     #ifdef USING_QT_UI
         // We will only use the default font
-        uint32 fontHash = 0; //hash::Fletcher((const uint8 *)fontName, strlen(fontName));
+        uint32 fontHash = Fletcher((const uint8 *)fontName, strlen(fontName));
         fontHash ^= size;
         fontHash ^= flags << 10;
 
@@ -247,7 +247,7 @@ namespace GFX
 
         QFont* font = new QFont();
         font->setPixelSize(size + 6);
-        fontMap_[fontHash] = font;
+        fontMap_[fontHash] = (TextDrawerFontContext *)font;
         fontHash_ = fontHash;
         return fontHash;
     #else
@@ -256,12 +256,12 @@ namespace GFX
     }
 
     void TextDrawer::setFont(uint32 fontHandle) {
-
+        UNUSED(fontHandle);
     }
 
     void TextDrawer::measureString(const char *str, float *w, float *h) {
     #ifdef USING_QT_UI
-        QFont* font = fontMap_.find(fontHash_)->second;
+        QFont* font = (QFont *)fontMap_.find(fontHash_)->second;
         QFontMetrics fm(*font);
         QSize size = fm.size(0, QString::fromUtf8(str));
         *w = (float)size.width() * fontScaleX_;
@@ -277,10 +277,10 @@ namespace GFX
             return;
 
     #ifdef USING_QT_UI
-        uint32 stringHash = hash::Fletcher((const uint8 *)str, strlen(str));
+        uint32 stringHash = Fletcher((const uint8 *)str, strlen(str));
         uint32 entryHash = stringHash ^ fontHash_;
 
-        target.Flush(true);
+        target.flush(true);
 
         TextStringEntry *entry;
 
@@ -288,10 +288,10 @@ namespace GFX
         if (iter != cache_.end()) {
             entry = iter->second;
             entry->lastUsedFrame = frameCount_;
-            thin3d_->SetTexture(0, entry->texture);
+            thin3d_->setTexture(0, entry->texture);
         }
         else {
-            QFont *font = fontMap_.find(fontHash_)->second;
+            QFont *font = (QFont *)fontMap_.find(fontHash_)->second;
             QFontMetrics fm(*font);
             QSize size = fm.size(0, QString::fromUtf8(str));
             QImage image((size.width() + 3) & ~ 3, (size.height() + 3) & ~ 3, QImage::Format_ARGB32_Premultiplied);
@@ -311,7 +311,7 @@ namespace GFX
             entry->bmWidth = entry->width = image.width();
             entry->bmHeight = entry->height = image.height();
             entry->lastUsedFrame = frameCount_;
-            entry->texture = thin3d_->CreateTexture(LINEAR2D, RGBA4444, entry->bmWidth, entry->bmHeight, 1, 0);
+            entry->texture = thin3d_->createTexture(LINEAR2D, RGBA4444, entry->bmWidth, entry->bmHeight, 1, 0);
 
             uint16 *bitmapData = new uint16[entry->bmWidth * entry->bmHeight];
             for (int x = 0; x < entry->bmWidth; x++) {
@@ -319,8 +319,8 @@ namespace GFX
                     bitmapData[entry->bmWidth * y + x] = 0xfff0 | image.pixel(x, y) >> 28;
                 }
             }
-            entry->texture->SetImageData(0, 0, 0, entry->bmWidth, entry->bmHeight, 1, 0, entry->bmWidth * 2, (const uint8 *)bitmapData);
-            entry->texture->Finalize(0);
+            entry->texture->setImageData(0, 0, 0, entry->bmWidth, entry->bmHeight, 1, 0, entry->bmWidth * 2, (const uint8 *)bitmapData);
+            entry->texture->finalize(0);
 
             delete [] bitmapData;
 
@@ -328,9 +328,9 @@ namespace GFX
         }
         float w = entry->bmWidth * fontScaleX_;
         float h = entry->bmHeight * fontScaleY_;
-        DrawBuffer::DoAlign(align, &x, &y, &w, &h);
-        target.DrawTexRect(x, y, x + w, y + h, 0.0f, 0.0f, 1.0f, 1.0f, color);
-        target.Flush(true);
+        DrawBuffer::doAlign(align, &x, &y, &w, &h);
+        target.drawTexRect(x, y, x + w, y + h, 0.0f, 0.0f, 1.0f, 1.0f, color);
+        target.flush(true);
     #endif
     }
 

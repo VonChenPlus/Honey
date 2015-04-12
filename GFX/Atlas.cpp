@@ -1,4 +1,5 @@
 #include "Atlas.h"
+#include <string.h>
 
 namespace GFX
 {

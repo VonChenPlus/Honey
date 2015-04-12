@@ -35,6 +35,7 @@ using THIN3D::T3DCreateGLContext;
 using THIN3D::Thin3DContext;
 #include "GFX/Texture.h"
 using GFX::Atlas;
+using GFX::AtlasImage;
 
 namespace GLOBAL
 {
@@ -59,6 +60,10 @@ namespace GLOBAL
     UIState &uiStateSaved() { return *_UIStatesaved; }
     shared_ptr<Thin3DContext> _Thin3D;
     Thin3DContext &thin3DContext() { return *_Thin3D; }
+    shared_ptr<Atlas> _UIAtlas;
+    Atlas &uiAtlas() { return *_UIAtlas; }
+    shared_ptr<AtlasImage> _UIAtlasImage[34];
+    shared_ptr<AtlasImage> *uiAtlasImage() { return _UIAtlasImage; }
 
     int _DPXRes;
     int dpXRes() { return _DPXRes; }
@@ -73,24 +78,29 @@ namespace GLOBAL
 void NativeInit() 
 {
     GLOBAL::_ScreenManager = make_shared<ScreenManager>();
+    GLOBAL::_DPIScale = 1.0f;
+    GLOBAL::_PixelInDPS = 1.0f;
+
+    GLOBAL::screenManager().switchScreen(new LogoScreen());
+}
+
+void NativeInitGraphics()
+{
     GLOBAL::_GLExtensions = make_shared<GLExtensions>();
     GLOBAL::_GLState = make_shared<OpenGLState>();
     GLOBAL::_DrawBuf2D = make_shared<DrawBuffer>();
     GLOBAL::_DrawBuf2DFront = make_shared<DrawBuffer>();
     GLOBAL::_UIState = make_shared<UIState>();
-    GLOBAL::_DPIScale = 1.0f;
-    GLOBAL::_PixelInDPS = 1.0f;
+    GLOBAL::_Thin3D = shared_ptr<Thin3DContext>(T3DCreateGLContext());
+    GLOBAL::_UIAtlas = make_shared<Atlas>();
+    for (int index = 0; index < 34; index++)
+        GLOBAL::_UIAtlasImage[index] = make_shared<AtlasImage>();
 
-    GLOBAL::screenManager().switchScreen(new LogoScreen());
+    GLOBAL::drawBuffer2D().setAtlas(&GLOBAL::uiAtlas());
 
     // We do this here, instead of in NativeInitGraphics, because the display may be reset.
     // When it's reset we don't want to forget all our managed things.
     gl_lost_manager_init();
-}
-
-void NativeInitGraphics()
-{
-    GLOBAL::_Thin3D = shared_ptr<Thin3DContext>(T3DCreateGLContext());
 }
 
 std::string System_GetProperty(SystemProperty prop)

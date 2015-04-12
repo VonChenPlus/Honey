@@ -30,6 +30,8 @@ namespace UI
     }
 
     void LogoScreen::sendMessage(const char *message, const char *value) {
+        UNUSED(message);
+        UNUSED(value);
     }
 
     bool LogoScreen::key(const KeyInput &key) {
@@ -69,7 +71,7 @@ namespace UI
         dc.flush();
     }
 
-    void LogoScreen::drawBackground(UIContext &, int alpha) {
+    void LogoScreen::drawBackground(UIContext &, int) {
 
     }
 }

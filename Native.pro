@@ -85,7 +85,8 @@ HEADERS += \
     $$P/UI/ViewGroup.h \
     $$P/INPUT/KeyCodes.h \
     $$P/UI/LogoScreen.h \
-    $$P/GFX/Atlas.h
+    $$P/GFX/Atlas.h \
+    $$P/UI/Theme.h
 
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)
