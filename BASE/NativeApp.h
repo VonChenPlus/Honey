@@ -13,7 +13,7 @@
 // The very first function to be called after NativeGetAppInfo. Even NativeMix is not called
 // before this, although it may be called at any point in time afterwards (on any thread!)
 // This functions must NOT call OpenGL. Main thread.
-void NativeInit();
+void NativeInit(int wd, int ht);
 
 // Runs after NativeInit() at some point. May (and probably should) call OpenGL.
 // Should not initialize anything screen-size-dependent - do that in NativeResized.

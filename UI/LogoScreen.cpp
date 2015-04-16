@@ -25,7 +25,7 @@ namespace UI
         UIScreen::update(input_state);
         frames_++;
         if (frames_ > 180 || input_state.pointer_down[0]) {
-            next();
+            //next();
         }
     }
 
@@ -55,15 +55,15 @@ namespace UI
         if (t > 1.0f)
             alpha = 1.0f;
         float alphaText = alpha;
-        if (t > 2.0f)
-            alphaText = 3.0f - t;
+        //if (t > 2.0f)
+        //    alphaText = 3.0f - t;
 
         drawBackground(dc, alpha);
 
         char temp[256];
         // Manually formatting utf-8 is fun.  \xXX doesn't work everywhere.
         snprintf(temp, sizeof(temp), "Created by Feng Chen%c%crd", 0xC3, 0xA5);
-        dc.draw()->setFontScale(1.0f, 1.0f);
+        dc.draw()->setFontScale(100.0f, 100.0f);
         dc.setFontStyle(dc.theme->uiFont);
         dc.drawText(temp, bounds.centerX(), bounds.centerY() + 40, ColorAlpha(0xFFFFFFFF, alphaText), ALIGN_CENTER);
 

@@ -15,6 +15,8 @@ namespace UI
 
     ScreenManager::ScreenManager() {
         nextScreen_ = NULLPTR;
+        dialogFinished_ = NULLPTR;
+        uiContext_ = NULLPTR;
     }
 
     ScreenManager::~ScreenManager() {

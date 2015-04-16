@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>ASSERT/ui_atlas_lowmem.zim</file>
+    </qresource>
+</RCC>
