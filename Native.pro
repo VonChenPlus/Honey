@@ -90,7 +90,8 @@ HEADERS += \
     $$P/BASE/ConstMap.h
 
 RESOURCES += \
-    NativeRes.qrc
+    $$P/NativeRes.qrc
+    
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)
 {

@@ -157,7 +157,7 @@ void NativeInitGraphics()
     GLOBAL::drawBuffer2D().init(&GLOBAL::thin3DContext());
     GLOBAL::drawBuffer2DFront().init(&GLOBAL::thin3DContext());
 
-    QFile asset("S:\\OpenSource\\Hive\\Native\\ASSERT\\ui_atlas_lowmem.zim");
+    QFile asset("S:\\OpenSource\\Hive\\Native\\ASSERT\\ui_atlas.zim");
     asset.open(QIODevice::ReadOnly);
     uint8_t *contents = new uint8_t[asset.size()+1];
     memcpy(contents, (uint8_t*)asset.readAll().data(), asset.size());
@@ -177,6 +177,10 @@ void NativeInitGraphics()
 
     GLOBAL::screenManager().setUIContext(&GLOBAL::uiContext());
     GLOBAL::screenManager().setThin3DContext(&GLOBAL::thin3DContext());
+
+    GLOBAL::uiTheme().uiFont = UI::FontStyle(UBUNTU24, "", 20);
+    GLOBAL::uiTheme().uiFontSmall = UI::FontStyle(UBUNTU24, "", 14);
+    GLOBAL::uiTheme().uiFontSmaller = UI::FontStyle(UBUNTU24, "", 11);
 
     GLOBAL::uiTheme().checkOn = I_CHECKEDBOX;
     GLOBAL::uiTheme().checkOff = I_SQUARE;

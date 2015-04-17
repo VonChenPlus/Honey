@@ -11,11 +11,6 @@ using GFX::DrawBuffer;
 using GFX::ALIGN_CENTER;
 #include "BASE/Color.h"
 
-namespace GLOBAL
-{
-    extern DrawBuffer &drawBuffer2D();
-}
-
 namespace UI
 {
     void LogoScreen::next() {
@@ -62,8 +57,8 @@ namespace UI
 
         char temp[256];
         // Manually formatting utf-8 is fun.  \xXX doesn't work everywhere.
-        snprintf(temp, sizeof(temp), "Created by Feng Chen%c%crd", 0xC3, 0xA5);
-        dc.draw()->setFontScale(100.0f, 100.0f);
+        snprintf(temp, sizeof(temp), "Created by Feng Chen");
+        dc.draw()->setFontScale(1.0f, 1.0f);
         dc.setFontStyle(dc.theme->uiFont);
         dc.drawText(temp, bounds.centerX(), bounds.centerY() + 40, ColorAlpha(0xFFFFFFFF, alphaText), ALIGN_CENTER);
 
