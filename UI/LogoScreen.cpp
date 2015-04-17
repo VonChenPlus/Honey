@@ -20,7 +20,7 @@ namespace UI
         UIScreen::update(input_state);
         frames_++;
         if (frames_ > 180 || input_state.pointer_down[0]) {
-            //next();
+            next();
         }
     }
 
@@ -50,8 +50,8 @@ namespace UI
         if (t > 1.0f)
             alpha = 1.0f;
         float alphaText = alpha;
-        //if (t > 2.0f)
-        //    alphaText = 3.0f - t;
+        if (t > 2.0f)
+            alphaText = 3.0f - t;
 
         drawBackground(dc, alpha);
 

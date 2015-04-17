@@ -9,13 +9,15 @@
 #include "UTILS/STRING/String.h"
 using UTILS::STRING::StringFromFormat;
 
+namespace GLOBAL
+{
+    extern GFX::GLExtensions &glExtensions();
+    extern std::string &sGlExtensions();
+    extern std::string &sEGlExtensions();
+}
+
 namespace GFX
 {
-    OpenGLState glstate;
-    GLExtensions gl_extensions;
-    std::string g_all_gl_extensions;
-    std::string g_all_egl_extensions;
-
     int OpenGLState::state_count = 0;
 
     void OpenGLState::initialize() {
@@ -83,7 +85,7 @@ namespace GFX
         if (done)
             return;
         done = true;
-        memset(&gl_extensions, 0, sizeof(gl_extensions));
+        memset(&GLOBAL::glExtensions(), 0, sizeof(GLOBAL::glExtensions()));
 
         const char *renderer = (const char *)glGetString(GL_RENDERER);
         const char *versionStr = (const char *)glGetString(GL_VERSION);
@@ -97,45 +99,45 @@ namespace GFX
             if (vendor == "NVIDIA Corporation"
                 || vendor == "Nouveau"
                 || vendor == "nouveau") {
-                gl_extensions.gpuVendor = GPU_VENDOR_NVIDIA;
+                GLOBAL::glExtensions().gpuVendor = GPU_VENDOR_NVIDIA;
             }
             else if (vendor == "Advanced Micro Devices, Inc."
                 || vendor == "ATI Technologies Inc.") {
-                gl_extensions.gpuVendor = GPU_VENDOR_AMD;
+                GLOBAL::glExtensions().gpuVendor = GPU_VENDOR_AMD;
             }
             else if (vendor == "Intel"
                 || vendor == "Intel Inc."
                 || vendor == "Intel Corporation"
                 || vendor == "Tungsten Graphics, Inc") {
                 // We'll assume this last one means Intel
-                gl_extensions.gpuVendor = GPU_VENDOR_INTEL;
+                GLOBAL::glExtensions().gpuVendor = GPU_VENDOR_INTEL;
             }
             else if (vendor == "ARM") {
-                gl_extensions.gpuVendor = GPU_VENDOR_ARM;
+                GLOBAL::glExtensions().gpuVendor = GPU_VENDOR_ARM;
             }
             else if (vendor == "Imagination Technologies") {
-                gl_extensions.gpuVendor = GPU_VENDOR_POWERVR;
+                GLOBAL::glExtensions().gpuVendor = GPU_VENDOR_POWERVR;
             }
             else if (vendor == "Qualcomm") {
-                gl_extensions.gpuVendor = GPU_VENDOR_ADRENO;
+                GLOBAL::glExtensions().gpuVendor = GPU_VENDOR_ADRENO;
             }
             else if (vendor == "Broadcom") {
-                gl_extensions.gpuVendor = GPU_VENDOR_BROADCOM;
+                GLOBAL::glExtensions().gpuVendor = GPU_VENDOR_BROADCOM;
                 // Just for reference: Galaxy Y has renderer == "VideoCore IV HW"
             }
             else {
-                gl_extensions.gpuVendor = GPU_VENDOR_UNKNOWN;
+                GLOBAL::glExtensions().gpuVendor = GPU_VENDOR_UNKNOWN;
             }
         }
         else {
-            gl_extensions.gpuVendor = GPU_VENDOR_UNKNOWN;
+            GLOBAL::glExtensions().gpuVendor = GPU_VENDOR_UNKNOWN;
         }
 
         //ILOG("GPU Vendor : %s ; renderer: %s version str: %s ; GLSL version str: %s", cvendor, renderer ? renderer : "N/A", versionStr ? versionStr : "N/A", glslVersionStr ? glslVersionStr : "N/A");
 
         if (renderer) {
-            strncpy(gl_extensions.model, renderer, sizeof(gl_extensions.model));
-            gl_extensions.model[sizeof(gl_extensions.model) - 1] = 0;
+            strncpy(GLOBAL::glExtensions().model, renderer, sizeof(GLOBAL::glExtensions().model));
+            GLOBAL::glExtensions().model[sizeof(GLOBAL::glExtensions().model) - 1] = 0;
         }
 
         char buffer[64] = { 0 };
@@ -148,27 +150,27 @@ namespace GFX
         for (int i = 0; i < len && numVer < 3; i++) {
             if (buffer[i] == '.') {
                 buffer[i] = 0;
-                gl_extensions.ver[numVer++] = strtol(lastNumStart, NULLPTR, 10);
+                GLOBAL::glExtensions().ver[numVer++] = strtol(lastNumStart, NULLPTR, 10);
                 i++;
                 lastNumStart = buffer + i;
             }
         }
         if (numVer < 3)
-            gl_extensions.ver[numVer++] = strtol(lastNumStart, NULLPTR, 10);
+            GLOBAL::glExtensions().ver[numVer++] = strtol(lastNumStart, NULLPTR, 10);
 
         // If the GL version >= 4.3, we know it's a true superset of OpenGL ES 3.0 and can thus enable
         // all the same modern paths.
         // Most of it could be enabled on lower GPUs as well, but let's start this way.
-        if (gl_extensions.versionGEThan(4, 3, 0)) {
-            gl_extensions.GLES3 = true;
+        if (GLOBAL::glExtensions().versionGEThan(4, 3, 0)) {
+            GLOBAL::glExtensions().GLES3 = true;
         }
 
         const char *extString = (const char *)glGetString(GL_EXTENSIONS);
         if (extString) {
-            g_all_gl_extensions = extString;
+            GLOBAL::sGlExtensions() = extString;
         }
         else {
-            g_all_gl_extensions = "";
+            GLOBAL::sGlExtensions() = "";
             extString = "";
         }
 
@@ -177,38 +179,38 @@ namespace GFX
         if (wglGetExtensionsStringEXT)
             wglString = wglGetExtensionsStringEXT();
         if (wglString) {
-            gl_extensions.EXT_swap_control_tear = strstr(wglString, "WGL_EXT_swap_control_tear") != 0;
-            g_all_egl_extensions = wglString;
+            GLOBAL::glExtensions().EXT_swap_control_tear = strstr(wglString, "WGL_EXT_swap_control_tear") != 0;
+            GLOBAL::sEGlExtensions() = wglString;
         }
         else {
-            g_all_egl_extensions = "";
+            GLOBAL::sEGlExtensions() = "";
         }
     #endif
 
         // Check the desktop extension instead of the OES one. They are very similar.
         // Also explicitly check those ATI devices that claims to support npot
-        gl_extensions.OES_texture_npot = strstr(extString, "GL_ARB_texture_non_power_of_two") != 0
+        GLOBAL::glExtensions().OES_texture_npot = strstr(extString, "GL_ARB_texture_non_power_of_two") != 0
             && !(((strncmp(renderer, "ATI RADEON X", 12) == 0) || (strncmp(renderer, "ATI MOBILITY RADEON X", 21) == 0)));
 
-        gl_extensions.NV_draw_texture = strstr(extString, "GL_NV_draw_texture") != 0;
-        gl_extensions.ARB_blend_func_extended = strstr(extString, "GL_ARB_blend_func_extended") != 0;
-        gl_extensions.ARB_shader_image_load_store = (strstr(extString, "GL_ARB_shader_image_load_store") != 0) || (strstr(extString, "GL_EXT_shader_image_load_store") != 0);
-        gl_extensions.EXT_bgra = strstr(extString, "GL_EXT_bgra") != 0;
-        gl_extensions.EXT_gpu_shader4 = strstr(extString, "GL_EXT_gpu_shader4") != 0;
-        gl_extensions.NV_framebuffer_blit = strstr(extString, "GL_NV_framebuffer_blit") != 0;
-        if (gl_extensions.gpuVendor == GPU_VENDOR_INTEL || !gl_extensions.versionGEThan(3, 0, 0)) {
+        GLOBAL::glExtensions().NV_draw_texture = strstr(extString, "GL_NV_draw_texture") != 0;
+        GLOBAL::glExtensions().ARB_blend_func_extended = strstr(extString, "GL_ARB_blend_func_extended") != 0;
+        GLOBAL::glExtensions().ARB_shader_image_load_store = (strstr(extString, "GL_ARB_shader_image_load_store") != 0) || (strstr(extString, "GL_EXT_shader_image_load_store") != 0);
+        GLOBAL::glExtensions().EXT_bgra = strstr(extString, "GL_EXT_bgra") != 0;
+        GLOBAL::glExtensions().EXT_gpu_shader4 = strstr(extString, "GL_EXT_gpu_shader4") != 0;
+        GLOBAL::glExtensions().NV_framebuffer_blit = strstr(extString, "GL_NV_framebuffer_blit") != 0;
+        if (GLOBAL::glExtensions().gpuVendor == GPU_VENDOR_INTEL || !GLOBAL::glExtensions().versionGEThan(3, 0, 0)) {
             // Force this extension to off on sub 3.0 OpenGL versions as it does not seem reliable
             // Also on Intel, see https://github.com/hrydgard/ppsspp/issues/4867
-            gl_extensions.ARB_blend_func_extended = false;
+            GLOBAL::glExtensions().ARB_blend_func_extended = false;
         }
 
         // Desktops support minmax and subimage unpack (GL_UNPACK_ROW_LENGTH etc)
-        gl_extensions.EXT_blend_minmax = true;
-        gl_extensions.EXT_unpack_subimage = true;
+        GLOBAL::glExtensions().EXT_blend_minmax = true;
+        GLOBAL::glExtensions().EXT_unpack_subimage = true;
 
         // GLES 3 subsumes many ES2 extensions.
-        if (gl_extensions.GLES3) {
-            gl_extensions.EXT_unpack_subimage = true;
+        if (GLOBAL::glExtensions().GLES3) {
+            GLOBAL::glExtensions().EXT_unpack_subimage = true;
         }
 
         if (strstr(extString, "GL_ARB_ES2_compatibility")) {
@@ -221,20 +223,20 @@ namespace GFX
             };
             for (int st = 0; st < 2; st++) {
                 for (int p = 0; p < 6; p++) {
-                    glGetShaderPrecisionFormat(shaderTypes[st], precisions[p], gl_extensions.range[st][p], &gl_extensions.precision[st][p]);
+                    glGetShaderPrecisionFormat(shaderTypes[st], precisions[p], GLOBAL::glExtensions().range[st][p], &GLOBAL::glExtensions().precision[st][p]);
                 }
             }
         }
 
-        gl_extensions.FBO_ARB = false;
-        gl_extensions.FBO_EXT = false;
-        gl_extensions.PBO_ARB = true;
-        gl_extensions.PBO_NV = true;
+        GLOBAL::glExtensions().FBO_ARB = false;
+        GLOBAL::glExtensions().FBO_EXT = false;
+        GLOBAL::glExtensions().PBO_ARB = true;
+        GLOBAL::glExtensions().PBO_NV = true;
         if (strlen(extString) != 0) {
-            gl_extensions.FBO_ARB = strstr(extString, "GL_ARB_framebuffer_object") != 0;
-            gl_extensions.FBO_EXT = strstr(extString, "GL_EXT_framebuffer_object") != 0;
-            gl_extensions.PBO_ARB = strstr(extString, "GL_ARB_pixel_buffer_object") != 0;
-            gl_extensions.PBO_NV = strstr(extString, "GL_NV_pixel_buffer_object") != 0;
+            GLOBAL::glExtensions().FBO_ARB = strstr(extString, "GL_ARB_framebuffer_object") != 0;
+            GLOBAL::glExtensions().FBO_EXT = strstr(extString, "GL_EXT_framebuffer_object") != 0;
+            GLOBAL::glExtensions().PBO_ARB = strstr(extString, "GL_ARB_pixel_buffer_object") != 0;
+            GLOBAL::glExtensions().PBO_NV = strstr(extString, "GL_NV_pixel_buffer_object") != 0;
         }
 
         ProcessGPUFeatures();

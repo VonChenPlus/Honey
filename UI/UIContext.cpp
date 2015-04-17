@@ -18,8 +18,6 @@ using UI::UIState;
 namespace GLOBAL
 {
     extern UIState &uiState();
-    extern DrawBuffer &drawBuffer2D();
-    extern DrawBuffer &drawBuffer2DFront();
     extern int &dpXRes();
     extern int &dpYRes();
     extern float &dpiScale();
@@ -27,33 +25,6 @@ namespace GLOBAL
 
 namespace UI
 {
-    static void UIBegin(Thin3DShaderSet *shaderSet) {
-        for (int i = 0; i < MAX_POINTERS; i++)
-            GLOBAL::uiState().hotitem[i] = 0;
-        GLOBAL::drawBuffer2D().begin(shaderSet);
-        GLOBAL::drawBuffer2DFront().begin(shaderSet);
-    }
-
-    static void UIEnd() {
-        for (int i = 0; i < MAX_POINTERS; i++) {
-            if (GLOBAL::uiState().mousedown[i] == 0) {
-                GLOBAL::uiState().activeitem[i] = 0;
-            }
-            else {
-                if (GLOBAL::uiState().activeitem[i] == 0) {
-                    GLOBAL::uiState().activeitem[i] = -1;
-                }
-            }
-        }
-        GLOBAL::drawBuffer2D().end();
-        GLOBAL::drawBuffer2DFront().end();
-
-        if (GLOBAL::uiState().ui_tick > 0)
-            GLOBAL::uiState().ui_tick--;
-        GLOBAL::drawBuffer2D().flush();
-        GLOBAL::drawBuffer2DFront().flush();
-    }
-
     UIContext::UIContext()
         : uishader_(0)
         , uitexture_(0)
@@ -89,14 +60,14 @@ namespace UI
         thin3d_->setRenderState(T3DRenderState::CULL_MODE, T3DCullMode::NO_CULL);
         thin3d_->setTexture(0, uitexture_);
         thin3d_->setScissorEnabled(false);
-        UIBegin(uishader_);
+        uiBegin(uishader_);
     }
 
     void UIContext::beginNoTex() {
         thin3d_->setBlendState(blend_);
         thin3d_->setRenderState(T3DRenderState::CULL_MODE, T3DCullMode::NO_CULL);
 
-        UIBegin(uishadernotex_);
+        uiBegin(uishadernotex_);
     }
 
     void UIContext::reBindTexture() const {
@@ -115,7 +86,7 @@ namespace UI
     }
 
     void UIContext::end() {
-        UIEnd();
+        uiEnd();
         flush();
     }
 
@@ -232,6 +203,33 @@ namespace UI
         case UI::DRAW_NOTHING:
             break;
         }
+    }
+
+    void UIContext::uiBegin(Thin3DShaderSet *shaderSet) {
+        for (int i = 0; i < MAX_POINTERS; i++)
+            GLOBAL::uiState().hotitem[i] = 0;
+        if (uidrawbuffer_) uidrawbuffer_->begin(shaderSet);
+        if (uidrawbufferTop_) uidrawbufferTop_->begin(shaderSet);
+    }
+
+    void UIContext::uiEnd() {
+        for (int i = 0; i < MAX_POINTERS; i++) {
+            if (GLOBAL::uiState().mousedown[i] == 0) {
+                GLOBAL::uiState().activeitem[i] = 0;
+            }
+            else {
+                if (GLOBAL::uiState().activeitem[i] == 0) {
+                    GLOBAL::uiState().activeitem[i] = -1;
+                }
+            }
+        }
+        if (uidrawbuffer_) uidrawbuffer_->end();
+        if (uidrawbufferTop_) uidrawbufferTop_->end();
+
+        if (GLOBAL::uiState().ui_tick > 0)
+            GLOBAL::uiState().ui_tick--;
+        if (uidrawbuffer_) uidrawbuffer_->flush();
+        if (uidrawbufferTop_) uidrawbufferTop_->flush();
     }
 }
 

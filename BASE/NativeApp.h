@@ -19,11 +19,6 @@ void NativeInit(int wd, int ht);
 // Should not initialize anything screen-size-dependent - do that in NativeResized.
 void NativeInitGraphics();
 
-// If you want to change DPI stuff (such as modifying dp_xres and dp_yres), this is the
-// place to do it. You should only read g_dpi_scale and pixel_xres and pixel_yres in this,
-// and only write dp_xres and dp_yres.
-void NativeResized();
-
 // Called ~sixty times a second, delivers the current input state.
 // Main thread.
 void NativeUpdate(_INPUT::InputState &input);

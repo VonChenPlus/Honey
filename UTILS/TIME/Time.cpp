@@ -36,35 +36,12 @@ namespace UTILS
             return elapsed * frequencyMult;
         }
 
-        #elif defined(BLACKBERRY)
-        double real_time_now() {
-            struct timespec time;
-            clock_gettime(CLOCK_MONOTONIC, &time); // Linux must use CLOCK_MONOTONIC_RAW due to time warps
-            return time.tv_sec + time.tv_nsec / 1.0e9;
-        }
         #else
 
         uint64 _frequency = 0;
         uint64 _starttime = 0;
 
         double real_time_now() {
-        #ifdef ANDROID
-            if (false && gl_extensions.EGL_NV_system_time) {
-                // This is needed to profile using PerfHUD on Tegra
-                if (_frequency == 0) {
-                    _frequency = eglGetSystemTimeFrequencyNV();
-                    _starttime = eglGetSystemTimeNV();
-                }
-
-                uint64 cur = eglGetSystemTimeNV();
-                int64 diff = cur - _starttime;
-
-                return (double)diff / (double)_frequency;
-            }
-            struct timespec time;
-            clock_gettime(CLOCK_MONOTONIC_RAW, &time);
-            return time.tv_sec + time.tv_nsec / 1.0e9;
-        #else
             static time_t start;
             struct timeval tv;
             gettimeofday(&tv, NULLPTR);
@@ -73,7 +50,6 @@ namespace UTILS
             }
             tv.tv_sec -= start;
             return (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
-        #endif
         }
 
         #endif

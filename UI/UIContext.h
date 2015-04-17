@@ -59,6 +59,9 @@ namespace UI
         THIN3D::Thin3DContext *getThin3DContext() { return thin3d_; }
 
     private:
+        void uiBegin(THIN3D::Thin3DShaderSet *shaderSet);
+        void uiEnd();
+
         THIN3D::Thin3DContext *thin3d_;
         MATH::Bounds bounds_;
 

@@ -88,9 +88,6 @@ HEADERS += \
     $$P/GFX/Atlas.h \
     $$P/UI/Theme.h \
     $$P/BASE/ConstMap.h
-
-RESOURCES += \
-    $$P/NativeRes.qrc
     
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)

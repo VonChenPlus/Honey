@@ -29,7 +29,6 @@ namespace GFX
     void ProcessGPUFeatures() {
         GLOBAL::glExtensions().bugs = 0;
 
-        //ILOG("Checking for GL driver bugs... vendor=%i model='%s'", (int)gl_extensions.gpuVendor, gl_extensions.model);
         // Should be table driven instead, this is a quick hack for Galaxy Y
         if (System_GetProperty(SYSPROP_NAME) == "samsung:GT-S5360") {
             GLOBAL::glExtensions().bugs |= BUG_FBO_UNUSABLE;
