@@ -35,17 +35,25 @@ namespace GFX
     {
     public:
         TextDrawer(THIN3D::Thin3DContext *thin3d);
-        ~TextDrawer();
+        virtual ~TextDrawer();
 
         uint32 setFont(const char *fontName, int size, int flags);
-        void setFont(uint32 fontHandle);  // Shortcut once you've set the font once.
-
         void setFontScale(float xscale, float yscale);
+
         void measureString(const char *str, float *w, float *h);
+
         void drawString(DrawBuffer &target, const char *str, float x, float y, uint32 color, int align = ALIGN_TOPLEFT);
         void drawStringRect(DrawBuffer &target, const char *str, const MATH::Bounds &bounds, uint32 color, int align);
         // Use for housekeeping like throwing out old strings.
         void oncePerFrame();
+
+    protected:
+        virtual TextDrawerFontContext *setFont(int size) = 0;  // Shortcut once you've set the font once.
+        virtual void measureString(TextDrawerFontContext * font, const char *str, float *w, float *h) = 0;
+        virtual void drawString(TextDrawerFontContext * font, const char *str, uint32 color, TextStringEntry **entry) = 0;
+        THIN3D::Thin3DTexture *createTexture(uint16 *bitmapData, int width, int height);
+
+        std::map<uint32, TextDrawerFontContext *> fontMap_;
 
     private:
         THIN3D::Thin3DContext *thin3d_;
@@ -55,7 +63,6 @@ namespace GFX
         float fontScaleY_;
 
         TextDrawerContext *ctx_;
-        std::map<uint32, TextDrawerFontContext *> fontMap_;
 
         uint32 fontHash_;
         // The key is the CityHash of the string xor the fontHash_.

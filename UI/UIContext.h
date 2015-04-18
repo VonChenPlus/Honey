@@ -6,7 +6,7 @@
 #include "MATH/Bounds.h"
 #include "THIN3D/Thin3D.h"
 #include "GFX/DrawBuffer.h"
-#include "GFX/DrawText.h"
+#include "GFX/TextDrawer.h"
 
 namespace UI
 {
@@ -20,7 +20,10 @@ namespace UI
         UIContext();
         ~UIContext();
 
-        void init(THIN3D::Thin3DContext *thin3d, THIN3D::Thin3DShaderSet *uiShaderTex, THIN3D::Thin3DShaderSet *uiShaderNoTex, THIN3D::Thin3DTexture *uitexture, GFX::DrawBuffer *uidrawbuffer, GFX::DrawBuffer *uidrawbufferTop);
+        void init(THIN3D::Thin3DContext *thin3d, THIN3D::Thin3DShaderSet *uiShaderTex,
+                  THIN3D::Thin3DShaderSet *uiShaderNoTex, THIN3D::Thin3DTexture *uitexture,
+                  GFX::DrawBuffer *uidrawbuffer, GFX::DrawBuffer *uidrawbufferTop,
+                  GFX::TextDrawer *textDrawer);
 
         void begin();
         void beginNoTex();

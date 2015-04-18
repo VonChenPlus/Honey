@@ -41,7 +41,10 @@ namespace UI
         delete textDrawer_;
     }
 
-    void UIContext::init(Thin3DContext *thin3d, Thin3DShaderSet *uishader, Thin3DShaderSet *uishadernotex, Thin3DTexture *uitexture, DrawBuffer *uidrawbuffer, DrawBuffer *uidrawbufferTop) {
+    void UIContext::init(Thin3DContext *thin3d, Thin3DShaderSet *uishader,
+                         Thin3DShaderSet *uishadernotex, Thin3DTexture *uitexture,
+                         DrawBuffer *uidrawbuffer, DrawBuffer *uidrawbufferTop,
+                         TextDrawer *textDrawer) {
         thin3d_ = thin3d;
         blend_ = thin3d_->getBlendStatePreset(T3DBlendStatePreset::BS_STANDARD_ALPHA);
         depth_ = thin3d_->createDepthStencilState(false, false, T3DComparison::LESS);
@@ -51,7 +54,7 @@ namespace UI
         uitexture_ = uitexture;
         uidrawbuffer_ = uidrawbuffer;
         uidrawbufferTop_ = uidrawbufferTop;
-        textDrawer_ = new TextDrawer(thin3d);
+        textDrawer_ = textDrawer;
     }
 
     void UIContext::begin() {
