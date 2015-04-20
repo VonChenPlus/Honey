@@ -1,7 +1,7 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 #include "INPUT/InputState.h"
 
 namespace UI

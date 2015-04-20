@@ -1,6 +1,6 @@
 #include "MATH/Quaternion.h"
 #include "MATH/Matrix.h"
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 
 namespace MATH
 {

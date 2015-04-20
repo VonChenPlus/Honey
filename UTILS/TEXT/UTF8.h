@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 
 namespace UTILS
 {

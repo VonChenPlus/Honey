@@ -15,7 +15,7 @@ using IMAGE::ZIM_RGBA4444;
 using IMAGE::ZIM_RGB565;
 using IMAGE::ZIM_ETC1;
 #include "GFX/GLDebug.h"
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 #include "IMAGE/PNGLoad.h"
 using IMAGE::PNGLoad;
 using IMAGE::PNGLoadPtr;

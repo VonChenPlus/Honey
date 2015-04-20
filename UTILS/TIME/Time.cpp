@@ -8,7 +8,7 @@
 #endif
 #include <stdio.h>
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 
 namespace UTILS
 {

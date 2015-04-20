@@ -1,6 +1,6 @@
 #include "MATH/Matrix.h"
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 #include "MATH/Quaternion.h"
 
 #ifdef _WIN32

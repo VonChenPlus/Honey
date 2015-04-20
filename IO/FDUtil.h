@@ -1,7 +1,7 @@
 #ifndef FDUTIL_H
 #define FDUTIL_H
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 #include <string>
 
 namespace IO

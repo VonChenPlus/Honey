@@ -1,7 +1,7 @@
 #ifndef PNGLOAD_H
 #define PNGLOAD_H
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 
 namespace IMAGE
 {

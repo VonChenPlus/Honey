@@ -1,7 +1,7 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 
 namespace UTILS
 {

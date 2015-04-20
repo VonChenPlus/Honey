@@ -4,7 +4,7 @@
 #include <string>
 #include <functional>
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 #include "INPUT/InputState.h"
 #include "MATH/Bounds.h"
 #include "MATH/Matrix.h"

@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 #include "MATH/Matrix.h"
 
 namespace THIN3D

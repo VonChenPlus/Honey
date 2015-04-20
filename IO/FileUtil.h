@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 
 namespace IO
 {

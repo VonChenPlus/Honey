@@ -20,7 +20,7 @@
 #include <sys/time.h>
 #endif
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 
 class recursive_mutex
 {

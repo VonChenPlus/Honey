@@ -1,7 +1,7 @@
 #ifndef INPUTSTATE_H
 #define INPUTSTATE_H
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 #include "MATH/Vector.h"
 #include "BASE/Mutex.h"
 

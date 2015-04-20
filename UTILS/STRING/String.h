@@ -7,7 +7,7 @@
 #include <string.h>
 #include <vector>
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 
 namespace UTILS
 {

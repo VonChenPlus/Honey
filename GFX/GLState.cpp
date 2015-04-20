@@ -4,7 +4,7 @@
 #include "GL/wglew.h"
 #endif
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 #include "GFX/GLExtensions.h"
 #include "UTILS/STRING/String.h"
 using UTILS::STRING::StringFromFormat;

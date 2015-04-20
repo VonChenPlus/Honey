@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 #include "GFX/GfxResourceHolder.h"
 #include "GFX/Atlas.h"
 

@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 #include "THIN3D/Thin3D.h"
 #include "GFX/DrawBuffer.h"
 #include "MATH/Bounds.h"

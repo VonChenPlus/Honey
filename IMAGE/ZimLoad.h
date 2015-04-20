@@ -1,7 +1,7 @@
 #ifndef ZIMLOAD_H
 #define ZIMLOAD_H
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 
 namespace IMAGE
 {

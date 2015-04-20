@@ -1,7 +1,7 @@
 #ifndef THEME_H
 #define THEME_H
 
-#include "BASE/BasicTypes.h"
+#include "BASE/Native.h"
 
 namespace UI
 {
