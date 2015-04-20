@@ -1,5 +1,5 @@
-#ifndef BASICYPES_H
-#define BASICYPES_H
+#ifndef NATIVE_H
+#define NATIVE_H
 
 #include <stdio.h>
 #include <stdint.h>
@@ -173,4 +173,4 @@ inline int c99_snprintf(char* str, size_t size, const char* format, ...) {
 
 #include "BASE/NException.h"
 
-#endif // BASICYPES_H
+#endif // NATIVE_H

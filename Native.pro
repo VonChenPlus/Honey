@@ -14,7 +14,6 @@ SOURCES += \
     $$P/BASE/*.cpp \
     $$P/GFX/*.cpp \
     $$P/IMAGE/*.cpp \
-    $$P/IO/*.cpp \
     $$P/MATH/*.cpp \
     $$P/THIN3D/*.cpp \
     $$P/UI/*.cpp \
@@ -22,14 +21,14 @@ SOURCES += \
     $$P/UTILS/HASH/Hash.cpp \
     $$P/UTILS/STRING/String.cpp \
     $$P/UTILS/TIME/Time.cpp \
-    $$P/UTILS/COLOR/Color.cpp
+    $$P/UTILS/COLOR/Color.cpp \
+    $$P/UTILS/IO/*.cpp
 
 HEADERS += \
     $$P/BASE/*.h \
     $$P/GFX/*.h \
     $$P/IMAGE/*.h \
     $$P/INPUT/*.h \
-    $$P/IO/*.h \
     $$P/MATH/*.h \
     $$P/THIN3D/*.h \
     $$P/UI/*.h \
@@ -37,7 +36,8 @@ HEADERS += \
     $$P/UTILS/TEXT/UTF16.h \
     $$P/UTILS/STRING/String.h \
     $$P/UTILS/TIME/Time.h \
-    $$P/UTILS/COLOR/Color.h
+    $$P/UTILS/COLOR/Color.h \
+    $$P/UTILS/IO/*.h
     
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)

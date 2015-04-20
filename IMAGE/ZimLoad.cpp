@@ -5,8 +5,8 @@
 #include <stdlib.h>
 
 #include "EXTERNALS/zlib/zlib.h"
-#include "IO/FileUtil.h"
-using IO::ReadLocalFile;
+#include "UTILS/IO/File.h"
+using UTILS::IO::ReadLocalFile;
 #include "UTILS/STRING/String.h"
 using UTILS::STRING::StringFromFormat;
 
