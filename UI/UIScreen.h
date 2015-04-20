@@ -12,12 +12,12 @@ namespace UI
         UIScreen();
         ~UIScreen();
 
-        virtual void update(_INPUT::InputState &input) override;
+        virtual void update(UI::InputState &input) override;
         virtual void render() override;
 
-        virtual bool touch(const _INPUT::TouchInput &touch) override;
-        virtual bool key(const _INPUT::KeyInput &touch) override;
-        virtual bool axis(const _INPUT::AxisInput &touch) override;
+        virtual bool touch(const UI::TouchInput &touch) override;
+        virtual bool key(const UI::KeyInput &touch) override;
+        virtual bool axis(const UI::AxisInput &touch) override;
 
         // Some useful default event handlers
         EventReturn OnOK(EventParams &e);

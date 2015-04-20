@@ -2,7 +2,7 @@
 #define SCREENMANAGER_H
 
 #include <vector>
-#include "INPUT/InputState.h"
+#include "UI/InputState.h"
 #include "UI/UIContext.h"
 #include "THIN3D/Thin3D.h"
 #include "UI/Screen.h"
@@ -23,7 +23,7 @@ namespace UI
         virtual ~ScreenManager();
 
         void switchScreen(Screen *screen);
-        void update(_INPUT::InputState &input);
+        void update(UI::InputState &input);
 
         void setUIContext(UIContext *context) { uiContext_ = context; }
         UIContext *getUIContext() { return uiContext_; }
@@ -43,9 +43,9 @@ namespace UI
         void finishDialog(Screen *dialog, DialogResult result = DR_OK);
 
         // Instant touch, separate from the update() mechanism.
-        bool touch(const _INPUT::TouchInput &touch);
-        bool key(const _INPUT::KeyInput &key);
-        bool axis(const _INPUT::AxisInput &touch);
+        bool touch(const UI::TouchInput &touch);
+        bool key(const UI::KeyInput &key);
+        bool axis(const UI::AxisInput &touch);
 
         // Push a dialog box in front. Currently 1-level only.
         void push(Screen *screen, LAYER_FLAG layerFlags = LAYER_DEFAULT);

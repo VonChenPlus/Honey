@@ -5,7 +5,7 @@
 #include <functional>
 
 #include "BASE/Native.h"
-#include "INPUT/InputState.h"
+#include "UI/InputState.h"
 #include "MATH/Bounds.h"
 #include "MATH/Matrix.h"
 #include "BASE/SmartPtr.h"
@@ -139,10 +139,10 @@ namespace UI
         // Please note that Touch is called ENTIRELY asynchronously from drawing!
         // Can even be called on a different thread! This is to really minimize latency, and decouple
         // touch response from the frame rate. Same with Key and Axis.
-        virtual bool key(const _INPUT::KeyInput &input) { UNUSED(input); return false; }
-        virtual void touch(const _INPUT::TouchInput &input) { UNUSED(input); }
-        virtual void axis(const _INPUT::AxisInput &input) { UNUSED(input); }
-        virtual void update(const _INPUT::InputState &input_state) { UNUSED(input_state); }
+        virtual bool key(const UI::KeyInput &input) { UNUSED(input); return false; }
+        virtual void touch(const UI::TouchInput &input) { UNUSED(input); }
+        virtual void axis(const UI::AxisInput &input) { UNUSED(input); }
+        virtual void update(const UI::InputState &input_state) { UNUSED(input_state); }
 
         virtual void focusChanged(int focusFlags) { UNUSED(focusFlags); }
 

@@ -28,7 +28,6 @@ HEADERS += \
     $$P/BASE/*.h \
     $$P/GFX/*.h \
     $$P/IMAGE/*.h \
-    $$P/INPUT/*.h \
     $$P/MATH/*.h \
     $$P/THIN3D/*.h \
     $$P/UI/*.h \

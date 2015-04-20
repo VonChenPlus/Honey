@@ -22,14 +22,14 @@ namespace UI
         virtual ~ViewGroup();
 
         // Pass through external events to children.
-        virtual bool key(const _INPUT::KeyInput &input) override;
-        virtual void touch(const _INPUT::TouchInput &input) override;
-        virtual void axis(const _INPUT::AxisInput &input) override;
+        virtual bool key(const UI::KeyInput &input) override;
+        virtual void touch(const UI::TouchInput &input) override;
+        virtual void axis(const UI::AxisInput &input) override;
 
         // By default, a container will layout to its own bounds.
         virtual void measure(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert) = 0;
         virtual void layout() = 0;
-        virtual void update(const _INPUT::InputState &input_state);
+        virtual void update(const UI::InputState &input_state);
 
         virtual void draw(UIContext &dc) override;
 

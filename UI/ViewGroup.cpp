@@ -1,8 +1,8 @@
 #include "ViewGroup.h"
-using _INPUT::AxisInput;
-using _INPUT::KeyInput;
-using _INPUT::TouchInput;
-using _INPUT::InputState;
+using UI::AxisInput;
+using UI::KeyInput;
+using UI::TouchInput;
+using UI::InputState;
 
 namespace UI
 {

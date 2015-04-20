@@ -1,10 +1,10 @@
 #include "BASE/Native.h"
 #include "UI/ScreenManager.h"
 #include "UI/Screen.h"
-#include "INPUT/InputState.h"
-using _INPUT::AxisInput;
-using _INPUT::KeyInput;
-using _INPUT::TouchInput;
+#include "UI/InputState.h"
+using UI::AxisInput;
+using UI::KeyInput;
+using UI::TouchInput;
 #include "UI/View.h"
 
 namespace UI
@@ -43,7 +43,7 @@ namespace UI
         }
     }
 
-    void ScreenManager::update(_INPUT::InputState &input) {
+    void ScreenManager::update(UI::InputState &input) {
         if (nextScreen_) {
             switchToNext();
         }

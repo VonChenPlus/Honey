@@ -439,7 +439,7 @@ png_inflate(png_structrp png_ptr, png_uint_32 owner, int finish,
        * a performance advantage, because it reduces the amount of data accessed
        * at each step and that may give the OS more time to page it in.
        */
-      png_ptr->zstream.next_in = PNGZ_INPUT_CAST(input);
+      png_ptr->zstream.next_in = PNGZUI_CAST(input);
       /* avail_in and avail_out are set below from 'size' */
       png_ptr->zstream.avail_in = 0;
       png_ptr->zstream.avail_out = 0;

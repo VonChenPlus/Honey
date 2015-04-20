@@ -2,7 +2,7 @@
 #define LOGOSCREEN_H
 
 #include "UI/UIScreen.h"
-#include "INPUT/InputState.h"
+#include "UI/InputState.h"
 
 namespace UI
 {
@@ -10,8 +10,8 @@ namespace UI
     public:
         LogoScreen()
             : frames_(0), switched_(false) {}
-        bool key(const _INPUT::KeyInput &key) override;
-        virtual void update(_INPUT::InputState &input) override;
+        bool key(const UI::KeyInput &key) override;
+        virtual void update(UI::InputState &input) override;
         virtual void render() override;
         virtual void sendMessage(const char *message, const char *value) override;
         virtual void createViews() override {}

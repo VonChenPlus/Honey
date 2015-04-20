@@ -1,7 +1,7 @@
 #ifndef KEYCODES
 #define KEYCODES
 
-namespace _INPUT
+namespace UI
 {
     enum _keycode_t
     {
@@ -189,11 +189,11 @@ namespace _INPUT
         NKCODE_CAPTIONS = 175,
         NKCODE_SETTINGS = 176,
         NKCODE_TV_POWER = 177,
-        NKCODE_TV_INPUT = 178,
+        NKCODE_TVUI = 178,
         NKCODE_STB_POWER = 179,
-        NKCODE_STB_INPUT = 180,
+        NKCODE_STBUI = 180,
         NKCODE_AVR_POWER = 181,
-        NKCODE_AVR_INPUT = 182,
+        NKCODE_AVRUI = 182,
         NKCODE_PROG_RED = 183,
         NKCODE_PROG_GREEN = 184,
         NKCODE_PROG_YELLOW = 185,

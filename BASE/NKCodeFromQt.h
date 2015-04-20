@@ -1,7 +1,7 @@
 #include "BASE/ConstMap.h"
 #include <map>
-#include "INPUT/KeyCodes.h"
-using namespace _INPUT;
+#include "UI/KeyCodes.h"
+using namespace UI;
 
 // TODO: Add any missing keys 
 static const std::map<int, int> KeyMapRawQttoNative = ConstMap<int, int>

@@ -1523,7 +1523,7 @@ namespace rg_etc1
                // (pixel0 + pixel1 + pixel2 + pixel3)/4 - block_color - (inten_table[selector0] + inten_table[selector1] + inten_table[selector2] + inten_table[selector3])/4 = 0
                // block_color = (pixel0 + pixel1 + pixel2 + pixel3)/4 - (inten_table[selector0] + inten_table[selector1] + inten_table[selector2] + inten_table[selector3])/4
                // So what this means:
-               // optimal_block_color = avg_input - avg_inten_delta
+               // optimal_block_color = avgUI - avg_inten_delta
                // So the optimal block color can be computed by taking the average block color and subtracting the current average of the intensity delta.
                // Unfortunately, optimal_block_color must then be quantized to 555 or 444 so it's not always possible to improve matters using this formula.
                // Also, the above formula is for unclamped intensity deltas. The actual implementation takes into account clamping.

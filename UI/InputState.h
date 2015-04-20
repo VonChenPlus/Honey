@@ -5,7 +5,7 @@
 #include "MATH/Vector.h"
 #include "BASE/Mutex.h"
 
-namespace _INPUT
+namespace UI
 {
     // Default device IDs
 

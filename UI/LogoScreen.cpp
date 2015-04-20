@@ -1,7 +1,7 @@
 #include "LogoScreen.h"
-using _INPUT::InputState;
-using _INPUT::KeyInput;
-using _INPUT::DEVICE_ID_MOUSE;
+using UI::InputState;
+using UI::KeyInput;
+using UI::DEVICE_ID_MOUSE;
 #include "UI/UIContext.h"
 #include "UI/ScreenManager.h"
 #include "MATH/Bounds.h"

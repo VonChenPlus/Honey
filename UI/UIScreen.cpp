@@ -5,8 +5,8 @@
 
 #include "UTILS/TIME/Time.h"
 using UTILS::TIME::time_now_d;
-#include "INPUT/KeyCodes.h"
-using namespace _INPUT;
+#include "UI/KeyCodes.h"
+using namespace UI;
 #include "UI/ScreenManager.h"
 
 namespace UI

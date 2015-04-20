@@ -126,7 +126,7 @@ void NativeInitGraphics()
     gl_lost_manager_init();
 }
 
-void NativeUpdate(_INPUT::InputState &input) {
+void NativeUpdate(UI::InputState &input) {
     {
         lock_guard lock(pendingMutex);
         for (size_t i = 0; i < pendingMessages.size(); i++) {
@@ -138,11 +138,11 @@ void NativeUpdate(_INPUT::InputState &input) {
     GLOBAL::screenManager().update(input);
 }
 
-void NativeTouch(const _INPUT::TouchInput &touch) {
+void NativeTouch(const UI::TouchInput &touch) {
     GLOBAL::screenManager().touch(touch);
 }
 
-bool NativeKey(const _INPUT::KeyInput &key) {
+bool NativeKey(const UI::KeyInput &key) {
     return GLOBAL::screenManager().key(key);
 }
 

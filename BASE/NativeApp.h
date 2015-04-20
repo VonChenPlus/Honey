@@ -2,7 +2,7 @@
 #define NATIVEAPP_H
 
 #include <string>
-#include "INPUT/InputState.h"
+#include "UI/InputState.h"
 
 // The Native App API.
 //
@@ -21,14 +21,14 @@ void NativeInitGraphics();
 
 // Called ~sixty times a second, delivers the current input state.
 // Main thread.
-void NativeUpdate(_INPUT::InputState &input);
+void NativeUpdate(UI::InputState &input);
 
 // Delivers touch events "instantly", without waiting for the next frame so that NativeUpdate can deliver.
 // Useful for triggering audio events, saving a few ms.
 // If you don't care about touch latency, just do a no-op implementation of this.
 // time is not yet implemented. finger can be from 0 to 7, inclusive.
-void NativeTouch(const _INPUT::TouchInput &touch);
-bool NativeKey(const _INPUT::KeyInput &key);
+void NativeTouch(const UI::TouchInput &touch);
+bool NativeKey(const UI::KeyInput &key);
 
 // Called when it's time to render. If the device can keep up, this
 // will also be called sixty times per second. Main thread.

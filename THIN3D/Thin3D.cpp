@@ -26,9 +26,9 @@ namespace THIN3D
     "void main() { gl_FragColor = texture2D(Sampler0, oTexCoord0) * oColor0; }\n";
 
     static const char * const hlslFsTexCol =
-    "struct PS_INPUT { float4 color : COLOR0; float2 uv : TEXCOORD0; };\n"
+    "struct PSUI { float4 color : COLOR0; float2 uv : TEXCOORD0; };\n"
     "sampler2D Sampler0 : register(s0);\n"
-    "float4 main(PS_INPUT input) : COLOR0 {\n"
+    "float4 main(PSUI input) : COLOR0 {\n"
     "  return input.color * tex2D(Sampler0, input.uv);\n"
     "}\n";
 
@@ -40,8 +40,8 @@ namespace THIN3D
     "void main() { gl_FragColor = oColor0; }\n";
 
     static const char * const hlslFsCol =
-    "struct PS_INPUT { float4 color : COLOR0; };\n"
-    "float4 main(PS_INPUT input) : COLOR0 {\n"
+    "struct PSUI { float4 color : COLOR0; };\n"
+    "float4 main(PSUI input) : COLOR0 {\n"
     "  return input.color;\n"
     "}\n";
 
@@ -56,10 +56,10 @@ namespace THIN3D
     "}";
 
     static const char * const hlslVsCol =
-    "struct VS_INPUT { float3 Position : POSITION; float4 Color0 : COLOR0; };\n"
+    "struct VSUI { float3 Position : POSITION; float4 Color0 : COLOR0; };\n"
     "struct VS_OUTPUT { float4 Position : POSITION; float4 Color0 : COLOR0; };\n"
     "float4x4 WorldViewProj;\n"
-    "VS_OUTPUT main(VS_INPUT input) {\n"
+    "VS_OUTPUT main(VSUI input) {\n"
     "  VS_OUTPUT output;\n"
     "  output.Position = mul(float4(input.Position, 1.0), WorldViewProj);\n"
     "  output.Color0 = input.Color0;\n"
@@ -80,10 +80,10 @@ namespace THIN3D
     "}\n";
 
     static const char * const hlslVsTexCol =
-    "struct VS_INPUT { float3 Position : POSITION; float2 Texcoord0 : TEXCOORD0; float4 Color0 : COLOR0; };\n"
+    "struct VSUI { float3 Position : POSITION; float2 Texcoord0 : TEXCOORD0; float4 Color0 : COLOR0; };\n"
     "struct VS_OUTPUT { float4 Position : POSITION; float2 Texcoord0 : TEXCOORD0; float4 Color0 : COLOR0; };\n"
     "float4x4 WorldViewProj;\n"
-    "VS_OUTPUT main(VS_INPUT input) {\n"
+    "VS_OUTPUT main(VSUI input) {\n"
     "  VS_OUTPUT output;\n"
     "  output.Position = mul(float4(input.Position, 1.0), WorldViewProj);\n"
     "  output.Texcoord0 = input.Texcoord0;\n"
