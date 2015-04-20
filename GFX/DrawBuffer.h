@@ -5,7 +5,7 @@
 #include "MATH/Bounds.h"
 #include "THIN3D/Thin3D.h"
 #include "GFX/Texture.h"
-#include "BASE/Color.h"
+#include "UTILS/COLOR/Color.h"
 #include "GFX/Atlas.h"
 
 namespace GFX
@@ -78,7 +78,7 @@ namespace GFX
 
         void rectVGradient(float x, float y, float w, float h, uint32 colorTop, uint32 colorBottom);
         void rectVDarkFaded(float x, float y, float w, float h, uint32 colorTop) {
-            rectVGradient(x, y, w, h, colorTop, DarkenColor(colorTop));
+            rectVGradient(x, y, w, h, colorTop, UTILS::COLOR::DarkenColor(colorTop));
         }
 
         void multiVGradient(float x, float y, float w, float h, GradientStop *stops, int numStops);

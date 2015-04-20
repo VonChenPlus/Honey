@@ -21,7 +21,8 @@ SOURCES += \
     $$P/UTILS/TEXT/UTF8.cpp \
     $$P/UTILS/HASH/Hash.cpp \
     $$P/UTILS/STRING/String.cpp \
-    $$P/UTILS/TIME/Time.cpp
+    $$P/UTILS/TIME/Time.cpp \
+    $$P/UTILS/COLOR/Color.cpp
 
 HEADERS += \
     $$P/BASE/*.h \
@@ -35,7 +36,8 @@ HEADERS += \
     $$P/UTILS/TEXT/UTF8.h \
     $$P/UTILS/TEXT/UTF16.h \
     $$P/UTILS/STRING/String.h \
-    $$P/UTILS/TIME/Time.h
+    $$P/UTILS/TIME/Time.h \
+    $$P/UTILS/COLOR/Color.h
     
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)

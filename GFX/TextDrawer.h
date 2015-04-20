@@ -53,8 +53,6 @@ namespace GFX
         virtual void drawString(TextDrawerFontContext * font, const char *str, uint32 color, TextStringEntry **entry) = 0;
         THIN3D::Thin3DTexture *createTexture(uint16 *bitmapData, int width, int height);
 
-        std::map<uint32, TextDrawerFontContext *> fontMap_;
-
     private:
         THIN3D::Thin3DContext *thin3d_;
 
@@ -63,6 +61,7 @@ namespace GFX
         float fontScaleY_;
 
         TextDrawerContext *ctx_;
+        std::map<uint32, TextDrawerFontContext *> fontMap_;
 
         uint32 fontHash_;
         // The key is the CityHash of the string xor the fontHash_.

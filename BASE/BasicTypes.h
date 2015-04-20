@@ -43,6 +43,7 @@ typedef int32_t int32;
 typedef int64_t int64;
 typedef size_t Size;
 typedef intptr_t SSize;
+typedef unsigned int Color;
 
 #ifdef _WIN32
 

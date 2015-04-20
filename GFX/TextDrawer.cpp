@@ -12,6 +12,7 @@ namespace GFX
     TextDrawer::TextDrawer(Thin3DContext *thin3d) : thin3d_(thin3d), ctx_(NULLPTR) {
         fontScaleX_ = 1.0f;
         fontScaleY_ = 1.0f;
+        frameCount_ = 0;
     }
 
     TextDrawer::~TextDrawer() {

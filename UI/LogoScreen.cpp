@@ -9,7 +9,7 @@ using MATH::Bounds;
 #include "GFX/DrawBuffer.h"
 using GFX::DrawBuffer;
 using GFX::ALIGN_CENTER;
-#include "BASE/Color.h"
+#include "UTILS/COLOR/Color.h"
 
 namespace UI
 {
@@ -58,9 +58,9 @@ namespace UI
         char temp[256];
         // Manually formatting utf-8 is fun.  \xXX doesn't work everywhere.
         snprintf(temp, sizeof(temp), "Created by Feng Chen");
-        dc.draw()->setFontScale(1.0f, 1.0f);
+        dc.setFontScale(1.0f, 1.0f);
         dc.setFontStyle(dc.theme->uiFont);
-        dc.drawText(temp, bounds.centerX(), bounds.centerY() + 40, ColorAlpha(0xFFFFFFFF, alphaText), ALIGN_CENTER);
+        dc.drawText(temp, bounds.centerX(), bounds.centerY() + 40, UTILS::COLOR::ColorAlpha(0xFFFFFFFF, alphaText), ALIGN_CENTER);
 
         dc.end();
         dc.flush();

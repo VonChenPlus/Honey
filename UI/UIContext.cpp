@@ -135,13 +135,14 @@ namespace UI
     void UIContext::setFontScale(float scaleX, float scaleY) {
         fontScaleX_ = scaleX;
         fontScaleY_ = scaleY;
+        uidrawbuffer_->setFontScale(scaleX, scaleY);
     }
 
     void UIContext::setFontStyle(const UI::FontStyle &fontStyle) {
         *fontStyle_ = fontStyle;
         if (textDrawer_) {
             textDrawer_->setFontScale(fontScaleX_, fontScaleY_);
-            text()->setFont(fontStyle.fontName.c_str(), fontStyle.sizePts, fontStyle.flags);
+            textDrawer_->setFont(fontStyle.fontName.c_str(), fontStyle.sizePts, fontStyle.flags);
         }
     }
 
@@ -152,8 +153,8 @@ namespace UI
     void UIContext::measureTextCount(const UI::FontStyle &style, const char *str, int count, float *x, float *y, int align) const {
         if (!textDrawer_ || (align & FLAG_DYNAMIC_ASCII)) {
             float sizeFactor = (float)style.sizePts / 24.0f;
-            draw()->setFontScale(fontScaleX_ * sizeFactor, fontScaleY_ * sizeFactor);
-            draw()->measureTextCount(style.atlasFont, str, count, x, y);
+            uidrawbuffer_->setFontScale(fontScaleX_ * sizeFactor, fontScaleY_ * sizeFactor);
+            uidrawbuffer_->measureTextCount(style.atlasFont, str, count, x, y);
         }
         else {
             textDrawer_->setFontScale(fontScaleX_, fontScaleY_);
@@ -165,8 +166,8 @@ namespace UI
     void UIContext::drawText(const char *str, float x, float y, uint32 color, int align) {
         if (!textDrawer_ || (align & FLAG_DYNAMIC_ASCII)) {
             float sizeFactor = (float)fontStyle_->sizePts / 24.0f;
-            draw()->setFontScale(fontScaleX_ * sizeFactor, fontScaleY_ * sizeFactor);
-            draw()->drawText(fontStyle_->atlasFont, str, x, y, color, align);
+            uidrawbuffer_->setFontScale(fontScaleX_ * sizeFactor, fontScaleY_ * sizeFactor);
+            uidrawbuffer_->drawText(fontStyle_->atlasFont, str, x, y, color, align);
         }
         else {
             textDrawer_->setFontScale(fontScaleX_, fontScaleY_);
@@ -178,8 +179,8 @@ namespace UI
     void UIContext::drawTextRect(const char *str, const Bounds &bounds, uint32 color, int align) {
         if (!textDrawer_ || (align & FLAG_DYNAMIC_ASCII)) {
             float sizeFactor = (float)fontStyle_->sizePts / 24.0f;
-            draw()->setFontScale(fontScaleX_ * sizeFactor, fontScaleY_ * sizeFactor);
-            draw()->drawTextRect(fontStyle_->atlasFont, str, bounds.x, bounds.y, bounds.w, bounds.h, color, align);
+            uidrawbuffer_->setFontScale(fontScaleX_ * sizeFactor, fontScaleY_ * sizeFactor);
+            uidrawbuffer_->drawTextRect(fontStyle_->atlasFont, str, bounds.x, bounds.y, bounds.w, bounds.h, color, align);
         }
         else {
             textDrawer_->setFontScale(fontScaleX_, fontScaleY_);
