@@ -5,7 +5,6 @@
 #include "BASE/Mutex.h"
 #include "UI/InputState.h"
 #include "UI/KeyCodes.h"
-using namespace UI;
 #include "MATH/Bounds.h"
 using MATH::Bounds;
 #include "UTILS/TIME/Time.h"

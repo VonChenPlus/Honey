@@ -10,8 +10,8 @@ namespace UI
     public:
         LogoScreen()
             : frames_(0), switched_(false) {}
-        bool key(const UI::KeyInput &key) override;
-        virtual void update(UI::InputState &input) override;
+        bool key(const KeyInput &key) override;
+        virtual void update(InputState &input) override;
         virtual void render() override;
         virtual void sendMessage(const char *message, const char *value) override;
         virtual void createViews() override {}

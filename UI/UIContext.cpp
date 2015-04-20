@@ -12,12 +12,11 @@ using THIN3D::T3DCullMode;
 using GFX::FLAG_DYNAMIC_ASCII;
 #include "UI/InputState.h"
 #include "UI/UI.h"
-using UI::UIState;
 #include "UI/View.h"
 
 namespace GLOBAL
 {
-    extern UIState &uiState();
+    extern UI::UIState &uiState();
     extern int &dpXRes();
     extern int &dpYRes();
     extern float &dpiScale();
@@ -138,7 +137,7 @@ namespace UI
         uidrawbuffer_->setFontScale(scaleX, scaleY);
     }
 
-    void UIContext::setFontStyle(const UI::FontStyle &fontStyle) {
+    void UIContext::setFontStyle(const FontStyle &fontStyle) {
         *fontStyle_ = fontStyle;
         if (textDrawer_) {
             textDrawer_->setFontScale(fontScaleX_, fontScaleY_);
@@ -146,11 +145,11 @@ namespace UI
         }
     }
 
-    void UIContext::measureText(const UI::FontStyle &style, const char *str, float *x, float *y, int align) const {
+    void UIContext::measureText(const FontStyle &style, const char *str, float *x, float *y, int align) const {
         measureTextCount(style, str, (int)strlen(str), x, y, align);
     }
 
-    void UIContext::measureTextCount(const UI::FontStyle &style, const char *str, int count, float *x, float *y, int align) const {
+    void UIContext::measureTextCount(const FontStyle &style, const char *str, int count, float *x, float *y, int align) const {
         if (!textDrawer_ || (align & FLAG_DYNAMIC_ASCII)) {
             float sizeFactor = (float)style.sizePts / 24.0f;
             uidrawbuffer_->setFontScale(fontScaleX_ * sizeFactor, fontScaleY_ * sizeFactor);
@@ -189,22 +188,22 @@ namespace UI
         }
     }
 
-    void UIContext::fillRect(const UI::Drawable &drawable, const Bounds &bounds) {
+    void UIContext::fillRect(const Drawable &drawable, const Bounds &bounds) {
         // Only draw if alpha is non-zero.
         if ((drawable.color & 0xFF000000) == 0)
             return;
 
         switch (drawable.type) {
-        case UI::DRAW_SOLID_COLOR:
+        case DRAW_SOLID_COLOR:
             uidrawbuffer_->drawImageStretch(theme->whiteImage, bounds.x, bounds.y, bounds.x2(), bounds.y2(), drawable.color);
             break;
-        case UI::DRAW_4GRID:
+        case DRAW_4GRID:
             uidrawbuffer_->drawImage4Grid(drawable.image, bounds.x, bounds.y, bounds.x2(), bounds.y2(), drawable.color);
             break;
-        case UI::DRAW_STRETCH_IMAGE:
+        case DRAW_STRETCH_IMAGE:
             uidrawbuffer_->drawImageStretch(drawable.image, bounds.x, bounds.y, bounds.x2(), bounds.y2(), drawable.color);
             break;
-        case UI::DRAW_NOTHING:
+        case DRAW_NOTHING:
             break;
         }
     }

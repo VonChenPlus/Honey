@@ -41,10 +41,10 @@
  */
 #if ZLIB_VERNUM < 0x1260
 #  define PNGZ_MSG_CAST(s) png_constcast(char*,s)
-#  define PNGZUI_CAST(b) png_constcast(png_bytep,b)
+#  define PNGZ_INPUT_CAST(b) png_constcast(png_bytep,b)
 #else
 #  define PNGZ_MSG_CAST(s) (s)
-#  define PNGZUI_CAST(b) (b)
+#  define PNGZ_INPUT_CAST(b) (b)
 #endif
 
 /* zlib.h declares a magic type 'uInt' that limits the amount of data that zlib

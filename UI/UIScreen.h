@@ -12,12 +12,12 @@ namespace UI
         UIScreen();
         ~UIScreen();
 
-        virtual void update(UI::InputState &input) override;
+        virtual void update(InputState &input) override;
         virtual void render() override;
 
-        virtual bool touch(const UI::TouchInput &touch) override;
-        virtual bool key(const UI::KeyInput &touch) override;
-        virtual bool axis(const UI::AxisInput &touch) override;
+        virtual bool touch(const TouchInput &touch) override;
+        virtual bool key(const KeyInput &touch) override;
+        virtual bool axis(const AxisInput &touch) override;
 
         // Some useful default event handlers
         EventReturn OnOK(EventParams &e);
@@ -30,7 +30,7 @@ namespace UI
 
         virtual void recreateViews() { recreateViews_ = true; }
 
-        UI::ViewGroup *root_;
+        ViewGroup *root_;
 
     private:
         void doRecreateViews();

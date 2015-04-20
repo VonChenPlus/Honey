@@ -1,8 +1,4 @@
 #include "ViewGroup.h"
-using UI::AxisInput;
-using UI::KeyInput;
-using UI::TouchInput;
-using UI::InputState;
 
 namespace UI
 {
@@ -135,7 +131,7 @@ namespace UI
     void ViewGroup::draw(UIContext &dc) {
         if (hasDropShadow_) {
             // Darken things behind.
-            dc.fillRect(UI::Drawable(0x60000000), dc.getBounds());
+            dc.fillRect(Drawable(0x60000000), dc.getBounds());
             float dropsize = 30;
             dc.draw()->drawImage4Grid(dc.theme->dropShadow4Grid,
                 bounds_.x - dropsize, bounds_.y,

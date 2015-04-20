@@ -6,7 +6,6 @@
 #include "UTILS/TIME/Time.h"
 using UTILS::TIME::time_now_d;
 #include "UI/KeyCodes.h"
-using namespace UI;
 #include "UI/ScreenManager.h"
 
 namespace UI
@@ -110,18 +109,18 @@ namespace UI
         return (pressed & (PAD_BUTTON_LEFT | PAD_BUTTON_RIGHT | PAD_BUTTON_UP | PAD_BUTTON_DOWN)) != 0;
     }
 
-    UI::EventReturn UIScreen::OnBack(UI::EventParams &) {
+    EventReturn UIScreen::OnBack(EventParams &) {
         screenManager()->finishDialog(this, DR_BACK);
-        return UI::EVENT_DONE;
+        return EVENT_DONE;
     }
 
-    UI::EventReturn UIScreen::OnOK(UI::EventParams &) {
+    EventReturn UIScreen::OnOK(EventParams &) {
         screenManager()->finishDialog(this, DR_OK);
-        return UI::EVENT_DONE;
+        return EVENT_DONE;
     }
 
-    UI::EventReturn UIScreen::OnCancel(UI::EventParams &) {
+    EventReturn UIScreen::OnCancel(EventParams &) {
         screenManager()->finishDialog(this, DR_CANCEL);
-        return UI::EVENT_DONE;
+        return EVENT_DONE;
     }
 }

@@ -139,10 +139,10 @@ namespace UI
         // Please note that Touch is called ENTIRELY asynchronously from drawing!
         // Can even be called on a different thread! This is to really minimize latency, and decouple
         // touch response from the frame rate. Same with Key and Axis.
-        virtual bool key(const UI::KeyInput &input) { UNUSED(input); return false; }
-        virtual void touch(const UI::TouchInput &input) { UNUSED(input); }
-        virtual void axis(const UI::AxisInput &input) { UNUSED(input); }
-        virtual void update(const UI::InputState &input_state) { UNUSED(input_state); }
+        virtual bool key(const KeyInput &input) { UNUSED(input); return false; }
+        virtual void touch(const TouchInput &input) { UNUSED(input); }
+        virtual void axis(const AxisInput &input) { UNUSED(input); }
+        virtual void update(const InputState &input_state) { UNUSED(input_state); }
 
         virtual void focusChanged(int focusFlags) { UNUSED(focusFlags); }
 
@@ -151,7 +151,7 @@ namespace UI
         }
 
         // Views don't do anything here in Layout, only containers implement this.
-        virtual void measure(const UI::UIContext &dc, MeasureSpec horiz, MeasureSpec vert);
+        virtual void measure(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert);
         virtual void layout() {}
         virtual void draw(UIContext &dc) { UNUSED(dc); }
 

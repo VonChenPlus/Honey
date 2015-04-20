@@ -41,20 +41,20 @@ namespace UI
 
         GFX::DrawBuffer *draw() const { return uidrawbuffer_; }
         GFX::DrawBuffer *drawTop() const { return uidrawbufferTop_; }
-        const UI::Theme *theme;
+        const Theme *theme;
 
         // Utility methods
 
         GFX::TextDrawer *text() const { return textDrawer_; }
 
-        void setFontStyle(const UI::FontStyle &style);
-        const UI::FontStyle &getFontStyle() { return *fontStyle_; }
+        void setFontStyle(const FontStyle &style);
+        const FontStyle &getFontStyle() { return *fontStyle_; }
         void setFontScale(float scaleX, float scaleY);
-        void measureTextCount(const UI::FontStyle &style, const char *str, int count, float *x, float *y, int align = 0) const;
-        void measureText(const UI::FontStyle &style, const char *str, float *x, float *y, int align = 0) const;
+        void measureTextCount(const FontStyle &style, const char *str, int count, float *x, float *y, int align = 0) const;
+        void measureText(const FontStyle &style, const char *str, float *x, float *y, int align = 0) const;
         void drawText(const char *str, float x, float y, uint32 color, int align = 0);
         void drawTextRect(const char *str, const MATH::Bounds &bounds, uint32 color, int align = 0);
-        void fillRect(const UI::Drawable &drawable, const MATH::Bounds &bounds);
+        void fillRect(const Drawable &drawable, const MATH::Bounds &bounds);
 
         // in dps, like dp_xres and dp_yres
         void setBounds(const MATH::Bounds &b) { bounds_ = b; }
@@ -70,7 +70,7 @@ namespace UI
 
         float fontScaleX_;
         float fontScaleY_;
-        UI::FontStyle *fontStyle_;
+        FontStyle *fontStyle_;
         GFX::TextDrawer *textDrawer_;
 
         THIN3D::Thin3DContext *thin3D_;

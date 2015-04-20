@@ -518,7 +518,7 @@ png_text_compress(png_structrp png_ptr, png_uint_32 chunk_name,
       png_uint_32 output_len;
 
       /* zlib updates these for us: */
-      png_ptr->zstream.next_in = PNGZUI_CAST(comp->input);
+      png_ptr->zstream.next_in = PNGZ_INPUT_CAST(comp->input);
       png_ptr->zstream.avail_in = 0; /* Set below */
       png_ptr->zstream.next_out = comp->output;
       png_ptr->zstream.avail_out = (sizeof comp->output);
@@ -1037,7 +1037,7 @@ png_compress_IDAT(png_structrp png_ptr, png_const_bytep input,
     * terminates the operation.  The _out values are maintained across calls to
     * this function, but the input must be reset each time.
     */
-   png_ptr->zstream.next_in = PNGZUI_CAST(input);
+   png_ptr->zstream.next_in = PNGZ_INPUT_CAST(input);
    png_ptr->zstream.avail_in = 0; /* set below */
    for (;;)
    {

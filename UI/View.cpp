@@ -95,11 +95,11 @@ namespace UI
     // Call this from UI thread
     EventReturn Event::dispatch(EventParams &e) {
         for (auto iter = handlers_.begin(); iter != handlers_.end(); ++iter) {
-            if ((iter->func)(e) == UI::EVENT_DONE) {
+            if ((iter->func)(e) == EVENT_DONE) {
                 // Event is handled, stop looping immediately. This event might even have gotten deleted.
-                return UI::EVENT_DONE;
+                return EVENT_DONE;
             }
         }
-        return UI::EVENT_SKIPPED;
+        return EVENT_SKIPPED;
     }
 }

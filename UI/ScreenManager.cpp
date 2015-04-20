@@ -2,9 +2,6 @@
 #include "UI/ScreenManager.h"
 #include "UI/Screen.h"
 #include "UI/InputState.h"
-using UI::AxisInput;
-using UI::KeyInput;
-using UI::TouchInput;
 #include "UI/View.h"
 
 namespace UI
@@ -43,7 +40,7 @@ namespace UI
         }
     }
 
-    void ScreenManager::update(UI::InputState &input) {
+    void ScreenManager::update(InputState &input) {
         if (nextScreen_) {
             switchToNext();
         }

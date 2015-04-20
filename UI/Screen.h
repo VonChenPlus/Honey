@@ -26,13 +26,13 @@ namespace UI
         }
 
         virtual void onFinish(DialogResult) {}
-        virtual void update(UI::InputState &) {}
+        virtual void update(InputState &) {}
         virtual void render() {}
         virtual void resized() {}
         virtual void dialogFinished(const Screen *, DialogResult) {}
-        virtual bool touch(const UI::TouchInput &) { return false;  }
-        virtual bool key(const UI::KeyInput &) { return false; }
-        virtual bool axis(const UI::AxisInput &) { return false; }
+        virtual bool touch(const TouchInput &) { return false;  }
+        virtual bool key(const KeyInput &) { return false; }
+        virtual bool axis(const AxisInput &) { return false; }
 
         virtual void sendMessage(const char *msg, const char *value) { UNUSED(msg); UNUSED(value); }
 
