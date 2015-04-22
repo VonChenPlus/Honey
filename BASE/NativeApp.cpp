@@ -26,8 +26,6 @@ using GFX::GLExtensions;
 using GFX::OpenGLState;
 #include "UI/UI.h"
 using UI::UIState;
-#include "UI/LogoScreen.h"
-using UI::LogoScreen;
 #include "GFX/GfxResourceHolder.h"
 using GFX::gl_lost_manager_init;
 #include "THIN3D/Thin3D.h"
@@ -103,8 +101,6 @@ void NativeInit(int wd, int ht)
     GLOBAL::_ScreenManager = make_shared<ScreenManager>();
     GLOBAL::_DPIScale = 1.0f;
     GLOBAL::_PixelInDPS = 1.0f;
-
-    GLOBAL::screenManager().switchScreen(new LogoScreen());
 }
 
 void NativeInitGraphics()
