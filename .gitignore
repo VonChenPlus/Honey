@@ -26,3 +26,11 @@
 *.exe
 *.out
 *.app
+
+# Temp Generate Files
+*.Debug
+*.Native
+*.Release
+Makefile
+Native.vcxproj
+Native.vcxproj.filters
