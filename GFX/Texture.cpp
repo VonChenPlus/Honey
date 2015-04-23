@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include "GFX/GLState.h"
-#include "IMAGE/ZimLoad.h"
+#include "IMAGE/TinyZim.h"
 using IMAGE::ZIM_CLAMP;
 using IMAGE::ZIM_HAS_MIPS;
 using IMAGE::ZIM_GEN_MIPS;
@@ -16,7 +16,7 @@ using IMAGE::ZIM_RGB565;
 using IMAGE::ZIM_ETC1;
 #include "GFX/GLDebug.h"
 #include "BASE/Native.h"
-#include "IMAGE/PNGLoad.h"
+#include "IMAGE/TinyPNG.h"
 using IMAGE::PNGLoad;
 using IMAGE::PNGLoadPtr;
 #include "EXTERNALS/jpge/jpgd.h"

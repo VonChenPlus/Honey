@@ -56,7 +56,7 @@ namespace UTILS
         }
         #endif
 
-        static FILE *OpenCFile(const std::string &filename, const char *mode) {
+        FILE *OpenCFile(const std::string &filename, const char *mode) {
             FILE *file = NULLPTR;
         #if defined(_WIN32) && defined(UNICODE)
             file = _wfopen(ConvertUTF8ToWString(filename).c_str(), ConvertUTF8ToWString(mode).c_str());

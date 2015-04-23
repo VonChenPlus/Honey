@@ -10,6 +10,8 @@ namespace UTILS
 {
     namespace IO
     {
+        FILE *OpenCFile(const std::string &filename, const char *mode);
+
         // Whole-file reading/writing
         void WriteStringToFile(bool text_file, const std::string &str, const char *filename);
         void ReadFileToString(bool text_file, const char *filename, std::string &str);

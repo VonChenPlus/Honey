@@ -1,12 +1,12 @@
 #include "Thin3D.h"
-#include "IMAGE/ZimLoad.h"
+#include "IMAGE/TinyZim.h"
 using IMAGE::ZIM_ETC1;
 using IMAGE::ZIM_RGBA8888;
 using IMAGE::ZIM_LUMINANCE;
 using IMAGE::LoadZIM;
 using IMAGE::LoadZIMPtr;
 using IMAGE::ZIM_FORMAT_MASK;
-#include "IMAGE/PNGLoad.h"
+#include "IMAGE/TinyPNG.h"
 using IMAGE::PNGLoadPtr;
 #include "EXTERNALS/jpge/jpgd.h"
 #include "UTILS/IO/File.h"

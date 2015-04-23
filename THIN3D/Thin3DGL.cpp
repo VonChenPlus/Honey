@@ -1,5 +1,5 @@
 #include "Thin3DGL.h"
-#include "IMAGE/ZimLoad.h"
+#include "IMAGE/TinyZim.h"
 using MATH::Matrix4x4;
 using IMAGE::ZIM_CLAMP;
 #include "MATH/Utils.h"

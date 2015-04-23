@@ -1,5 +1,5 @@
-#ifndef PNGLOAD_H
-#define PNGLOAD_H
+#ifndef THINPNG_H
+#define THINPNG_H
 
 #include "BASE/Native.h"
 
@@ -14,4 +14,4 @@ namespace IMAGE
                 int *pheight, unsigned char **image_data_ptr);
 }
 
-#endif // PNGLOAD_H
+#endif // THINPNG_H

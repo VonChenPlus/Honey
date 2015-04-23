@@ -1,5 +1,5 @@
-#ifndef ZIMLOAD_H
-#define ZIMLOAD_H
+#ifndef TINYZIM_H
+#define TINYZIM_H
 
 #include "BASE/Native.h"
 
@@ -54,6 +54,13 @@ namespace IMAGE
     // to width, height, and image, as if they were arrays, up to 12 (max texture size is 4096 which is 2^12).
     int LoadZIM(const char *filename, int *width, int *height, int *flags, uint8 **image);
     int LoadZIMPtr(const uint8 *zim, Size datasize, int *width, int *height, int *flags, uint8 **image);
+
+    // SaveZIM's responsibility:
+    // * Write the ZIM format
+    // * Generate mipmaps if requested
+    // * Convert images to the requested format
+    // Input image is always 8888 RGBA. SaveZIM takes care of downsampling and mipmap generation.
+    void SaveZIM(const char *filename, int width, int height, int pitch, int format, const uint8_t *image);
 }
 
-#endif // ZIMLOAD_H
+#endif // TINYZIM_H

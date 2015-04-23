@@ -13,6 +13,16 @@ namespace MATH
     inline bool IsPowerOf2(int n) {
         return n == 1 || (n & (n - 1)) == 0;
     }
+
+    inline int Clamp16(int x) {
+        if (x < 0) return 0; if (x > 15) return 15; return x;
+    }
+    inline int Clamp32(int x) {
+        if (x < 0) return 0; if (x > 31) return 31; return x;
+    }
+    inline int Clamp64(int x) {
+        if (x < 0) return 0; if (x > 63) return 63; return x;
+    }
 }
 
 #endif // UTILS_H

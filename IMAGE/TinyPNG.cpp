@@ -1,4 +1,4 @@
-#include "PNGLoad.h"
+#include "TinyPNG.h"
 
 #include <string.h>
 #include <stdlib.h>
