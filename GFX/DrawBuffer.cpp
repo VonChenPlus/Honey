@@ -19,6 +19,7 @@ using THIN3D::VS_TEXTURE_COLOR_2D;
 #include "MATH/Utils.h"
 #include "UTILS/TEXT/UTF8.h"
 using UTILS::TEXT::UTF8;
+#include "Atlas.h"
 
 namespace GLOBAL
 {
@@ -27,6 +28,8 @@ namespace GLOBAL
 
 namespace GFX
 {
+    extern Atlas _UIAtlas;
+
     enum
     {
         // Enough?
@@ -37,7 +40,7 @@ namespace GFX
 
     DrawBuffer::DrawBuffer()
         : count_(0)
-        , atlas(0) {
+        , atlas(&_UIAtlas) {
         verts_ = new Vertex[MAX_VERTS];
         fontscalex = 1.0f;
         fontscaley = 1.0f;
@@ -59,7 +62,6 @@ namespace GFX
         vbuf_ = NULLPTR;
     #endif
         inited_ = true;
-
         std::vector<Thin3DVertexComponent> components;
         components.push_back(Thin3DVertexComponent("Position", SEM_POSITION, FLOATx3, 0));
         components.push_back(Thin3DVertexComponent("TexCoord0", SEM_TEXCOORD0, FLOATx2, 12));

@@ -60,7 +60,7 @@ namespace IMAGE
     // * Generate mipmaps if requested
     // * Convert images to the requested format
     // Input image is always 8888 RGBA. SaveZIM takes care of downsampling and mipmap generation.
-    void SaveZIM(const char *filename, int width, int height, int pitch, int format, const uint8_t *image);
+    void SaveZIM(const char *filename, int width, int height, int pitch, int flags, const uint8_t *image);
 }
 
 #endif // TINYZIM_H
