@@ -13,6 +13,7 @@ using IMAGE::PNGLoadPtr;
 using UTILS::IO::ReadLocalFile;
 #include "UTILS/STRING/String.h"
 using UTILS::STRING::StringFromFormat;
+#include <QImage>
 
 namespace THIN3D
 {
@@ -245,7 +246,7 @@ namespace THIN3D
         T3DImageFormat fmt;
         uint8 *image[16] = { NULLPTR };
 
-       LoadTextureLevels(data, size, type, width, height, &num_levels, &fmt, image, &zim_flags);
+        LoadTextureLevels(data, size, type, width, height, &num_levels, &fmt, image, &zim_flags);
 
         Thin3DTexture *tex = createTexture(LINEAR2D, fmt, width[0], height[0], 1, num_levels);
         for (int i = 0; i < num_levels; i++) {

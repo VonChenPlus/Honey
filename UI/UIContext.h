@@ -73,7 +73,6 @@ namespace UI
         FontStyle *fontStyle_;
         GFX::TextDrawer *textDrawer_;
 
-        THIN3D::Thin3DContext *thin3D_;
         THIN3D::Thin3DDepthStencilState *depth_;
         THIN3D::Thin3DBlendState *blend_;
         THIN3D::Thin3DShaderSet *uishader_;

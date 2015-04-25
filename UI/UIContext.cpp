@@ -60,7 +60,7 @@ namespace UI
         thin3d_->setBlendState(blend_);
         thin3d_->setDepthStencilState(depth_);
         thin3d_->setRenderState(T3DRenderState::CULL_MODE, T3DCullMode::NO_CULL);
-        thin3d_->setTexture(0, uitexture_);
+        if (uitexture_) thin3d_->setTexture(0, uitexture_);
         thin3d_->setScissorEnabled(false);
         uiBegin(uishader_);
     }
@@ -73,7 +73,7 @@ namespace UI
     }
 
     void UIContext::reBindTexture() const {
-        thin3d_->setTexture(0, uitexture_);
+        if (uitexture_) thin3d_->setTexture(0, uitexture_);
     }
 
     void UIContext::flush() {
