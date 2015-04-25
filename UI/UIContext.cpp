@@ -22,6 +22,11 @@ namespace GLOBAL
     extern float &dpiScale();
 }
 
+namespace GFX
+{
+    extern const unsigned char *getUIData(int &size);
+}
+
 namespace UI
 {
     UIContext::UIContext()
@@ -51,6 +56,11 @@ namespace UI
         uishader_ = uishader;
         uishadernotex_ = uishadernotex;
         uitexture_ = uitexture;
+        if (!uitexture_) {
+            int size = 0;
+            const unsigned char *data = GFX::getUIData(size);
+            uitexture_ = thin3d_->createTextureFromFileData(data, size, THIN3D::ZIM);
+        }
         uidrawbuffer_ = uidrawbuffer;
         uidrawbufferTop_ = uidrawbufferTop;
         textDrawer_ = textDrawer;
