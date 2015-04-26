@@ -5,8 +5,13 @@
 
 #include "UTILS/TIME/Time.h"
 using UTILS::TIME::time_now_d;
+using UTILS::TIME::time_now;
 #include "UI/KeyCodes.h"
 #include "UI/ScreenManager.h"
+#include "UTILS/RANDOM/GMRandom.h"
+using UTILS::RANDOM::GMRandom;
+#include "UTILS/COLOR/Color.h"
+using UTILS::COLOR::ColorAlpha;
 
 namespace UI
 {
@@ -122,5 +127,49 @@ namespace UI
     EventReturn UIScreen::OnCancel(EventParams &) {
         screenManager()->finishDialog(this, DR_CANCEL);
         return EVENT_DONE;
+    }
+
+    static const int symbols[4] = {
+        I_CROSS,
+        I_CIRCLE,
+        I_SQUARE,
+        I_TRIANGLE
+    };
+
+    static const uint32_t colors[4] = {
+        0xC0FFFFFF,
+        0xC0FFFFFF,
+        0xC0FFFFFF,
+        0xC0FFFFFF,
+    };
+
+    void UIScreen::drawBackground(UIContext &dc, int alpha) {
+        static float xbase[100] = {0};
+        static float ybase[100] = {0};
+        float xres = dc.getBounds().w;
+        float yres = dc.getBounds().h;
+        static int last_xres = 0;
+        static int last_yres = 0;
+
+        if (xbase[0] == 0.0f || last_xres != xres || last_yres != yres) {
+            GMRandom rng;
+            for (int i = 0; i < 100; i++) {
+                xbase[i] = rng.randFloat() * xres;
+                ybase[i] = rng.randFloat() * yres;
+            }
+            last_xres = xres;
+            last_yres = yres;
+        }
+
+        int img = I_BG;
+        dc.draw()->drawImageStretch(img, dc.getBounds());
+        float t = time_now();
+        for (int i = 0; i < 100; i++) {
+            float x = xbase[i] + dc.getBounds().x;
+            float y = ybase[i] + dc.getBounds().y + 40 * cosf(i * 7.2f + t * 1.3f);
+            float angle = sinf(i + t);
+            int n = i & 3;
+            dc.draw()->drawImageRotated(symbols[n], x, y, 1.0f, angle, ColorAlpha(colors[n], alpha * 0.1f));
+        }
     }
 }
