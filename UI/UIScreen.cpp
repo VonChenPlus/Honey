@@ -20,6 +20,7 @@ namespace UI
     extern bool TouchEvent(const TouchInput &touch, ViewGroup *root);
     extern bool KeyEvent(const KeyInput &key, ViewGroup *root);
     extern bool AxisEvent(const AxisInput &axis, ViewGroup *root);
+    extern bool IsEscapeKeyCode(int keyCode);
 
     UIScreen::UIScreen()
         : Screen(), root_(0), recreateViews_(true), hatDown_(0) {
@@ -143,7 +144,7 @@ namespace UI
         0xC0FFFFFF,
     };
 
-    void UIScreen::drawBackground(UIContext &dc, int alpha) {
+    void UIScreenWithBackground::drawBackground(UIContext &dc, int alpha) {
         static float xbase[100] = {0};
         static float ybase[100] = {0};
         float xres = dc.getBounds().w;
@@ -171,5 +172,25 @@ namespace UI
             int n = i & 3;
             dc.draw()->drawImageRotated(symbols[n], x, y, 1.0f, angle, ColorAlpha(colors[n], alpha * 0.1f));
         }
+
+        dc.flush();
+    }
+
+    bool UIDialogScreen::key(const KeyInput &key) {
+        bool retval = UIScreen::key(key);
+        if (!retval && (key.flags & KEY_DOWN) && IsEscapeKeyCode(key.keyCode)) {
+            if (finished_) {
+                throw _NException_Normal("Screen already finished");
+            } else {
+                finished_ = true;
+                screenManager()->finishDialog(this, DR_BACK);
+            }
+            return true;
+        }
+        return retval;
+    }
+
+    void UIDialogScreenWithBackground::drawBackground(UIContext &dc, int alpha) {
+        UIScreenWithBackground::drawBackground(dc, alpha);
     }
 }

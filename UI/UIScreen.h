@@ -26,7 +26,7 @@ namespace UI
 
     protected:
         virtual void createViews() = 0;
-        virtual void drawBackground(UIContext &, int alpha = 1.0);
+        virtual void drawBackground(UIContext &, int alpha = 1.0) = 0;
 
         virtual void recreateViews() { recreateViews_ = true; }
 
@@ -38,6 +38,30 @@ namespace UI
         bool recreateViews_;
 
         int hatDown_;
+    };
+
+    class UIScreenWithBackground : public UIScreen {
+    public:
+        UIScreenWithBackground() : UIScreen() {}
+    protected:
+        virtual void drawBackground(UIContext &, int alpha = 1.0) override;
+    };
+
+    class UIDialogScreen : public UIScreen
+    {
+    public:
+        UIDialogScreen() : UIScreen(), finished_(false) {}
+        virtual bool key(const KeyInput &key) override;
+
+    private:
+        bool finished_;
+    };
+
+    class UIDialogScreenWithBackground : public UIDialogScreen, public UIScreenWithBackground {
+    public:
+        UIDialogScreenWithBackground() : UIDialogScreen() {}
+    protected:
+        virtual void drawBackground(UIContext &dc, int alpha = 1.0) override;
     };
 }
 

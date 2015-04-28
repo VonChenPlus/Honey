@@ -401,4 +401,8 @@ namespace UI
         else
             return 10.0f / std::max(1.0f, distance - distanceBonus) + overlap;
     }
+
+    bool IsEscapeKeyCode(int keyCode) {
+        return keyCode == NKCODE_ESCAPE || keyCode == NKCODE_BACK || keyCode == NKCODE_BUTTON_CIRCLE || keyCode == NKCODE_BUTTON_B || keyCode == NKCODE_BUTTON_2;
+    }
 }
