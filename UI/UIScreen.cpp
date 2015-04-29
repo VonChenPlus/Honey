@@ -131,10 +131,10 @@ namespace UI
     }
 
     static const int symbols[4] = {
-        I_CROSS,
-        I_CIRCLE,
-        I_SQUARE,
-        I_TRIANGLE
+        I_H,
+        I_I,
+        I_V,
+        I_E
     };
 
     static const uint32_t colors[4] = {

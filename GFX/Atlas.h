@@ -61,10 +61,10 @@ namespace GFX
 
     // IMAGES_ui
     #define I_SOLIDWHITE 0
-    #define I_CROSS 1
-    #define I_CIRCLE 2
-    #define I_SQUARE 3
-    #define I_TRIANGLE 4
+    #define I_H 1
+    #define I_I 2
+    #define I_V 3
+    #define I_E 4
     #define I_SELECT 5
     #define I_START 6
     #define I_ARROW 7
