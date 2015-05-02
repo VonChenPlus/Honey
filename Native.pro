@@ -17,6 +17,7 @@ SOURCES += \
     $$P/MATH/*.cpp \
     $$P/THIN3D/*.cpp \
     $$P/UI/*.cpp \
+    $$P/UI/CONTROLS/*.cpp \
     $$P/UTILS/TEXT/UTF8.cpp \
     $$P/UTILS/HASH/Hash.cpp \
     $$P/UTILS/STRING/String.cpp \
@@ -31,6 +32,7 @@ HEADERS += \
     $$P/MATH/*.h \
     $$P/THIN3D/*.h \
     $$P/UI/*.h \
+    $$P/UI/CONTROLS/*.h \
     $$P/UTILS/TEXT/UTF8.h \
     $$P/UTILS/TEXT/UTF16.h \
     $$P/UTILS/STRING/String.h \

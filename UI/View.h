@@ -2,7 +2,6 @@
 #define VIEW_H
 
 #include <string>
-#include <functional>
 
 #include "BASE/Native.h"
 #include "UI/InputState.h"
@@ -11,6 +10,7 @@
 #include "BASE/SmartPtr.h"
 #include "UI/UIContext.h"
 #include "UI/Theme.h"
+#include "UI/Event.h"
 
 namespace UI
 {
@@ -19,24 +19,6 @@ namespace UI
         UNSPECIFIED,
         EXACTLY,
         AT_MOST,
-    };
-
-    class View;
-    // Should cover all bases.
-    struct EventParams
-    {
-        View *v;
-        uint32_t a, b, x, y;
-        float f;
-        std::string s;
-    };
-
-    // I hope I can find a way to simplify this one day.
-    enum EventReturn
-    {
-        EVENT_DONE,  // Return this when no other view may process this event, for example if you changed the view hierarchy
-        EVENT_SKIPPED,  // Return this if you ignored an event
-        EVENT_CONTINUE,  // Return this if it's safe to send this event to further listeners. This should normally be the default choice but often EVENT_DONE is necessary.
     };
 
     struct MeasureSpec
@@ -51,6 +33,37 @@ namespace UI
         MeasureSpecType type;
         float size;
     };
+
+    enum Gravity {
+        G_LEFT = 0,
+        G_RIGHT = 1,
+        G_HCENTER = 2,
+
+        G_HORIZMASK = 3,
+
+        G_TOP = 0,
+        G_BOTTOM = 4,
+        G_VCENTER = 8,
+
+        G_TOPLEFT = G_TOP | G_LEFT,
+        G_TOPRIGHT = G_TOP | G_RIGHT,
+
+        G_BOTTOMLEFT = G_BOTTOM | G_LEFT,
+        G_BOTTOMRIGHT = G_BOTTOM | G_RIGHT,
+
+        G_CENTER = G_HCENTER | G_VCENTER,
+
+        G_VERTMASK = 3 << 2,
+    };
+
+    enum Orientation {
+        ORIENT_HORIZONTAL,
+        ORIENT_VERTICAL,
+    };
+
+    inline Orientation Opposite(Orientation o) {
+        if (o == ORIENT_HORIZONTAL) return ORIENT_VERTICAL; else return ORIENT_HORIZONTAL;
+    }
 
     // The four cardinal directions should be enough, plus Prev/Next in "element order".
     enum FocusDirection
@@ -85,6 +98,18 @@ namespace UI
     {
         WRAP_CONTENT = -1,
         FILL_PARENT = -2,
+    };
+
+    struct Margins {
+        Margins() : top(0), bottom(0), left(0), right(0) {}
+        explicit Margins(int8 all) : top(all), bottom(all), left(all), right(all) {}
+        Margins(int8 horiz, int8 vert) : top(vert), bottom(vert), left(horiz), right(horiz) {}
+        Margins(int8 l, int8 t, int8 r, int8 b) : top(t), bottom(b), left(l), right(r) {}
+
+        int8 top;
+        int8 bottom;
+        int8 left;
+        int8 right;
     };
 
     enum LayoutParamsType
@@ -217,33 +242,24 @@ namespace UI
         DISALLOW_COPY_AND_ASSIGN(View)
     };
 
-    struct HandlerRegistration {
-        std::function<EventReturn(EventParams&)> func;
-    };
-    class Event {
+    // These don't do anything when touched.
+    class InertView : public View
+    {
     public:
-        Event() {}
-        ~Event() {
-            handlers_.clear();
-        }
-        // Call this from input thread or whatever, it doesn't matter
-        void trigger(EventParams &e);
-        // Call this from UI thread
-        EventReturn dispatch(EventParams &e);
+        InertView(LayoutParams *layoutParams)
+            : View(layoutParams) {}
 
-        // This is suggested for use in most cases. Autobinds, allowing for neat syntax.
-        template<class T>
-        T *handle(T *thiz, EventReturn (T::* theCallback)(EventParams &e)) {
-            add(std::bind(theCallback, thiz, std::placeholders::_1));
-            return thiz;
-        }
+        bool key(const KeyInput &) override { return false; }
+        void touch(const TouchInput &) override {}
+        bool canBeFocused() const override { return false; }
+        void update(const InputState &) override {}
+    };
 
-        // Sometimes you have an already-bound function<>, just use this then.
-        void add(std::function<EventReturn(EventParams&)> func);
-
-    private:
-        std::vector<HandlerRegistration> handlers_;
-        DISALLOW_COPY_AND_ASSIGN(Event)
+    class Item : public InertView
+    {
+    public:
+        Item(LayoutParams *layoutParams);
+        void getContentDimensions(const UIContext &dc, float &w, float &h) const override;
     };
 }
 

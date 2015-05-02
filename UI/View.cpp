@@ -7,30 +7,11 @@ using MATH::Bounds;
 
 namespace UI
 {
-    extern void EventTriggered(Event *e, EventParams params);
+    extern void MeasureBySpec(float sz, float contentWidth, MeasureSpec spec, float *measured);
     extern void RemoveQueuedEvents(View *v);
     extern View *GetFocusedView();
     extern void SetFocusedView(View *view, bool force);
     extern bool IsFocusMovementEnabled();
-
-    void MeasureBySpec(float sz, float contentWidth, MeasureSpec spec, float *measured) {
-        *measured = sz;
-        if (sz == WRAP_CONTENT) {
-            if (spec.type == UNSPECIFIED || spec.type == AT_MOST)
-                *measured = contentWidth;
-            else if (spec.type == EXACTLY)
-                *measured = spec.size;
-        }
-        else if (sz == FILL_PARENT) {
-            if (spec.type == UNSPECIFIED)
-                *measured = contentWidth;  // We have no value to set
-            else
-                *measured = spec.size;
-        }
-        else if (spec.type == EXACTLY || (spec.type == AT_MOST && *measured > spec.size)) {
-            *measured = spec.size;
-        }
-    }
 
     View::~View() {
         if (hasFocus())
@@ -81,25 +62,15 @@ namespace UI
         return GetFocusedView() == this;
     }
 
-    void Event::add(std::function<EventReturn(EventParams&)> func) {
-        HandlerRegistration reg;
-        reg.func = func;
-        handlers_.push_back(reg);
-    }
-
-    // Call this from input thread or whatever, it doesn't matter
-    void Event::trigger(EventParams &e) {
-        EventTriggered(this, e);
-    }
-
-    // Call this from UI thread
-    EventReturn Event::dispatch(EventParams &e) {
-        for (auto iter = handlers_.begin(); iter != handlers_.end(); ++iter) {
-            if ((iter->func)(e) == EVENT_DONE) {
-                // Event is handled, stop looping immediately. This event might even have gotten deleted.
-                return EVENT_DONE;
-            }
+    Item::Item(LayoutParams *layoutParams) : InertView(layoutParams) {
+        if (!layoutParams) {
+            layoutParams_->width = FILL_PARENT;
+            layoutParams_->height = 64.f;
         }
-        return EVENT_SKIPPED;
+    }
+
+    void Item::getContentDimensions(const UIContext &, float &w, float &h) const {
+        w = 0.0f;
+        h = 0.0f;
     }
 }

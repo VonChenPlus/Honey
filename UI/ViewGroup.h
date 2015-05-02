@@ -14,6 +14,10 @@ namespace UI
         float score;
     };
 
+    enum {
+        NONE = -1,
+    };
+
     class ViewGroup : public View
     {
     public:
@@ -77,6 +81,81 @@ namespace UI
         Drawable bg_;
         bool hasDropShadow_;
         bool clip_;
+    };
+
+    class AnchorLayoutParams : public LayoutParams
+    {
+    public:
+        AnchorLayoutParams(Size w, Size h, float l, float t, float r, float b, bool c = false)
+            : LayoutParams(w, h, LP_ANCHOR), left(l), top(t), right(r), bottom(b), center(c) {
+
+        }
+        AnchorLayoutParams(Size w, Size h, bool c = false)
+            : LayoutParams(w, h, LP_ANCHOR), left(0), top(0), right(NONE), bottom(NONE), center(c) {
+        }
+        AnchorLayoutParams(float l, float t, float r, float b, bool c = false)
+            : LayoutParams(WRAP_CONTENT, WRAP_CONTENT, LP_ANCHOR), left(l), top(t), right(r), bottom(b), center(c) {}
+
+        // These are not bounds, but distances from the container edges.
+        // Set to NONE to not attach this edge to the container.
+        float left, top, right, bottom;
+        bool center;  // If set, only two "sides" can be set, and they refer to the center, not the edge, of the view being layouted.
+    };
+
+    class AnchorLayout : public ViewGroup
+    {
+    public:
+        AnchorLayout(LayoutParams *layoutParams = 0) : ViewGroup(layoutParams) {}
+        void measure(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert) override;
+        void layout() override;
+    };
+
+    class LinearLayoutParams : public LayoutParams
+    {
+    public:
+        LinearLayoutParams()
+            : LayoutParams(LP_LINEAR), weight(0.0f), gravity(G_TOPLEFT), hasMargins_(false) {}
+        explicit LinearLayoutParams(float wgt, Gravity grav = G_TOPLEFT)
+            : LayoutParams(LP_LINEAR), weight(wgt), gravity(grav), hasMargins_(false) {}
+        LinearLayoutParams(float wgt, const Margins &mgn)
+            : LayoutParams(LP_LINEAR), weight(wgt), gravity(G_TOPLEFT), margins(mgn), hasMargins_(true) {}
+        LinearLayoutParams(Size w, Size h, float wgt = 0.0f, Gravity grav = G_TOPLEFT)
+            : LayoutParams(w, h, LP_LINEAR), weight(wgt), gravity(grav), hasMargins_(false) {}
+        LinearLayoutParams(Size w, Size h, float wgt, Gravity grav, const Margins &mgn)
+            : LayoutParams(w, h, LP_LINEAR), weight(wgt), gravity(grav), margins(mgn), hasMargins_(true) {}
+        LinearLayoutParams(Size w, Size h, const Margins &mgn)
+            : LayoutParams(w, h, LP_LINEAR), weight(0.0f), gravity(G_TOPLEFT), margins(mgn), hasMargins_(true) {}
+        LinearLayoutParams(Size w, Size h, float wgt, const Margins &mgn)
+            : LayoutParams(w, h, LP_LINEAR), weight(wgt), gravity(G_TOPLEFT), margins(mgn), hasMargins_(true) {}
+        LinearLayoutParams(const Margins &mgn)
+            : LayoutParams(WRAP_CONTENT, WRAP_CONTENT, LP_LINEAR), weight(0.0f), gravity(G_TOPLEFT), margins(mgn), hasMargins_(true) {}
+
+        float weight;
+        Gravity gravity;
+        Margins margins;
+
+        bool hasMargins() const { return hasMargins_; }
+
+    private:
+        bool hasMargins_;
+    };
+
+    class LinearLayout : public ViewGroup
+    {
+    public:
+        LinearLayout(Orientation orientation, LayoutParams *layoutParams = 0)
+            : ViewGroup(layoutParams), orientation_(orientation), defaultMargins_(0), spacing_(10) {}
+
+        void measure(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert) override;
+        void layout() override;
+        void setSpacing(float spacing) {
+            spacing_ = spacing;
+        }
+    protected:
+        Orientation orientation_;
+    private:
+        Margins defaultMargins_;
+        float spacing_;
     };
 }
 

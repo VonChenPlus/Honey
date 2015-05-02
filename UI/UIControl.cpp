@@ -57,11 +57,30 @@ namespace UI
     static int frameCount;
     static bool focusForced;
 
+    void MeasureBySpec(float sz, float contentWidth, MeasureSpec spec, float *measured) {
+        *measured = sz;
+        if (sz == WRAP_CONTENT) {
+            if (spec.type == UNSPECIFIED || spec.type == AT_MOST)
+                *measured = contentWidth;
+            else if (spec.type == EXACTLY)
+                *measured = spec.size;
+        }
+        else if (sz == FILL_PARENT) {
+            if (spec.type == UNSPECIFIED)
+                *measured = contentWidth;  // We have no value to set
+            else
+                *measured = spec.size;
+        }
+        else if (spec.type == EXACTLY || (spec.type == AT_MOST && *measured > spec.size)) {
+            *measured = spec.size;
+        }
+    }
+
     View *GetFocusedView() {
         return focusedView;
     }
 
-    void SetFocusedView(View *view, bool force) {
+    void SetFocusedView(View *view, bool force = false) {
         if (focusedView) {
             focusedView->focusChanged(FF_LOSTFOCUS);
         }
@@ -404,5 +423,9 @@ namespace UI
 
     bool IsEscapeKeyCode(int keyCode) {
         return keyCode == NKCODE_ESCAPE || keyCode == NKCODE_BACK || keyCode == NKCODE_BUTTON_CIRCLE || keyCode == NKCODE_BUTTON_B || keyCode == NKCODE_BUTTON_2;
+    }
+
+    bool IsAcceptKeyCode(int keyCode) {
+        return keyCode == NKCODE_SPACE || keyCode == NKCODE_ENTER || keyCode == NKCODE_Z || keyCode == NKCODE_BUTTON_A || keyCode == NKCODE_BUTTON_CROSS || keyCode == NKCODE_BUTTON_1;
     }
 }

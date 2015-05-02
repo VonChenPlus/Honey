@@ -1,8 +1,31 @@
 #include "ViewGroup.h"
 
+#include <algorithm>
+
+#include "MATH/Bounds.h"
+using MATH::Bounds;
+
 namespace UI
 {
+    extern void MeasureBySpec(float sz, float contentWidth, MeasureSpec spec, float *measured);
     extern float GetDirectionScore(View *origin, View *destination, FocusDirection direction);
+
+    void ApplyGravity(const Bounds outer, const Margins &margins, float w, float h, int gravity, Bounds &inner) {
+        inner.w = w - (margins.left + margins.right);
+        inner.h = h - (margins.right + margins.left);
+
+        switch (gravity & G_HORIZMASK) {
+        case G_LEFT: inner.x = outer.x + margins.left; break;
+        case G_RIGHT: inner.x = outer.x + outer.w - w - margins.right; break;
+        case G_HCENTER: inner.x = outer.x + (outer.w - w) / 2; break;
+        }
+
+        switch (gravity & G_VERTMASK) {
+        case G_TOP: inner.y = outer.y + margins.top; break;
+        case G_BOTTOM: inner.y = outer.y + outer.h - h - margins.bottom; break;
+        case G_VCENTER: inner.y = outer.y + (outer.h - h) / 2; break;
+        }
+    }
 
     ViewGroup::~ViewGroup() {
         // Tear down the contents recursively.
@@ -183,6 +206,261 @@ namespace UI
                 return true;
         }
         return false;
+    }
+
+    void AnchorLayout::measure(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert) {
+        MeasureBySpec(layoutParams_->width, 0.0f, horiz, &measuredWidth_);
+        MeasureBySpec(layoutParams_->height, 0.0f, vert, &measuredHeight_);
+
+        for (size_t i = 0; i < views_.size(); i++) {
+            int width = WRAP_CONTENT;
+            int height = WRAP_CONTENT;
+
+            MeasureSpec specW(UNSPECIFIED, 0.0f);
+            MeasureSpec specH(UNSPECIFIED, 0.0f);
+
+            const AnchorLayoutParams *params = static_cast<const AnchorLayoutParams *>(views_[i]->getLayoutParams());
+            if (!params->is(LP_ANCHOR)) params = 0;
+            if (params) {
+                width = params->width;
+                height = params->height;
+
+                if (!params->center) {
+                    if (params->left >= 0 && params->right >= 0) 	{
+                        width = measuredWidth_ - params->left - params->right;
+                    }
+                    if (params->top >= 0 && params->bottom >= 0) 	{
+                        height = measuredHeight_ - params->top - params->bottom;
+                    }
+                }
+                specW = width < 0 ? MeasureSpec(UNSPECIFIED) : MeasureSpec(EXACTLY, width);
+                specH = height < 0 ? MeasureSpec(UNSPECIFIED) : MeasureSpec(EXACTLY, height);
+            }
+
+            views_[i]->measure(dc, specW, specH);
+        }
+    }
+
+    void AnchorLayout::layout() {
+        for (size_t i = 0; i < views_.size(); i++) {
+            const AnchorLayoutParams *params = static_cast<const AnchorLayoutParams *>(views_[i]->getLayoutParams());
+            if (!params->is(LP_ANCHOR)) params = 0;
+
+            Bounds vBounds;
+            vBounds.w = views_[i]->getMeasuredWidth();
+            vBounds.h = views_[i]->getMeasuredHeight();
+
+            // Clamp width/height to our own
+            if (vBounds.w > bounds_.w) vBounds.w = bounds_.w;
+            if (vBounds.h > bounds_.h) vBounds.h = bounds_.h;
+
+            float left = 0, top = 0, right = 0, bottom = 0, center = false;
+            if (params) {
+                left = params->left;
+                top = params->top;
+                right = params->right;
+                bottom = params->bottom;
+                center = params->center;
+            }
+
+            if (left >= 0) {
+                vBounds.x = bounds_.x + left;
+                if (center)
+                    vBounds.x -= vBounds.w * 0.5f;
+            } else if (right >= 0) {
+                vBounds.x = bounds_.x2() - right - vBounds.w;
+                if (center) {
+                    vBounds.x += vBounds.w * 0.5f;
+                }
+            }
+
+            if (top >= 0) {
+                vBounds.y = bounds_.y + top;
+                if (center)
+                    vBounds.y -= vBounds.h * 0.5f;
+            } else if (bottom >= 0) {
+                vBounds.y = bounds_.y2() - bottom - vBounds.h;
+                if (center)
+                    vBounds.y += vBounds.h * 0.5f;
+            }
+
+            views_[i]->setBounds(vBounds);
+            views_[i]->layout();
+        }
+    }
+
+    // TODO: This code needs some cleanup/restructuring...
+    void LinearLayout::measure(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert) {
+        MeasureBySpec(layoutParams_->width, 0.0f, horiz, &measuredWidth_);
+        MeasureBySpec(layoutParams_->height, 0.0f, vert, &measuredHeight_);
+
+        if (views_.empty())
+            return;
+
+        float sum = 0.0f;
+        float maxOther = 0.0f;
+        float totalWeight = 0.0f;
+        float weightSum = 0.0f;
+        float weightZeroSum = 0.0f;
+
+        int numVisible = 0;
+
+        for (size_t i = 0; i < views_.size(); i++) {
+            if (views_[i]->getVisibility() == V_GONE)
+                continue;
+            numVisible++;
+
+            const LayoutParams *layoutParams = views_[i]->getLayoutParams();
+            const LinearLayoutParams *linLayoutParams = static_cast<const LinearLayoutParams *>(layoutParams);
+            if (!linLayoutParams->is(LP_LINEAR)) linLayoutParams = 0;
+
+            Margins margins = defaultMargins_;
+
+            if (linLayoutParams) {
+                totalWeight += linLayoutParams->weight;
+                if (linLayoutParams->hasMargins())
+                    margins = linLayoutParams->margins;
+            }
+
+            if (orientation_ == ORIENT_HORIZONTAL) {
+                MeasureSpec v = vert;
+                if (v.type == UNSPECIFIED && measuredHeight_ != 0.0)
+                    v = MeasureSpec(AT_MOST, measuredHeight_);
+                views_[i]->measure(dc, MeasureSpec(UNSPECIFIED, measuredWidth_), v - (float)(margins.top + margins.bottom));
+            } else if (orientation_ == ORIENT_VERTICAL) {
+                MeasureSpec h = horiz;
+                if (h.type == UNSPECIFIED && measuredWidth_ != 0) h = MeasureSpec(AT_MOST, measuredWidth_);
+                views_[i]->measure(dc, h - (float)(margins.left + margins.right), MeasureSpec(UNSPECIFIED, measuredHeight_));
+            }
+
+            float amount;
+            if (orientation_ == ORIENT_HORIZONTAL) {
+                amount = views_[i]->getMeasuredWidth() + margins.left + margins.right;
+                maxOther = std::max(maxOther, views_[i]->getMeasuredHeight() + margins.top + margins.bottom);
+            } else {
+                amount = views_[i]->getMeasuredHeight() + margins.top + margins.bottom;
+                maxOther = std::max(maxOther, views_[i]->getMeasuredWidth() + margins.left + margins.right);
+            }
+
+            sum += amount;
+            if (linLayoutParams) {
+                if (linLayoutParams->weight == 0.0f)
+                    weightZeroSum += amount;
+
+                weightSum += linLayoutParams->weight;
+            } else {
+                weightZeroSum += amount;
+            }
+        }
+
+        weightZeroSum += spacing_ * (numVisible - 1);
+
+        // Alright, got the sum. Let's take the remaining space after the fixed-size views,
+        // and distribute among the weighted ones.
+        if (orientation_ == ORIENT_HORIZONTAL) {
+            MeasureBySpec(layoutParams_->width, weightZeroSum, horiz, &measuredWidth_);
+            MeasureBySpec(layoutParams_->height, maxOther, vert, &measuredHeight_);
+
+            float unit = (measuredWidth_ - weightZeroSum) / weightSum;
+            // Redistribute the stretchy ones! and remeasure the children!
+            for (size_t i = 0; i < views_.size(); i++) {
+                if (views_[i]->getVisibility() == V_GONE)
+                    continue;
+                const LayoutParams *layoutParams = views_[i]->getLayoutParams();
+                const LinearLayoutParams *linLayoutParams = static_cast<const LinearLayoutParams *>(layoutParams);
+                if (!linLayoutParams->is(LP_LINEAR)) linLayoutParams = 0;
+
+                if (linLayoutParams && linLayoutParams->weight > 0.0f) {
+                    Margins margins = defaultMargins_;
+                    if (linLayoutParams->hasMargins())
+                        margins = linLayoutParams->margins;
+                    int marginSum = margins.left + margins.right;
+                    MeasureSpec v = vert;
+                    if (v.type == UNSPECIFIED && measuredHeight_ != 0.0)
+                        v = MeasureSpec(AT_MOST, measuredHeight_);
+                    views_[i]->measure(dc, MeasureSpec(EXACTLY, unit * linLayoutParams->weight - marginSum), v - (float)(margins.top + margins.bottom));
+                }
+            }
+        } else {
+            //MeasureBySpec(layoutParams_->height, vert.type == UNSPECIFIED ? sum : weightZeroSum, vert, &measuredHeight_);
+            MeasureBySpec(layoutParams_->height, weightZeroSum, vert, &measuredHeight_);
+            MeasureBySpec(layoutParams_->width, maxOther, horiz, &measuredWidth_);
+
+            float unit = (measuredHeight_ - weightZeroSum) / weightSum;
+
+            // Redistribute the stretchy ones! and remeasure the children!
+            for (size_t i = 0; i < views_.size(); i++) {
+                if (views_[i]->getVisibility() == V_GONE)
+                    continue;
+                const LayoutParams *layoutParams = views_[i]->getLayoutParams();
+                const LinearLayoutParams *linLayoutParams = static_cast<const LinearLayoutParams *>(layoutParams);
+                if (!linLayoutParams->is(LP_LINEAR)) linLayoutParams = 0;
+
+                if (linLayoutParams && linLayoutParams->weight > 0.0f) {
+                    Margins margins = defaultMargins_;
+                    if (linLayoutParams->hasMargins())
+                        margins = linLayoutParams->margins;
+                    int marginSum = margins.top + margins.bottom;
+                    MeasureSpec h = horiz;
+                    if (h.type == UNSPECIFIED && measuredWidth_ != 0.0)
+                        h = MeasureSpec(AT_MOST, measuredWidth_);
+                    views_[i]->measure(dc, h - (float)(margins.left + margins.right), MeasureSpec(EXACTLY, unit * linLayoutParams->weight - marginSum));
+                }
+            }
+        }
+    }
+
+    // weight != 0 = fill remaining space.
+    void LinearLayout::layout() {
+        const Bounds &bounds = bounds_;
+
+        Bounds itemBounds;
+        float pos;
+
+        if (orientation_ == ORIENT_HORIZONTAL) {
+            pos = bounds.x;
+            itemBounds.y = bounds.y;
+            itemBounds.h = measuredHeight_;
+        } else {
+            pos = bounds.y;
+            itemBounds.x = bounds.x;
+            itemBounds.w = measuredWidth_;
+        }
+
+        for (size_t i = 0; i < views_.size(); i++) {
+            if (views_[i]->getVisibility() == V_GONE)
+                continue;
+
+            const LayoutParams *layoutParams = views_[i]->getLayoutParams();
+            const LinearLayoutParams *linLayoutParams = static_cast<const LinearLayoutParams *>(layoutParams);
+            if (!linLayoutParams->is(LP_LINEAR)) linLayoutParams = 0;
+
+            Gravity gravity = G_TOPLEFT;
+            Margins margins = defaultMargins_;
+            if (linLayoutParams) {
+                if (linLayoutParams->hasMargins())
+                    margins = linLayoutParams->margins;
+                gravity = linLayoutParams->gravity;
+            }
+
+            if (orientation_ == ORIENT_HORIZONTAL) {
+                itemBounds.x = pos;
+                itemBounds.w = views_[i]->getMeasuredWidth() + margins.left + margins.right;
+            } else {
+                itemBounds.y = pos;
+                itemBounds.h = views_[i]->getMeasuredHeight() + margins.top + margins.bottom;
+            }
+
+            Bounds innerBounds;
+            ApplyGravity(itemBounds, margins,
+                views_[i]->getMeasuredWidth(), views_[i]->getMeasuredHeight(),
+                gravity, innerBounds);
+
+            views_[i]->setBounds(innerBounds);
+            views_[i]->layout();
+
+            pos += spacing_ + (orientation_ == ORIENT_HORIZONTAL ? itemBounds.w : itemBounds.h);
+        }
     }
 }
 
