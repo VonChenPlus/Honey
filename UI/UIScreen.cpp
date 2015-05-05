@@ -53,15 +53,14 @@ namespace UI
     void UIScreen::render() {
         doRecreateViews();
 
+        screenManager()->getUIContext()->begin();
+        drawBackground(*screenManager()->getUIContext());
         if (root_) {
             LayoutViewHierarchy(*screenManager()->getUIContext(), root_);
-
-            screenManager()->getUIContext()->begin();
-            drawBackground(*screenManager()->getUIContext());
             root_->draw(*screenManager()->getUIContext());
-            screenManager()->getUIContext()->end();
-            screenManager()->getUIContext()->flush();
         }
+        screenManager()->getUIContext()->end();
+        screenManager()->getUIContext()->flush();
     }
 
     bool UIScreen::touch(const TouchInput &touch) {
