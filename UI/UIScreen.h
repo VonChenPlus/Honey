@@ -10,7 +10,7 @@ namespace UI
     {
     public:
         UIScreen();
-        ~UIScreen();
+        virtual ~UIScreen();
 
         virtual void update(InputState &input) override;
         virtual void render() override;
@@ -43,6 +43,8 @@ namespace UI
     class UIScreenWithBackground : public UIScreen {
     public:
         UIScreenWithBackground() : UIScreen() {}
+        virtual ~UIScreenWithBackground() {}
+
     protected:
         virtual void drawBackground(UIContext &, int alpha = 1.0) override;
     };
@@ -60,6 +62,8 @@ namespace UI
     class UIDialogScreenWithBackground : public UIDialogScreen, public UIScreenWithBackground {
     public:
         UIDialogScreenWithBackground() : UIDialogScreen() {}
+        virtual ~UIDialogScreenWithBackground() {}
+
     protected:
         virtual void drawBackground(UIContext &dc, int alpha = 1.0) override;
     };
