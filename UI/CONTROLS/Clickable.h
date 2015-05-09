@@ -29,6 +29,16 @@ namespace UI
         bool dragging_;
         bool down_;
     };
+
+    class ClickableItem : public Clickable
+    {
+    public:
+        ClickableItem(LayoutParams *layoutParams);
+        void getContentDimensions(const UIContext &dc, float &w, float &h) const override;
+
+        // Draws the item background.
+        void draw(UIContext &dc) override;
+    };
 }
 
 #endif // CLICKABLE_H

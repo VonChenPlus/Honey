@@ -26,7 +26,7 @@ namespace UI
 
     protected:
         virtual void createViews() = 0;
-        virtual void drawBackground(UIContext &, int alpha = 1.0) = 0;
+        virtual void drawBackground(UIContext &, int alpha = 1.0) {UNUSED(alpha);}
 
         virtual void recreateViews() { recreateViews_ = true; }
 

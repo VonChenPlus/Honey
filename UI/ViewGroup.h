@@ -86,11 +86,11 @@ namespace UI
     class AnchorLayoutParams : public LayoutParams
     {
     public:
-        AnchorLayoutParams(Size w, Size h, float l, float t, float r, float b, bool c = false)
+        AnchorLayoutParams(fSize w, fSize h, float l, float t, float r, float b, bool c = false)
             : LayoutParams(w, h, LP_ANCHOR), left(l), top(t), right(r), bottom(b), center(c) {
 
         }
-        AnchorLayoutParams(Size w, Size h, bool c = false)
+        AnchorLayoutParams(fSize w, fSize h, bool c = false)
             : LayoutParams(w, h, LP_ANCHOR), left(0), top(0), right(NONE), bottom(NONE), center(c) {
         }
         AnchorLayoutParams(float l, float t, float r, float b, bool c = false)
@@ -119,13 +119,13 @@ namespace UI
             : LayoutParams(LP_LINEAR), weight(wgt), gravity(grav), hasMargins_(false) {}
         LinearLayoutParams(float wgt, const Margins &mgn)
             : LayoutParams(LP_LINEAR), weight(wgt), gravity(G_TOPLEFT), margins(mgn), hasMargins_(true) {}
-        LinearLayoutParams(Size w, Size h, float wgt = 0.0f, Gravity grav = G_TOPLEFT)
+        LinearLayoutParams(fSize w, fSize h, float wgt = 0.0f, Gravity grav = G_TOPLEFT)
             : LayoutParams(w, h, LP_LINEAR), weight(wgt), gravity(grav), hasMargins_(false) {}
-        LinearLayoutParams(Size w, Size h, float wgt, Gravity grav, const Margins &mgn)
+        LinearLayoutParams(fSize w, fSize h, float wgt, Gravity grav, const Margins &mgn)
             : LayoutParams(w, h, LP_LINEAR), weight(wgt), gravity(grav), margins(mgn), hasMargins_(true) {}
-        LinearLayoutParams(Size w, Size h, const Margins &mgn)
+        LinearLayoutParams(fSize w, fSize h, const Margins &mgn)
             : LayoutParams(w, h, LP_LINEAR), weight(0.0f), gravity(G_TOPLEFT), margins(mgn), hasMargins_(true) {}
-        LinearLayoutParams(Size w, Size h, float wgt, const Margins &mgn)
+        LinearLayoutParams(fSize w, fSize h, float wgt, const Margins &mgn)
             : LayoutParams(w, h, LP_LINEAR), weight(wgt), gravity(G_TOPLEFT), margins(mgn), hasMargins_(true) {}
         LinearLayoutParams(const Margins &mgn)
             : LayoutParams(WRAP_CONTENT, WRAP_CONTENT, LP_LINEAR), weight(0.0f), gravity(G_TOPLEFT), margins(mgn), hasMargins_(true) {}

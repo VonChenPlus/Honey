@@ -79,4 +79,30 @@ namespace UI
         }
         return ret;
     }
+
+    ClickableItem::ClickableItem(LayoutParams *layoutParams) : Clickable(layoutParams) {
+        if (!layoutParams) {
+            if (layoutParams_->width == WRAP_CONTENT)
+                layoutParams_->width = FILL_PARENT;
+            layoutParams_->height = 64.0f;
+        }
+    }
+
+    void ClickableItem::getContentDimensions(const UIContext &, float &w, float &h) const {
+        w = 0.0f;
+        h = 0.0f;
+    }
+
+    void ClickableItem::draw(UIContext &dc) {
+        Style style = dc.theme->itemStyle;
+
+        if (hasFocus()) {
+            style = dc.theme->itemFocusedStyle;
+        }
+        if (down_) {
+            style = dc.theme->itemDownStyle;
+        }
+
+        dc.fillRect(style.background, bounds_);
+    }
 }

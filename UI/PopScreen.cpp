@@ -46,7 +46,7 @@ namespace UI
         float yres = screenManager()->getUIContext()->getBounds().h;
 
         box_ = new LinearLayout(ORIENT_VERTICAL,
-            new AnchorLayoutParams(550, fillVertical() ? yres - 30 : (Size)WRAP_CONTENT, dc.getBounds().centerX(), dc.getBounds().centerY(), NONE, NONE, true));
+            new AnchorLayoutParams(550, fillVertical() ? yres - 30 : (fSize) WRAP_CONTENT, dc.getBounds().centerX(), dc.getBounds().centerY(), NONE, NONE, true));
 
         root_->add(box_);
         box_->setBG(UI::Drawable(0xFF303030));
@@ -71,5 +71,17 @@ namespace UI
 
             box_->add(buttonRow);
         }
+    }
+
+    EventReturn PopupScreen::OnOK(EventParams &) {
+        onCompleted(DR_OK);
+        screenManager()->finishDialog(this, DR_OK);
+        return UI::EVENT_DONE;
+    }
+
+    EventReturn PopupScreen::OnCancel(EventParams &) {
+        onCompleted(DR_CANCEL);
+        screenManager()->finishDialog(this, DR_CANCEL);
+        return UI::EVENT_DONE;
     }
 }
