@@ -1,5 +1,5 @@
-#ifndef INERTVIEW_H
-#define INERTVIEW_H
+#ifndef POPUPHEADER_H
+#define POPUPHEADER_H
 
 #include "UI/View.h"
 
@@ -19,4 +19,4 @@ namespace UI
     };
 }
 
-#endif // INERTVIEW_H
+#endif // POPUPHEADER_H
