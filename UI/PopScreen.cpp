@@ -18,9 +18,6 @@ namespace UI
             return UIDialogScreen::touch(touch);
         }
 
-        if (!box_->getBounds().contains(touch.x, touch.y))
-            screenManager()->finishDialog(this, DR_BACK);
-
         return UIDialogScreen::touch(touch);
     }
 
@@ -74,14 +71,14 @@ namespace UI
     }
 
     EventReturn PopupScreen::OnOK(EventParams &) {
-        onCompleted(DR_OK);
-        screenManager()->finishDialog(this, DR_OK);
+        if (onCompleted(DR_OK))
+            screenManager()->finishDialog(this, DR_OK);
         return UI::EVENT_DONE;
     }
 
     EventReturn PopupScreen::OnCancel(EventParams &) {
-        onCompleted(DR_CANCEL);
-        screenManager()->finishDialog(this, DR_CANCEL);
+        if (onCompleted(DR_CANCEL))
+            screenManager()->finishDialog(this, DR_CANCEL);
         return UI::EVENT_DONE;
     }
 }

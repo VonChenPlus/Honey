@@ -20,7 +20,7 @@ namespace UI
     protected:
         virtual bool fillVertical() const { return false; }
         virtual bool showButtons() const { return true; }
-        virtual void onCompleted(DialogResult) {}
+        virtual bool onCompleted(DialogResult) { return false;  }
 
     private:
         UI::EventReturn OnOK(UI::EventParams &e);
