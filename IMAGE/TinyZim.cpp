@@ -6,9 +6,9 @@
 #include <QImage>
 #include "EXTERNALS/zlib/zlib.h"
 #include "EXTERNALS/rg_etc1/rg_etc1.h"
-#include "UTILS/IO/File.h"
-using UTILS::IO::ReadLocalFile;
-using UTILS::IO::OpenCFile;
+#include "IO/File.h"
+using IO::ReadLocalFile;
+using IO::OpenCFile;
 #include "UTILS/STRING/String.h"
 using UTILS::STRING::StringFromFormat;
 #include "MATH/Utils.h"

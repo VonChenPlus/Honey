@@ -9,8 +9,8 @@ using IMAGE::ZIM_FORMAT_MASK;
 #include "IMAGE/TinyPNG.h"
 using IMAGE::PNGLoadPtr;
 #include "EXTERNALS/jpge/jpgd.h"
-#include "UTILS/IO/File.h"
-using UTILS::IO::ReadLocalFile;
+#include "IO/File.h"
+using IO::ReadLocalFile;
 #include "UTILS/STRING/String.h"
 using UTILS::STRING::StringFromFormat;
 #include <QImage>

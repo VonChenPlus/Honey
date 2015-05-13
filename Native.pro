@@ -17,13 +17,13 @@ SOURCES += \
     $$P/MATH/*.cpp \
     $$P/THIN3D/*.cpp \
     $$P/UI/*.cpp \
+    $$P/IO/*.cpp \
     $$P/UI/CONTROLS/*.cpp \
     $$P/UTILS/TEXT/UTF8.cpp \
     $$P/UTILS/HASH/Hash.cpp \
     $$P/UTILS/STRING/String.cpp \
     $$P/UTILS/TIME/Time.cpp \
-    $$P/UTILS/COLOR/Color.cpp \
-    $$P/UTILS/IO/*.cpp
+    $$P/UTILS/COLOR/Color.cpp
 
 HEADERS += \
     $$P/BASE/*.h \
@@ -32,13 +32,13 @@ HEADERS += \
     $$P/MATH/*.h \
     $$P/THIN3D/*.h \
     $$P/UI/*.h \
+    $$P/IO/*.h \
     $$P/UI/CONTROLS/*.h \
     $$P/UTILS/TEXT/UTF8.h \
     $$P/UTILS/TEXT/UTF16.h \
     $$P/UTILS/STRING/String.h \
     $$P/UTILS/TIME/Time.h \
     $$P/UTILS/COLOR/Color.h \
-    $$P/UTILS/IO/*.h \
     $$P/UTILS/RANDOM/*.h
     
 # Zlib
