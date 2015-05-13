@@ -63,7 +63,7 @@ public:
     // written.
     void flush(int fd);
     void flushToFile(const char *filename);
-    void flushSocket(uintptr_t sock);  // Windows portability
+    void flushSocket(UIntPtr sock);  // Windows portability
 
     void readAll(int fd, int hintSize = 0);
     void readAllWithProgress(int fd, int knownSize, float *progress);

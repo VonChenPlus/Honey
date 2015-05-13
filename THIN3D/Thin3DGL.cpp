@@ -146,20 +146,20 @@ namespace THIN3D
                 glEnableVertexAttribArray(i);
             }
         }
-        intptr_t b = (intptr_t)base;
+        IntPtr b = (IntPtr)base;
         for (Size i = 0; i < components_.size(); i++) {
             switch (components_[i].type) {
             case FLOATx2:
-                glVertexAttribPointer(components_[i].semantic, 2, GL_FLOAT, GL_FALSE, stride_, (void *)(b + (intptr_t)components_[i].offset));
+                glVertexAttribPointer(components_[i].semantic, 2, GL_FLOAT, GL_FALSE, stride_, (void *)(b + (IntPtr)components_[i].offset));
                 break;
             case FLOATx3:
-                glVertexAttribPointer(components_[i].semantic, 3, GL_FLOAT, GL_FALSE, stride_, (void *)(b + (intptr_t)components_[i].offset));
+                glVertexAttribPointer(components_[i].semantic, 3, GL_FLOAT, GL_FALSE, stride_, (void *)(b + (IntPtr)components_[i].offset));
                 break;
             case FLOATx4:
-                glVertexAttribPointer(components_[i].semantic, 4, GL_FLOAT, GL_FALSE, stride_, (void *)(b + (intptr_t)components_[i].offset));
+                glVertexAttribPointer(components_[i].semantic, 4, GL_FLOAT, GL_FALSE, stride_, (void *)(b + (IntPtr)components_[i].offset));
                 break;
             case UNORM8x4:
-                glVertexAttribPointer(components_[i].semantic, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride_, (void *)(b + (intptr_t)components_[i].offset));
+                glVertexAttribPointer(components_[i].semantic, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride_, (void *)(b + (IntPtr)components_[i].offset));
                 break;
             case INVALID:
                 throw _NException_Normal("Thin3DGLVertexFormat: Invalid component type applied");

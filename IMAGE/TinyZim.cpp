@@ -6,7 +6,7 @@
 #include <QImage>
 #include "EXTERNALS/zlib/zlib.h"
 #include "EXTERNALS/rg_etc1/rg_etc1.h"
-#include "IO/File.h"
+#include "IO/FileUtils.h"
 using IO::ReadLocalFile;
 using IO::OpenCFile;
 #include "UTILS/STRING/String.h"

@@ -43,7 +43,7 @@ namespace UI
         float yres = screenManager()->getUIContext()->getBounds().h;
 
         box_ = new LinearLayout(ORIENT_VERTICAL,
-            new AnchorLayoutParams(550, fillVertical() ? yres - 30 : (fSize) WRAP_CONTENT, dc.getBounds().centerX(), dc.getBounds().centerY(), NONE, NONE, true));
+            new AnchorLayoutParams(550.0, fillVertical() ? yres - 30.0 : (float)WRAP_CONTENT, dc.getBounds().centerX(), dc.getBounds().centerY(), NONE, NONE, true));
 
         root_->add(box_);
         box_->setBG(UI::Drawable(0xFF303030));
@@ -57,7 +57,7 @@ namespace UI
 
         if (showButtons() && !button1_.empty()) {
             // And the two buttons at the bottom.
-            LinearLayout *buttonRow = new LinearLayout(ORIENT_HORIZONTAL, new LinearLayoutParams(200, WRAP_CONTENT));
+            LinearLayout *buttonRow = new LinearLayout(ORIENT_HORIZONTAL, new LinearLayoutParams(200.0, WRAP_CONTENT));
             buttonRow->setSpacing(0);
 
             // Adjust button order to the platform default.

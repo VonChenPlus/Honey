@@ -42,8 +42,8 @@ typedef int16_t int16;
 typedef int32_t int32;
 typedef int64_t int64;
 typedef size_t Size;
-typedef float fSize;
-typedef intptr_t SSize;
+typedef intptr_t IntPtr;
+typedef uintptr_t UIntPtr;
 typedef unsigned int Color;
 
 #ifdef _WIN32

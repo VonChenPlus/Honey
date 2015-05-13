@@ -1,5 +1,5 @@
-#ifndef SOCKET_H
-#define SOCKET_H
+#ifndef SOCKETUTILS_H
+#define SOCKETUTILS_H
 
 #include "BASE/Native.h"
 #include <string>
@@ -21,4 +21,4 @@ namespace IO
     void SetNonBlocking(int fd, bool non_blocking);
 }
 
-#endif // SOCKET_H
+#endif // SOCKETUTILS_H

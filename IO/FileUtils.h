@@ -1,5 +1,5 @@
-#ifndef FILE_H
-#define FILE_H
+#ifndef FILEUTILS_H
+#define FILEUTILS_H
 
 #include <string>
 #include <vector>
@@ -56,4 +56,4 @@ namespace IO
     #endif
 }
 
-#endif // FILE_H
+#endif // FILEUTILS_H

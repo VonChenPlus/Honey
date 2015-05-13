@@ -14,7 +14,7 @@
 #include <unistd.h>
 #endif
 
-#include "IO/Socket.h"
+#include "IO/SocketUtils.h"
 using IO::WriteLine;
 #include "UTILS/TIME/Time.h"
 using UTILS::TIME::sleep_ms;
@@ -146,7 +146,7 @@ void Buffer::flushToFile(const char *filename) {
     fclose(f);
 }
 
-void Buffer::flushSocket(uintptr_t sock) {
+void Buffer::flushSocket(UIntPtr sock) {
     for (Size pos = 0, end = data_.size(); pos < end; ) {
         int sent = send(sock, &data_[pos], (int)(end - pos), 0);
         if (sent < 0) {

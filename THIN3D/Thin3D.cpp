@@ -9,7 +9,7 @@ using IMAGE::ZIM_FORMAT_MASK;
 #include "IMAGE/TinyPNG.h"
 using IMAGE::PNGLoadPtr;
 #include "EXTERNALS/jpge/jpgd.h"
-#include "IO/File.h"
+#include "IO/FileUtils.h"
 using IO::ReadLocalFile;
 #include "UTILS/STRING/String.h"
 using UTILS::STRING::StringFromFormat;
