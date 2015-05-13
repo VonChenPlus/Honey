@@ -8,7 +8,7 @@
 #include "EXTERNALS/rg_etc1/rg_etc1.h"
 #include "IO/FileUtils.h"
 using IO::ReadLocalFile;
-using IO::OpenCFile;
+using IO::OpenFile;
 #include "UTILS/STRING/String.h"
 using UTILS::STRING::StringFromFormat;
 #include "MATH/Utils.h"
@@ -313,7 +313,7 @@ namespace IMAGE
     }
 
     void SaveZIM(const char *filename, int width, int height, int pitch, int flags, const uint8_t *image_data) {
-        FILE *f = OpenCFile(filename, "wb");
+        FILE *f = OpenFile(filename, "wb");
         static const char magic[5] = "ZIMG";
         fwrite(magic, 1, 4, f);
         fwrite(&width, 1, 4, f);

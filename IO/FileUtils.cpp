@@ -54,7 +54,7 @@ namespace IO
     }
     #endif
 
-    FILE *OpenCFile(const std::string &filename, const char *mode) {
+    FILE *OpenFile(const std::string &filename, const char *mode) {
         FILE *file = NULLPTR;
     #if defined(_WIN32) && defined(UNICODE)
         file = _wfopen(ConvertUTF8ToWString(filename).c_str(), ConvertUTF8ToWString(mode).c_str());
@@ -62,12 +62,12 @@ namespace IO
         file =  fopen(filename.c_str(), mode);
     #endif
         if (file == NULLPTR)
-            throw _NException_("OpenCFile failed", NException::IO);
+            throw _NException_("OpenFile failed", NException::IO);
         return file;
     }
 
     void WriteStringToFile(bool text_file, const std::string &str, const char *filename) {
-        FILE *file = OpenCFile(filename, text_file ? "w" : "wb");
+        FILE *file = OpenFile(filename, text_file ? "w" : "wb");
         Size len = str.size();
         if (len != fwrite(str.data(), 1, str.size(), file))
         {
@@ -78,7 +78,7 @@ namespace IO
     }
 
     void WriteDataToFile(bool text_file, const void* data, const unsigned int size, const char *filename) {
-        FILE *file = OpenCFile(filename, text_file ? "w" : "wb");
+        FILE *file = OpenFile(filename, text_file ? "w" : "wb");
         Size len = size;
         if (len != fwrite(data, 1, len, file)) {
             fclose(file);
@@ -114,7 +114,7 @@ namespace IO
     }
 
     void ReadFileToString(bool text_file, const char *filename, std::string &str) {
-        FILE *file = OpenCFile(filename, text_file ? "r" : "rb");
+        FILE *file = OpenFile(filename, text_file ? "r" : "rb");
         Size len = (Size)GetSize(file);
         char *buf = new char[len + 1];
         buf[fread(buf, 1, len, file)] = 0;
@@ -125,7 +125,7 @@ namespace IO
 
 
     void ReadDataFromFile(bool text_file, unsigned char* &data, const unsigned int size, const char *filename) {
-        FILE *file = OpenCFile(filename, text_file ? "r" : "rb");
+        FILE *file = OpenFile(filename, text_file ? "r" : "rb");
         Size len = (Size)GetSize(file);
         if(len > size) {
             fclose(file);
@@ -137,7 +137,7 @@ namespace IO
 
     // The return is non-const because - why not?
     uint8 *ReadLocalFile(const char *filename, Size *size) {
-        FILE *file = OpenCFile(filename, "rb");
+        FILE *file = OpenFile(filename, "rb");
         Size fSize = (Size)GetSize(file);
         uint8 *contents = new uint8[fSize+1];
         fread(contents, 1, fSize, file);
@@ -161,23 +161,6 @@ namespace IO
                 fname[i--] = '\0';
         }
         return;
-    }
-
-    // Returns true if file filename exists
-    bool Exists(const std::string &filename) {
-    #ifdef _WIN32
-        std::wstring wstr = ConvertUTF8ToWString(filename);
-        return GetFileAttributes(wstr.c_str()) != 0xFFFFFFFF;
-    #else
-        struct stat64 file_info;
-
-        std::string copy(filename);
-        StripTailDirSlashes(copy);
-
-        int result = stat64(copy.c_str(), &file_info);
-
-        return (result == 0);
-    #endif
     }
 
     // Returns true if filename is a directory
@@ -244,7 +227,7 @@ namespace IO
             return false;
     }
 
-    Size GetFilesInDir(const char *directory, std::vector<FileInfo> *files, const char *filter, int flags) {
+    Size GetFilesInDirectory(const char *directory, std::vector<FileInfo> *files, const char *filter, int flags) {
         Size foundEntries = 0;
         std::set<std::string> filters;
         std::string tmp;
@@ -354,7 +337,7 @@ namespace IO
     #endif
     }
 
-    void DeleteDir(const char *dir) {
+    void DeleteDirectory(const char *dir) {
     #ifdef _WIN32
         if (!RemoveDirectory(ConvertUTF8ToWString(dir).c_str())) {
             throw _NException_(StringFromFormat("Error deleting directory %s: %i", dir, GetLastError()), NException::IO);
@@ -366,7 +349,7 @@ namespace IO
 
     #endif
 
-    std::string GetDir(const std::string &path) {
+    std::string GetDirectory(const std::string &path) {
         if (path == "/")
             return path;
         int n = (int)path.size() - 1;
@@ -385,19 +368,36 @@ namespace IO
         return cutpath;
     }
 
-    std::string GetFilename(std::string path) {
-        Size off = GetDir(path).size() + 1;
+    std::string GetFileName(std::string path) {
+        Size off = GetDirectory(path).size() + 1;
         if (off < path.size())
             return path.substr(off);
         else
             return path;
     }
 
-    void MakeDir(const std::string &path) {
+    void MakeDirectory(const std::string &path) {
     #ifdef _WIN32
         mkdir(path.c_str());
     #else
         mkdir(path.c_str(), 0777);
+    #endif
+    }
+
+    // Returns true if file filename exists
+    bool Exists(const std::string &filename) {
+    #ifdef _WIN32
+        std::wstring wstr = ConvertUTF8ToWString(filename);
+        return GetFileAttributes(wstr.c_str()) != 0xFFFFFFFF;
+    #else
+        struct stat64 file_info;
+
+        std::string copy(filename);
+        StripTailDirSlashes(copy);
+
+        int result = stat64(copy.c_str(), &file_info);
+
+        return (result == 0);
     #endif
     }
 

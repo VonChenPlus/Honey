@@ -8,7 +8,8 @@
 
 namespace IO
 {
-    FILE *OpenCFile(const std::string &filename, const char *mode);
+    // File IO
+    FILE *OpenFile(const std::string &filename, const char *mode);
 
     // Whole-file reading/writing
     void WriteStringToFile(bool text_file, const std::string &str, const char *filename);
@@ -19,8 +20,8 @@ namespace IO
 
     // Direct readers. deallocate using delete [].
     uint8 *ReadLocalFile(const char *filename, Size *size);
-    // Beginnings of a directory utility system. TODO: Improve.
 
+    // File Operator
     struct FileInfo
     {
         std::string name;
@@ -29,28 +30,30 @@ namespace IO
         bool isDirectory;
         bool isWritable;
         uint64 size;
-
         bool operator <(const FileInfo &other) const;
     };
 
     std::string GetFileExtension(const std::string &fn);
-    std::string GetDir(const std::string &path);
-    std::string GetFilename(std::string path);
+    std::string GetFileName(std::string path);
     void GetFileInfo(const char *path, FileInfo *fileInfo);
 
+    // Directory Operator
     enum
     {
         GETFILES_GETHIDDEN = 1
     };
 
-    Size GetFilesInDir(const char *directory, std::vector<FileInfo> *files, const char *filter = 0, int flags = 0);
+    Size GetFilesInDirectory(const char *directory, std::vector<FileInfo> *files, const char *filter = 0, int flags = 0);
     void DeleteFile(const char *file);
-    void DeleteDir(const char *file);
-    bool Exists(const std::string &filename);
+    void DeleteDirectory(const char *file);
     bool IsDirectory(const std::string &filename);
-    void MakeDir(const std::string &path);
-    std::string GetDir(const std::string &path);
+    void MakeDirectory(const std::string &path);
+    std::string GetDirectory(const std::string &path);
 
+    // other
+    bool Exists(const std::string &filename);
+
+    // Driver
     #ifdef _WIN32
     std::vector<std::string> GetWindowsDrives();
     #endif
