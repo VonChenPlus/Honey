@@ -10,7 +10,8 @@ namespace IO
     class Socket
     {
     public:
-        Socket(int sock);
+        Socket(int sock): sock_(sock) {
+        }
         virtual ~Socket() {}
 
         int getSock() {return sock_;}

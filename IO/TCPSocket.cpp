@@ -3,10 +3,19 @@
 #ifndef _WIN32
 #include <unistd.h>
 #include <sys/select.h>
+#include <signal.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <linux/tcp.h>
+#define SOCKLEN socklen_t
 #define errorNumber errno
 #else
 #include <io.h>
 #include <winsock2.h>
+#define SOCKLEN int
 #define errorNumber WSAGetLastError()
 #endif
 
@@ -90,7 +99,7 @@ namespace IO
     std::string TCPSocket::getAddress() {
         struct sockaddr_in  info;
         struct in_addr    addr;
-        int info_size = sizeof(info);
+        SOCKLEN info_size = sizeof(info);
 
         getsockname(getSock(), (struct sockaddr *)&info, &info_size);
         memcpy(&addr, &info.sin_addr, sizeof(addr));
@@ -108,19 +117,13 @@ namespace IO
     }
 
     std::string TCPSocket::getEndpoint() {
-        std::string endpoint = getAddress();
-        int port = getPort();
-        endpoint.append("::");
-        char buffer[100] = {0};
-        itoa(port, buffer, 10);
-        endpoint.append(buffer);
-        return endpoint;
+        return StringFromFormat("%s::%d", getAddress().c_str(), getPort());
     }
 
     std::string TCPSocket::getPeerAddress() {
         struct sockaddr_in  info;
         struct in_addr    addr;
-        int info_size = sizeof(info);
+        SOCKLEN info_size = sizeof(info);
 
         getpeername(getSock(), (struct sockaddr *)&info, &info_size);
         memcpy(&addr, &info.sin_addr, sizeof(addr));
@@ -135,25 +138,19 @@ namespace IO
 
     int TCPSocket::getPeerPort() {
         struct sockaddr_in  info;
-        int info_size = sizeof(info);
+        SOCKLEN info_size = sizeof(info);
 
         getpeername(getSock(), (struct sockaddr *)&info, &info_size);
         return ntohs(info.sin_port);
     }
 
     std::string TCPSocket::getPeerEndpoint() {
-        std::string endpoint = getPeerAddress();
-        int port = getPeerPort();
-        endpoint.append("::");
-        char buffer[100] = {0};
-        itoa(port, buffer, 10);
-        endpoint.append(buffer);
-        return endpoint;
+        return StringFromFormat("%s::%d", getPeerAddress().c_str(), getPeerPort());
     }
 
     bool TCPSocket::sameMachine() {
         struct sockaddr_in peeraddr, myaddr;
-        int addrlen = sizeof(struct sockaddr_in);
+        SOCKLEN addrlen = sizeof(struct sockaddr_in);
 
         getpeername(getSock(), (struct sockaddr *)&peeraddr, &addrlen);
         getsockname(getSock(), (struct sockaddr *)&myaddr, &addrlen);
@@ -177,21 +174,21 @@ namespace IO
     bool TCPSocket::isSocket(int sock)
     {
         struct sockaddr_in info;
-        int info_size = sizeof(info);
+        SOCKLEN info_size = sizeof(info);
         return getsockname(sock, (struct sockaddr *)&info, &info_size) >= 0;
     }
 
     bool TCPSocket::isConnected(int sock)
     {
         struct sockaddr_in info;
-        int info_size = sizeof(info);
+        SOCKLEN info_size = sizeof(info);
         return getpeername(sock, (struct sockaddr *)&info, &info_size) >= 0;
     }
 
 
     int TCPSocket::getSockPort(int sock) {
         struct sockaddr_in info;
-        int info_size = sizeof(info);
+        SOCKLEN info_size = sizeof(info);
         if (getsockname(sock, (struct sockaddr *)&info, &info_size) < 0)
             return 0;
         return ntohs(info.sin_port);
