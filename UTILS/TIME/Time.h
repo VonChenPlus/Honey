@@ -7,23 +7,22 @@ namespace UTILS
     {
         // http://linux.die.net/man/3/clock_gettime
 
-        // This time implementation caches the time for max performance (call time_now() as much as you like).
-        // You need to call time_update() once per frame (or whenever you need the correct time right now).
+        // Uncached time. Slower than the above cached time functions. Does not update cached time, call TimeUpdate for that.
+        double FetchCurrentTime();
 
-        void time_update();
+        // This time implementation caches the time for max performance (call TimeNow() as much as you like).
+        // You need to call TimeUpdate() once per frame (or whenever you need the correct time right now).
+
+        void TimeUpdate();
 
         // Seconds.
-        float time_now();
-        double time_now_d();
+        float TimeNow();
+        double TimeNowD();
 
-        // Uncached time. Slower than the above cached time functions. Does not update cached time, call time_update for that.
-        double real_time_now();
-
-        int time_now_ms();
-
+        int TimeNow_MS();
 
         // Sleep. Does not necessarily have millisecond granularity, especially on Windows.
-        void sleep_ms(int ms);
+        void Sleep_MS(int ms);
     }
 }
 

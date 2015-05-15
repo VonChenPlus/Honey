@@ -4,8 +4,8 @@
 #include <queue>
 
 #include "UTILS/TIME/Time.h"
-using UTILS::TIME::time_now_d;
-using UTILS::TIME::time_now;
+using UTILS::TIME::TimeNowD;
+using UTILS::TIME::TimeNow;
 #include "UI/KeyCodes.h"
 #include "UI/ScreenManager.h"
 #include "UTILS/RANDOM/GMRandom.h"
@@ -163,7 +163,7 @@ namespace UI
 
         int img = I_BG;
         dc.draw()->drawImageStretch(img, dc.getBounds());
-        float t = time_now();
+        float t = TimeNow();
         for (int i = 0; i < 100; i++) {
             float x = xbase[i] + dc.getBounds().x;
             float y = ybase[i] + dc.getBounds().y + 40 * cosf(i * 7.2f + t * 1.3f);

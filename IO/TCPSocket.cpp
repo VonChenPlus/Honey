@@ -42,7 +42,7 @@ namespace IO
     }
 
     TCPSocket::TCPSocket(int sock, bool closeSock)
-        : Socket(sock)
+        : sock_(sock)
         , closeSock_(closeSock) {
     }
 
@@ -50,8 +50,7 @@ namespace IO
         : closeSock_(true) {
         initSockets();
 
-        int sock;
-        if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+        if ((sock_ = socket(AF_INET, SOCK_STREAM, 0)) < 0)
             throw _NException_(StringFromFormat("unable to create socket, errorNumber = %d", errorNumber), NException::IO);
 
         #ifndef WIN32
@@ -78,12 +77,12 @@ namespace IO
         }
 
         // Attempt to connect to the remote host
-        if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
+        if (connect(sock_, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
             throw _NException_(StringFromFormat("unable to connect to host, errorNumber = %d", errorNumber), NException::IO);
         }
 
         // Disable Nagle's algorithm, to reduce latency
-        enableNagles(sock, false);
+        enableNagles(sock_, false);
     }
 
     TCPSocket::~TCPSocket() {
@@ -160,7 +159,7 @@ namespace IO
 
     void TCPSocket::shutdown()
     {
-        Socket::shutdown();
+        shutdowned_ = true;
         ::shutdown(getSock(), 2);
     }
 

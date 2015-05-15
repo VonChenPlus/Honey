@@ -23,7 +23,7 @@ namespace UTILS
         double frequencyMult;
         LARGE_INTEGER startTime;
 
-        double real_time_now() {
+        double FetchCurrentTime() {
             if (frequency.QuadPart == 0) {
                 QueryPerformanceFrequency(&frequency);
                 QueryPerformanceCounter(&startTime);
@@ -41,7 +41,7 @@ namespace UTILS
         uint64 _frequency = 0;
         uint64 _starttime = 0;
 
-        double real_time_now() {
+        double FetchCurrentTime() {
             static time_t start;
             struct timeval tv;
             gettimeofday(&tv, NULLPTR);
@@ -54,32 +54,24 @@ namespace UTILS
 
         #endif
 
-        void time_update() {
-            curtime = real_time_now();
+        void TimeUpdate() {
+            curtime = FetchCurrentTime();
             curtime_f = (float)curtime;
-
-            //printf("curtime: %f %f\n", curtime, curtime_f);
-            // also smooth time.
-            //curtime+=float((double) (time-_starttime) / (double) _frequency);
-            //curtime*=0.5f;
-            //curtime+=1.0f/60.0f;
-            //lastTime=curtime;
-            //curtime_f = (float)curtime;
         }
 
-        float time_now() {
+        float TimeNow() {
             return curtime_f;
         }
 
-        double time_now_d() {
+        double TimeNowD() {
             return curtime;
         }
 
-        int time_now_ms() {
+        int TimeNow_MS() {
             return int(curtime*1000.0);
         }
 
-        void sleep_ms(int ms) {
+        void Sleep_MS(int ms) {
             #ifdef _WIN32
             #ifndef METRO
                 Sleep(ms);

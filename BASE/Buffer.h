@@ -12,7 +12,7 @@ class Buffer
 {
 public:
     Buffer();
-    ~Buffer();
+    virtual ~Buffer();
 
     // Write max [length] bytes to the returned pointer.
     // Any other operation on this Buffer invalidates the pointer.
@@ -56,28 +56,12 @@ public:
     // Only to be used for debugging, since it might not be fast at all.
     void peekAll(std::string *dest);
 
-    // Simple I/O.
-
-    // Writes the entire buffer to the file descriptor. Also resets the
-    // size to zero. On failure, data remains in buffer and nothing is
-    // written.
-    void flush(int fd);
-    void flushToFile(const char *filename);
-    void flushSocket(UIntPtr sock);  // Windows portability
-
-    void readAll(int fd, int hintSize = 0);
-    void readAllWithProgress(int fd, int knownSize, float *progress);
-
-    // < 0: error
-    // >= 0: number of bytes read
-    int read(int fd, Size sz);
-
     // Utilities. Try to avoid checking for size.
     Size size() const { return data_.size(); }
     bool empty() const { return size() == 0; }
     void clear() { data_.resize(0); }
 
-private:
+protected:
     // TODO: Find a better internal representation, like a cord.
     std::vector<char> data_;
 

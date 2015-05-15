@@ -8,7 +8,7 @@
 #include "MATH/Bounds.h"
 using MATH::Bounds;
 #include "UTILS/TIME/Time.h"
-using UTILS::TIME::time_now_d;
+using UTILS::TIME::TimeNowD;
 #include "UI/UI.h"
 #include "MATH/Point.h"
 using MATH::Point;
@@ -133,7 +133,7 @@ namespace UI
                 HeldKey hk;
                 hk.key = key.keyCode;
                 hk.deviceId = key.deviceId;
-                hk.triggerTime = time_now_d() + repeatDelay;
+                hk.triggerTime = TimeNowD() + repeatDelay;
 
                 // Check if the key is already held. If it is, ignore it. This is to avoid
                 // multiple key repeat mechanisms colliding.
@@ -217,7 +217,7 @@ namespace UI
     }
 
     static void ProcessHeldKeys(ViewGroup *root) {
-        double now = time_now_d();
+        double now = TimeNowD();
 
     restart:
 

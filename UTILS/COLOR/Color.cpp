@@ -4,6 +4,14 @@ namespace UTILS
 {
     namespace COLOR
     {
+        Color DarkenColor(Color color) {
+            return (color & 0xFF000000) | ((color >> 1)&0x7F7F7F);
+        }
+
+        Color WhitenColor(Color color) {
+            return ((color & 0xFF000000) | ((color >> 1)&0x7F7F7F)) + 0x7F7F7F;
+        }
+
         uint32 WhiteAlpha(float alpha) {
             if (alpha < 0.0f) alpha = 0.0f;
             if (alpha > 1.0f) alpha = 1.0f;

@@ -19,11 +19,11 @@ SOURCES += \
     $$P/UI/*.cpp \
     $$P/IO/*.cpp \
     $$P/UI/CONTROLS/*.cpp \
-    $$P/UTILS/TEXT/UTF8.cpp \
-    $$P/UTILS/HASH/Hash.cpp \
-    $$P/UTILS/STRING/String.cpp \
-    $$P/UTILS/TIME/Time.cpp \
-    $$P/UTILS/COLOR/Color.cpp
+    $$P/UTILS/TEXT/*.cpp \
+    $$P/UTILS/HASH/*.cpp \
+    $$P/UTILS/STRING/*.cpp \
+    $$P/UTILS/TIME/*.cpp \
+    $$P/UTILS/COLOR/*.cpp
 
 HEADERS += \
     $$P/BASE/*.h \
@@ -34,11 +34,10 @@ HEADERS += \
     $$P/UI/*.h \
     $$P/IO/*.h \
     $$P/UI/CONTROLS/*.h \
-    $$P/UTILS/TEXT/UTF8.h \
-    $$P/UTILS/TEXT/UTF16.h \
-    $$P/UTILS/STRING/String.h \
-    $$P/UTILS/TIME/Time.h \
-    $$P/UTILS/COLOR/Color.h \
+    $$P/UTILS/TEXT/*.h \
+    $$P/UTILS/STRING/*.h \
+    $$P/UTILS/TIME/*.h \
+    $$P/UTILS/COLOR/*.h \
     $$P/UTILS/RANDOM/*.h
     
 # Zlib

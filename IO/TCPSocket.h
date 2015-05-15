@@ -1,28 +1,30 @@
 #ifndef TCPSOCKET_H
 #define TCPSOCKET_H
 
-#include "IO/Socket.h"
+#include <string>
 
 namespace IO
 {
-    class TCPSocket final: public Socket
+    class TCPSocket
     {
     public:
         TCPSocket(int sock, bool closeSock);
         TCPSocket(const char *host, int port);
         ~TCPSocket();
 
-        virtual std::string getAddress() override;
-        virtual int getPort() override;
-        virtual std::string getEndpoint() override;
+        int getSock() {return sock_;}
 
-        virtual std::string getPeerAddress() override;
-        virtual int getPeerPort() override;
-        virtual std::string getPeerEndpoint() override;
+        virtual std::string getAddress();
+        virtual int getPort();
+        virtual std::string getEndpoint();
 
-        virtual bool sameMachine() override;
+        virtual std::string getPeerAddress();
+        virtual int getPeerPort();
+        virtual std::string getPeerEndpoint();
 
-        virtual void shutdown() override;
+        virtual bool sameMachine();
+
+        virtual void shutdown();
 
         static void enableNagles(int sock, bool enable);
         static bool isSocket(int sock);
@@ -30,6 +32,8 @@ namespace IO
         static int getSockPort(int sock);
 
     private:
+        int sock_;
+        bool shutdowned_;
         bool closeSock_;
     };
 }

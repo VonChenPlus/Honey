@@ -109,9 +109,8 @@ namespace IO
             throw _NException_Normal("Error setting socket nonblocking status");
         }
         #else
-        UNUSED(sock);
-        UNUSED(non_blocking);
-        //WLOG("NonBlocking mode not supported on Win32");
+        if (ioctlsocket(sock, FIONBIO, (unsigned long *)&non_blocking) < 0)
+            throw _NException_Normal("Error setting socket nonblocking status");
         #endif
     }
 }
