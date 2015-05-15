@@ -130,7 +130,7 @@ namespace GFX
         // hook for generated textures
         if (!memcmp(filename, "gen:", 4)) {
             int bpp, w, h;
-            bool clamp;
+            bool clamp = false;
             uint8 *data = GenerateTexture(filename, bpp, w, h, clamp);
             if (!data)
                 throw _NException_("GenerateTexture failed", NException::GFX);
@@ -140,7 +140,7 @@ namespace GFX
                 glTexImage2D(GL_TEXTURE_2D, 0, 1, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
             }
             else {
-                //FLOG("unsupported");
+                throw _NException_Normal("unsupported image format!");
             }
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);

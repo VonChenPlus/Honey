@@ -140,7 +140,7 @@ namespace IO
         FILE *file = OpenFile(filename, "rb");
         Size fSize = (Size)GetSize(file);
         uint8 *contents = new uint8[fSize+1];
-        fread(contents, 1, fSize, file);
+        fSize = fread(contents, 1, fSize, file);
         fclose(file);
         contents[fSize] = 0;
         *size = fSize;

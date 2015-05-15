@@ -55,7 +55,7 @@ namespace IO
 
         #ifndef WIN32
           // - By default, close the socket on exec()
-            fcntl(sock, F_SETFD, FD_CLOEXEC);
+            fcntl(sock_, F_SETFD, FD_CLOEXEC);
         #endif
 
         // Try processing the host as an IP address
