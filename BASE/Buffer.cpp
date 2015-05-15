@@ -1,5 +1,6 @@
 #include "Buffer.h"
 
+#include <stdarg.h>
 #include <string.h>
 
 #include "UTILS/STRING/String.h"
