@@ -14,7 +14,7 @@
 #include "IO/SocketUtils.h"
 using IO::WriteLine;
 #include "UTILS/TIME/Time.h"
-using UTILS::TIME::Sleep_MS;
+using UTILS::TIME::SleepThread;
 #include "UTILS/STRING/String.h"
 using UTILS::STRING::StringFromFormat;
 
@@ -51,7 +51,7 @@ namespace IO
 
             // Buffer full, don't spin.
             if (sent == 0) {
-                Sleep_MS(1);
+                SleepThread(1);
             }
         }
         data_.resize(0);

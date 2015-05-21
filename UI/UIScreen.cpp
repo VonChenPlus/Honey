@@ -4,7 +4,6 @@
 #include <queue>
 
 #include "UTILS/TIME/Time.h"
-using UTILS::TIME::TimeNowD;
 using UTILS::TIME::TimeNow;
 #include "UI/KeyCodes.h"
 #include "UI/ScreenManager.h"

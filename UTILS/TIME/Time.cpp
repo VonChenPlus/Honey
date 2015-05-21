@@ -15,7 +15,6 @@ namespace UTILS
     namespace TIME
     {
         static double curtime = 0;
-        static float curtime_f = 0;
 
         #ifdef _WIN32
 
@@ -56,22 +55,13 @@ namespace UTILS
 
         void TimeUpdate() {
             curtime = FetchCurrentTime();
-            curtime_f = (float)curtime;
         }
 
-        float TimeNow() {
-            return curtime_f;
-        }
-
-        double TimeNowD() {
+        double TimeNow() {
             return curtime;
         }
 
-        int TimeNow_MS() {
-            return int(curtime*1000.0);
-        }
-
-        void Sleep_MS(int ms) {
+        void SleepThread(int ms) {
             #ifdef _WIN32
             #ifndef METRO
                 Sleep(ms);

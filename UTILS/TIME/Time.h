@@ -16,13 +16,12 @@ namespace UTILS
         void TimeUpdate();
 
         // Seconds.
-        float TimeNow();
-        double TimeNowD();
+        double TimeNow();
 
         int TimeNow_MS();
 
         // Sleep. Does not necessarily have millisecond granularity, especially on Windows.
-        void Sleep_MS(int ms);
+        void SleepThread(int ms);
     }
 }
 
