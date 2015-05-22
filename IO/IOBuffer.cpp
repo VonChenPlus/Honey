@@ -77,7 +77,7 @@ namespace IO
             else if (retval < 0) {
                 throw _NException_(StringFromFormat("error reading from buffer: %i", retval), NException::IO);
             }
-            char *p = append((Size)retval);
+            char *p = appendBufferSize((Size)retval);
             memcpy(p, &buf[0], retval);
         }
     }
@@ -103,7 +103,7 @@ namespace IO
             else if (retval < 0) {
                 throw _NException_(StringFromFormat("error reading from buffer: %i", retval), NException::IO);
             }
-            char *p = append((Size)retval);
+            char *p = appendBufferSize((Size)retval);
             memcpy(p, &buf[0], retval);
             total += retval;
             *progress = (float)total / (float)knownSize;
@@ -118,7 +118,7 @@ namespace IO
             if (retval < 0) {
                 return retval;
             }
-            char *p = append((Size)retval);
+            char *p = appendBufferSize((Size)retval);
             memcpy(p, buf, retval);
             sz -= retval;
             received += retval;

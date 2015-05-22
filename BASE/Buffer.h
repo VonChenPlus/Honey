@@ -14,47 +14,17 @@ public:
     Buffer();
     virtual ~Buffer();
 
-    // Write max [length] bytes to the returned pointer.
-    // Any other operation on this Buffer invalidates the pointer.
-    char *append(Size length);
-
     // These work pretty much like you'd expect.
-    void append(const char *str);  // str null-terminated. The null is not copied.
-    void append(const std::string &str);
+    void append(const char *data, Size len);
     void append(const Buffer &other);
-
-    // Various types. Useful for varz etc. Appends a string representation of the
-    // value, rather than a binary representation.
+    void appendFormat(const char *fmt, ...);
     void appendValue(int value);
 
-    // Parsing Helpers
-
-    // Use for easy line skipping. If no CRLF within the buffer, returns -1.
-    // If parsing HTML headers, this indicates that you should probably buffer up
-    // more data.
-    int offsetToAfterNextCRLF();
-
     // Takers
-
-    void take(Size length, std::string *dest);
-    void take(Size length, char *dest);
-    void takeAll(std::string *dest) { take(size(), dest); }
-    // On failure, return value < 0 and *dest is unchanged.
-    // Strips off the actual CRLF from the result.
-    int takeLineCRLF(std::string *dest);
+    void take(Size length, char *dest, bool peek = false);
 
     // Skippers
     void skip(Size length);
-    // Returns -1 on failure (no CRLF within sight).
-    // Otherwise returns the length of the line skipped, not including CRLF. Can be 0.
-    int skipLineCRLF();
-
-    // Utility functions.
-    void printf(const char *fmt, ...);
-
-    // Dumps the entire buffer to the string, but keeps it around.
-    // Only to be used for debugging, since it might not be fast at all.
-    void peekAll(std::string *dest);
 
     // Utilities. Try to avoid checking for size.
     Size size() const { return data_.size(); }
@@ -62,6 +32,10 @@ public:
     void clear() { data_.resize(0); }
 
 protected:
+    // Write max [length] bytes to the returned pointer.
+    // Any other operation on this Buffer invalidates the pointer.
+    char *appendBufferSize(Size length);
+
     // TODO: Find a better internal representation, like a cord.
     std::vector<char> data_;
 

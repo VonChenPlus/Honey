@@ -12,88 +12,24 @@ Buffer::Buffer() {
 Buffer::~Buffer() {
 }
 
-char *Buffer::append(Size length) {
+char *Buffer::appendBufferSize(Size length) {
     Size old_size = data_.size();
     data_.resize(old_size + length);
     return &data_[0] + old_size;
 }
 
-void Buffer::append(const std::string &str) {
-    char *ptr = append(str.size());
-    memcpy(ptr, str.data(), str.size());
-}
-
-void Buffer::append(const char *str) {
-    Size len = strlen(str);
-    char *dest = append(len);
-    memcpy(dest, str, len);
+void Buffer::append(const char *data, Size len) {
+    char *dest = appendBufferSize(len);
+    memcpy(dest, data, len);
 }
 
 void Buffer::append(const Buffer &other) {
     Size len = other.size();
-    char *dest = append(len);
+    char *dest = appendBufferSize(len);
     memcpy(dest, &other.data_[0], len);
 }
 
-void Buffer::appendValue(int value) {
-    append(StringFromFormat("%i", value).c_str());
-}
-
-void Buffer::take(Size length, std::string *dest) {
-    if (length > data_.size()) {
-        throw _NException_Normal("truncating length");
-    }
-    dest->resize(length);
-    if (length > 0) {
-        take(length, &(*dest)[0]);
-    }
-}
-
-void Buffer::take(Size length, char *dest) {
-    memcpy(dest, &data_[0], length);
-    data_.erase(data_.begin(), data_.begin() + length);
-}
-
-int Buffer::takeLineCRLF(std::string *dest) {
-    int after_next_line = offsetToAfterNextCRLF();
-    if (after_next_line < 0)
-        return after_next_line;
-    else {
-        take(after_next_line - 2, dest);
-        skip(2);  // Skip the CRLF
-        return after_next_line - 2;
-    }
-}
-
-void Buffer::skip(Size length) {
-    if (length > data_.size()) {
-        throw _NException_Normal("truncating length");
-    }
-    data_.erase(data_.begin(), data_.begin() + length);
-}
-
-int Buffer::skipLineCRLF()
-{
-    int after_next_line = offsetToAfterNextCRLF();
-    if (after_next_line < 0)
-        return after_next_line;
-    else {
-        skip(after_next_line);
-        return after_next_line - 2;
-    }
-}
-
-int Buffer::offsetToAfterNextCRLF()
-{
-    for (int i = 0; i < (int)data_.size() - 1; i++) {
-        if (data_[i] == '\r' && data_[i + 1] == '\n') {
-          return i + 2;
-        }
-    }
-    return -1;
-}
-
-void Buffer::printf(const char *fmt, ...) {
+void Buffer::appendFormat(const char *fmt, ...) {
     char buffer[2048];
     va_list vl;
     va_start(vl, fmt);
@@ -105,12 +41,27 @@ void Buffer::printf(const char *fmt, ...) {
         throw _NException_Normal("vsnprintf failed");
     }
     va_end(vl);
-    char *ptr = append(retval);
+    char *ptr = appendBufferSize(retval);
     memcpy(ptr, buffer, retval);
 }
 
-void Buffer::peekAll(std::string *dest) {
-    dest->resize(data_.size());
-    memcpy(&(*dest)[0], &data_[0], data_.size());
+void Buffer::appendValue(int value) {
+    std::string temp = StringFromFormat("%i", value);
+    append(temp.c_str(), temp.size());
 }
 
+void Buffer::take(Size length, char *dest, bool peek) {
+    if (length > data_.size())
+        throw _NException_Normal("truncating length");
+
+    memcpy(dest, &data_[0], length);
+    if (!peek)
+        data_.erase(data_.begin(), data_.begin() + length);
+}
+
+void Buffer::skip(Size length) {
+    if (length > data_.size()) {
+        throw _NException_Normal("truncating length");
+    }
+    data_.erase(data_.begin(), data_.begin() + length);
+}
