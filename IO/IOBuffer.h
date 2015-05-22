@@ -1,11 +1,11 @@
 #ifndef IOBUFFER_H
 #define IOBUFFER_H
 
-#include "BASE/Buffer.h"
+#include "BASE/NBuffer.h"
 
 namespace IO
 {
-class IOBuffer : public Buffer
+class IOBuffer : public NBuffer
 {
     public:
         IOBuffer();

@@ -1,5 +1,5 @@
-#ifndef BUFFER_H
-#define BUFFER_H
+#ifndef NBUFFER_H
+#define NBUFFER_H
 
 #include <vector>
 #include <string>
@@ -8,15 +8,15 @@
 
 // Acts as a queue. Intended to be as fast as possible for most uses.
 // Does not do synchronization, must use external mutexes.
-class Buffer
+class NBuffer
 {
 public:
-    Buffer();
-    virtual ~Buffer();
+    NBuffer();
+    virtual ~NBuffer();
 
     // These work pretty much like you'd expect.
     void append(const char *data, Size len);
-    void append(const Buffer &other);
+    void append(const NBuffer &other);
     void appendFormat(const char *fmt, ...);
     void appendValue(int value);
 
@@ -39,7 +39,7 @@ protected:
     // TODO: Find a better internal representation, like a cord.
     std::vector<char> data_;
 
-    DISALLOW_COPY_AND_ASSIGN(Buffer)
+    DISALLOW_COPY_AND_ASSIGN(NBuffer)
 };
 
-#endif // BUFFER_H
+#endif // NBUFFER_H

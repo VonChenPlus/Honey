@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <iomanip>
 
-#include "BASE/Buffer.h"
+#include "BASE/NBuffer.h"
 
 namespace UTILS
 {
@@ -88,7 +88,7 @@ namespace UTILS
         }
 
         void DataToHexString(const uint8 *data, Size size, std::string *output) {
-            Buffer buffer;
+            NBuffer buffer;
             for (Size i = 0; i < size; i++) {
                 buffer.appendFormat("%02x ", data[i]);
                 if (i && !(i & 15))
