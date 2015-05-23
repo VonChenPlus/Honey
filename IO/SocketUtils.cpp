@@ -6,6 +6,7 @@
 #ifndef _WIN32
 #include <unistd.h>
 #include <sys/select.h>
+#include <sys/socket.h>
 #else
 #include <io.h>
 #include <winsock2.h>
@@ -13,66 +14,38 @@
 #include <fcntl.h>
 #include <string.h>
 
+#include "UTILS/STRING/String.h"
+using UTILS::STRING::StringFromFormat;
+
 namespace IO
 {
-    // Slow as hell and should only be used for prototyping.
-    // Reads from a socket, up to an '\n'. This means that if the line ends
-    // with '\r', the '\r' will be returned.
-    Size ReadLine(int fd, char *vptr, Size buf_size) {
-        char *buffer = vptr;
-        Size n;
-        for (n = 1; n < buf_size; n++) {
-            char c;
-            int rc;
-            if ((rc = read(fd, &c, 1)) == 1) {
-                *buffer++ = c;
-                if (c == '\n')
-                    break;
-            }
-            else if (rc == 0) {
-                if (n == 1)
-                    return 0;
-                else
-                    break;
-            }
-            else {
-                if (errno == EINTR)
-                    continue;
-                //FLOG("Error in Readline()");
-            }
+    void ReadWithProgress(int fd, size_t length, NBuffer &buffer, float *progress) {
+        std::vector<NBYTE> buf;
+        if (length >= 1024 * 64 * 16) {
+            buf.resize(1024 * 64);
+        }
+        else if (length >= 1024 * 16) {
+            buf.resize(length / 16);
+        }
+        else {
+            buf.resize(1024);
         }
 
-        *buffer = 0;
-        return n;
-    }
-
-    // Misnamed, it just writes raw data in a retry loop.
-    Size WriteLine(int fd, const char *vptr, Size n) {
-        const char *buffer = vptr;
-        Size nleft = n;
-
-        while (nleft > 0) {
-            int nwritten;
-            if ((nwritten = (int)write(fd, buffer, (unsigned int)nleft)) <= 0) {
-                if (errno == EINTR)
-                    nwritten = 0;
-              //else
-              //  FLOG("Error in Writeline()");
+        int total = 0;
+        while (true) {
+            int retval = recv(fd, &buf[0], (int)buf.size(), 0);
+            if (retval == 0) {
+                return;
+            }
+            else if (retval < 0) {
+                throw _NException_(StringFromFormat("error reading from buffer: %i", retval), NException::IO);
             }
 
-            nleft  -= nwritten;
-            buffer += nwritten;
+            buffer.append(&buf[0], retval);
+            total += retval;
+            if (progress)
+                *progress = (float)total / (float)length;
         }
-
-        return n;
-    }
-
-    Size WriteLine(int fd, const char *buffer) {
-        return WriteLine(fd, buffer, strlen(buffer));
-    }
-
-    Size Write(int fd, const std::string &str) {
-        return WriteLine(fd, str.c_str(), str.size());
     }
 
     void WaitUntilReady(int fd, double timeout) {
@@ -87,7 +60,8 @@ namespace IO
         int rval = select(fd + 1, &fds, NULLPTR, NULLPTR, &tv);
         if (rval < 0) {
             throw _NException_("Error calling select", NException::IO);
-        } else if (rval == 0) {
+        }
+        else if (rval == 0) {
             throw _NException_("Timeout", NException::IO);
         }
     }
@@ -110,7 +84,7 @@ namespace IO
         }
         #else
         if (ioctlsocket(sock, FIONBIO, (unsigned long *)&non_blocking) < 0)
-            throw _NException_Normal("Error setting socket nonblocking status");
+            throw _NException_("Error setting socket nonblocking status", NException::IO);
         #endif
     }
 }

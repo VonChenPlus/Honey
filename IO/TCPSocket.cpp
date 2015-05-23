@@ -170,20 +170,17 @@ namespace IO
         }
     }
 
-    bool TCPSocket::isSocket(int sock)
-    {
+    bool TCPSocket::isSocket(int sock) {
         struct sockaddr_in info;
         SOCKLEN info_size = sizeof(info);
         return getsockname(sock, (struct sockaddr *)&info, &info_size) >= 0;
     }
 
-    bool TCPSocket::isConnected(int sock)
-    {
+    bool TCPSocket::isConnected(int sock) {
         struct sockaddr_in info;
         SOCKLEN info_size = sizeof(info);
         return getpeername(sock, (struct sockaddr *)&info, &info_size) >= 0;
     }
-
 
     int TCPSocket::getSockPort(int sock) {
         struct sockaddr_in info;

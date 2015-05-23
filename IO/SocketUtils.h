@@ -1,18 +1,14 @@
 #ifndef SOCKETUTILS_H
 #define SOCKETUTILS_H
 
-#include "BASE/Native.h"
 #include <string>
+
+#include "BASE/Native.h"
+#include "BASE/NBuffer.h"
 
 namespace IO
 {
-    // Slow as hell and should only be used for prototyping.
-    Size ReadLine(int fd, char *buffer, Size buf_size);
-
-    // Decently fast.
-    Size WriteLine(int fd, const char *buffer, Size buf_size);
-    Size WriteLine(int fd, const char *buffer);
-    Size Write(int fd, const std::string &str);
+    void ReadWithProgress(int fd, int length, NBuffer &buffer, float *progress);
 
     // Returns true if the fd became ready, false if it didn't or
     // if there was another error.

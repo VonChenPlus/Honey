@@ -15,16 +15,17 @@ public:
     virtual ~NBuffer();
 
     // These work pretty much like you'd expect.
-    void append(const char *data, Size len);
+    virtual void append(const NBYTE *data, Size len);
     void append(const NBuffer &other);
-    void appendFormat(const char *fmt, ...);
+    void appendFormat(const NBYTE *fmt, ...);
     void appendValue(int value);
 
     // Takers
-    void take(Size length, char *dest, bool peek = false);
+    virtual void take(Size length, NBYTE *dest);
+    virtual void peek(Size length, NBYTE *dest);
 
     // Skippers
-    void skip(Size length);
+    virtual void skip(Size length);
 
     // Utilities. Try to avoid checking for size.
     Size size() const { return data_.size(); }
@@ -34,10 +35,10 @@ public:
 protected:
     // Write max [length] bytes to the returned pointer.
     // Any other operation on this Buffer invalidates the pointer.
-    char *appendBufferSize(Size length);
+    NBYTE *appendBufferSize(Size length);
 
     // TODO: Find a better internal representation, like a cord.
-    std::vector<char> data_;
+    std::vector<NBYTE> data_;
 
     DISALLOW_COPY_AND_ASSIGN(NBuffer)
 };
