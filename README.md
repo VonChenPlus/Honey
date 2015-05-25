@@ -5,9 +5,11 @@ This is my library of stuff that I use when writing C++ programs.
 
 Features
 --------
-* OpenGL utility code, like compressed texture loading(almost from Henrik Rydgård).
-* 2D texture atlases and drawing code(almost from Henrik Rydgård).
-* ETC1 texture save/load support(almost from Henrik Rydgård).
+* Smart Graph Frame (almost from [Henrik Rydgård](https://travis-ci.org/VonChenPlus/Hive)).
+* LocalFile IO and Socket IO.
+* Smart Pointer.
+* Math Library.
+* Some Utils.
 
 Licenses
 --------
