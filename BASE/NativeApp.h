@@ -2,7 +2,7 @@
 #define NATIVEAPP_H
 
 #include <string>
-#include "UI/InputState.h"
+#include "SGF/UI/InputState.h"
 
 // The Native App API.
 //

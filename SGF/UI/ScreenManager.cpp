@@ -1,8 +1,8 @@
 #include "BASE/Native.h"
-#include "UI/ScreenManager.h"
-#include "UI/Screen.h"
-#include "UI/InputState.h"
-#include "UI/View.h"
+#include "SGF/UI/ScreenManager.h"
+#include "SGF/UI/Screen.h"
+#include "SGF/UI/InputState.h"
+#include "SGF/UI/View.h"
 
 namespace UI
 {

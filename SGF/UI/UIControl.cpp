@@ -1,15 +1,15 @@
 #include <queue>
 #include <set>
 
-#include "UI/ViewGroup.h"
+#include "SGF/UI/ViewGroup.h"
 #include "BASE/Mutex.h"
-#include "UI/InputState.h"
-#include "UI/KeyCodes.h"
+#include "SGF/UI/InputState.h"
+#include "SGF/UI/KeyCodes.h"
 #include "MATH/Bounds.h"
 using MATH::Bounds;
 #include "UTILS/TIME/NTime.h"
 using UTILS::TIME::TimeNow;
-#include "UI/UI.h"
+#include "SGF/UI/UI.h"
 #include "MATH/Point.h"
 using MATH::Point;
 

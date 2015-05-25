@@ -1,8 +1,8 @@
 #ifndef UISCREEN_H
 #define UISCREEN_H
 
-#include "UI/Screen.h"
-#include "UI/ViewGroup.h"
+#include "SGF/UI/Screen.h"
+#include "SGF/UI/ViewGroup.h"
 
 namespace UI
 {

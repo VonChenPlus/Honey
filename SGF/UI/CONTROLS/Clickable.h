@@ -1,7 +1,7 @@
 #ifndef CLICKABLE_H
 #define CLICKABLE_H
 
-#include "UI/View.h"
+#include "SGF/UI/View.h"
 
 namespace UI
 {

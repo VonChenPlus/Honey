@@ -5,8 +5,8 @@
 
 #include "UTILS/TIME/NTime.h"
 using UTILS::TIME::TimeNow;
-#include "UI/KeyCodes.h"
-#include "UI/ScreenManager.h"
+#include "SGF/UI/KeyCodes.h"
+#include "SGF/UI/ScreenManager.h"
 #include "UTILS/RANDOM/GMRandom.h"
 using UTILS::RANDOM::GMRandom;
 #include "UTILS/COLOR/Color.h"

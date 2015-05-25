@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "GFX/GLState.h"
+#include "SGF/GFX/GLState.h"
 #include "IMAGE/TinyZim.h"
 using IMAGE::ZIM_CLAMP;
 using IMAGE::ZIM_HAS_MIPS;
@@ -14,14 +14,14 @@ using IMAGE::ZIM_RGBA8888;
 using IMAGE::ZIM_RGBA4444;
 using IMAGE::ZIM_RGB565;
 using IMAGE::ZIM_ETC1;
-#include "GFX/GLDebug.h"
+#include "SGF/GFX/GLDebug.h"
 #include "BASE/Native.h"
 #include "IMAGE/TinyPNG.h"
 using IMAGE::PNGLoad;
 using IMAGE::PNGLoadPtr;
 #include "EXTERNALS/jpge/jpgd.h"
 #include "EXTERNALS/rg_etc1/rg_etc1.h"
-#include "GFX/GLExtensions.h"
+#include "SGF/GFX/GLExtensions.h"
 #include "UTILS/STRING/NString.h"
 using UTILS::STRING::StringFromFormat;
 

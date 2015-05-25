@@ -2,7 +2,7 @@
 #define SCREEN_H
 
 #include "BASE/Native.h"
-#include "UI/InputState.h"
+#include "SGF/UI/InputState.h"
 
 namespace UI
 {

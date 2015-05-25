@@ -4,13 +4,13 @@
 #include <string>
 
 #include "BASE/Native.h"
-#include "UI/InputState.h"
+#include "SGF/UI/InputState.h"
 #include "MATH/Bounds.h"
 #include "MATH/Matrix.h"
 #include "BASE/SmartPtr.h"
-#include "UI/UIContext.h"
-#include "UI/Theme.h"
-#include "UI/Event.h"
+#include "SGF/UI/UIContext.h"
+#include "SGF/UI/Theme.h"
+#include "SGF/UI/Event.h"
 
 namespace UI
 {

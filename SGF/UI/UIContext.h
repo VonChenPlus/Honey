@@ -4,9 +4,9 @@
 #include <vector>
 
 #include "MATH/Bounds.h"
-#include "THIN3D/Thin3D.h"
-#include "GFX/DrawBuffer.h"
-#include "GFX/TextDrawer.h"
+#include "SGF/THIN3D/Thin3D.h"
+#include "SGF/GFX/DrawBuffer.h"
+#include "SGF/GFX/TextDrawer.h"
 
 namespace UI
 {

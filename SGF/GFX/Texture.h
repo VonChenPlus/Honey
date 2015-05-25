@@ -4,8 +4,8 @@
 #include <string>
 
 #include "BASE/Native.h"
-#include "GFX/GfxResourceHolder.h"
-#include "GFX/Atlas.h"
+#include "SGF/GFX/GfxResourceHolder.h"
+#include "SGF/GFX/Atlas.h"
 
 namespace GFX
 {

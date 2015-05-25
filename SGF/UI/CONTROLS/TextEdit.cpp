@@ -1,8 +1,8 @@
 #include "TextEdit.h"
 #include "MATH/Bounds.h"
 using MATH::Bounds;
-#include "UI/KeyCodes.h"
-#include "GFX/DrawBuffer.h"
+#include "SGF/UI/KeyCodes.h"
+#include "SGF/GFX/DrawBuffer.h"
 using GFX::ALIGN_CENTER;
 using GFX::ALIGN_VCENTER;
 using GFX::ALIGN_LEFT;

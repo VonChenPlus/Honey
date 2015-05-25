@@ -1,5 +1,5 @@
 #include "Button.h"
-#include "GFX/Atlas.h"
+#include "SGF/GFX/Atlas.h"
 using GFX::AtlasImage;
 using GFX::ALIGN_CENTER;
 

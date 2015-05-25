@@ -1,7 +1,7 @@
 #ifndef VIEWGROUP_H
 #define VIEWGROUP_H
 
-#include "UI/View.h"
+#include "SGF/UI/View.h"
 
 namespace UI
 {

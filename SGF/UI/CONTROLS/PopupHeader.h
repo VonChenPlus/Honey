@@ -1,7 +1,7 @@
 #ifndef POPUPHEADER_H
 #define POPUPHEADER_H
 
-#include "UI/View.h"
+#include "SGF/UI/View.h"
 
 namespace UI
 {

@@ -3,10 +3,10 @@
 
 #include <map>
 
-#include "THIN3D/Thin3D.h"
-#include "GFX/GLCommon.h"
-#include "GFX/GLState.h"
-#include "GFX/GfxResourceHolder.h"
+#include "SGF/THIN3D/Thin3D.h"
+#include "SGF/GFX/GLCommon.h"
+#include "SGF/GFX/GLState.h"
+#include "SGF/GFX/GfxResourceHolder.h"
 #include "MATH/Matrix.h"
 
 namespace THIN3D

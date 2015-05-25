@@ -1,8 +1,8 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-#include "UI/CONTROLS/Clickable.h"
-#include "GFX/Texture.h"
+#include "SGF/UI/CONTROLS/Clickable.h"
+#include "SGF/GFX/Texture.h"
 
 namespace UI
 {

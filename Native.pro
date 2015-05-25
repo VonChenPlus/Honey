@@ -12,13 +12,13 @@ INCLUDEPATH += $$P
 
 SOURCES += \
     $$P/BASE/*.cpp \
-    $$P/GFX/*.cpp \
+    $$P/SGF/GFX/*.cpp \
+    $$P/SGF/THIN3D/*.cpp \
+    $$P/SGF/UI/*.cpp \
+    $$P/SGF/UI/CONTROLS/*.cpp \
     $$P/IMAGE/*.cpp \
     $$P/MATH/*.cpp \
-    $$P/THIN3D/*.cpp \
-    $$P/UI/*.cpp \
     $$P/IO/*.cpp \
-    $$P/UI/CONTROLS/*.cpp \
     $$P/UTILS/TEXT/*.cpp \
     $$P/UTILS/HASH/*.cpp \
     $$P/UTILS/STRING/*.cpp \
@@ -27,13 +27,13 @@ SOURCES += \
 
 HEADERS += \
     $$P/BASE/*.h \
-    $$P/GFX/*.h \
+    $$P/SGF/GFX/*.h \
+    $$P/SGF/THIN3D/*.h \
+    $$P/SGF/UI/*.h \
+    $$P/SGF/UI/CONTROLS/*.h \
     $$P/IMAGE/*.h \
     $$P/MATH/*.h \
-    $$P/THIN3D/*.h \
-    $$P/UI/*.h \
     $$P/IO/*.h \
-    $$P/UI/CONTROLS/*.h \
     $$P/UTILS/TEXT/*.h \
     $$P/UTILS/STRING/*.h \
     $$P/UTILS/TIME/*.h \

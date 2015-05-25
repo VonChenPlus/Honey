@@ -1,7 +1,7 @@
 #ifndef UI_H
 #define UI_H
 
-#include "UI/InputState.h"
+#include "SGF/UI/InputState.h"
 
 namespace UI
 {

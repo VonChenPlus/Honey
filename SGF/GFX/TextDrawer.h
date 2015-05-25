@@ -4,8 +4,8 @@
 #include <map>
 
 #include "BASE/Native.h"
-#include "THIN3D/Thin3D.h"
-#include "GFX/DrawBuffer.h"
+#include "SGF/THIN3D/Thin3D.h"
+#include "SGF/GFX/DrawBuffer.h"
 #include "MATH/Bounds.h"
 
 namespace GFX

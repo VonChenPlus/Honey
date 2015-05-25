@@ -3,10 +3,10 @@
 
 #include "MATH/Matrix.h"
 #include "MATH/Bounds.h"
-#include "THIN3D/Thin3D.h"
-#include "GFX/Texture.h"
+#include "SGF/THIN3D/Thin3D.h"
+#include "SGF/GFX/Texture.h"
 #include "UTILS/COLOR/Color.h"
-#include "GFX/Atlas.h"
+#include "SGF/GFX/Atlas.h"
 
 namespace GFX
 {

@@ -1,4 +1,4 @@
-#include "GFX/TextDrawer.h"
+#include "SGF/GFX/TextDrawer.h"
 using THIN3D::Thin3DContext;
 using THIN3D::LINEAR2D;
 using THIN3D::RGBA4444;

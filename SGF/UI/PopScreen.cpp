@@ -1,7 +1,7 @@
 #include "PopScreen.h"
-#include "UI/KeyCodes.h"
-#include "UI/ScreenManager.h"
-#include "UI/CONTROLS/PopupHeader.h"
+#include "SGF/UI/KeyCodes.h"
+#include "SGF/UI/ScreenManager.h"
+#include "SGF/UI/CONTROLS/PopupHeader.h"
 
 namespace UI
 {

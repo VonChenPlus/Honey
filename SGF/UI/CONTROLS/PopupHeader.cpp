@@ -1,5 +1,5 @@
 #include "PopupHeader.h"
-#include "GFX/Atlas.h"
+#include "SGF/GFX/Atlas.h"
 using GFX::ALIGN_LEFT;
 using GFX::ALIGN_VCENTER;
 

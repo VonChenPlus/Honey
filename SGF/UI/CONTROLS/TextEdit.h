@@ -1,7 +1,7 @@
 #ifndef TEXTEDIT_H
 #define TEXTEDIT_H
 
-#include "UI/View.h"
+#include "SGF/UI/View.h"
 
 namespace UI
 {

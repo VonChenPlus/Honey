@@ -2,10 +2,10 @@
 #define SCREENMANAGER_H
 
 #include <vector>
-#include "UI/InputState.h"
-#include "UI/UIContext.h"
-#include "THIN3D/Thin3D.h"
-#include "UI/Screen.h"
+#include "SGF/UI/InputState.h"
+#include "SGF/UI/UIContext.h"
+#include "SGF/THIN3D/Thin3D.h"
+#include "SGF/UI/Screen.h"
 
 namespace UI
 {

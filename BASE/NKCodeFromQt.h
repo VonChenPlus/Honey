@@ -1,6 +1,6 @@
 #include "BASE/ConstMap.h"
 #include <map>
-#include "UI/KeyCodes.h"
+#include "SGF/UI/KeyCodes.h"
 using namespace UI;
 
 // TODO: Add any missing keys 

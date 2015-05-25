@@ -10,9 +10,9 @@ using GFX::TextDrawer;
 using THIN3D::T3DRenderState;
 using THIN3D::T3DCullMode;
 using GFX::FLAG_DYNAMIC_ASCII;
-#include "UI/InputState.h"
-#include "UI/UI.h"
-#include "UI/View.h"
+#include "SGF/UI/InputState.h"
+#include "SGF/UI/UI.h"
+#include "SGF/UI/View.h"
 
 namespace GLOBAL
 {

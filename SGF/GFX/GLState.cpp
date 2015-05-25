@@ -5,7 +5,7 @@
 #endif
 
 #include "BASE/Native.h"
-#include "GFX/GLExtensions.h"
+#include "SGF/GFX/GLExtensions.h"
 #include "UTILS/STRING/NString.h"
 using UTILS::STRING::StringFromFormat;
 
