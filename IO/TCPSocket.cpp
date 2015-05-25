@@ -9,7 +9,8 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <linux/tcp.h>
+#include <netinet/tcp.h>
+#include <errno.h>
 #define SOCKLEN socklen_t
 #define errorNumber errno
 #else

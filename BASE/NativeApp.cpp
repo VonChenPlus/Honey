@@ -70,7 +70,6 @@ namespace GLOBAL
     float &pixelInDPS() { return _PixelInDPS; }
 }
 
-static bool resized = false;
 static recursive_mutex pendingMutex;
 struct PendingMessage {
     std::string msg;

@@ -74,6 +74,8 @@ namespace GFX
     #ifdef _WIN32
         if (wglSwapIntervalEXT)
             wglSwapIntervalEXT(interval);
+    #else
+        UNUSED(interval);
     #endif
     }
 

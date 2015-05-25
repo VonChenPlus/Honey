@@ -148,7 +148,6 @@ namespace THIN3D
     private:
         GLuint shader_;
         GLuint type_;
-        bool ok_;
         std::string source_;  // So we can recompile in case of context loss.
     };
 
