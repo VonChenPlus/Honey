@@ -14,7 +14,7 @@
 #include <fcntl.h>
 #include <string.h>
 
-#include "UTILS/STRING/String.h"
+#include "UTILS/STRING/NString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace IO

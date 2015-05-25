@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "EXTERNALS/libpng17/png.h"
-#include "UTILS/STRING/String.h"
+#include "UTILS/STRING/NString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace IMAGE

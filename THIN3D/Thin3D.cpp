@@ -11,7 +11,7 @@ using IMAGE::PNGLoadPtr;
 #include "EXTERNALS/jpge/jpgd.h"
 #include "IO/FileUtils.h"
 using IO::ReadLocalFile;
-#include "UTILS/STRING/String.h"
+#include "UTILS/STRING/NString.h"
 using UTILS::STRING::StringFromFormat;
 #include <QImage>
 

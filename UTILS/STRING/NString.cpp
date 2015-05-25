@@ -1,4 +1,4 @@
-#include "String.h"
+#include "NString.h"
 
 #ifdef _WIN32
 #include <windows.h>

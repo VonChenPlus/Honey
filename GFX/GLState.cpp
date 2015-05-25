@@ -6,7 +6,7 @@
 
 #include "BASE/Native.h"
 #include "GFX/GLExtensions.h"
-#include "UTILS/STRING/String.h"
+#include "UTILS/STRING/NString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace GLOBAL

@@ -27,7 +27,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
 #ifdef _WIN32
 using UTILS::TEXT::ConvertWStringToUTF8;
 #endif
-#include "UTILS/STRING/String.h"
+#include "UTILS/STRING/NString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace IO

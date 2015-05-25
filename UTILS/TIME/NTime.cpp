@@ -1,4 +1,4 @@
-#include "Time.h"
+#include "NTime.h"
 
 #ifdef _WIN32
 #include <windows.h>

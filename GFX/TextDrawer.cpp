@@ -13,6 +13,7 @@ namespace GFX
         fontScaleX_ = 1.0f;
         fontScaleY_ = 1.0f;
         frameCount_ = 0;
+        UNUSED(ctx_);
     }
 
     TextDrawer::~TextDrawer() {

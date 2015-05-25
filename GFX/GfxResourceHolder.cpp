@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "BASE/Native.h"
-#include "UTILS/STRING/String.h"
+#include "UTILS/STRING/NString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace GFX
