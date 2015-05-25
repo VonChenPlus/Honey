@@ -5,7 +5,7 @@ This is my library of stuff that I use when writing C++ programs.
 
 Features
 --------
-* Smart Graph Frame (almost from [Henrik Rydgård](https://travis-ci.org/VonChenPlus/Hive)).
+* Smart Graph Frame (almost from [Henrik Rydgård](https://github.com/hrydgard)).
 * LocalFile IO and Socket IO.
 * Smart Pointer.
 * Math Library.
