@@ -10,19 +10,16 @@ namespace MATH
         Point() {}
         Point(float x_, float y_) : x(x_), y(y_) {}
 
-        float x;
-        float y;
-
         float distanceTo(const Point &other) const {
             float dx = other.x - x, dy = other.y - y;
             return sqrtf(dx*dx + dy*dy);
         }
 
-        /*
-        FocusDirection directionTo(const Point &other) const {
-            int angle = atan2f(other.y - y, other.x - x) / (2 * M_PI) - 0.125;
+        inline bool equals(const Point &p) const {return x == p.x && y == p.y;}
+        inline Point translate(const Point &p) const {return Point(x + p.x, y + p.y);}
 
-        }*/
+        float x;
+        float y;
     };
 }
 

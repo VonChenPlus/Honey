@@ -299,13 +299,13 @@ namespace IMAGE
         // Really stupid mipmap downsampling - at least it does gamma though.
         for (int y = 0; y < height; y+=2) {
             for (int x = 0; x < width; x+=2) {
-                const uint8_t *tl = image + pitch * y + x*4;
-                const uint8_t *tr = tl + 4;
-                const uint8_t *bl = tl + pitch;
-                const uint8_t *br = bl + 4;
+                const uint8_t *topLeft = image + pitch * y + x*4;
+                const uint8_t *tr = topLeft + 4;
+                const uint8_t *bl = topLeft + pitch;
+                const uint8_t *bottomRight = bl + 4;
                 uint8_t *d = out + ((y/2) * ((width/2)) + x / 2) * 4;
                 for (int c = 0; c < 4; c++) {
-                    d[c] = gamma[degamma[tl[c]] + degamma[tr[c]] + degamma[bl[c]] + degamma[br[c]]];
+                    d[c] = gamma[degamma[topLeft[c]] + degamma[tr[c]] + degamma[bl[c]] + degamma[bottomRight[c]]];
                 }
             }
         }

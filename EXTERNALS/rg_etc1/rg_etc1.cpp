@@ -1301,42 +1301,42 @@ namespace rg_etc1
 
       inline color_quad_u8 get_scaled_color() const
       {
-         int br, bg, bb;
+         int bottomRight, bg, bb;
          if (m_color4)
          {
-            br = m_unscaled_color.r | (m_unscaled_color.r << 4);
+            bottomRight = m_unscaled_color.r | (m_unscaled_color.r << 4);
             bg = m_unscaled_color.g | (m_unscaled_color.g << 4);
             bb = m_unscaled_color.b | (m_unscaled_color.b << 4);
          }
          else
          {
-            br = (m_unscaled_color.r >> 2) | (m_unscaled_color.r << 3);
+            bottomRight = (m_unscaled_color.r >> 2) | (m_unscaled_color.r << 3);
             bg = (m_unscaled_color.g >> 2) | (m_unscaled_color.g << 3);
             bb = (m_unscaled_color.b >> 2) | (m_unscaled_color.b << 3);
          }
-         return color_quad_u8(br, bg, bb);
+         return color_quad_u8(bottomRight, bg, bb);
       }
 
       inline void get_block_colors(color_quad_u8* pBlock_colors)
       {
-         int br, bg, bb;
+         int bottomRight, bg, bb;
          if (m_color4)
          {
-            br = m_unscaled_color.r | (m_unscaled_color.r << 4);
+            bottomRight = m_unscaled_color.r | (m_unscaled_color.r << 4);
             bg = m_unscaled_color.g | (m_unscaled_color.g << 4);
             bb = m_unscaled_color.b | (m_unscaled_color.b << 4);
          }
          else
          {
-            br = (m_unscaled_color.r >> 2) | (m_unscaled_color.r << 3);
+            bottomRight = (m_unscaled_color.r >> 2) | (m_unscaled_color.r << 3);
             bg = (m_unscaled_color.g >> 2) | (m_unscaled_color.g << 3);
             bb = (m_unscaled_color.b >> 2) | (m_unscaled_color.b << 3);
          }
          const int* pInten_table = g_etc1_inten_tables[m_inten_table];
-         pBlock_colors[0].set(br + pInten_table[0], bg + pInten_table[0], bb + pInten_table[0]);
-         pBlock_colors[1].set(br + pInten_table[1], bg + pInten_table[1], bb + pInten_table[1]);
-         pBlock_colors[2].set(br + pInten_table[2], bg + pInten_table[2], bb + pInten_table[2]);
-         pBlock_colors[3].set(br + pInten_table[3], bg + pInten_table[3], bb + pInten_table[3]);
+         pBlock_colors[0].set(bottomRight + pInten_table[0], bg + pInten_table[0], bb + pInten_table[0]);
+         pBlock_colors[1].set(bottomRight + pInten_table[1], bg + pInten_table[1], bb + pInten_table[1]);
+         pBlock_colors[2].set(bottomRight + pInten_table[2], bg + pInten_table[2], bb + pInten_table[2]);
+         pBlock_colors[3].set(bottomRight + pInten_table[3], bg + pInten_table[3], bb + pInten_table[3]);
       }
 
       color_quad_u8 m_unscaled_color;

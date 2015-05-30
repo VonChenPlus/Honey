@@ -43,6 +43,9 @@ namespace MATH
         Point center() const {
             return Point(centerX(), centerY());
         }
+
+        float area() { return w * h; }
+
         Bounds expand(float amount) const {
             return Bounds(x - amount, y - amount, w + amount * 2, h + amount * 2);
         }
