@@ -17,23 +17,16 @@ namespace IO
         timeoutms_ = timeoutms;
     }
 
-    void FDInBuffer::take(Size length, NBYTE *dest) {
-        check(length);
-        NBuffer::take(length, dest);
+    void FDInBuffer::take(Size length, NBYTE *dest, bool wait) {
+        // do not know total buffer size sometimes, so we do not throw exception
+        check(length, wait, false);
+        NBuffer::take(length, dest, wait);
     }
 
-    void FDInBuffer::peek(Size length, NBYTE *dest) {
-        check(length);
-        NBuffer::peek(length, dest);
-    }
-
-    void FDInBuffer::check(Size length, bool wait) {
-        if (length > size()) {
-            overrun(length - size(), wait);
-            if (wait && length > size()) {
-                throw _NException_Normal("truncating length");
-            }
-        }
+    void FDInBuffer::take(Size length, NBuffer &other, bool wait) {
+        // do not know total buffer size sometimes, so we do not throw exception
+        check(length, wait, false);
+        NBuffer::take(length, other, wait);
     }
 
     void FDInBuffer::overrun(Size length, bool wait) {

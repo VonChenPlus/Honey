@@ -41,7 +41,7 @@ namespace IO
                 throw _NException_(StringFromFormat("error reading from buffer: %i", retval), NException::IO);
             }
 
-            buffer.append(&buf[0], retval);
+            buffer.append(retval, &buf[0]);
             total += retval;
             if (progress)
                 *progress = (float)total / (float)length;

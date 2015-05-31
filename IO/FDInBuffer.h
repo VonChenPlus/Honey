@@ -13,12 +13,11 @@ namespace IO
 
         void setTimeout(int timeoutms);
 
-        void take(Size length, NBYTE *dest) override;
-        void peek(Size length, NBYTE *dest) override;
+        void take(Size length, NBYTE *dest, bool wait = true) override;
+        void take(Size length, NBuffer &other, bool wait = true) override;
 
     private:
-        void check(Size length, bool wait = true);
-        void overrun(Size length, bool wait = true);
+        void overrun(Size length, bool wait = true) override;
 
     private:
         int timeoutms_;

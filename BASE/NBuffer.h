@@ -15,24 +15,35 @@ public:
     virtual ~NBuffer();
 
     // These work pretty much like you'd expect.
-    virtual void append(const NBYTE *data, Size len);
+    virtual void append(Size len, const NBYTE *data, bool wait = true);
     void append(const NBuffer &other);
     void appendFormat(const NBYTE *fmt, ...);
     void appendValue(int value);
 
-    // Takers
-    virtual void take(Size length, NBYTE *dest);
-    virtual void peek(Size length, NBYTE *dest);
-
-    // Skippers
-    virtual void skip(Size length);
+    virtual void take(Size length, NBYTE *dest, bool wait = true);
+    virtual void take(Size length, NBuffer &other, bool wait = true);
+    virtual void peek(Size length, NBYTE *dest, bool wait = true);
+    virtual void peek(Size length, NBuffer &other, bool wait = true);
+    virtual void skip(Size length, bool wait = true);
 
     // Utilities. Try to avoid checking for size.
     Size size() const { return data_.size(); }
     bool empty() const { return size() == 0; }
     void clear() { data_.resize(0); }
+    NBYTE *data() { return &data_[0]; }
 
 protected:
+    void check(Size length, bool wait = true, bool throwException = true) {
+        if (length > size()) {
+            overrun(length - size(), wait);
+            if (throwException && wait && length > size()) {
+                throw _NException_Normal("truncating length");
+            }
+        }
+    }
+
+    virtual void overrun(Size, bool = true) {}
+
     // Write max [length] bytes to the returned pointer.
     // Any other operation on this Buffer invalidates the pointer.
     NBYTE *appendBufferSize(Size length);

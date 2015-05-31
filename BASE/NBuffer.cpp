@@ -19,7 +19,7 @@ NBYTE *NBuffer::appendBufferSize(Size length) {
     return &data_[0] + old_size;
 }
 
-void NBuffer::append(const NBYTE *data, Size len) {
+void NBuffer::append(Size len, const NBYTE *data, bool) {
     NBYTE *dest = appendBufferSize(len);
     memcpy(dest, data, len);
 }
@@ -48,10 +48,10 @@ void NBuffer::appendFormat(const NBYTE *fmt, ...) {
 
 void NBuffer::appendValue(int value) {
     std::string temp = StringFromFormat("%i", value);
-    append(temp.c_str(), temp.size());
+    append(temp.size(), temp.c_str());
 }
 
-void NBuffer::take(Size length, NBYTE *dest) {
+void NBuffer::take(Size length, NBYTE *dest, bool) {
     if (length > data_.size()) {
         throw _NException_Normal("truncating length");
     }
@@ -59,14 +59,33 @@ void NBuffer::take(Size length, NBYTE *dest) {
     data_.erase(data_.begin(), data_.begin() + length);
 }
 
-void NBuffer::peek(Size length, NBYTE *dest) {
+void NBuffer::take(Size length, NBuffer &other, bool) {
+    if (length > data_.size()) {
+        throw _NException_Normal("truncating length");
+    }
+
+    other.appendBufferSize(length);
+    memcpy(&other.data_[0], &data_[0], length);
+    data_.erase(data_.begin(), data_.begin() + length);
+}
+
+void NBuffer::peek(Size length, NBYTE *dest, bool) {
     if (length > data_.size()) {
         throw _NException_Normal("truncating length");
     }
     memcpy(dest, &data_[0], length);
 }
 
-void NBuffer::skip(Size length) {
+void NBuffer::peek(Size length, NBuffer &other, bool) {
+    if (length > data_.size()) {
+        throw _NException_Normal("truncating length");
+    }
+
+    other.appendBufferSize(length);
+    memcpy(&other.data_[0], &data_[0], length);
+}
+
+void NBuffer::skip(Size length, bool) {
     if (length > data_.size()) {
         throw _NException_Normal("truncating length");
     }
