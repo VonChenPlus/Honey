@@ -1,23 +1,20 @@
-#ifndef SOCKINBUFFER_H
-#define SOCKINBUFFER_H
+#ifndef FDINBUFFER_H
+#define FDINBUFFER_H
 
 #include "BASE/NBuffer.h"
 
 namespace IO
 {
-    class SockInBuffer final: protected NBuffer
+    class FDInBuffer final: protected NBuffer
     {
     public:
-        SockInBuffer(int sock);
-        ~SockInBuffer();
+        FDInBuffer(int fd);
+        ~FDInBuffer();
 
         void setTimeout(int timeoutms);
 
         void take(Size length, NBYTE *dest) override;
         void peek(Size length, NBYTE *dest) override;
-
-        // Skippers
-        void skip(Size length) override;
 
     private:
         void check(Size length, bool wait = true);
@@ -25,8 +22,8 @@ namespace IO
 
     private:
         int timeoutms_;
-        int sock_;
+        int fd_;
     };
 }
 
-#endif // SOCKINBUFFER_H
+#endif // FDINBUFFER_H
