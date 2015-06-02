@@ -12,8 +12,8 @@ namespace MATH
         Rect() {}
         Rect(Point topLeft_, Point bottomRight_) : topLeft(topLeft_), bottomRight(bottomRight_) {}
         Rect(int x1, int y1, int x2, int y2) : topLeft(x1, y1), bottomRight(x2, y2) {}
-        inline void setXYWH(int x, int y, int w, int h) {
-          topLeft.x = x; topLeft.y = y; bottomRight.x = x+w; bottomRight.y = y+h;
+        inline void setRect(int xPos, int yPos, int width, int height) {
+          topLeft.x = xPos; topLeft.y = yPos; bottomRight.x = xPos + width; bottomRight.y = yPos + height;
         }
 
         inline Rect intersect(const Rect &r) const {
@@ -25,7 +25,7 @@ namespace MATH
           return result;
         }
 
-        inline Rect union_boundary(const Rect &r) const {
+        inline Rect unionBoundary(const Rect &r) const {
           if (r.empty()) return *this;
           if (empty()) return r;
           Rect result;
