@@ -14,17 +14,9 @@
 #define THREAD_RETURN void*
 #else
 
-// partial std::thread implementation for win32/pthread
-
-#include <algorithm>
-
 #if (_MSC_VER >= 1600) || (GCC_VERSION >= GCC_VER(4,3,0) && __GXX_EXPERIMENTAL_CXX0X__)
 #define USE_RVALUE_REFERENCES
 #endif
-
-//#ifdef __APPLE__
-//#import <Foundation/NSAutoreleasePool.h>
-//#endif
 
 #if defined(_WIN32)
 // WIN32

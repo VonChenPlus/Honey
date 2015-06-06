@@ -4,6 +4,8 @@
 #include "THREAD/NThreadDef.h"
 #include "THREAD/NThreadUtils.h"
 
+// partial std::thread implementation for win32/pthread
+
 namespace THREAD
 {
     class ThreadID final
