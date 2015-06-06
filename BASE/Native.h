@@ -17,6 +17,9 @@
 
 #endif
 
+#define GCC_VER(x,y,z)	((x) * 10000 + (y) * 100 + (z))
+#define GCC_VERSION GCC_VER(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__)
+
 #ifdef _WIN32
 #pragma warning(disable:4244)
 #pragma warning(disable:4996)
