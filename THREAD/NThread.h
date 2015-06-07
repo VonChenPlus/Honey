@@ -1,6 +1,8 @@
 #ifndef NTHREAD_H
 #define NTHREAD_H
 
+#include <functional>
+
 #include "THREAD/NThreadDef.h"
 #include "THREAD/NThreadUtils.h"
 
@@ -26,8 +28,9 @@ namespace THREAD
     template <typename FuncName>
     class TheadFunc final
     {
-    public:
-        TheadFunc(FuncName func) : func_(func) {}
+        friend class NThread;
+    private:
+        TheadFunc(FuncName&& func) : func_(func) {}
 
         void run() { func_(); }
 
@@ -35,30 +38,37 @@ namespace THREAD
         FuncName func_;
     };
 
-    template <typename FuncName, typename Arg>
-    class TheadFuncWithArg final
+    template <typename Callback>
+    class ThreadFuncWithArgs final
     {
-    public:
-        TheadFuncWithArg(FuncName func, Arg arg) : func_(func), arg_(arg) {}
+        friend class NThread;
+    private:
+        ThreadFuncWithArgs(Callback callback) : callback_(callback) {
+        }
 
-        void run() { func_(arg_); }
+        void run() { callback_();  }
 
     private:
-        FuncName func_;
-        Arg arg_;
+        Callback callback_;
     };
 
     class NThread final
     {
     public:
         template <typename FuncName>
-        NThread(FuncName func) {
+        NThread(FuncName&& func) {
             startThread(new TheadFunc<FuncName>(func));
         }
 
-        template <typename FuncName, typename Arg>
-        NThread(FuncName func, Arg arg) {
-            startThread(new TheadFuncWithArg<FuncName, Arg>(func, arg));
+        //template <typename FuncName, typename Arg>
+        //NThread(FuncName&& func, Arg&& arg) {
+        //    startThread(new TheadFuncWithArg<FuncName, Arg>(func, arg));
+        //}
+
+        template <typename FuncName, typename... Args>
+        NThread(FuncName&& func, Args&&... args) {
+            startThread(CreateCallback(std::bind(func, args...)));
+            //new ThreadFuncWithArgs<FuncName, Args...>(func, (args)...));
         }
 
         ~NThread() {
@@ -103,6 +113,11 @@ namespace THREAD
             static_cast<FuncName *>(funcObj)->run();
             delete static_cast<FuncName *>(funcObj);
             return 0;
+        }
+
+        template <typename Callback>
+        static ThreadFuncWithArgs<Callback> *CreateCallback(Callback&& callback) {
+            return new ThreadFuncWithArgs<Callback>(callback);
         }
 
     private:

@@ -11,7 +11,7 @@ namespace UI
         EventParams e;
         e.v = this;
         OnClick.trigger(e);
-    };
+    }
 
     void Clickable::focusChanged(int focusFlags) {
         if (focusFlags & FF_LOSTFOCUS) {
