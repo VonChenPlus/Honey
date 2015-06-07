@@ -60,15 +60,9 @@ namespace THREAD
             startThread(new TheadFunc<FuncName>(func));
         }
 
-        //template <typename FuncName, typename Arg>
-        //NThread(FuncName&& func, Arg&& arg) {
-        //    startThread(new TheadFuncWithArg<FuncName, Arg>(func, arg));
-        //}
-
         template <typename FuncName, typename... Args>
         NThread(FuncName&& func, Args&&... args) {
             startThread(CreateCallback(std::bind(func, args...)));
-            //new ThreadFuncWithArgs<FuncName, Args...>(func, (args)...));
         }
 
         ~NThread() {
