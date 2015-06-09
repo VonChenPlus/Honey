@@ -7,7 +7,6 @@
 using UTILS::STRING::StringFromFormat;
 
 NBuffer::NBuffer() {
-    data_.resize(10);
 }
 
 NBuffer::~NBuffer() {

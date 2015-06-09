@@ -5,7 +5,8 @@
 namespace IO
 {
     FDInBuffer::FDInBuffer(int fd)
-        : fd_(fd) {
+        : fd_(fd)
+        , timeoutms_(0) {
         if (!TCPSocket::isSocket(fd_))
             throw _NException_Normal("Invalid Sock object!");
     }

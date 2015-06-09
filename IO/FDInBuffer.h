@@ -20,8 +20,8 @@ namespace IO
         void overrun(Size length, bool wait = true) override;
 
     private:
-        int timeoutms_;
         int fd_;
+        int timeoutms_;
     };
 }
 
