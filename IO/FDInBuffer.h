@@ -17,7 +17,7 @@ namespace IO
         void take(Size length, NBuffer &other, bool wait = true) override;
 
     private:
-        void overrun(Size length, bool wait = true) override;
+        void fillBuffer(Size length, bool wait = true) override;
 
     private:
         int fd_;

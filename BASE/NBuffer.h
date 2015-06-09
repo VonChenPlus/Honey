@@ -33,16 +33,16 @@ public:
     NBYTE *data() { return &data_[0]; }
 
 protected:
-    void check(Size length, bool wait = true, bool throwException = true) {
+    void checkBuffer(Size length, bool wait = true, bool throwException = true) {
         if (length > size()) {
-            overrun(length - size(), wait);
+            fillBuffer(length - size(), wait);
             if (throwException && wait && length > size()) {
                 throw _NException_Normal("truncating length");
             }
         }
     }
 
-    virtual void overrun(Size, bool = true) {}
+    virtual void fillBuffer(Size, bool = true) {}
 
     // Write max [length] bytes to the returned pointer.
     // Any other operation on this Buffer invalidates the pointer.

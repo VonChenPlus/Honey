@@ -20,17 +20,17 @@ namespace IO
 
     void FDInBuffer::take(Size length, NBYTE *dest, bool wait) {
         // do not know total buffer size sometimes, so we do not throw exception
-        check(length, wait, false);
+        checkBuffer(length, wait, false);
         NBuffer::take(length, dest, wait);
     }
 
     void FDInBuffer::take(Size length, NBuffer &other, bool wait) {
         // do not know total buffer size sometimes, so we do not throw exception
-        check(length, wait, false);
+        checkBuffer(length, wait, false);
         NBuffer::take(length, other, wait);
     }
 
-    void FDInBuffer::overrun(Size length, bool wait) {
+    void FDInBuffer::fillBuffer(Size length, bool wait) {
         WaitUntilReady(fd_, wait ? timeoutms_ : 0);
         ReadWithProgress(fd_, length, *this, NULLPTR);
     }
