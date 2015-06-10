@@ -2,7 +2,7 @@
 #define NATIVEAPP_H
 
 #include <string>
-#include "SGF/UI/InputState.h"
+#include "SMARTGRAPH/UI/InputState.h"
 
 // The Native App API.
 //

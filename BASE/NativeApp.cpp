@@ -18,17 +18,17 @@
 using std::shared_ptr;
 using std::make_shared;
 
-#include "SGF/UI/ScreenManager.h"
+#include "SMARTGRAPH/UI/ScreenManager.h"
 using UI::ScreenManager;
-#include "SGF/GFX/GLExtensions.h"
+#include "SMARTGRAPH/GFX/GLExtensions.h"
 using GFX::GLExtensions;
-#include "SGF/GFX/GLState.h"
+#include "SMARTGRAPH/GFX/GLState.h"
 using GFX::OpenGLState;
-#include "SGF/UI/UI.h"
+#include "SMARTGRAPH/UI/UI.h"
 using UI::UIState;
-#include "SGF/GFX/GfxResourceHolder.h"
+#include "SMARTGRAPH/GFX/GfxResourceHolder.h"
 using GFX::gl_lost_manager_init;
-#include "SGF/THIN3D/Thin3D.h"
+#include "SMARTGRAPH/THIN3D/Thin3D.h"
 using THIN3D::T3DCreateGLContext;
 using THIN3D::Thin3DContext;
 using THIN3D::T3DClear;
