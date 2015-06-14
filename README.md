@@ -9,7 +9,8 @@ Features
 * LocalFile IO and Socket IO.
 * Smart Pointer.
 * Math Library.
-* Some Utils.
+* Thread Library.
+* Some Utils(Color/Hash/String/Text/Time/Random).
 
 Licenses
 --------
