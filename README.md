@@ -6,10 +6,12 @@ This is my library of stuff that I use when writing C++ programs.
 Features
 --------
 * Smart Graph Frame (almost from [Henrik Rydgård](https://github.com/hrydgard)).
-* LocalFile IO and Socket IO.
+* IO Handler.
+* Image Handler(PNG).
 * Smart Pointer.
 * Math Library.
-* Some Utils.
+* Thread Library.
+* Some Utils(Color/Hash/String/Text/Time/Random).
 
 Licenses
 --------
