@@ -49,7 +49,7 @@ namespace UTILS
         }
 
 
-        unsigned int ParseHex(const char *_szValue) {
+        unsigned int ParseHexString(const char *_szValue) {
             int Value = 0;
             Size Finish = strlen(_szValue);
             if (Finish > 8 ) { Finish = 8; }

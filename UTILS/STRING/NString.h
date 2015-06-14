@@ -14,50 +14,17 @@ namespace UTILS
     namespace STRING
     {
         #ifdef _MSC_VER
-        #pragma warning (disable:4996)
-        #ifndef strncasecmp
-        #define strncasecmp _strnicmp
-        #endif
-        #ifndef strcasecmp
-        #define strcasecmp _strcmpi
-        #endif
-        #endif
+            #pragma warning (disable:4996)
+            #ifndef strncasecmp
+                #define strncasecmp _strnicmp
+            #endif
 
-        #ifdef BLACKBERRY
-        // QNX Does not have an implementation of vasprintf
-        static inline int vasprintf(char **rResult, const char *aFormat, va_list aAp) {
-            int rVal;
-            char *result;
-            va_list ap;
-
-            result = (char *) malloc(16);
-            if (result == NULLPTR) return -1;
-
-            va_copy(ap, aAp);
-            rVal = vsnprintf(result, 16, aFormat, ap);
-            va_end(ap);
-
-            if (rVal == -1) {
-                free(result);
-                return rVal;
-            }
-            else if (rVal >= 16) {
-                free(result);
-                result = (char *) malloc(rVal + 1);
-                if (result == NULLPTR) return -1;
-
-                va_copy(ap, aAp);
-                rVal = vsnprintf(result, rVal + 1, aFormat, aAp);
-                va_end(ap);
-            }
-
-            *rResult = result;
-            return rVal;
-        }
+            #ifndef strcasecmp
+                #define strcasecmp _strcmpi
+            #endif
         #endif
 
         // Other simple string utilities.
-
         inline bool StartsWith(const std::string &str, const std::string &what) {
             if (str.size() < what.size())
                 return false;
@@ -90,7 +57,7 @@ namespace UTILS
         }
 
         // highly unsafe and not recommended.
-        unsigned int ParseHex(const char* _szValue);
+        unsigned int ParseHexString(const char* _szValue);
 
         std::string StringFromFormat(const char* format, ...);
         std::string StringFromInt(int value);

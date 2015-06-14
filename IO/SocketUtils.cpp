@@ -7,9 +7,13 @@
 #include <unistd.h>
 #include <sys/select.h>
 #include <sys/socket.h>
+#define errorNumber errno
+#define SOCKEINTR EINTR
 #else
 #include <io.h>
 #include <winsock2.h>
+#define errorNumber WSAGetLastError()
+#define SOCKEINTR WSAEINTR
 #endif
 #include <fcntl.h>
 #include <string.h>
@@ -32,7 +36,7 @@ namespace IO
         }
 
         int total = 0;
-        while (true) {
+        do {
             int retval = recv(fd, &buf[0], (int)buf.size(), 0);
             if (retval == 0) {
                 return;
@@ -45,7 +49,7 @@ namespace IO
             total += retval;
             if (progress)
                 *progress = (float)total / (float)length;
-        }
+        } while (errorNumber == SOCKEINTR);
     }
 
     void WaitUntilReady(int fd, double timeout) {
