@@ -17,13 +17,15 @@
 #endif
 #include <fcntl.h>
 #include <string.h>
+#include <algorithm>
+#undef min
 
 #include "UTILS/STRING/NString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace IO
 {
-    void ReadWithProgress(int fd, size_t length, NBuffer &buffer, float *progress) {
+    void ReadWithProgress(int fd, Size length, NBuffer &buffer, float *progress) {
         std::vector<NBYTE> buf;
         if (length >= 1024 * 64 * 16) {
             buf.resize(1024 * 64);
@@ -42,14 +44,44 @@ namespace IO
                 return;
             }
             else if (retval < 0) {
-                throw _NException_(StringFromFormat("error reading from buffer: %i", retval), NException::IO);
+                throw _NException_(StringFromFormat("error recv from buffer: %i", retval), NException::IO);
             }
 
             buffer.append(retval, &buf[0]);
             total += retval;
             if (progress)
                 *progress = (float)total / (float)length;
-        } while (errorNumber == SOCKEINTR);
+        } while (errorNumber == SOCKEINTR && total < length);
+    }
+
+    void WriteWithProgress(int fd, Size length, NBuffer &buffer, float *progress) {
+        std::vector<NBYTE> buf;
+        if (length >= 1024 * 64 * 16) {
+            buf.resize(1024 * 64);
+        }
+        else if (length >= 1024 * 16) {
+            buf.resize(length / 16);
+        }
+        else {
+            buf.resize(1024);
+        }
+
+        int total = 0;
+        do {
+            Size bufSize = std::min(buf.size(), buffer.size());
+            buffer.take(bufSize, &buf[0]);
+            int retval = send(fd, &buf[0], (int)buf.size(), 0);
+            if (retval == 0) {
+                return;
+            }
+            else if (retval < 0) {
+                throw _NException_(StringFromFormat("error send to buffer: %i", retval), NException::IO);
+            }
+
+            total += retval;
+            if (progress)
+                *progress = (float)total / (float)length;
+        } while (errorNumber == SOCKEINTR && total < length);
     }
 
     void WaitUntilReady(int fd, double timeout) {

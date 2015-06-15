@@ -33,6 +33,19 @@ public:
     NBYTE *data() { return &data_[0]; }
 
 protected:
+    // Write max [length] bytes to the returned pointer.
+    // Any other operation on this Buffer invalidates the pointer.
+    NBYTE *appendBufferSize(Size length);
+
+    // TODO: Find a better internal representation, like a cord.
+    std::vector<NBYTE> data_;
+
+    DISALLOW_COPY_AND_ASSIGN(NBuffer)
+};
+
+class NInBuffer : public NBuffer
+{
+protected:
     void checkBuffer(Size length, bool wait = true, bool throwException = true) {
         if (length > size()) {
             fillBuffer(length - size(), wait);
@@ -43,15 +56,12 @@ protected:
     }
 
     virtual void fillBuffer(Size, bool = true) {}
+};
 
-    // Write max [length] bytes to the returned pointer.
-    // Any other operation on this Buffer invalidates the pointer.
-    NBYTE *appendBufferSize(Size length);
-
-    // TODO: Find a better internal representation, like a cord.
-    std::vector<NBYTE> data_;
-
-    DISALLOW_COPY_AND_ASSIGN(NBuffer)
+class NOutBuffer: public NBuffer
+{
+protected:
+    virtual void flushBuffer(Size, bool = true) {}
 };
 
 #endif // NBUFFER_H
