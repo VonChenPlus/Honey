@@ -5,7 +5,7 @@
 
 namespace IO
 {
-    class FDOutBuffer final: protected NOutBuffer
+    class FDOutBuffer final: public NOutBuffer
     {
     public:
         FDOutBuffer(int fd);
@@ -13,9 +13,10 @@ namespace IO
 
         void setTimeout(int timeoutms);
 
-        void append(Size len, const NBYTE *data, bool wait = true) override;
-
         void flushBuffer(Size len, bool wait = true) override;
+
+    protected:
+        void write(Size len, const NBYTE *data, bool wait = true) override;
 
     private:
         int fd_;

@@ -19,13 +19,13 @@ namespace IO
         timeoutms_ = timeoutms;
     }
 
-    void FDOutBuffer::append(Size len, const NBYTE *data, bool wait) {
+    void FDOutBuffer::write(Size len, const NBYTE *data, bool wait) {
         if (len < MIN_BULK_SIZE) {
-            NBuffer::append(len, data, wait);
+            NBuffer::write(len, data, wait);
             return;
         }
 
-        NBuffer::append(len, data, wait);
+        NBuffer::write(len, data, wait);
         flushBuffer(size(), wait);
     }
 

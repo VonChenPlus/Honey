@@ -15,13 +15,12 @@ public:
     virtual ~NBuffer();
 
     // These work pretty much like you'd expect.
-    virtual void append(Size len, const NBYTE *data, bool wait = true);
-    void append(const NBuffer &other);
-    void appendFormat(const NBYTE *fmt, ...);
-    void appendValue(int value);
+    virtual void write(Size len, const NBYTE *data, bool wait = true);
+    void write(const NBuffer &other);
+    void writeAsFormat(const NBYTE *fmt, ...);
 
-    virtual void take(Size length, NBYTE *dest, bool wait = true);
-    virtual void take(Size length, NBuffer &other, bool wait = true);
+    virtual void read(Size length, NBYTE *dest, bool wait = true);
+    virtual void read(Size length, NBuffer &other, bool wait = true);
     virtual void peek(Size length, NBYTE *dest, bool wait = true);
     virtual void peek(Size length, NBuffer &other, bool wait = true);
     virtual void skip(Size length, bool wait = true);
@@ -45,6 +44,20 @@ protected:
 
 class NInBuffer : protected NBuffer
 {
+public:
+    template <typename T>
+    void readAny(Size length, T *dest, bool wait = true) {
+        read(length, (NBYTE *)dest, wait);
+    }
+
+    void read(Size length, NBYTE *dest, bool wait = true) override {
+        NBuffer::read(length, dest, wait);
+    }
+
+    void read(Size length, NBuffer &other, bool wait = true) override {
+        NBuffer::read(length, other, wait);
+    }
+
 protected:
     void checkBuffer(Size length, bool wait = true, bool throwException = true) {
         if (length > size()) {
@@ -60,7 +73,12 @@ protected:
 
 class NOutBuffer: protected NBuffer
 {
-protected:
+public:
+    template <typename T>
+    void writeAny(Size length, T *dest, bool wait = true) {
+        write(length, (NBYTE *)dest, wait);
+    }
+
     virtual void flushBuffer(Size, bool = true) {}
 };
 

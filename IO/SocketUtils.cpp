@@ -47,7 +47,7 @@ namespace IO
                 throw _NException_(StringFromFormat("error recv from buffer: %i", retval), NException::IO);
             }
 
-            buffer.append(retval, &buf[0]);
+            buffer.write(retval, &buf[0]);
             total += retval;
             if (progress)
                 *progress = (float)total / (float)length;
@@ -69,7 +69,7 @@ namespace IO
         Size total = 0;
         do {
             Size bufSize = std::min(buf.size(), buffer.size());
-            buffer.take(bufSize, &buf[0]);
+            buffer.read(bufSize, &buf[0]);
             int retval = send(fd, &buf[0], (int)buf.size(), 0);
             if (retval == 0) {
                 return;

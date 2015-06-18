@@ -90,12 +90,12 @@ namespace UTILS
         void DataToHexString(const uint8 *data, Size size, std::string *output) {
             NBuffer buffer;
             for (Size i = 0; i < size; i++) {
-                buffer.appendFormat("%02x ", data[i]);
+                buffer.writeAsFormat("%02x ", data[i]);
                 if (i && !(i & 15))
-                    buffer.appendFormat("\n");
+                    buffer.writeAsFormat("\n");
             }
             output->resize(buffer.size());
-            buffer.take(buffer.size(), &(*output)[0]);
+            buffer.read(buffer.size(), &(*output)[0]);
         }
 
         std::string StringFromFormat(const char* format, ...) {

@@ -18,16 +18,10 @@ namespace IO
         timeoutms_ = timeoutms;
     }
 
-    void FDInBuffer::take(Size length, NBYTE *dest, bool wait) {
+    void FDInBuffer::read(Size length, NBYTE *dest, bool wait) {
         // do not know total buffer size sometimes, so we do not throw exception
         checkBuffer(length, wait, false);
-        NBuffer::take(length, dest, wait);
-    }
-
-    void FDInBuffer::take(Size length, NBuffer &other, bool wait) {
-        // do not know total buffer size sometimes, so we do not throw exception
-        checkBuffer(length, wait, false);
-        NBuffer::take(length, other, wait);
+        NBuffer::read(length, dest, wait);
     }
 
     void FDInBuffer::fillBuffer(Size length, bool wait) {

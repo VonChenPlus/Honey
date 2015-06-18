@@ -18,18 +18,18 @@ NBYTE *NBuffer::appendBufferSize(Size length) {
     return &data_[0] + old_size;
 }
 
-void NBuffer::append(Size len, const NBYTE *data, bool) {
+void NBuffer::write(Size len, const NBYTE *data, bool) {
     NBYTE *dest = appendBufferSize(len);
     memcpy(dest, data, len);
 }
 
-void NBuffer::append(const NBuffer &other) {
+void NBuffer::write(const NBuffer &other) {
     Size len = other.size();
     NBYTE *dest = appendBufferSize(len);
     memcpy(dest, &other.data_[0], len);
 }
 
-void NBuffer::appendFormat(const NBYTE *fmt, ...) {
+void NBuffer::writeAsFormat(const NBYTE *fmt, ...) {
     NBYTE buffer[2048];
     va_list vl;
     va_start(vl, fmt);
@@ -45,12 +45,7 @@ void NBuffer::appendFormat(const NBYTE *fmt, ...) {
     memcpy(ptr, buffer, retval);
 }
 
-void NBuffer::appendValue(int value) {
-    std::string temp = StringFromFormat("%i", value);
-    append(temp.size(), temp.c_str());
-}
-
-void NBuffer::take(Size length, NBYTE *dest, bool) {
+void NBuffer::read(Size length, NBYTE *dest, bool) {
     if (length > data_.size()) {
         throw _NException_Normal("truncating length");
     }
@@ -58,7 +53,7 @@ void NBuffer::take(Size length, NBYTE *dest, bool) {
     data_.erase(data_.begin(), data_.begin() + length);
 }
 
-void NBuffer::take(Size length, NBuffer &other, bool) {
+void NBuffer::read(Size length, NBuffer &other, bool) {
     if (length > data_.size()) {
         throw _NException_Normal("truncating length");
     }
