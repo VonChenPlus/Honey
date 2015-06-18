@@ -43,7 +43,7 @@ protected:
     DISALLOW_COPY_AND_ASSIGN(NBuffer)
 };
 
-class NInBuffer : public NBuffer
+class NInBuffer : protected NBuffer
 {
 protected:
     void checkBuffer(Size length, bool wait = true, bool throwException = true) {
@@ -58,7 +58,7 @@ protected:
     virtual void fillBuffer(Size, bool = true) {}
 };
 
-class NOutBuffer: public NBuffer
+class NOutBuffer: protected NBuffer
 {
 protected:
     virtual void flushBuffer(Size, bool = true) {}

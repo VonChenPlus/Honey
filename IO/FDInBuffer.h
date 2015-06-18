@@ -5,7 +5,7 @@
 
 namespace IO
 {
-    class FDInBuffer final: protected NInBuffer
+    class FDInBuffer final: public NInBuffer
     {
     public:
         FDInBuffer(int fd);

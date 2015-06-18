@@ -7,7 +7,7 @@ namespace IO
     #define MIN_BULK_SIZE 1024
     FDOutBuffer::FDOutBuffer(int fd)
         : fd_(fd)
-        , timeoutms_(0) {
+        , timeoutms_(-1) {
         if (!TCPSocket::isSocket(fd_))
             throw _NException_Normal("Invalid Sock object!");
     }
@@ -30,7 +30,7 @@ namespace IO
     }
 
     void FDOutBuffer::flushBuffer(Size len, bool wait) {
-        WaitUntilReady(fd_, wait ? timeoutms_ : 0);
+        WaitUntilReady(fd_, wait ? timeoutms_ : 0, true);
         WriteWithProgress(fd_, len, *this, NULLPTR);
     }
 }

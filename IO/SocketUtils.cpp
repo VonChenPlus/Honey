@@ -37,7 +37,7 @@ namespace IO
             buf.resize(1024);
         }
 
-        int total = 0;
+        Size total = 0;
         do {
             int retval = recv(fd, &buf[0], (int)buf.size(), 0);
             if (retval == 0) {
@@ -66,7 +66,7 @@ namespace IO
             buf.resize(1024);
         }
 
-        int total = 0;
+        Size total = 0;
         do {
             Size bufSize = std::min(buf.size(), buffer.size());
             buffer.take(bufSize, &buf[0]);
@@ -84,16 +84,27 @@ namespace IO
         } while (errorNumber == SOCKEINTR && total < length);
     }
 
-    void WaitUntilReady(int fd, double timeout) {
+    void WaitUntilReady(int fd, int timeoutms, bool write) {
         struct timeval tv;
-        tv.tv_sec = floor(timeout);
-        tv.tv_usec = (timeout - floor(timeout)) * 1000000.0;
+        struct timeval* tvp = &tv;
+        if (timeoutms != -1) {
+            tv.tv_sec = timeoutms / 1000;
+            tv.tv_usec = (timeoutms % 1000) * 1000;
+        }
+        else {
+            tvp = 0;
+        }
 
         fd_set fds;
         FD_ZERO(&fds);
         FD_SET(fd, &fds);
         // First argument to select is the highest socket in the set + 1.
-        int rval = select(fd + 1, &fds, NULLPTR, NULLPTR, &tv);
+        int rval = 0;
+        if (!write)
+            rval = select(fd + 1, &fds, NULLPTR, NULLPTR, tvp);
+        else
+            rval = select(fd + 1, NULLPTR, &fds, NULLPTR, tvp);
+
         if (rval < 0) {
             throw _NException_("Error calling select", NException::IO);
         }
