@@ -66,3 +66,7 @@ INCLUDEPATH += $$P/EXTERNALS/glew
 # rg_etc1
 SOURCES += $$P/EXTERNALS/rg_etc1/*.cpp
 HEADERS += $$P/EXTERNALS/rg_etc1/*.h
+
+# d3des
+SOURCES += $$P/EXTERNALS/d3des/*.c
+HEADERS += $$P/EXTERNALS/d3des/*.h
