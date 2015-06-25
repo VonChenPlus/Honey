@@ -69,6 +69,8 @@ protected:
     }
 
     virtual void fillBuffer(Size, bool = true) {}
+
+    virtual bool swapBuffer() { return false;  }
 };
 
 class NOutBuffer: protected NBuffer

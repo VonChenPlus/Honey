@@ -18,6 +18,7 @@ namespace IO
 
     private:
         void fillBuffer(Size length, bool wait = true) override;
+        bool swapBuffer() override { return true;  }
 
     private:
         int fd_;

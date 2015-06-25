@@ -31,7 +31,7 @@ static unsigned char Df_Key[24] = {
 	0x89,0xab,0xcd,0xef,0x01,0x23,0x45,0x67 };
  
 static unsigned short bytebit[8]	= {
-	0200, 0100, 040, 020, 010, 04, 02, 01 };
+    01, 02, 04, 010, 020, 040, 0100, 0200 };
  
 static unsigned long bigbyte[24] = {
 	0x800000L,	0x400000L,	0x200000L, 	0x100000L,

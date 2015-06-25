@@ -25,7 +25,19 @@ namespace IO
     }
 
     void FDInBuffer::fillBuffer(Size length, bool wait) {
-        WaitUntilReady(fd_, wait ? timeoutms_ : 0);
+        while (true) {
+            try
+            {
+                WaitUntilReady(fd_, wait ? timeoutms_ : 0);
+                break;
+            }
+            catch (NException e)
+            {
+                if (stricmp(e.reason().c_str(), "Timeout") != 0) {
+                    break;
+                }
+            }
+        }
         ReadWithProgress(fd_, length, *this, NULLPTR);
     }
 }
