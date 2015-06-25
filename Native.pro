@@ -3,6 +3,7 @@ QT += opengl
 QT -= gui
 TEMPLATE = lib
 CONFIG += staticlib
+CONFIG -= flat
 
 P = $$_PRO_FILE_PWD_/../Native
 
