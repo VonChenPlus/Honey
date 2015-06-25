@@ -31,13 +31,11 @@ namespace IO
 
     void FDOutBuffer::flushBuffer(Size len, bool wait) {
         while (true) {
-            try
-            {
+            try {
                 WaitUntilReady(fd_, wait ? timeoutms_ : 0, true);
                 break;
             }
-            catch (NException e)
-            {
+            catch (NException e) {
                 if (stricmp(e.reason().c_str(), "Timeout") != 0) {
                     break;
                 }
