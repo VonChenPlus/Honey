@@ -3,7 +3,7 @@
 
 #include "BASE/ConstMap.h"
 #include <map>
-#include "SMARTGRAPH/UI/KeyCodes.h"
+#include "GRAPH/UI/KeyCodes.h"
 using namespace UI;
 
 // TODO: Add any missing keys 

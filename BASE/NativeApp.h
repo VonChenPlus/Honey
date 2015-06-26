@@ -2,7 +2,7 @@
 #define NATIVEAPP_H
 
 #include <string>
-#include "SMARTGRAPH/UI/InputState.h"
+#include "GRAPH/UI/InputState.h"
 
 //
 // Implement these functions and you've got a native app. These are called
