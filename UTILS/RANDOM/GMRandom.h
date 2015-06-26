@@ -1,7 +1,7 @@
 #ifndef GMRANDOM_H
 #define GMRANDOM_H
 
-#include "BASE/Native.h"
+#include "BASE/Honey.h"
 
 namespace UTILS
 {

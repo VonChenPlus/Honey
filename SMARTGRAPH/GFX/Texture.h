@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "BASE/Native.h"
+#include "BASE/Honey.h"
 #include "SMARTGRAPH/GFX/GfxResourceHolder.h"
 #include "SMARTGRAPH/GFX/Atlas.h"
 

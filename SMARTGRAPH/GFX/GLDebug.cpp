@@ -1,6 +1,6 @@
 #include "GLDebug.h"
 #include "SMARTGRAPH/GFX/GLCommon.h"
-#include "BASE/Native.h"
+#include "BASE/Honey.h"
 #include "UTILS/STRING/NString.h"
 using UTILS::STRING::StringFromFormat;
 

@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-#include "BASE/Native.h"
+#include "BASE/Honey.h"
 
 // Acts as a queue. Intended to be as fast as possible for most uses.
 // Does not do synchronization, must use external mutexes.

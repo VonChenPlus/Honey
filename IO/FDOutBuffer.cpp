@@ -1,9 +1,8 @@
 #include "FDOutBuffer.h"
 
-#include <string.h>
-
 #include "IO/TCPSocket.h"
 #include "IO/SocketUtils.h"
+#include "UTILS/STRING/NString.h"
 
 namespace IO
 {
@@ -39,7 +38,7 @@ namespace IO
                 break;
             }
             catch (NException e) {
-                if (stricmp(e.reason().c_str(), "Timeout") != 0) {
+                if (strcasecmp(e.reason().c_str(), "Timeout") != 0) {
                     break;
                 }
             }

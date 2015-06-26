@@ -1,7 +1,7 @@
 #ifndef HASH_H
 #define HASH_H
 
-#include "BASE/Native.h"
+#include "BASE/Honey.h"
 
 namespace UTILS
 {

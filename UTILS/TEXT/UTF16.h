@@ -1,7 +1,7 @@
 #ifndef UTF16_H
 #define UTF16_H
 
-#include "BASE/Native.h"
+#include "BASE/Honey.h"
 
 namespace UTILS
 {

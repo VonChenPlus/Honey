@@ -1,7 +1,7 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
-#include "BASE/Native.h"
+#include "BASE/Honey.h"
 #include "SMARTGRAPH/UI/InputState.h"
 
 namespace UI

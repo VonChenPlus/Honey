@@ -1,7 +1,7 @@
 // NativeApp implementation for platforms that will use that framework, like:
 // Windows, Linux.
 //
-// Native is a cross platform framework. It's not very mature and mostly
+// Honey is a cross platform framework. It's not very mature and mostly
 // just built according to the needs of my own apps.
 //
 

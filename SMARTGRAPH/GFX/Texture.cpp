@@ -15,7 +15,7 @@ using IMAGE::ZIM_RGBA4444;
 using IMAGE::ZIM_RGB565;
 using IMAGE::ZIM_ETC1;
 #include "SMARTGRAPH/GFX/GLDebug.h"
-#include "BASE/Native.h"
+#include "BASE/Honey.h"
 #include "IMAGE/TinyPNG.h"
 using IMAGE::PNGLoad;
 using IMAGE::PNGLoadPtr;

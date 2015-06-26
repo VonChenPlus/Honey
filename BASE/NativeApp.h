@@ -4,7 +4,6 @@
 #include <string>
 #include "SMARTGRAPH/UI/InputState.h"
 
-// The Native App API.
 //
 // Implement these functions and you've got a native app. These are called
 // from the framework, which exposes the native JNI api which is a bit

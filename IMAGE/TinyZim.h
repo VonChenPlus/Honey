@@ -1,7 +1,7 @@
 #ifndef TINYZIM_H
 #define TINYZIM_H
 
-#include "BASE/Native.h"
+#include "BASE/Honey.h"
 
 namespace IMAGE
 {

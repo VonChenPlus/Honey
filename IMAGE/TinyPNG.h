@@ -1,7 +1,7 @@
 #ifndef THINPNG_H
 #define THINPNG_H
 
-#include "BASE/Native.h"
+#include "BASE/Honey.h"
 
 namespace IMAGE
 {
