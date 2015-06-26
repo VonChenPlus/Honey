@@ -1,11 +1,11 @@
-TARGET = Native
+TARGET = Honey
 QT += opengl
 QT -= gui
 TEMPLATE = lib
 CONFIG += staticlib
 CONFIG -= flat
 
-P = $$_PRO_FILE_PWD_/../Native
+P = $$_PRO_FILE_PWD_/../Honey
 
 include($$P/Settings.pri)
 
