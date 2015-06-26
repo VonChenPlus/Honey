@@ -1,4 +1,7 @@
 #include "FDOutBuffer.h"
+
+#include <string.h>
+
 #include "IO/TCPSocket.h"
 #include "IO/SocketUtils.h"
 
