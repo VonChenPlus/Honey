@@ -95,7 +95,7 @@ namespace GFX
         UNUSED(set_blend_state);
 
         if (!shaderSet_) {
-            throw _NException_("No program set!", NException::GFX);
+            throw _HException_("No program set!", HException::GFX);
         }
 
         if (count_ == 0)

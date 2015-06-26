@@ -175,6 +175,6 @@ inline int c99_snprintf(char* str, size_t size, const char* format, ...) {
 
 #endif
 
-#include "BASE/NException.h"
+#include "BASE/HException.h"
 
 #endif // HONEY_H

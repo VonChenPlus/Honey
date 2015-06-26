@@ -27,7 +27,7 @@ using UTILS::TEXT::ConvertUTF8ToWString;
 #ifdef _WIN32
 using UTILS::TEXT::ConvertWStringToUTF8;
 #endif
-#include "UTILS/STRING/NString.h"
+#include "UTILS/STRING/HString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace IO
@@ -62,7 +62,7 @@ namespace IO
         file =  fopen(filename.c_str(), mode);
     #endif
         if (file == NULLPTR)
-            throw _NException_("OpenFile failed", NException::IO);
+            throw _HException_("OpenFile failed", HException::IO);
         return file;
     }
 
@@ -72,7 +72,7 @@ namespace IO
         if (len != fwrite(str.data(), 1, str.size(), file))
         {
             fclose(file);
-            throw _NException_("fwrite failed", NException::IO);
+            throw _HException_("fwrite failed", HException::IO);
         }
         fclose(file);
     }
@@ -82,7 +82,7 @@ namespace IO
         Size len = size;
         if (len != fwrite(data, 1, len, file)) {
             fclose(file);
-            throw _NException_("fwrite failed", NException::IO);
+            throw _HException_("fwrite failed", HException::IO);
         }
         fclose(file);
     }
@@ -96,18 +96,18 @@ namespace IO
         off64_t pos = lseek64(fd, 0, SEEK_CUR);
         off64_t size = lseek64(fd, 0, SEEK_END);
         if (size != pos && lseek64(fd, pos, SEEK_SET) != pos) {
-            throw _NException_("lseek64 failed", NException::IO);
+            throw _HException_("lseek64 failed", HException::IO);
         }
         return size;
     #else
         uint64_t pos = ftello(file);
         if (fseek(file, 0, SEEK_END) != 0) {
-            throw _NException_("fseek failed", NException::IO);
+            throw _HException_("fseek failed", HException::IO);
         }
         uint64_t size = ftello(file);
         // Reset the seek position to where it was when we started.
         if (size != pos && fseeko(file, pos, SEEK_SET) != 0) {
-            throw _NException_("fseeko failed", NException::IO);
+            throw _HException_("fseeko failed", HException::IO);
         }
         return size;
     #endif
@@ -129,7 +129,7 @@ namespace IO
         Size len = (Size)GetSize(file);
         if(len > size) {
             fclose(file);
-            throw _NException_Normal("truncating length");
+            throw _HException_Normal("truncating length");
         }
         data[fread(data, 1, size, file)] = 0;
         fclose(file);
@@ -177,7 +177,7 @@ namespace IO
     #ifdef _WIN32
         WIN32_FILE_ATTRIBUTE_DATA attrs;
         if (!GetFileAttributesExW(ConvertUTF8ToWString(path).c_str(), GetFileExInfoStandard, &attrs)) {
-            throw _NException_Normal("GetFileAttributes failed");
+            throw _HException_Normal("GetFileAttributes failed");
         }
         fileInfo->size = (uint64)attrs.nFileSizeLow | ((uint64)attrs.nFileSizeHigh << 32);
         fileInfo->isDirectory = (attrs.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
@@ -192,7 +192,7 @@ namespace IO
         int result = stat64(copy.c_str(), &file_info);
 
         if (result < 0) {
-            throw _NException_Normal("GetFileAttributes failed");
+            throw _HException_Normal("GetFileAttributes failed");
         }
 
         fileInfo->isDirectory = S_ISDIR(file_info.st_mode);
@@ -327,12 +327,12 @@ namespace IO
     {
     #ifdef _WIN32
         if (!::DeleteFile(ConvertUTF8ToWString(file).c_str())) {
-            throw _NException_(StringFromFormat("Error deleting %s: %i", file, GetLastError()), NException::IO);
+            throw _HException_(StringFromFormat("Error deleting %s: %i", file, GetLastError()), HException::IO);
         }
     #else
         int err = unlink(file);
         if (err) {
-            throw _NException_(StringFromFormat("Error unlinking %s: %i", file, err), NException::IO);
+            throw _HException_(StringFromFormat("Error unlinking %s: %i", file, err), HException::IO);
         }
     #endif
     }
@@ -340,7 +340,7 @@ namespace IO
     void DeleteDirectory(const char *dir) {
     #ifdef _WIN32
         if (!RemoveDirectory(ConvertUTF8ToWString(dir).c_str())) {
-            throw _NException_(StringFromFormat("Error deleting directory %s: %i", dir, GetLastError()), NException::IO);
+            throw _HException_(StringFromFormat("Error deleting directory %s: %i", dir, GetLastError()), HException::IO);
         }
     #else
         rmdir(dir);

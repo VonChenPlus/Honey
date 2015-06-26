@@ -4,12 +4,12 @@
 #include <string>
 
 #include "BASE/Honey.h"
-#include "BASE/NBuffer.h"
+#include "BASE/HBuffer.h"
 
 namespace IO
 {
-    void ReadWithProgress(int fd, Size length, NBuffer &buffer, float *progress);
-    void WriteWithProgress(int fd, Size length, NBuffer &buffer, float *progress);
+    void ReadWithProgress(int fd, Size length, HBuffer &buffer, float *progress);
+    void WriteWithProgress(int fd, Size length, HBuffer &buffer, float *progress);
 
     // Returns true if the fd became ready, false if it didn't or
     // if there was another error.

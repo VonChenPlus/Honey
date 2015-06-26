@@ -5,8 +5,8 @@
 #include <windows.h>
 #endif
 
-#include "THREAD/NThreadDef.h"
-#include "UTILS/TIME/NTime.h"
+#include "THREAD/HThreadDef.h"
+#include "UTILS/TIME/HTime.h"
 
 namespace THREAD
 {

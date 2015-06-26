@@ -22,7 +22,7 @@ namespace UI
 
     void ScreenManager::switchScreen(Screen *screen) {
         if (screen == nextScreen_) {
-            throw _NException_Normal("Already switching to this screen");
+            throw _HException_Normal("Already switching to this screen");
         }
         // Note that if a dialog is found, this will be a silent background switch that
         // will only become apparent if the dialog is closed. The previous screen will stick around
@@ -63,7 +63,7 @@ namespace UI
             case LAYER_SIDEMENU:
             case LAYER_TRANSPARENT:
                 if (stack_.size() == 1) {
-                    throw _NException_Normal("Can't have sidemenu over nothing");
+                    throw _HException_Normal("Can't have sidemenu over nothing");
                 }
                 else {
                     auto iter = stack_.end();
@@ -82,7 +82,7 @@ namespace UI
             }
         }
         else {
-            throw _NException_Normal("No current screen");
+            throw _HException_Normal("No current screen");
         }
 
         processFinishDialog();
@@ -117,10 +117,10 @@ namespace UI
 
     void ScreenManager::finishDialog(Screen *dialog, DialogResult result) {
         if (stack_.empty()) {
-            throw _NException_Normal("Must be in a dialog to finishDialog");
+            throw _HException_Normal("Must be in a dialog to finishDialog");
         }
         if (dialog != stack_.back().screen) {
-            throw _NException_Normal("Wrong dialog being finished!");
+            throw _HException_Normal("Wrong dialog being finished!");
         }
         dialog->onFinish(result);
         dialogFinished_ = dialog;
@@ -173,13 +173,13 @@ namespace UI
             stack_.pop_back();
         }
         else {
-            throw _NException_Normal("Can't pop when stack empty");
+            throw _HException_Normal("Can't pop when stack empty");
         }
     }
 
     void ScreenManager::switchToNext() {
         if (!nextScreen_) {
-            throw _NException_Normal("switchToNext: No nextScreen_");
+            throw _HException_Normal("switchToNext: No nextScreen_");
         }
 
         Layer temp = {0, LAYER_DEFAULT};
@@ -213,7 +213,7 @@ namespace UI
             }
 
             if (!caller) {
-                throw _NException_Normal("ERROR: no top screen when finishing dialog");
+                throw _HException_Normal("ERROR: no top screen when finishing dialog");
             } else if (caller != topScreen()) {
                 // The caller may get confused if we call dialogFinished() now.
                 //WLOG("Skipping non-top dialog when finishing dialog.");

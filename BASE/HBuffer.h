@@ -1,5 +1,5 @@
-#ifndef NBUFFER_H
-#define NBUFFER_H
+#ifndef HBUFFER_H
+#define HBUFFER_H
 
 #include <vector>
 #include <string>
@@ -8,21 +8,21 @@
 
 // Acts as a queue. Intended to be as fast as possible for most uses.
 // Does not do synchronization, must use external mutexes.
-class NBuffer
+class HBuffer
 {
 public:
-    NBuffer();
-    virtual ~NBuffer();
+    HBuffer();
+    virtual ~HBuffer();
 
     // These work pretty much like you'd expect.
     virtual void write(Size len, const NBYTE *data, bool wait = true);
-    void write(const NBuffer &other);
+    void write(const HBuffer &other);
     void writeAsFormat(const NBYTE *fmt, ...);
 
     virtual void read(Size length, NBYTE *dest, bool wait = true);
-    virtual void read(Size length, NBuffer &other, bool wait = true);
+    virtual void read(Size length, HBuffer &other, bool wait = true);
     virtual void peek(Size length, NBYTE *dest, bool wait = true);
-    virtual void peek(Size length, NBuffer &other, bool wait = true);
+    virtual void peek(Size length, HBuffer &other, bool wait = true);
     virtual void skip(Size length, bool wait = true);
 
     // Utilities. Try to avoid checking for size.
@@ -39,10 +39,10 @@ protected:
     // TODO: Find a better internal representation, like a cord.
     std::vector<NBYTE> data_;
 
-    DISALLOW_COPY_AND_ASSIGN(NBuffer)
+    DISALLOW_COPY_AND_ASSIGN(HBuffer)
 };
 
-class NInBuffer : protected NBuffer
+class HInBuffer : protected HBuffer
 {
 public:
     template <typename T>
@@ -51,11 +51,11 @@ public:
     }
 
     void read(Size length, NBYTE *dest, bool wait = true) override {
-        NBuffer::read(length, dest, wait);
+        HBuffer::read(length, dest, wait);
     }
 
-    void read(Size length, NBuffer &other, bool wait = true) override {
-        NBuffer::read(length, other, wait);
+    void read(Size length, HBuffer &other, bool wait = true) override {
+        HBuffer::read(length, other, wait);
     }
 
 protected:
@@ -63,7 +63,7 @@ protected:
         if (length > size()) {
             fillBuffer(length - size(), wait);
             if (throwException && wait && length > size()) {
-                throw _NException_Normal("truncating length");
+                throw _HException_Normal("truncating length");
             }
         }
     }
@@ -73,7 +73,7 @@ protected:
     virtual bool swapBuffer() { return false;  }
 };
 
-class NOutBuffer: protected NBuffer
+class HOutBuffer: protected HBuffer
 {
 public:
     template <typename T>
@@ -84,4 +84,4 @@ public:
     virtual void flushBuffer(Size, bool = true) {}
 };
 
-#endif // NBUFFER_H
+#endif // HBUFFER_H

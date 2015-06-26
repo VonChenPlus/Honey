@@ -2,7 +2,7 @@
 
 #include "IO/TCPSocket.h"
 #include "IO/SocketUtils.h"
-#include "UTILS/STRING/NString.h"
+#include "UTILS/STRING/HString.h"
 
 namespace IO
 {
@@ -11,7 +11,7 @@ namespace IO
         : fd_(fd)
         , timeoutms_(-1) {
         if (!TCPSocket::isSocket(fd_))
-            throw _NException_Normal("Invalid Sock object!");
+            throw _HException_Normal("Invalid Sock object!");
     }
 
     FDOutBuffer::~FDOutBuffer() {
@@ -23,11 +23,11 @@ namespace IO
 
     void FDOutBuffer::write(Size len, const NBYTE *data, bool wait) {
         if (len < MIN_BULK_SIZE) {
-            NBuffer::write(len, data, wait);
+            HBuffer::write(len, data, wait);
             return;
         }
 
-        NBuffer::write(len, data, wait);
+        HBuffer::write(len, data, wait);
         flushBuffer(size(), wait);
     }
 
@@ -37,7 +37,7 @@ namespace IO
                 WaitUntilReady(fd_, wait ? timeoutms_ : 0, true);
                 break;
             }
-            catch (NException e) {
+            catch (HException e) {
                 if (strcasecmp(e.reason().c_str(), "Timeout") != 0) {
                     break;
                 }

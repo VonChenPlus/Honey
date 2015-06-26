@@ -20,12 +20,12 @@
 #include <algorithm>
 #undef min
 
-#include "UTILS/STRING/NString.h"
+#include "UTILS/STRING/HString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace IO
 {
-    void ReadWithProgress(int fd, Size length, NBuffer &buffer, float *progress) {
+    void ReadWithProgress(int fd, Size length, HBuffer &buffer, float *progress) {
         std::vector<NBYTE> buf;
         if (length >= 1024 * 64 * 16) {
             buf.resize(1024 * 64);
@@ -44,7 +44,7 @@ namespace IO
                 return;
             }
             else if (retval < 0) {
-                throw _NException_(StringFromFormat("error recv from buffer: %i", retval), NException::IO);
+                throw _HException_(StringFromFormat("error recv from buffer: %i", retval), HException::IO);
             }
 
             buffer.write(retval, &buf[0]);
@@ -54,7 +54,7 @@ namespace IO
         } while (errorNumber == SOCKEINTR && total < length);
     }
 
-    void WriteWithProgress(int fd, Size length, NBuffer &buffer, float *progress) {
+    void WriteWithProgress(int fd, Size length, HBuffer &buffer, float *progress) {
         std::vector<NBYTE> buf;
         if (length >= 1024 * 64 * 16) {
             buf.resize(1024 * 64);
@@ -75,7 +75,7 @@ namespace IO
                 return;
             }
             else if (retval < 0) {
-                throw _NException_(StringFromFormat("error send to buffer: %i", retval), NException::IO);
+                throw _HException_(StringFromFormat("error send to buffer: %i", retval), HException::IO);
             }
 
             total += retval;
@@ -106,10 +106,10 @@ namespace IO
             rval = select(fd + 1, NULLPTR, &fds, NULLPTR, tvp);
 
         if (rval < 0) {
-            throw _NException_("Error calling select", NException::IO);
+            throw _HException_("Error calling select", HException::IO);
         }
         else if (rval == 0) {
-            throw _NException_("Timeout", NException::IO);
+            throw _HException_("Timeout", HException::IO);
         }
     }
 
@@ -117,7 +117,7 @@ namespace IO
         #ifndef _WIN32
         int opts = fcntl(sock, F_GETFL);
         if (opts < 0) {
-            throw _NException_Normal("Error getting socket status while changing nonblocking status");
+            throw _HException_Normal("Error getting socket status while changing nonblocking status");
         }
         if (non_blocking) {
             opts = (opts | O_NONBLOCK);
@@ -127,11 +127,11 @@ namespace IO
         }
 
         if (fcntl(sock, F_SETFL, opts) < 0) {
-            throw _NException_Normal("Error setting socket nonblocking status");
+            throw _HException_Normal("Error setting socket nonblocking status");
         }
         #else
         if (ioctlsocket(sock, FIONBIO, (unsigned long *)&non_blocking) < 0)
-            throw _NException_("Error setting socket nonblocking status", NException::IO);
+            throw _HException_("Error setting socket nonblocking status", HException::IO);
         #endif
     }
 }

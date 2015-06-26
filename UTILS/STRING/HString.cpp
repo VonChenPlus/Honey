@@ -1,4 +1,4 @@
-#include "NString.h"
+#include "HString.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <iomanip>
 
-#include "BASE/NBuffer.h"
+#include "BASE/HBuffer.h"
 
 namespace UTILS
 {
@@ -88,7 +88,7 @@ namespace UTILS
         }
 
         void DataToHexString(const uint8 *data, Size size, std::string *output) {
-            NBuffer buffer;
+            HBuffer buffer;
             for (Size i = 0; i < size; i++) {
                 buffer.writeAsFormat("%02x ", data[i]);
                 if (i && !(i & 15))

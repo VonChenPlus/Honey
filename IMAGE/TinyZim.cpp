@@ -9,7 +9,7 @@
 #include "IO/FileUtils.h"
 using IO::ReadLocalFile;
 using IO::OpenFile;
-#include "UTILS/STRING/NString.h"
+#include "UTILS/STRING/HString.h"
 using UTILS::STRING::StringFromFormat;
 #include "MATH/Utils.h"
 using MATH::IsPowerOf2;
@@ -68,7 +68,7 @@ namespace IMAGE
 
     int LoadZIMPtr(const uint8 *zim, Size datasize, int *width, int *height, int *flags, uint8 **image) {
         if (zim[0] != 'Z' || zim[1] != 'I' || zim[2] != 'M' || zim[3] != 'G') {
-            throw _NException_Normal("Not a ZIM file");
+            throw _HException_Normal("Not a ZIM file");
         }
         memcpy(width, zim + 4, 4);
         memcpy(height, zim + 8, 4);
@@ -102,13 +102,13 @@ namespace IMAGE
                     break;
                 }
             default:
-                throw _NException_Normal(StringFromFormat("Invalid ZIM format %i", *flags & ZIM_FORMAT_MASK));
+                throw _HException_Normal(StringFromFormat("Invalid ZIM format %i", *flags & ZIM_FORMAT_MASK));
             }
             total_data_size += image_data_size[i];
         }
 
         if (total_data_size == 0) {
-            throw _NException_Normal("Invalid ZIM data size 0");
+            throw _HException_Normal("Invalid ZIM data size 0");
         }
 
         image[0] = (uint8 *)malloc(total_data_size);
@@ -124,13 +124,13 @@ namespace IMAGE
                 return 0;
             }
             if (outlen != total_data_size) {
-                throw _NException_Normal(StringFromFormat("Wrong size data in ZIM: %i vs %i", (int)outlen, (int)total_data_size));
+                throw _HException_Normal(StringFromFormat("Wrong size data in ZIM: %i vs %i", (int)outlen, (int)total_data_size));
             }
         }
         else {
             memcpy(*image, zim + 16, datasize - 16);
             if (datasize - 16 != (Size)total_data_size) {
-                throw _NException_Normal(StringFromFormat("Wrong size data in ZIM: %i vs %i", (int)(datasize-16), (int)total_data_size));
+                throw _HException_Normal(StringFromFormat("Wrong size data in ZIM: %i vs %i", (int)(datasize-16), (int)total_data_size));
             }
         }
         return num_levels;
@@ -218,7 +218,7 @@ namespace IMAGE
 
             // Check for power of 2
             if (!IsPowerOf2(width) || !IsPowerOf2(height))
-                throw _NException_Normal("Image must have power of 2 dimensions");
+                throw _HException_Normal("Image must have power of 2 dimensions");
 
             // Convert RGBX to ETC1 before saving.
             int blockw = width/4;
@@ -279,7 +279,7 @@ namespace IMAGE
             break;
 
         default:
-            throw _NException_Normal("Unhandled ZIM format");
+            throw _HException_Normal("Unhandled ZIM format");
         }
     }
 
@@ -335,7 +335,7 @@ namespace IMAGE
                     fwrite(dest, 1, dest_len, f);
                 }
                 else {
-                    throw _NException_Normal("Zlib compression failed.");
+                    throw _HException_Normal("Zlib compression failed.");
                 }
                 delete [] dest;
             } else {

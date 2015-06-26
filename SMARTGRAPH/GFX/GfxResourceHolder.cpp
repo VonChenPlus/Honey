@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "BASE/Honey.h"
-#include "UTILS/STRING/NString.h"
+#include "UTILS/STRING/HString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace GFX
@@ -75,7 +75,7 @@ namespace GFX
             //FLOG("Lost manager already shutdown");
         }
         else if (holders->size() > 0) {
-            throw _NException_(StringFromFormat("Lost manager shutdown with %i objects still registered", (int)holders->size()), NException::GFX);
+            throw _HException_(StringFromFormat("Lost manager shutdown with %i objects still registered", (int)holders->size()), HException::GFX);
         }
 
         delete holders;

@@ -7,7 +7,7 @@
 #include "SMARTGRAPH/UI/KeyCodes.h"
 #include "MATH/Bounds.h"
 using MATH::Bounds;
-#include "UTILS/TIME/NTime.h"
+#include "UTILS/TIME/HTime.h"
 using UTILS::TIME::TimeNow;
 #include "SMARTGRAPH/UI/UI.h"
 #include "MATH/Point.h"
@@ -247,7 +247,7 @@ namespace UI
         frameCount++;
 
         if (!root) {
-            throw _NException_Normal("Tried to update a view hierarchy from a zero pointer root");
+            throw _HException_Normal("Tried to update a view hierarchy from a zero pointer root");
         }
 
         if (focusMoves.size()) {
@@ -279,7 +279,7 @@ namespace UI
 
     void LayoutViewHierarchy(const UIContext &dc, ViewGroup *root) {
         if (!root) {
-            throw _NException_Normal("Tried to layout a view hierarchy from a zero pointer root");
+            throw _HException_Normal("Tried to layout a view hierarchy from a zero pointer root");
         }
         const Bounds &rootBounds = dc.getBounds();
 
@@ -392,7 +392,7 @@ namespace UI
             break;
         case FOCUS_PREV:
         case FOCUS_NEXT:
-            throw _NException_Normal("Invalid focus direction");
+            throw _HException_Normal("Invalid focus direction");
             break;
         }
 

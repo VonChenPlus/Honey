@@ -6,7 +6,7 @@ using IMAGE::ZIM_CLAMP;
 using MATH::IsPowerOf2;
 using IMAGE::ZIM_HAS_MIPS;
 using IMAGE::ZIM_GEN_MIPS;
-#include "UTILS/STRING/NString.h"
+#include "UTILS/STRING/HString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace GLOBAL
@@ -136,7 +136,7 @@ namespace THIN3D
             infoLog[len] = '\0';
             glDeleteShader(shader_);
             shader_ = 0;
-            throw _NException_(StringFromFormat("%s Shader compile error:\n%s", type_ == GL_FRAGMENT_SHADER ? "Fragment" : "Vertex", infoLog), NException::GFX);
+            throw _HException_(StringFromFormat("%s Shader compile error:\n%s", type_ == GL_FRAGMENT_SHADER ? "Fragment" : "Vertex", infoLog), HException::GFX);
         }
     }
 
@@ -162,7 +162,7 @@ namespace THIN3D
                 glVertexAttribPointer(components_[i].semantic, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride_, (void *)(b + (IntPtr)components_[i].offset));
                 break;
             case INVALID:
-                throw _NException_Normal("Thin3DGLVertexFormat: Invalid component type applied");
+                throw _HException_Normal("Thin3DGLVertexFormat: Invalid component type applied");
             }
         }
     }
@@ -221,7 +221,7 @@ namespace THIN3D
                 std::string log = StringFromFormat("Could not link program:\n %s", buf);
                 delete[] buf;
                 // We've thrown out the source at this point. Might want to do something about that.
-                throw _NException_(log, NException::GFX);
+                throw _HException_(log, HException::GFX);
             }
         }
 
@@ -365,7 +365,7 @@ namespace THIN3D
             glTexImage2D(GL_TEXTURE_2D, level, internalFormat, width_, height_, 0, format, type, data);
             break;
         default:
-            throw _NException_Normal("Targets other than GL_TEXTURE_2D not yet supported");
+            throw _HException_Normal("Targets other than GL_TEXTURE_2D not yet supported");
         }
     }
 
@@ -383,7 +383,7 @@ namespace THIN3D
             loadFromFile(filename_.c_str());
         }
         else {
-            throw _NException_Normal(StringFromFormat("Texture %p cannot be restored - has no filename", this));
+            throw _HException_Normal(StringFromFormat("Texture %p cannot be restored - has no filename", this));
         }
     }
 
@@ -437,7 +437,7 @@ namespace THIN3D
 
     Thin3DShaderSet *Thin3DGLContext::createShaderSet(Thin3DShader *vshader, Thin3DShader *fshader) {
         if (!vshader || !fshader) {
-            throw _NException_Normal(StringFromFormat("ShaderSet requires both a valid vertex and a fragment shader: %p %p", vshader, fshader));
+            throw _HException_Normal(StringFromFormat("ShaderSet requires both a valid vertex and a fragment shader: %p %p", vshader, fshader));
         }
         Thin3DGLShaderSet *shaderSet = new Thin3DGLShaderSet();
         vshader->addRef();

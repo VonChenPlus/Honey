@@ -11,7 +11,7 @@ using IMAGE::PNGLoadPtr;
 #include "EXTERNALS/jpge/jpgd.h"
 #include "IO/FileUtils.h"
 using IO::ReadLocalFile;
-#include "UTILS/STRING/NString.h"
+#include "UTILS/STRING/HString.h"
 using UTILS::STRING::StringFromFormat;
 #include <QImage>
 
@@ -166,7 +166,7 @@ namespace THIN3D
             type = DetectImageFileType(data, size);
         }
         if (type == TYPE_UNKNOWN) {
-            throw _NException_Normal("File has unknown format");
+            throw _HException_Normal("File has unknown format");
         }
 
         *num_levels = 0;
@@ -195,7 +195,7 @@ namespace THIN3D
             }
             break;
         default:
-            throw _NException_Normal("File has unknown format");
+            throw _HException_Normal("File has unknown format");
         }
     }
 
@@ -216,7 +216,7 @@ namespace THIN3D
                 free(image[i]);
             }
             else {
-                throw _NException_Normal(StringFromFormat("Missing image level %i", i));
+                throw _HException_Normal(StringFromFormat("Missing image level %i", i));
             }
         }
 

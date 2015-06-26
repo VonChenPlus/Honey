@@ -6,7 +6,7 @@
 
 #include "BASE/Honey.h"
 #include "SMARTGRAPH/GFX/GLExtensions.h"
-#include "UTILS/STRING/NString.h"
+#include "UTILS/STRING/HString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace GLOBAL
@@ -245,6 +245,6 @@ namespace GFX
 
         int error = glGetError();
         if (error)
-            throw _NException_(StringFromFormat("GL error in init: %i", error), NException::GFX);
+            throw _HException_(StringFromFormat("GL error in init: %i", error), HException::GFX);
     }
 }

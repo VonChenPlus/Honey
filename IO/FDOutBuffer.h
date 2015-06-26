@@ -1,11 +1,11 @@
 #ifndef FDOUTBUFFER_H
 #define FDOUTBUFFER_H
 
-#include "BASE/NBuffer.h"
+#include "BASE/HBuffer.h"
 
 namespace IO
 {
-    class FDOutBuffer final: public NOutBuffer
+    class FDOutBuffer final: public HOutBuffer
     {
     public:
         FDOutBuffer(int fd);

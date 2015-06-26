@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "EXTERNALS/libpng17/png.h"
-#include "UTILS/STRING/NString.h"
+#include "UTILS/STRING/HString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace IMAGE
@@ -19,7 +19,7 @@ namespace IMAGE
         png_image_begin_read_from_file(&png, file);
 
         if (PNG_IMAGE_FAILED(png)) {
-            throw _NException_(StringFromFormat("pngLoad: %s", png.message), NException::IO);
+            throw _HException_(StringFromFormat("pngLoad: %s", png.message), HException::IO);
         }
         *pwidth = png.width;
         *pheight = png.height;
@@ -38,7 +38,7 @@ namespace IMAGE
         png_image_begin_read_from_memory(&png, input_ptr, input_len);
 
         if (PNG_IMAGE_FAILED(png)) {
-            throw _NException_(StringFromFormat("pngLoad: %s", png.message), NException::IO);
+            throw _HException_(StringFromFormat("pngLoad: %s", png.message), HException::IO);
         }
         *pwidth = png.width;
         *pheight = png.height;

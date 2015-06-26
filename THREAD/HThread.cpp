@@ -1,4 +1,4 @@
-#include "NThread.h"
+#include "HThread.h"
 
 namespace THREAD
 {
@@ -22,11 +22,11 @@ namespace THREAD
         return thread_ < rhs.thread_;
     }
 
-    bool NThread::joinable() const {
+    bool HThread::joinable() const {
         return id_ == ThreadID();
     }
 
-    void NThread::join() {
+    void HThread::join() {
     #ifdef _WIN32
         WaitForSingleObject(handle_, INFINITE);
     #else
@@ -35,7 +35,7 @@ namespace THREAD
         detach();
     }
 
-    void NThread::detach() {
+    void HThread::detach() {
     #ifdef _WIN32
         CloseHandle(handle_);
     #else
@@ -44,7 +44,7 @@ namespace THREAD
         id_ = ThreadID();
     }
 
-    void NThread::swap(NThread &other) {
+    void HThread::swap(HThread &other) {
         std::swap(id_, other.id_);
     #ifdef _WIN32
         std::swap(handle_, other.handle_);

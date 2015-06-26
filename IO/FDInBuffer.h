@@ -1,11 +1,11 @@
 #ifndef FDINBUFFER_H
 #define FDINBUFFER_H
 
-#include "BASE/NBuffer.h"
+#include "BASE/HBuffer.h"
 
 namespace IO
 {
-    class FDInBuffer final: public NInBuffer
+    class FDInBuffer final: public HInBuffer
     {
     public:
         FDInBuffer(int fd);

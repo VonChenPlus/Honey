@@ -20,7 +20,7 @@
 #define errorNumber WSAGetLastError()
 #endif
 
-#include "UTILS/STRING/NString.h"
+#include "UTILS/STRING/HString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace IO
@@ -35,7 +35,7 @@ namespace IO
         WSADATA initResult;
 
         if (WSAStartup(requiredVersion, &initResult) != 0)
-            throw _NException_(StringFromFormat("unable to initialise Winsock2, errorNumber = %d", errorNumber), NException::IO);
+            throw _HException_(StringFromFormat("unable to initialise Winsock2, errorNumber = %d", errorNumber), HException::IO);
         #else
         signal(SIGPIPE, SIG_IGN);
         #endif
@@ -52,7 +52,7 @@ namespace IO
         initSockets();
 
         if ((sock_ = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-            throw _NException_(StringFromFormat("unable to create socket, errorNumber = %d", errorNumber), NException::IO);
+            throw _HException_(StringFromFormat("unable to create socket, errorNumber = %d", errorNumber), HException::IO);
 
         #ifndef WIN32
           // - By default, close the socket on exec()
@@ -73,13 +73,13 @@ namespace IO
                 addr.sin_addr.s_addr = ((struct in_addr *)hostinfo->h_addr)->s_addr;
             }
             else {
-                throw _NException_(StringFromFormat("unable to resolve host by name, errorNumber = %d", errorNumber), NException::IO);
+                throw _HException_(StringFromFormat("unable to resolve host by name, errorNumber = %d", errorNumber), HException::IO);
             }
         }
 
         // Attempt to connect to the remote host
         if (connect(sock_, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
-            throw _NException_(StringFromFormat("unable to connect to host, errorNumber = %d", errorNumber), NException::IO);
+            throw _HException_(StringFromFormat("unable to connect to host, errorNumber = %d", errorNumber), HException::IO);
         }
 
         // Disable Nagle's algorithm, to reduce latency
@@ -167,7 +167,7 @@ namespace IO
     void TCPSocket::enableNagles(int sock, bool enable) {
         int one = enable ? 0 : 1;
         if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char *)&one, sizeof(one)) < 0) {
-            throw _NException_(StringFromFormat("unable to setsockopt TCP_NODELAY, errorNumber = %d", errorNumber), NException::IO);
+            throw _HException_(StringFromFormat("unable to setsockopt TCP_NODELAY, errorNumber = %d", errorNumber), HException::IO);
         }
     }
 

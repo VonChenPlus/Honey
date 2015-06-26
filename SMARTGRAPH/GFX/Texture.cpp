@@ -22,7 +22,7 @@ using IMAGE::PNGLoadPtr;
 #include "EXTERNALS/jpge/jpgd.h"
 #include "EXTERNALS/rg_etc1/rg_etc1.h"
 #include "SMARTGRAPH/GFX/GLExtensions.h"
-#include "UTILS/STRING/NString.h"
+#include "UTILS/STRING/HString.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace GLOBAL
@@ -133,14 +133,14 @@ namespace GFX
             bool clamp = false;
             uint8 *data = GenerateTexture(filename, bpp, w, h, clamp);
             if (!data)
-                throw _NException_("GenerateTexture failed", NException::GFX);
+                throw _HException_("GenerateTexture failed", HException::GFX);
             glGenTextures(1, &id_);
             glBindTexture(GL_TEXTURE_2D, id_);
             if (bpp == 1) {
                 glTexImage2D(GL_TEXTURE_2D, 0, 1, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
             }
             else {
-                throw _NException_Normal("unsupported image format!");
+                throw _HException_Normal("unsupported image format!");
             }
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
@@ -187,10 +187,10 @@ namespace GFX
             loadJPEG(fn);
         }
         else if (!name || !strlen(name)) {
-            throw _NException_(StringFromFormat("Failed to identify image file %s by extension", name), NException::GFX);
+            throw _HException_(StringFromFormat("Failed to identify image file %s by extension", name), HException::GFX);
         }
         else {
-            throw _NException_("Cannot load a texture with an empty filename", NException::GFX);
+            throw _HException_("Cannot load a texture with an empty filename", HException::GFX);
         }
     }
 
@@ -221,7 +221,7 @@ namespace GFX
         int actual_comps;
         image_data = jpgd::decompress_jpeg_image_from_file(filename, &width_, &height_, &actual_comps, 4);
         if (!image_data) {
-            throw _NException_("jpeg: image data returned was 0", NException::IO);
+            throw _HException_("jpeg: image data returned was 0", HException::IO);
         }
 
         GL_CHECK();
@@ -310,7 +310,7 @@ namespace GFX
         int flags;
         int num_levels = LoadZIM(filename, &width[0], &height[0], &flags, &image_data[0]);
         if (num_levels >= ZIM_MAX_MIP_LEVELS)
-            throw _NException_Normal("num_levels >= ZIM_MAX_MIP_LEVELS");
+            throw _HException_Normal("num_levels >= ZIM_MAX_MIP_LEVELS");
         width_ = width[0];
         height_ = height[0];
         int data_type = GL_UNSIGNED_BYTE;

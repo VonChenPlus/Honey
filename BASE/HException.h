@@ -1,5 +1,5 @@
-#ifndef NEXCEPTION_H
-#define NEXCEPTION_H
+#ifndef HEXCEPTION_H
+#define HEXCEPTION_H
 
 #include <exception>
 #include <string>
@@ -17,11 +17,11 @@
   #define NOEXCEPT throw()
 #endif  /*  NOEXCEPT    */
 
-#define _NException_( msg, type) NException( (msg), (type), __FILE__, __LINE__ )
-#define _NException_Unknown( msg) _NException_( (msg), (NException::Unknown) )
-#define _NException_Normal( msg) _NException_( (msg), (NException::Normal) )
+#define _HException_( msg, type) HException( (msg), (type), __FILE__, __LINE__ )
+#define _HException_Unknown( msg) _HException_( (msg), (HException::Unknown) )
+#define _HException_Normal( msg) _HException_( (msg), (HException::Normal) )
 
-class NException : std::exception
+class HException : std::exception
 {
 public:
     enum NType
@@ -39,8 +39,8 @@ protected:
     int whereline_;
 
 public:
-    NException(const std::string reason, NType type = Unknown, std::string file = "", int line = 0) NOEXCEPT;
-    virtual ~NException() NOEXCEPT;
+    HException(const std::string reason, NType type = Unknown, std::string file = "", int line = 0) NOEXCEPT;
+    virtual ~HException() NOEXCEPT;
 
     const std::string &reason() NOEXCEPT { return reason_; }
     NType type() NOEXCEPT { return type_; }
@@ -48,7 +48,7 @@ public:
     int whereline() NOEXCEPT { return whereline_; }
 
 private:
-    NException() NOEXCEPT {}
+    HException() NOEXCEPT {}
 };
 
-#endif // NEXCEPTION_H
+#endif // HEXCEPTION_H

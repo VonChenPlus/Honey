@@ -3,7 +3,7 @@
 #include <set>
 #include <queue>
 
-#include "UTILS/TIME/NTime.h"
+#include "UTILS/TIME/HTime.h"
 using UTILS::TIME::TimeNow;
 #include "SMARTGRAPH/UI/KeyCodes.h"
 #include "SMARTGRAPH/UI/ScreenManager.h"
@@ -178,7 +178,7 @@ namespace UI
         bool retval = UIScreen::key(key);
         if (!retval && (key.flags & KEY_DOWN) && IsEscapeKeyCode(key.keyCode)) {
             if (finished_) {
-                throw _NException_Normal("Screen already finished");
+                throw _HException_Normal("Screen already finished");
             } else {
                 finished_ = true;
                 screenManager()->finishDialog(this, DR_BACK);

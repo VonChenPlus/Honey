@@ -1,3 +1,6 @@
+#ifndef NKCODEFROMQT_H
+#define NKCODEFROMQT_H
+
 #include "BASE/ConstMap.h"
 #include <map>
 #include "SMARTGRAPH/UI/KeyCodes.h"
@@ -90,3 +93,4 @@ static const std::map<int, int> KeyMapRawQttoNative = ConstMap < int, int >
     (Qt::Key_Back, NKCODE_BACK)
     (Qt::Key_Backspace, NKCODE_DEL);
 
+#endif // NKCODEFROMQT_H

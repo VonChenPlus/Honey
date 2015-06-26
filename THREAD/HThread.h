@@ -1,10 +1,10 @@
-#ifndef NTHREAD_H
-#define NTHREAD_H
+#ifndef HTHREAD_H
+#define HTHREAD_H
 
 #include <functional>
 
-#include "THREAD/NThreadDef.h"
-#include "THREAD/NThreadUtils.h"
+#include "THREAD/HThreadDef.h"
+#include "THREAD/HThreadUtils.h"
 
 // partial std::thread implementation for win32/pthread
 
@@ -12,7 +12,7 @@ namespace THREAD
 {
     class ThreadID final
     {
-        friend class NThread;
+        friend class HThread;
     public:
         ThreadID();
         ThreadID(THREAD_ID threadid);
@@ -28,7 +28,7 @@ namespace THREAD
     template <typename FuncName>
     class TheadFunc final
     {
-        friend class NThread;
+        friend class HThread;
     private:
         TheadFunc(FuncName&& func) : func_(func) {}
 
@@ -41,7 +41,7 @@ namespace THREAD
     template <typename Callback>
     class ThreadFuncWithArgs final
     {
-        friend class NThread;
+        friend class HThread;
     private:
         ThreadFuncWithArgs(Callback callback) : callback_(callback) {
         }
@@ -52,20 +52,20 @@ namespace THREAD
         Callback callback_;
     };
 
-    class NThread final
+    class HThread final
     {
     public:
         template <typename FuncName>
-        NThread(FuncName&& func) {
+        HThread(FuncName&& func) {
             startThread(new TheadFunc<FuncName>(func));
         }
 
         template <typename FuncName, typename... Args>
-        NThread(FuncName&& func, Args&&... args) {
+        HThread(FuncName&& func, Args&&... args) {
             startThread(CreateCallback(std::bind(func, args...)));
         }
 
-        ~NThread() {
+        ~HThread() {
             if (joinable())
                 detach();
         }
@@ -82,7 +82,7 @@ namespace THREAD
         bool joinable() const;
         void join();
         void detach();
-        void swap(NThread &other);
+        void swap(HThread &other);
 
     private:
         template <typename FuncObject>
@@ -123,4 +123,4 @@ namespace THREAD
     };
 }
 
-#endif // NTHREAD_H
+#endif // HTHREAD_H
