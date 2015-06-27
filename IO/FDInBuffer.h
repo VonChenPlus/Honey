@@ -13,12 +13,10 @@ namespace IO
 
         void setTimeout(int timeoutms);
 
-    protected:
-        void read(Size length, NBYTE *dest, bool wait = true) override;
-
     private:
+        void read(Size length, HBYTE *dest, bool wait = true) override;
         void fillBuffer(Size length, bool wait = true) override;
-        bool swapBuffer() override { return true;  }
+        bool bigEndian() override { return true; }
 
     private:
         int fd_;

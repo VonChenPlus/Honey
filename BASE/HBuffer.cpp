@@ -12,25 +12,25 @@ HBuffer::HBuffer() {
 HBuffer::~HBuffer() {
 }
 
-NBYTE *HBuffer::appendBufferSize(Size length) {
+HBYTE *HBuffer::appendBufferSize(Size length) {
     Size old_size = data_.size();
     data_.resize(old_size + length);
     return &data_[0] + old_size;
 }
 
-void HBuffer::write(Size len, const NBYTE *data, bool) {
-    NBYTE *dest = appendBufferSize(len);
+void HBuffer::write(Size len, const HBYTE *data, bool) {
+    HBYTE *dest = appendBufferSize(len);
     memcpy(dest, data, len);
 }
 
 void HBuffer::write(const HBuffer &other) {
     Size len = other.size();
-    NBYTE *dest = appendBufferSize(len);
+    HBYTE *dest = appendBufferSize(len);
     memcpy(dest, &other.data_[0], len);
 }
 
-void HBuffer::writeAsFormat(const NBYTE *fmt, ...) {
-    NBYTE buffer[2048];
+void HBuffer::writeAsFormat(const HBYTE *fmt, ...) {
+    HBYTE buffer[2048];
     va_list vl;
     va_start(vl, fmt);
     int retval = vsnprintf(buffer, sizeof(buffer), fmt, vl);
@@ -41,11 +41,11 @@ void HBuffer::writeAsFormat(const NBYTE *fmt, ...) {
         throw _HException_Normal("vsnprintf failed");
     }
     va_end(vl);
-    NBYTE *ptr = appendBufferSize(retval);
+    HBYTE *ptr = appendBufferSize(retval);
     memcpy(ptr, buffer, retval);
 }
 
-void HBuffer::read(Size length, NBYTE *dest, bool) {
+void HBuffer::read(Size length, HBYTE *dest, bool) {
     if (length > data_.size()) {
         throw _HException_Normal("truncating length");
     }
@@ -63,7 +63,7 @@ void HBuffer::read(Size length, HBuffer &other, bool) {
     data_.erase(data_.begin(), data_.begin() + length);
 }
 
-void HBuffer::peek(Size length, NBYTE *dest, bool) {
+void HBuffer::peek(Size length, HBYTE *dest, bool) {
     if (length > data_.size()) {
         throw _HException_Normal("truncating length");
     }

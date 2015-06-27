@@ -16,7 +16,8 @@ namespace IO
         void flushBuffer(Size len, bool wait = true) override;
 
     protected:
-        void write(Size len, const NBYTE *data, bool wait = true) override;
+        void write(Size len, const HBYTE *data, bool wait = true) override;
+        bool bigEndian() override { return true; }
 
     private:
         int fd_;

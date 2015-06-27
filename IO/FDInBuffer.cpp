@@ -20,7 +20,7 @@ namespace IO
         timeoutms_ = timeoutms;
     }
 
-    void FDInBuffer::read(Size length, NBYTE *dest, bool wait) {
+    void FDInBuffer::read(Size length, HBYTE *dest, bool wait) {
         // do not know total buffer size sometimes, so we do not throw exception
         checkBuffer(length, wait, false);
         HBuffer::read(length, dest, wait);

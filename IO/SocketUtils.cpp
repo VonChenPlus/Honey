@@ -26,7 +26,7 @@ using UTILS::STRING::StringFromFormat;
 namespace IO
 {
     void ReadWithProgress(int fd, Size length, HBuffer &buffer, float *progress) {
-        std::vector<NBYTE> buf;
+        std::vector<HBYTE> buf;
         if (length >= 1024 * 64 * 16) {
             buf.resize(1024 * 64);
         }
@@ -55,7 +55,7 @@ namespace IO
     }
 
     void WriteWithProgress(int fd, Size length, HBuffer &buffer, float *progress) {
-        std::vector<NBYTE> buf;
+        std::vector<HBYTE> buf;
         if (length >= 1024 * 64 * 16) {
             buf.resize(1024 * 64);
         }

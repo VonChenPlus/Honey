@@ -15,13 +15,13 @@ public:
     virtual ~HBuffer();
 
     // These work pretty much like you'd expect.
-    virtual void write(Size len, const NBYTE *data, bool wait = true);
+    virtual void write(Size len, const HBYTE *data, bool wait = true);
     void write(const HBuffer &other);
-    void writeAsFormat(const NBYTE *fmt, ...);
+    void writeAsFormat(const HBYTE *fmt, ...);
 
-    virtual void read(Size length, NBYTE *dest, bool wait = true);
+    virtual void read(Size length, HBYTE *dest, bool wait = true);
     virtual void read(Size length, HBuffer &other, bool wait = true);
-    virtual void peek(Size length, NBYTE *dest, bool wait = true);
+    virtual void peek(Size length, HBYTE *dest, bool wait = true);
     virtual void peek(Size length, HBuffer &other, bool wait = true);
     virtual void skip(Size length, bool wait = true);
 
@@ -29,15 +29,26 @@ public:
     Size size() const { return data_.size(); }
     bool empty() const { return size() == 0; }
     void clear() { data_.resize(0); }
-    NBYTE *data() { return &data_[0]; }
+    HBYTE *data() { return &data_[0]; }
 
 protected:
     // Write max [length] bytes to the returned pointer.
     // Any other operation on this Buffer invalidates the pointer.
-    NBYTE *appendBufferSize(Size length);
+    HBYTE *appendBufferSize(Size length);
+
+    template <typename T>
+    T swap(T *value) {
+        switch (sizeof(T)) {
+        case 2: return (T)swap16((uint8 *)value);
+        case 4: return (T)swap32((uint8 *)value);
+        case 8: return (T)swap64((uint8 *)value);
+        default:
+            throw _HException_Normal("Unhander data bits!");
+        }
+    }
 
     // TODO: Find a better internal representation, like a cord.
-    std::vector<NBYTE> data_;
+    std::vector<HBYTE> data_;
 
     DISALLOW_COPY_AND_ASSIGN(HBuffer)
 };
@@ -47,15 +58,28 @@ class HInBuffer : protected HBuffer
 public:
     template <typename T>
     void readAny(Size length, T *dest, bool wait = true) {
-        read(length, (NBYTE *)dest, wait);
+        if (length >= sizeof(T) && bigEndian() && sizeof(T) != 1) {
+            if (length % sizeof(T) != 0)
+                throw _HException_Normal("Unaligned data size!");
+
+            Size count = length / sizeof(T);
+            for (Size index = 0; index < count; ++index) {
+                read(sizeof(T), (HBYTE *)&dest[index], wait);
+                dest[index] = swap(&dest[index]);
+            }
+        }
+        else
+            read(length, (HBYTE *)dest, wait);
     }
 
-    void read(Size length, NBYTE *dest, bool wait = true) override {
-        HBuffer::read(length, dest, wait);
+    template <typename T>
+    void readOne(T *dest, bool wait = true) {
+        readAny(sizeof(T), dest, wait);
     }
 
-    void read(Size length, HBuffer &other, bool wait = true) override {
-        HBuffer::read(length, other, wait);
+    template <typename T>
+    void readAny(Size length, T &dest, bool wait = true) {
+        read(length, dest, wait);
     }
 
 protected:
@@ -70,7 +94,7 @@ protected:
 
     virtual void fillBuffer(Size, bool = true) {}
 
-    virtual bool swapBuffer() { return false;  }
+    virtual bool bigEndian() { return false; }
 };
 
 class HOutBuffer: protected HBuffer
@@ -78,10 +102,24 @@ class HOutBuffer: protected HBuffer
 public:
     template <typename T>
     void writeAny(Size length, T *dest, bool wait = true) {
-        write(length, (NBYTE *)dest, wait);
+        if (length >= sizeof(T) && bigEndian() && sizeof(T) != 1) {
+            if (length % sizeof(T) != 0)
+                throw _HException_Normal("Unaligned data size!");
+
+            Size count = length / sizeof(T);
+            for (Size index = 0; index < count; ++index) {
+                T temp = swap(&dest[index]);
+                write(sizeof(T), (HBYTE *)&temp, wait);
+            }
+        }
+        else
+            write(length, (HBYTE *)dest, wait);
     }
 
     virtual void flushBuffer(Size, bool = true) {}
+
+protected:
+    virtual bool bigEndian() { return false; }
 };
 
 #endif // HBUFFER_H

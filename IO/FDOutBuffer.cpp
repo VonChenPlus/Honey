@@ -21,7 +21,7 @@ namespace IO
         timeoutms_ = timeoutms;
     }
 
-    void FDOutBuffer::write(Size len, const NBYTE *data, bool wait) {
+    void FDOutBuffer::write(Size len, const HBYTE *data, bool wait) {
         if (len < MIN_BULK_SIZE) {
             HBuffer::write(len, data, wait);
             return;
