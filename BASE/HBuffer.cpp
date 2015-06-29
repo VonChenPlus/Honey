@@ -49,7 +49,8 @@ void HBuffer::read(Size length, HBYTE *dest, bool) {
     if (length > data_.size()) {
         throw _HException_Normal("truncating length");
     }
-    memcpy(dest, &data_[0], length);
+    if (dest)
+        memcpy(dest, &data_[0], length);
     data_.erase(data_.begin(), data_.begin() + length);
 }
 

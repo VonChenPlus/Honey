@@ -21,17 +21,17 @@ namespace IO
         timeoutms_ = timeoutms;
     }
 
-    void FDOutBuffer::write(Size len, const HBYTE *data, bool wait) {
-        if (len < MIN_BULK_SIZE) {
-            HBuffer::write(len, data, wait);
+    void FDOutBuffer::write(Size length, const HBYTE *data, bool wait) {
+        if (length < MIN_BULK_SIZE) {
+            HBuffer::write(length, data, wait);
             return;
         }
 
-        HBuffer::write(len, data, wait);
+        HBuffer::write(length, data, wait);
         flushBuffer(size(), wait);
     }
 
-    void FDOutBuffer::flushBuffer(Size len, bool wait) {
+    void FDOutBuffer::flushBuffer(Size length, bool wait) {
         while (true) {
             try {
                 WaitUntilReady(fd_, wait ? timeoutms_ : 0, true);
@@ -43,6 +43,9 @@ namespace IO
                 }
             }
         }
-        WriteWithProgress(fd_, len, *this, NULLPTR);
+
+        if (length == 0)
+            length = this->size();
+        WriteWithProgress(fd_, length, *this, NULLPTR);
     }
 }

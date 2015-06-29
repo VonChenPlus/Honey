@@ -13,10 +13,10 @@ namespace IO
 
         void setTimeout(int timeoutms);
 
-        void flushBuffer(Size len, bool wait = true) override;
+        void flushBuffer(Size length = 0, bool wait = true) override;
 
     protected:
-        void write(Size len, const HBYTE *data, bool wait = true) override;
+        void write(Size length, const HBYTE *data, bool wait = true) override;
         bool bigEndian() override { return true; }
 
     private:

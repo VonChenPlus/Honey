@@ -65,7 +65,9 @@ public:
             Size count = length / sizeof(T);
             for (Size index = 0; index < count; ++index) {
                 read(sizeof(T), (HBYTE *)&dest[index], wait);
-                dest[index] = swap(&dest[index]);
+                if (dest) {
+                    dest[index] = swap(&dest[index]);
+                }
             }
         }
         else
@@ -75,6 +77,17 @@ public:
     template <typename T>
     void readOne(T *dest, bool wait = true) {
         readAny(sizeof(T), dest, wait);
+    }
+
+    template <typename T>
+    T readOne(bool wait = true) {
+        T temp;
+        readOne(&temp, wait);
+        return temp;
+    }
+
+    void skip(Size length, bool wait = true) {
+        readAny(length, (uint8 *)NULLPTR, wait);
     }
 
     template <typename T>
@@ -116,7 +129,12 @@ public:
             write(length, (HBYTE *)dest, wait);
     }
 
-    virtual void flushBuffer(Size, bool = true) {}
+    template <typename T>
+    void writeOne(T *dest, bool wait = true) {
+        writeAny(sizeof(T), dest, wait);
+    }
+
+    virtual void flushBuffer(Size = -1, bool = true) {}
 
 protected:
     virtual bool bigEndian() { return false; }
