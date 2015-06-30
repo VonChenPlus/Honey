@@ -134,7 +134,19 @@ public:
         writeAny(sizeof(T), dest, wait);
     }
 
-    virtual void flushBuffer(Size = -1, bool = true) {}
+    template <typename T>
+    void writeOne(T dest, bool wait = true) {
+        writeAny(sizeof(T), &dest, wait);
+    }
+
+    void pad(Size length) {
+        uint8 temp = 0;
+        for (Size index = 0; index < length; ++index) {
+            writeOne(&temp);
+        }
+    }
+
+    virtual void flushBuffer(Size = 0, bool = true) {}
 
 protected:
     virtual bool bigEndian() { return false; }
