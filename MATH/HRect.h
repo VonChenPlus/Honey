@@ -11,7 +11,7 @@ namespace MATH
     public:
         Rect() {}
         Rect(Point topLeft_, Point bottomRight_) : topLeft(topLeft_), bottomRight(bottomRight_) {}
-        Rect(int x1, int y1, int x2, int y2) : topLeft(x1, y1), bottomRight(x2, y2) {}
+        Rect(int left, int top, int right, int bottom) : topLeft(left, top), bottomRight(right, bottom) {}
         inline void setRect(int xPos, int yPos, int width, int height) {
           topLeft.x = xPos; topLeft.y = yPos; bottomRight.x = xPos + width; bottomRight.y = yPos + height;
         }
