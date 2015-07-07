@@ -16,7 +16,7 @@ using THIN3D::FLOATx3;
 using THIN3D::FLOATx2;
 using THIN3D::UNORM8x4;
 using THIN3D::VS_TEXTURE_COLOR_2D;
-#include "MATH/Utils.h"
+#include "MATH/MathDef.h"
 #include "UTILS/TEXT/UTF8.h"
 using UTILS::TEXT::UTF8;
 #include "Atlas.h"
@@ -284,7 +284,7 @@ namespace GFX
     void DrawBuffer::circle(float xc, float yc, float radius, float thickness, int segments, float startAngle, uint32 color, float u_mul) {
         UNUSED(startAngle);
 
-        float angleDelta = PI * 2 / segments;
+        float angleDelta = MATH_PI * 2 / segments;
         float uDelta = 1.0f / segments;
         float t2 = thickness / 2.0f;
         float r1 = radius + t2;

@@ -11,22 +11,12 @@ using IO::ReadLocalFile;
 using IO::OpenFile;
 #include "UTILS/STRING/HString.h"
 using UTILS::STRING::StringFromFormat;
-#include "MATH/Utils.h"
+#include "MATH/MathDef.h"
 using MATH::IsPowerOf2;
-using MATH::Clamp16;
-using MATH::Clamp32;
-using MATH::Clamp64;
+using MATH::Log2I;
 
 namespace IMAGE
 {
-    static unsigned int log2i(unsigned int val) {
-        unsigned int ret = -1;
-        while (val != 0) {
-            val >>= 1; ret++;
-        }
-        return ret;
-    }
-
     int ezuncompress(unsigned char* pDest, long* pnDestLen, const unsigned char* pSrc, long nSrcLen) {
         z_stream stream;
         stream.next_in = (Bytef*)pSrc;
@@ -77,7 +67,7 @@ namespace IMAGE
         int num_levels = 1;
         int image_data_size[ZIM_MAX_MIP_LEVELS];
         if (*flags & ZIM_HAS_MIPS) {
-            num_levels = log2i(*width < *height ? *width : *height) + 1;
+            num_levels = Log2I(*width < *height ? *width : *height) + 1;
         }
         int total_data_size = 0;
         for (int i = 0; i < num_levels; i++) {
@@ -246,10 +236,10 @@ namespace IMAGE
                 for (int y = 0; y < height; y++) {
                     for (int x = 0; x < width; x++) {
                         int dithval = dith[(x&3)+((y&0x3)<<2)] - 8;
-                        int r = Clamp16((image_data[i * 4] + dithval) >> 4);
-                        int g = Clamp16((image_data[i * 4 + 1] + dithval) >> 4);
-                        int b = Clamp16((image_data[i * 4 + 2] + dithval) >> 4);
-                        int a = Clamp16((image_data[i * 4 + 3] + dithval) >> 4);	// really dither alpha?
+                        int r = MATH_CLAMP16((image_data[i * 4] + dithval) >> 4);
+                        int g = MATH_CLAMP16((image_data[i * 4 + 1] + dithval) >> 4);
+                        int b = MATH_CLAMP16((image_data[i * 4 + 2] + dithval) >> 4);
+                        int a = MATH_CLAMP16((image_data[i * 4 + 3] + dithval) >> 4);	// really dither alpha?
                         // Note: GL_UNSIGNED_SHORT_4_4_4_4, not GL_UNSIGNED_SHORT_4_4_4_4_REV
                         *dst++ = (r << 12) | (g << 8) | (b << 4) | (a << 0);
                         i++;
@@ -267,9 +257,9 @@ namespace IMAGE
                     for (int x = 0; x < width; x++) {
                         int dithval = dith[(x&3)+((y&0x3)<<2)] - 8;
                         dithval = 0;
-                        int r = Clamp32((image_data[i * 4] + dithval/2) >> 3);
-                        int g = Clamp64((image_data[i * 4 + 1] + dithval/4) >> 2);
-                        int b = Clamp32((image_data[i * 4 + 2] + dithval/2) >> 3);
+                        int r = MATH_CLAMP32((image_data[i * 4] + dithval/2) >> 3);
+                        int g = MATH_CLAMP64((image_data[i * 4 + 1] + dithval/4) >> 2);
+                        int b = MATH_CLAMP32((image_data[i * 4 + 2] + dithval/2) >> 3);
                         // Note: GL_UNSIGNED_SHORT_5_6_5, not GL_UNSIGNED_SHORT_5_6_5_REV
                         *dst++ = (r << 11) | (g << 5) | (b);
                         i++;
@@ -322,7 +312,7 @@ namespace IMAGE
 
         int num_levels = 1;
         if (flags & ZIM_HAS_MIPS) {
-            num_levels = log2i(width > height ? height : width) + 1;
+            num_levels = Log2I(width > height ? height : width) + 1;
         }
         for (int i = 0; i < num_levels; i++) {
             uint8_t *data = 0;

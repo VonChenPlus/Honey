@@ -2,7 +2,7 @@
 #include "IMAGE/TinyZim.h"
 using MATH::Matrix4x4;
 using IMAGE::ZIM_CLAMP;
-#include "MATH/Utils.h"
+#include "MATH/MathDef.h"
 using MATH::IsPowerOf2;
 using IMAGE::ZIM_HAS_MIPS;
 using IMAGE::ZIM_GEN_MIPS;
