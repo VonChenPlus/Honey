@@ -14,6 +14,7 @@ namespace MATH
     #define MATH_RAD_TO_DEG(x)          ((x)* 57.29577951f)
 
     #define MATH_PI             3.141592653589793f
+    #define MATH_PIOVER2        1.57079632679489661923f
     #define MATH_1_PI           0.31830988618379067154
     #define MATH_E              2.71828182845904523536f
 
@@ -46,7 +47,13 @@ namespace MATH
     #define MATH_UINT64_MAX     std::numeric_limits<uint64>::max()
     #define MATH_UINT64_MIN     std::numeric_limits<uint64>::min()
 
-    #define MATH_EPSILON        0.000001f
+    #define MATH_FLOAT_MAX      std::numeric_limits<float>::max()
+    #define MATH_FLOAT_MIN      std::numeric_limits<float>::min()
+    #define MATH_FLOAT_EPSILON  std::numeric_limits<float>::epsilon()
+
+    #define MATH_DOUBLE_MAX      std::numeric_limits<double>::max()
+    #define MATH_DOUBLE_MIN      std::numeric_limits<double>::min()
+    #define MATH_DOUBLE_EPSILON  std::numeric_limits<double>::epsilon()
 
     #define MATH_CLAMP(x, lo, hi) ((x < lo) ? lo : ((x > hi) ? hi : x))
     #define MATH_CLAMP16(x) MATH_CLAMP(x, 0, 16)
