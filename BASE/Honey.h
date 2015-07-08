@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <stdlib.h>  // for byte swapping
 
+#include "BASE/HException.h"
+
 #ifdef _WIN32
 // We need this to compile without hundreds of std::bind errors in Visual Studio 2012
 // since by default VARIADIC_MAX is something low like 3, 4, or 5.
@@ -110,6 +112,18 @@ inline uint16 swap16(const uint8* _pData) {return swap16(*(const uint16*)_pData)
 inline uint32 swap32(const uint8* _pData) {return swap32(*(const uint32*)_pData);}
 inline uint64 swap64(const uint8* _pData) {return swap64(*(const uint64*)_pData);}
 
+
+template <typename T>
+T swap(T *value) {
+    switch (sizeof(T)) {
+    case 2: return (T)swap16((uint8 *)value);
+    case 4: return (T)swap32((uint8 *)value);
+    case 8: return (T)swap64((uint8 *)value);
+    default:
+        throw _HException_Normal("Unhander data bits!");
+    }
+}
+
 // Thread local storage
 #ifdef _WIN32
 #define __THREAD __declspec( thread ) 
@@ -170,7 +184,5 @@ inline int c99_snprintf(char* str, size_t size, const char* format, ...) {
 #define vscprintf _vscprintf
 
 #endif
-
-#include "BASE/HException.h"
 
 #endif // HONEY_H

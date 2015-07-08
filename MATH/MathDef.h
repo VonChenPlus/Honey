@@ -1,8 +1,9 @@
 #ifndef MATHDEF_H
 #define MATHDEF_H
 
-#include <climits>
+#include <limits>
 #include <cstdlib>
+#include <cmath>
 
 #include "BASE/Honey.h"
 
@@ -59,6 +60,27 @@ namespace MATH
     #define MATH_CLAMP16(x) MATH_CLAMP(x, 0, 16)
     #define MATH_CLAMP32(x) MATH_CLAMP(x, 0, 32)
     #define MATH_CLAMP64(x) MATH_CLAMP(x, 0, 64)
+
+    template <typename T>
+    inline T MATHZERO() { return 0;}
+    template <>
+    inline float MATHZERO() { return 0.0f; }
+    template <>
+    inline double MATHZERO() { return 0.0; }
+
+    template <typename T>
+    inline T MATHONE() { return 1;}
+    template <>
+    inline float MATHONE() { return 1.0f; }
+    template <>
+    inline double MATHONE() { return 1.0; }
+
+    template <typename T>
+    inline bool MATHEQUALS(const T &v1, const T &v2) { return v1 == v2; }
+    template <>
+    inline bool MATHEQUALS(const float &v1, const float &v2) { return std::abs(v1 - v2) < std::numeric_limits<float>::epsilon(); }
+    template <>
+    inline bool MATHEQUALS(const double &v1, const double &v2) { return std::abs(v1 - v2) < std::numeric_limits<double>::epsilon(); }
 
     inline bool IsPowerOf2(int n) {
         return n == 1 || (n & (n - 1)) == 0;

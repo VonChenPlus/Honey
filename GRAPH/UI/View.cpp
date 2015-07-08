@@ -2,7 +2,7 @@
 
 #include <queue>
 
-using MATH::Point;
+using MATH::Vector2f;
 using MATH::Bounds;
 
 namespace UI
@@ -34,14 +34,14 @@ namespace UI
         h = 10.0f;
     }
 
-    Point View::getFocusPosition(FocusDirection dir) {
+    Vector2f View::getFocusPosition(FocusDirection dir) {
         // The +2/-2 is some extra fudge factor to cover for views sitting right next to each other.
         // Distance zero yields strange results otherwise.
         switch (dir) {
-        case FOCUS_LEFT: return Point(bounds_.x + 2, bounds_.centerY());
-        case FOCUS_RIGHT: return Point(bounds_.x2() - 2, bounds_.centerY());
-        case FOCUS_UP: return Point(bounds_.centerX(), bounds_.y + 2);
-        case FOCUS_DOWN: return Point(bounds_.centerX(), bounds_.y2() - 2);
+        case FOCUS_LEFT: return Vector2f(bounds_.x + 2, bounds_.centerY());
+        case FOCUS_RIGHT: return Vector2f(bounds_.x2() - 2, bounds_.centerY());
+        case FOCUS_UP: return Vector2f(bounds_.centerX(), bounds_.y + 2);
+        case FOCUS_DOWN: return Vector2f(bounds_.centerX(), bounds_.y2() - 2);
 
         default:
             return bounds_.center();

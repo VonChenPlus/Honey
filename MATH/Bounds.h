@@ -1,7 +1,7 @@
 #ifndef BOUNDS_H
 #define BOUNDS_H
 
-#include "MATH/Point.h"
+#include "MATH/Vector.h"
 
 namespace MATH
 {
@@ -40,8 +40,8 @@ namespace MATH
         float y2() const { return y + h; }
         float centerX() const { return x + w * 0.5f; }
         float centerY() const { return y + h * 0.5f; }
-        Point center() const {
-            return Point(centerX(), centerY());
+        Vector2f center() const {
+            return Vector2f(centerX(), centerY());
         }
 
         float area() { return w * h; }

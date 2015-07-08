@@ -216,7 +216,7 @@ namespace UI
         // Fake RTTI
         virtual bool isViewGroup() const { return false; }
 
-        MATH::Point getFocusPosition(FocusDirection dir);
+        MATH::Vector2f getFocusPosition(FocusDirection dir);
 
     protected:
         // Inputs to layout

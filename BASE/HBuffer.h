@@ -36,17 +36,6 @@ protected:
     // Any other operation on this Buffer invalidates the pointer.
     HBYTE *appendBufferSize(Size length);
 
-    template <typename T>
-    T swap(T *value) {
-        switch (sizeof(T)) {
-        case 2: return (T)swap16((uint8 *)value);
-        case 4: return (T)swap32((uint8 *)value);
-        case 8: return (T)swap64((uint8 *)value);
-        default:
-            throw _HException_Normal("Unhander data bits!");
-        }
-    }
-
     // TODO: Find a better internal representation, like a cord.
     std::vector<HBYTE> data_;
 

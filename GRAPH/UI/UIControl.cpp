@@ -10,8 +10,8 @@ using MATH::Bounds;
 #include "UTILS/TIME/HTime.h"
 using UTILS::TIME::TimeNow;
 #include "GRAPH/UI/UI.h"
-#include "MATH/Point.h"
-using MATH::Point;
+#include "MATH/Vector.h"
+using MATH::Vector2f;
 
 namespace GLOBAL
 {
@@ -340,8 +340,8 @@ namespace UI
         if (destination->getVisibility() != V_VISIBLE)
             return 0.0f;
 
-        Point originPos = origin->getFocusPosition(direction);
-        Point destPos = destination->getFocusPosition(Opposite(direction));
+        Vector2f originPos = origin->getFocusPosition(direction);
+        Vector2f destPos = destination->getFocusPosition(Opposite(direction));
 
         float dx = destPos.x - originPos.x;
         float dy = destPos.y - originPos.y;
