@@ -41,8 +41,7 @@ HEADERS += \
     $$P/UTILS/STRING/*.h \
     $$P/UTILS/TIME/*.h \
     $$P/UTILS/COLOR/*.h \
-    $$P/UTILS/RANDOM/*.h \
-    MATH/Vector3.h
+    $$P/UTILS/RANDOM/*.h
     
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)
