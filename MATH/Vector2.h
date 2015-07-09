@@ -22,8 +22,13 @@ namespace MATH
             , y(_y) {
         }
 
+        Vector2(const Vector2 &copy) {
+            set(copy);
+        }
+
         inline bool isZero() const {
-            return x == MATHZERO<T>() && y == MATHZERO<T>();
+            return x == MATHZERO<T>()
+                    && y == MATHZERO<T>();
         }
 
         inline bool isOne() const {
@@ -87,7 +92,7 @@ namespace MATH
 
         void normalize() {
             T n = x * x + y * y;
-            if (MATHEQUALS<T>(x, MATHONE<T>()))
+            if (MATHEQUALS<T>(n, MATHONE<T>()))
                 return;
 
             n = (T)sqrt(n);
@@ -238,23 +243,20 @@ namespace MATH
         }
 
         inline bool operator<(const Vector2& v) const {
-            if (MATHEQUALS<T>(x, v.x)) {
-                return y < v.y;
-            }
-
-            return x < v.x;
+            if (x < v.x && y < v.y)
+                return true;
+            return false;
         }
 
         inline bool operator>(const Vector2& v) const {
-            if (MATHEQUALS<T>(x, v.x)) {
-                return y > v.y;
-            }
-
-            return x > v.x;
+            if (x > v.x && y > v.y)
+                return true;
+            return false;
         }
 
         inline bool operator==(const Vector2& v) const {
-            return MATHEQUALS<T>(x, v.x) && MATHEQUALS<T>(y, v.y);
+            return MATHEQUALS<T>(x, v.x)
+                    && MATHEQUALS<T>(y, v.y);
         }
 
         inline bool equals(const Vector2 &p) const {

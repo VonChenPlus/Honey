@@ -36,7 +36,7 @@ namespace MATH
         Quaternion operator -() {
             return Quaternion(-x,-y,-z,-w);
         }
-        void setRotation(Vector3 axis, float angle) {
+        void setRotation(Vector3f axis, float angle) {
             axis /= axis.length();
             angle *= .5f;
             float sine = sinf(angle);
@@ -45,10 +45,10 @@ namespace MATH
             y = sine * axis.y;
             z = sine * axis.z;
         }
-        void toAxisAngle(Vector3 &v, float &angle) {
+        void toAxisAngle(Vector3f &v, float &angle) {
             normalize();
             if (w==1.0f && x==0.0f && y==0.0f && z==0.0f) {
-                v = Vector3(0,1,0);
+                v = Vector3f(0,1,0);
                 angle = 0.0f;
                 return;
             }

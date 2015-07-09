@@ -101,7 +101,7 @@ namespace UI
 
         // Accelerometer
         bool accelerometer_valid;
-        MATH::Vector3 acc;
+        MATH::Vector3f acc;
 
         DISALLOW_COPY_AND_ASSIGN(InputState)
     };

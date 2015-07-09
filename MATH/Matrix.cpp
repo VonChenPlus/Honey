@@ -161,28 +161,28 @@ namespace MATH
         return temp;
     }
 
-    void Matrix4x4::setViewLookAt(const Vector3 &vFrom, const Vector3 &vAt, const Vector3 &vWorldUp) {
-        Vector3 vView = vFrom - vAt;	// OpenGL, sigh...
+    void Matrix4x4::setViewLookAt(const Vector3f &vFrom, const Vector3f &vAt, const Vector3f &vWorldUp) {
+        Vector3f vView = vFrom - vAt;	// OpenGL, sigh...
         vView.normalize();
         float DotProduct = vWorldUp * vView;
-        Vector3 vUp = vWorldUp - vView * DotProduct;
+        Vector3f vUp = vWorldUp - vView * DotProduct;
         float Length = vUp.length();
 
         if (1e-6f > Length) {
             // EMERGENCY
-            vUp = Vector3(0.0f, 1.0f, 0.0f) - vView * vView.y;
+            vUp = Vector3f(0.0f, 1.0f, 0.0f) - vView * vView.y;
             // If we still have near-zero length, resort to a different axis.
             Length = vUp.length();
             if (1e-6f > Length)
             {
-                vUp		 = Vector3(0.0f, 0.0f, 1.0f) - vView * vView.z;
+                vUp		 = Vector3f(0.0f, 0.0f, 1.0f) - vView * vView.z;
                 Length	= vUp.length();
                 if (1e-6f > Length)
                     return;
             }
         }
         vUp.normalize();
-        Vector3 vRight = vUp % vView;
+        Vector3f vRight = vUp % vView;
         empty();
 
         xx = vRight.x; xy = vUp.x; xz=vView.x;
@@ -195,27 +195,27 @@ namespace MATH
         ww = 1.0f;
     }
 
-    void Matrix4x4::setViewLookAtD3D(const Vector3 &vFrom, const Vector3 &vAt, const Vector3 &vWorldUp) {
-        Vector3 vView = vAt - vFrom;
+    void Matrix4x4::setViewLookAtD3D(const Vector3f &vFrom, const Vector3f &vAt, const Vector3f &vWorldUp) {
+        Vector3f vView = vAt - vFrom;
         vView.normalize();
         float DotProduct = vWorldUp * vView;
-        Vector3 vUp = vWorldUp - vView * DotProduct;
+        Vector3f vUp = vWorldUp - vView * DotProduct;
         float Length = vUp.length();
 
         if (1e-6f > Length) {
-            vUp = Vector3(0.0f, 1.0f, 0.0f) - vView * vView.y;
+            vUp = Vector3f(0.0f, 1.0f, 0.0f) - vView * vView.y;
             // If we still have near-zero length, resort to a different axis.
             Length = vUp.length();
             if (1e-6f > Length)
             {
-                vUp		 = Vector3(0.0f, 0.0f, 1.0f) - vView * vView.z;
+                vUp		 = Vector3f(0.0f, 0.0f, 1.0f) - vView * vView.z;
                 Length	= vUp.length();
                 if (1e-6f > Length)
                     return;
             }
         }
         vUp.normalize();
-        Vector3 vRight = vUp % vView;
+        Vector3f vRight = vUp % vView;
         empty();
 
         xx = vRight.x; xy = vUp.x; xz=vView.x;
@@ -229,7 +229,7 @@ namespace MATH
     }
 
 
-    void Matrix4x4::setViewFrame(const Vector3 &pos, const Vector3 &vRight, const Vector3 &vView, const Vector3 &vUp) {
+    void Matrix4x4::setViewFrame(const Vector3f &pos, const Vector3f &vRight, const Vector3f &vView, const Vector3f &vUp) {
         xx = vRight.x; xy = vUp.x; xz=vView.x; xw = 0.0f;
         yx = vRight.y; yy = vUp.y; yz=vView.y; yw = 0.0f;
         zx = vRight.z; zy = vUp.z; zz=vView.z; zw = 0.0f;
@@ -307,14 +307,14 @@ namespace MATH
         zw = 1.0f;
     }
 
-    void Matrix4x4::setRotationAxisAngle(const Vector3 &axis, float angle) {
+    void Matrix4x4::setRotationAxisAngle(const Vector3f &axis, float angle) {
         Quaternion quat;
         quat.setRotation(axis, angle);
         quat.toMatrix(this);
     }
 
     // from a (Position, Rotation, Scale) Vector3 quat Vector3 tuple
-    Matrix4x4 Matrix4x4::fromPRS(const Vector3 &positionv, const Quaternion &rotv, const Vector3 &scalev) {
+    Matrix4x4 Matrix4x4::fromPRS(const Vector3f &positionv, const Quaternion &rotv, const Vector3f &scalev) {
         Matrix4x4 newM;
         newM.setIdentity();
         Matrix4x4 rot, scale;

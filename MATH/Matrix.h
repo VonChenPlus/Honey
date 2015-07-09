@@ -22,21 +22,21 @@ namespace MATH
             float m[16];
         };
 
-        const Vector3 right() const {return Vector3(xx, xy, xz);}
-        const Vector3 up()		const {return Vector3(yx, yy, yz);}
-        const Vector3 front() const {return Vector3(zx, zy, zz);}
-        const Vector3 move()	const {return Vector3(wx, wy, wz);}
+        const Vector3f right() const {return Vector3f(xx, xy, xz);}
+        const Vector3f up()		const {return Vector3f(yx, yy, yz);}
+        const Vector3f front() const {return Vector3f(zx, zy, zz);}
+        const Vector3f move()	const {return Vector3f(wx, wy, wz);}
 
-        void setRight(const Vector3 &v) {
+        void setRight(const Vector3f &v) {
             xx = v.x; xy = v.y; xz = v.z;
         }
-        void setUp(const Vector3 &v) {
+        void setUp(const Vector3f &v) {
             yx = v.x; yy = v.y; yz = v.z;
         }
-        void setFront(const Vector3 &v) {
+        void setFront(const Vector3f &v) {
             zx = v.x; zy = v.y; zz = v.z;
         }
-        void setMove(const Vector3 &v) {
+        void setMove(const Vector3f &v) {
             wx = v.x; wy = v.y; wz = v.z;
         }
 
@@ -61,7 +61,7 @@ namespace MATH
             empty();
             xx=yy=zz=f; ww=1.0f;
         }
-        void setScaling(const Vector3 f) {
+        void setScaling(const Vector3f f) {
             empty();
             xx=f.x;
             yy=f.y;
@@ -72,13 +72,13 @@ namespace MATH
         void setIdentity() {
             setScaling(1.0f);
         }
-        void setTranslation(const Vector3 &trans) {
+        void setTranslation(const Vector3f &trans) {
             setIdentity();
             wx = trans.x;
             wy = trans.y;
             wz = trans.z;
         }
-        void setTranslationAndScaling(const Vector3 &trans, const Vector3 &scale) {
+        void setTranslationAndScaling(const Vector3f &trans, const Vector3f &scale) {
             setScaling(scale);
             wx = trans.x;
             wy = trans.y;
@@ -117,7 +117,7 @@ namespace MATH
             ww = 1.0f;
         }
 
-        void setRotationAxisAngle(const Vector3 &axis, float angle);
+        void setRotationAxisAngle(const Vector3f &axis, float angle);
         void setRotation(float x,float y, float z);
         void setProjection(float near_plane, float far_plane, float fov_horiz, float aspect = 0.75f);
         void setProjectionD3D(float near_plane, float far_plane, float fov_horiz, float aspect = 0.75f);
@@ -138,9 +138,9 @@ namespace MATH
             wx=Pd * Lx;			wy=Pd * Ly;		 wz=Pd * Lz;		 ww=Pd * Lw + d;
         }
 
-        void setViewLookAt(const Vector3 &from, const Vector3 &at, const Vector3 &worldup);
-        void setViewLookAtD3D(const Vector3 &from, const Vector3 &at, const Vector3 &worldup);
-        void setViewFrame(const Vector3 &pos, const Vector3 &right, const Vector3 &forward, const Vector3 &up);
+        void setViewLookAt(const Vector3f &from, const Vector3f &at, const Vector3f &worldup);
+        void setViewLookAtD3D(const Vector3f &from, const Vector3f &at, const Vector3f &worldup);
+        void setViewFrame(const Vector3f &pos, const Vector3f &right, const Vector3f &forward, const Vector3f &up);
         void stabilizeOrtho() {
             /*
             front().normalize();
@@ -151,9 +151,9 @@ namespace MATH
         }
         void toText(char *buffer, int len) const;
         void print() const;
-        static Matrix4x4 fromPRS(const Vector3 &position, const Quaternion &normal, const Vector3 &scale);
+        static Matrix4x4 fromPRS(const Vector3f &position, const Quaternion &normal, const Vector3f &scale);
 
-        void translateAndScale(const Vector3 &trans, const Vector3 &scale) {
+        void translateAndScale(const Vector3f &trans, const Vector3f &scale) {
             xx = xx * scale.x + xw * trans.x;
             xy = xy * scale.y + xw * trans.y;
             xz = xz * scale.z + xw * trans.z;
