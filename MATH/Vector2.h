@@ -27,8 +27,8 @@ namespace MATH
         }
 
         inline bool isZero() const {
-            return x == MATHZERO<T>()
-                    && y == MATHZERO<T>();
+            return MATHEQUALS(x, MATHZERO<T>())
+                    && MATHEQUALS(y, MATHZERO<T>());
         }
 
         inline bool isOne() const {
@@ -49,16 +49,10 @@ namespace MATH
 
         void clamp(const Vector2& min, const Vector2& max) {
             // Clamp the x value.
-            if (x < min.x)
-                x = min.x;
-            if (x > max.x)
-                x = max.x;
+            x = MATH_CLAMP((x), (min.x), (max.x));
 
             // Clamp the y value.
-            if (y < min.y)
-                y = min.y;
-            if (y > max.y)
-                y = max.y;
+            y = MATH_CLAMP((y), (min.y), (max.y));
         }
 
         T distance(const Vector2& v) const {

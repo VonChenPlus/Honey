@@ -29,9 +29,9 @@ namespace MATH
         }
 
         inline bool isZero() const {
-            return x == MATHZERO<T>()
-                    && y == MATHZERO<T>()
-                    && y == MATHZERO<T>();
+            return MATHEQUALS(x, MATHZERO<T>())
+                    && MATHEQUALS(y, MATHZERO<T>())
+                    && MATHEQUALS(z, MATHZERO<T>());
         }
 
         inline bool isOne() const {
@@ -46,7 +46,7 @@ namespace MATH
             y += v.z;
         }
 
-        inline void add(float _x, float _y, float _z) {
+        inline void add(const T& _x, const T& _y, const T& _z) {
             x += _x;
             y += _y;
             z += _z;
@@ -54,22 +54,13 @@ namespace MATH
 
         void clamp(const Vector3& min, const Vector3& max) {
             // Clamp the x value.
-            if (x < min.x)
-                x = min.x;
-            if (x > max.x)
-                x = max.x;
+            x = MATH_CLAMP((x), (min.x), (max.x));
 
             // Clamp the y value.
-            if (y < min.y)
-                y = min.y;
-            if (y > max.y)
-                y = max.y;
+            y = MATH_CLAMP((y), (min.y), (max.y));
 
             // Clamp the z value.
-            if (z < min.z)
-                z = min.z;
-            if (z > max.z)
-                z = max.z;
+            z = MATH_CLAMP((z), (min.z), (max.z));
         }
 
         void cross(const Vector3& v) {
@@ -142,6 +133,7 @@ namespace MATH
         inline void scale(const T &scalar) {
             x *= scalar;
             y *= scalar;
+            z *= scalar;
         }
 
         inline void set(const T &_x, const T &_y, const T &_z) {
