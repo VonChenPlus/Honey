@@ -1,5 +1,5 @@
-#ifndef NRECT_H
-#define NRECT_H
+#ifndef RECTANGLE_H
+#define RECTANGLE_H
 
 #include <algorithm>
 
@@ -112,4 +112,4 @@ namespace MATH
     typedef Rectangle<int> Recti;
 }
 
-#endif // NRECT_H
+#endif // RECTANGLE_H
