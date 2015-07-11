@@ -171,7 +171,7 @@ namespace UI
 
         virtual void focusChanged(int focusFlags) { UNUSED(focusFlags); }
 
-        void move(MATH::Bounds bounds) {
+        void move(MATH::Boundsf bounds) {
             bounds_ = bounds;
         }
 
@@ -187,10 +187,10 @@ namespace UI
         virtual void getContentDimensions(const UIContext &dc, float &w, float &h) const;
 
         // Called when the layout is done.
-        void setBounds(MATH::Bounds bounds) { bounds_ = bounds; }
+        void setBounds(MATH::Boundsf bounds) { bounds_ = bounds; }
         virtual const LayoutParams *getLayoutParams() const { return layoutParams_.get(); }
         virtual void replaceLayoutParams(LayoutParams *newLayoutParams) { layoutParams_.reset(newLayoutParams); }
-        const MATH::Bounds &getBounds() const { return bounds_; }
+        const MATH::Boundsf &getBounds() const { return bounds_; }
 
         virtual bool setFocus();
         bool hasFocus() const;
@@ -230,7 +230,7 @@ namespace UI
         float measuredHeight_;
 
         // Outputs of layout. X/Y are absolute screen coordinates, hierarchy is "gone" here.
-        MATH::Bounds bounds_;
+        MATH::Boundsf bounds_;
 
         scoped_ptr<MATH::Matrix4x4> transform_;
 

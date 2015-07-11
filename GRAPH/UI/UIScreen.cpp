@@ -145,8 +145,8 @@ namespace UI
     void UIScreenWithBackground::drawBackground(UIContext &dc, int alpha) {
         static float xbase[100] = {0};
         static float ybase[100] = {0};
-        float xres = dc.getBounds().w;
-        float yres = dc.getBounds().h;
+        float xres = dc.getBounds().width;
+        float yres = dc.getBounds().height;
         static int last_xres = 0;
         static int last_yres = 0;
 
@@ -164,8 +164,8 @@ namespace UI
         dc.draw()->drawImageStretch(img, dc.getBounds());
         float t = TimeNow();
         for (int i = 0; i < 100; i++) {
-            float x = xbase[i] + dc.getBounds().x;
-            float y = ybase[i] + dc.getBounds().y + 40 * cosf(i * 7.2f + t * 1.3f);
+            float x = xbase[i] + dc.getBounds().left;
+            float y = ybase[i] + dc.getBounds().top + 40 * cosf(i * 7.2f + t * 1.3f);
             float angle = sinf(i + t);
             int n = i & 3;
             dc.draw()->drawImageRotated(symbols[n], x, y, 1.0f, angle, ColorAlpha(colors[n], alpha * 0.1f));

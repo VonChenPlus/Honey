@@ -30,7 +30,7 @@ namespace UI
         dc.fillRect(style.background, bounds_);
         float tw, th;
         dc.measureText(dc.theme->uiFont, text_.c_str(), &tw, &th);
-        if (tw > bounds_.w || imageID_ != -1) {
+        if (tw > bounds_.width || imageID_ != -1) {
             dc.pushScissor(bounds_);
         }
         dc.setFontStyle(dc.theme->uiFont);
@@ -43,7 +43,7 @@ namespace UI
                 dc.draw()->drawImage(imageID_, bounds_.centerX() - tw / 2 - 5 - img.w/2, bounds_.centerY(), 1.0f, 0xFFFFFFFF, ALIGN_CENTER);
             }
         }
-        if (tw > bounds_.w || imageID_ != -1) {
+        if (tw > bounds_.width || imageID_ != -1) {
             dc.popScissor();
         }
     }

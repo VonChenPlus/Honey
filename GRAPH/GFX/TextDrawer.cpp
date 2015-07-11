@@ -4,7 +4,7 @@ using THIN3D::LINEAR2D;
 using THIN3D::RGBA4444;
 #include "UTILS/HASH/Hash.h"
 using UTILS::HASH::Fletcher;
-using MATH::Bounds;
+using MATH::Boundsf;
 using THIN3D::Thin3DTexture;
 
 namespace GFX
@@ -82,20 +82,20 @@ namespace GFX
         target.flush(true);
     }
 
-    void TextDrawer::drawStringRect(DrawBuffer &target, const char *str, const Bounds &bounds, uint32 color, int align) {
-        float x = bounds.x;
-        float y = bounds.y;
+    void TextDrawer::drawStringRect(DrawBuffer &target, const char *str, const Boundsf &bounds, uint32 color, int align) {
+        float x = bounds.left;
+        float y = bounds.top;
         if (align & ALIGN_HCENTER) {
             x = bounds.centerX();
         }
         else if (align & ALIGN_RIGHT) {
-            x = bounds.x2();
+            x = bounds.right();
         }
         if (align & ALIGN_VCENTER) {
             y = bounds.centerY();
         }
         else if (align & ALIGN_BOTTOM) {
-            y = bounds.y2();
+            y = bounds.bottom();
         }
 
         drawString(target, str, x, y, color, align);

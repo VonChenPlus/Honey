@@ -1,6 +1,6 @@
 #include "TextEdit.h"
 #include "MATH/Bounds.h"
-using MATH::Bounds;
+using MATH::Boundsf;
 #include "GRAPH/UI/KeyCodes.h"
 #include "GRAPH/GFX/DrawBuffer.h"
 using GFX::ALIGN_CENTER;
@@ -25,11 +25,11 @@ namespace UI
         dc.setFontStyle(dc.theme->uiFont);
         dc.fillRect(hasFocus() ? UI::Drawable(0x80000000) : UI::Drawable(0x30000000), bounds_);
 
-        float textX = bounds_.x;
+        float textX = bounds_.left;
         float w, h;
 
-        Bounds textBounds = bounds_;
-        textBounds.x = textX;
+        Boundsf textBounds = bounds_;
+        textBounds.left = textX;
 
         if (text_.empty()) {
             if (placeholderText_.size()) {
@@ -46,11 +46,11 @@ namespace UI
             float caretX = w;
             caretX += textX;
 
-            if (caretX > bounds_.w) {
+            if (caretX > bounds_.width) {
                 // Scroll text to the left if the caret won't fit. Not ideal but looks better than not scrolling it.
-                textX -= caretX - bounds_.w;
+                textX -= caretX - bounds_.width;
             }
-            dc.fillRect(UI::Drawable(0xFFFFFFFF), Bounds(caretX - 1, bounds_.y + 2, 3, bounds_.h - 4));
+            dc.fillRect(UI::Drawable(0xFFFFFFFF), Boundsf(caretX - 1, bounds_.top + 2, 3, bounds_.height - 4));
         }
         dc.popScissor();
     }

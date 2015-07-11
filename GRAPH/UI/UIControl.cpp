@@ -6,7 +6,7 @@
 #include "GRAPH/UI/InputState.h"
 #include "GRAPH/UI/KeyCodes.h"
 #include "MATH/Bounds.h"
-using MATH::Bounds;
+using MATH::Boundsf;
 #include "UTILS/TIME/HTime.h"
 using UTILS::TIME::TimeNow;
 #include "GRAPH/UI/UI.h"
@@ -281,10 +281,10 @@ namespace UI
         if (!root) {
             throw _HException_Normal("Tried to layout a view hierarchy from a zero pointer root");
         }
-        const Bounds &rootBounds = dc.getBounds();
+        const Boundsf &rootBounds = dc.getBounds();
 
-        MeasureSpec horiz(EXACTLY, rootBounds.w);
-        MeasureSpec vert(EXACTLY, rootBounds.h);
+        MeasureSpec horiz(EXACTLY, rootBounds.width);
+        MeasureSpec vert(EXACTLY, rootBounds.height);
 
         // Two phases - measure contents, layout.
         root->measure(dc, horiz, vert);
@@ -304,31 +304,31 @@ namespace UI
         GLOBAL::uiState() = GLOBAL::uiStateSaved();
     }
 
-    static float HorizontalOverlap(const Bounds &a, const Bounds &b) {
-        if (a.x2() < b.x || b.x2() < a.x)
+    static float HorizontalOverlap(const Boundsf &a, const Boundsf &b) {
+        if (a.right() < b.left || b.right() < a.left)
             return 0.0f;
         // okay they do overlap. Let's clip.
-        float maxMin = std::max(a.x, b.x);
-        float minMax = std::min(a.x2(), b.x2());
+        float maxMin = std::max(a.left, b.left);
+        float minMax = std::min(a.right(), b.right());
         float overlap = minMax - maxMin;
         if (overlap < 0.0f)
             return 0.0f;
         else
-            return std::min(1.0f, overlap / std::min(a.w, b.w));
+            return std::min(1.0f, overlap / std::min(a.width, b.width));
     }
 
     // Returns the percentage the smaller one overlaps the bigger one.
-    static float VerticalOverlap(const Bounds &a, const Bounds &b) {
-        if (a.y2() < b.y || b.y2() < a.y)
+    static float VerticalOverlap(const Boundsf &a, const Boundsf &b) {
+        if (a.bottom() < b.top || b.bottom() < a.top)
             return 0.0f;
         // okay they do overlap. Let's clip.
-        float maxMin = std::max(a.y, b.y);
-        float minMax = std::min(a.y2(), b.y2());
+        float maxMin = std::max(a.top, b.top);
+        float minMax = std::min(a.bottom(), b.bottom());
         float overlap = minMax - maxMin;
         if (overlap < 0.0f)
             return 0.0f;
         else
-            return std::min(1.0f, overlap / std::min(a.h, b.h));
+            return std::min(1.0f, overlap / std::min(a.height, b.height));
     }
 
     float GetDirectionScore(View *origin, View *destination, FocusDirection direction) {
@@ -362,14 +362,14 @@ namespace UI
         switch (direction) {
         case FOCUS_LEFT:
             overlap = vertOverlap;
-            originSize = origin->getBounds().w;
+            originSize = origin->getBounds().width;
             if (dirX > 0.0f) {
                 wrongDirection = true;
             }
             break;
         case FOCUS_UP:
             overlap = horizOverlap;
-            originSize = origin->getBounds().h;
+            originSize = origin->getBounds().height;
             if (dirY > 0.0f) {
                 wrongDirection = true;
             }
@@ -377,14 +377,14 @@ namespace UI
             break;
         case FOCUS_RIGHT:
             overlap = vertOverlap;
-            originSize = origin->getBounds().w;
+            originSize = origin->getBounds().width;
             if (dirX < 0.0f) {
                 wrongDirection = true;
             }
             break;
         case FOCUS_DOWN:
             overlap = horizOverlap;
-            originSize = origin->getBounds().h;
+            originSize = origin->getBounds().height;
             if (dirY < 0.0f) {
                 wrongDirection = true;
             }
@@ -400,12 +400,12 @@ namespace UI
         // upwards in a scroll view instead of moving up to the top bar.
         float distanceBonus = 0.0f;
         if (vertical) {
-            float widthDifference = origin->getBounds().w - destination->getBounds().w;
+            float widthDifference = origin->getBounds().width - destination->getBounds().width;
             if (widthDifference == 0) {
                 distanceBonus = 40;
             }
         } else {
-            float heightDifference = origin->getBounds().h - destination->getBounds().h;
+            float heightDifference = origin->getBounds().height - destination->getBounds().height;
             if (heightDifference == 0) {
                 distanceBonus = 40;
             }

@@ -105,13 +105,13 @@ namespace GFX
         void measureImage(ImageID atlas_image, float *w, float *h);
         void drawImage(ImageID atlas_image, float x, float y, float scale, Color color = COLOR(0xFFFFFF), int align = ALIGN_TOPLEFT);
         void drawImageStretch(ImageID atlas_image, float x1, float y1, float x2, float y2, Color color = COLOR(0xFFFFFF));
-        void drawImageStretch(int atlas_image, const MATH::Bounds &bounds, Color color = COLOR(0xFFFFFF)) {
-            drawImageStretch(atlas_image, bounds.x, bounds.y, bounds.x2(), bounds.y2(), color);
+        void drawImageStretch(int atlas_image, const MATH::Boundsf &bounds, Color color = COLOR(0xFFFFFF)) {
+            drawImageStretch(atlas_image, bounds.left, bounds.top, bounds.right(), bounds.bottom(), color);
         }
         void drawImageRotated(ImageID atlas_image, float x, float y, float scale, float angle, Color color = COLOR(0xFFFFFF), bool mirror_h = false);	// Always centers
         void drawTexRect(float x1, float y1, float x2, float y2, float u1, float v1, float u2, float v2, Color color);
-        void drawTexRect(const MATH::Bounds &bounds, float u1, float v1, float u2, float v2, Color color) {
-            drawTexRect(bounds.x, bounds.y, bounds.x2(), bounds.y2(), u1, v1, u2, v2, color);
+        void drawTexRect(const MATH::Boundsf &bounds, float u1, float v1, float u2, float v2, Color color) {
+            drawTexRect(bounds.left, bounds.top, bounds.right(), bounds.bottom(), u1, v1, u2, v2, color);
         }
         // Results in 18 triangles. Kind of expensive for a button.
         void drawImage4Grid(ImageID atlas_image, float x1, float y1, float x2, float y2, Color color = COLOR(0xFFFFFF), float corner_scale = 1.0);

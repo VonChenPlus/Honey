@@ -6,58 +6,76 @@
 namespace MATH
 {
     // Resolved bounds on screen after layout.
-    struct Bounds
+    template <typename T>
+    class Bounds
     {
-        Bounds() : x(0), y(0), w(0), h(0) {}
-        Bounds(float x_, float y_, float w_, float h_) : x(x_), y(y_), w(w_), h(h_) {}
+    public:
+        Bounds()
+            : left(MATHZERO<T>())
+            , top(MATHZERO<T>())
+            , width(MATHZERO<T>())
+            , height(MATHZERO<T>()) {
 
-        bool contains(float px, float py) const {
-            return (px >= x && py >= y && px < x + w && py < y + h);
+        }
+
+        Bounds(const T &_x, const T &_y, const T &_w, const T &_h)
+            : left(_x)
+            , top(_y)
+            , width(_w)
+            , height(_h) {
+
+        }
+
+        bool contains(const T &px, const T &py) const {
+            return (!(px < left || py < top) && px < left + width && py < top + height);
         }
 
         bool intersects(const Bounds &other) const {
-            return !(x > other.x2() || x2() < other.x || y > other.y2() || y2() < other.y);
+            return !(left > other.right() || right() < other.left || top > other.bottom() || bottom() < other.top);
         }
 
         void clip(const Bounds &clipTo) {
-            if (x < clipTo.x) {
-                w -= clipTo.x - x;
-                x = clipTo.x;
+            if (left < clipTo.left) {
+                width -= clipTo.left - left;
+                left = clipTo.left;
             }
-            if (y < clipTo.y) {
-                h -= clipTo.y - y;
-                y = clipTo.y;
+            if (top < clipTo.top) {
+                height -= clipTo.top - top;
+                top = clipTo.top;
             }
-            if (x2() > clipTo.x2()) {
-                w = clipTo.x2() - x;
+            if (right() > clipTo.right()) {
+                width = clipTo.right() - left;
             }
-            if (y2() > clipTo.y2()) {
-                h = clipTo.y2() - y;
+            if (bottom() > clipTo.bottom()) {
+                height = clipTo.bottom() - top;
             }
         }
 
-        float x2() const { return x + w; }
-        float y2() const { return y + h; }
-        float centerX() const { return x + w * 0.5f; }
-        float centerY() const { return y + h * 0.5f; }
-        Vector2f center() const {
-            return Vector2f(centerX(), centerY());
+        T right() const { return left + width; }
+        T bottom() const { return top + height; }
+        T centerX() const { return left + width * 0.5f; }
+        T centerY() const { return top + height * 0.5f; }
+        Vector2<T> center() const {
+            return Vector2<T>(centerX(), centerY());
         }
 
-        float area() { return w * h; }
+        T area() { return width * height; }
 
-        Bounds expand(float amount) const {
-            return Bounds(x - amount, y - amount, w + amount * 2, h + amount * 2);
+        Bounds expand(T amount) const {
+            return Bounds(left - amount, top - amount, width + amount * 2, height + amount * 2);
         }
-        Bounds offset(float xAmount, float yAmount) const {
-            return Bounds(x + xAmount, y + yAmount, w, h);
+        Bounds offset(T xAmount, T yAmount) const {
+            return Bounds(left + xAmount, top + yAmount, width, height);
         }
-
-        float x;
-        float y;
-        float w;
-        float h;
+\
+    public:
+        T left;
+        T top;
+        T width;
+        T height;
     };
+
+    typedef Bounds<float> Boundsf;
 }
 
 #endif // BOUNDS_H

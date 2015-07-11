@@ -43,7 +43,7 @@ namespace GFX
         void measureString(const char *str, float *w, float *h);
 
         void drawString(DrawBuffer &target, const char *str, float x, float y, uint32 color, int align = ALIGN_TOPLEFT);
-        void drawStringRect(DrawBuffer &target, const char *str, const MATH::Bounds &bounds, uint32 color, int align);
+        void drawStringRect(DrawBuffer &target, const char *str, const MATH::Boundsf &bounds, uint32 color, int align);
         // Use for housekeeping like throwing out old strings.
         void oncePerFrame();
 

@@ -38,10 +38,10 @@ namespace UI
         // The +2/-2 is some extra fudge factor to cover for views sitting right next to each other.
         // Distance zero yields strange results otherwise.
         switch (dir) {
-        case FOCUS_LEFT: return Vector2f(bounds_.x + 2, bounds_.centerY());
-        case FOCUS_RIGHT: return Vector2f(bounds_.x2() - 2, bounds_.centerY());
-        case FOCUS_UP: return Vector2f(bounds_.centerX(), bounds_.y + 2);
-        case FOCUS_DOWN: return Vector2f(bounds_.centerX(), bounds_.y2() - 2);
+        case FOCUS_LEFT: return Vector2f(bounds_.left + 2, bounds_.centerY());
+        case FOCUS_RIGHT: return Vector2f(bounds_.right() - 2, bounds_.centerY());
+        case FOCUS_UP: return Vector2f(bounds_.centerX(), bounds_.top + 2);
+        case FOCUS_DOWN: return Vector2f(bounds_.centerX(), bounds_.bottom() - 2);
 
         default:
             return bounds_.center();

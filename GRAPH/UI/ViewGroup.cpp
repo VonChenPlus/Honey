@@ -3,27 +3,27 @@
 #include <algorithm>
 
 #include "MATH/Bounds.h"
-using MATH::Bounds;
+using MATH::Boundsf;
 
 namespace UI
 {
     extern void MeasureBySpec(float sz, float contentWidth, MeasureSpec spec, float *measured);
     extern float GetDirectionScore(View *origin, View *destination, FocusDirection direction);
 
-    void ApplyGravity(const Bounds outer, const Margins &margins, float w, float h, int gravity, Bounds &inner) {
-        inner.w = w - (margins.left + margins.right);
-        inner.h = h - (margins.right + margins.left);
+    void ApplyGravity(const Boundsf outer, const Margins &margins, float width, float height, int gravity, Boundsf &inner) {
+        inner.width = width - (margins.left + margins.right);
+        inner.height = height - (margins.right + margins.left);
 
         switch (gravity & G_HORIZMASK) {
-        case G_LEFT: inner.x = outer.x + margins.left; break;
-        case G_RIGHT: inner.x = outer.x + outer.w - w - margins.right; break;
-        case G_HCENTER: inner.x = outer.x + (outer.w - w) / 2; break;
+        case G_LEFT: inner.left = outer.left + margins.left; break;
+        case G_RIGHT: inner.left = outer.left + outer.width - width - margins.right; break;
+        case G_HCENTER: inner.left = outer.left + (outer.width - width) / 2; break;
         }
 
         switch (gravity & G_VERTMASK) {
-        case G_TOP: inner.y = outer.y + margins.top; break;
-        case G_BOTTOM: inner.y = outer.y + outer.h - h - margins.bottom; break;
-        case G_VCENTER: inner.y = outer.y + (outer.h - h) / 2; break;
+        case G_TOP: inner.top = outer.top + margins.top; break;
+        case G_BOTTOM: inner.top = outer.top + outer.height - height - margins.bottom; break;
+        case G_VCENTER: inner.top = outer.top + (outer.height - height) / 2; break;
         }
     }
 
@@ -157,8 +157,8 @@ namespace UI
             dc.fillRect(Drawable(0x60000000), dc.getBounds());
             float dropsize = 30;
             dc.draw()->drawImage4Grid(dc.theme->dropShadow4Grid,
-                bounds_.x - dropsize, bounds_.y,
-                bounds_.x2() + dropsize, bounds_.y2()+dropsize*1.5, 0xDF000000, 3.0f);
+                bounds_.left - dropsize, bounds_.top,
+                bounds_.right() + dropsize, bounds_.bottom()+dropsize*1.5, 0xDF000000, 3.0f);
         }
 
         if (clip_) {
@@ -246,13 +246,13 @@ namespace UI
             const AnchorLayoutParams *params = static_cast<const AnchorLayoutParams *>(views_[i]->getLayoutParams());
             if (!params->is(LP_ANCHOR)) params = 0;
 
-            Bounds vBounds;
-            vBounds.w = views_[i]->getMeasuredWidth();
-            vBounds.h = views_[i]->getMeasuredHeight();
+            Boundsf vBounds;
+            vBounds.width = views_[i]->getMeasuredWidth();
+            vBounds.height = views_[i]->getMeasuredHeight();
 
             // Clamp width/height to our own
-            if (vBounds.w > bounds_.w) vBounds.w = bounds_.w;
-            if (vBounds.h > bounds_.h) vBounds.h = bounds_.h;
+            if (vBounds.width > bounds_.width) vBounds.width = bounds_.width;
+            if (vBounds.height > bounds_.height) vBounds.height = bounds_.height;
 
             float left = 0, top = 0, right = 0, bottom = 0, center = false;
             if (params) {
@@ -264,24 +264,24 @@ namespace UI
             }
 
             if (left >= 0) {
-                vBounds.x = bounds_.x + left;
+                vBounds.left = bounds_.left + left;
                 if (center)
-                    vBounds.x -= vBounds.w * 0.5f;
+                    vBounds.left -= vBounds.width * 0.5f;
             } else if (right >= 0) {
-                vBounds.x = bounds_.x2() - right - vBounds.w;
+                vBounds.left = bounds_.bottom() - right - vBounds.width;
                 if (center) {
-                    vBounds.x += vBounds.w * 0.5f;
+                    vBounds.left += vBounds.width * 0.5f;
                 }
             }
 
             if (top >= 0) {
-                vBounds.y = bounds_.y + top;
+                vBounds.top = bounds_.top + top;
                 if (center)
-                    vBounds.y -= vBounds.h * 0.5f;
+                    vBounds.top -= vBounds.height * 0.5f;
             } else if (bottom >= 0) {
-                vBounds.y = bounds_.y2() - bottom - vBounds.h;
+                vBounds.height = bounds_.bottom() - bottom - vBounds.height;
                 if (center)
-                    vBounds.y += vBounds.h * 0.5f;
+                    vBounds.top += vBounds.height * 0.5f;
             }
 
             views_[i]->setBounds(vBounds);
@@ -412,19 +412,19 @@ namespace UI
 
     // weight != 0 = fill remaining space.
     void LinearLayout::layout() {
-        const Bounds &bounds = bounds_;
+        const Boundsf &bounds = bounds_;
 
-        Bounds itemBounds;
+        Boundsf itemBounds;
         float pos;
 
         if (orientation_ == ORIENT_HORIZONTAL) {
-            pos = bounds.x;
-            itemBounds.y = bounds.y;
-            itemBounds.h = measuredHeight_;
+            pos = bounds.left;
+            itemBounds.top = bounds.top;
+            itemBounds.height = measuredHeight_;
         } else {
-            pos = bounds.y;
-            itemBounds.x = bounds.x;
-            itemBounds.w = measuredWidth_;
+            pos = bounds.height;
+            itemBounds.left = bounds.left;
+            itemBounds.width = measuredWidth_;
         }
 
         for (size_t i = 0; i < views_.size(); i++) {
@@ -444,14 +444,14 @@ namespace UI
             }
 
             if (orientation_ == ORIENT_HORIZONTAL) {
-                itemBounds.x = pos;
-                itemBounds.w = views_[i]->getMeasuredWidth() + margins.left + margins.right;
+                itemBounds.left = pos;
+                itemBounds.width = views_[i]->getMeasuredWidth() + margins.left + margins.right;
             } else {
-                itemBounds.y = pos;
-                itemBounds.h = views_[i]->getMeasuredHeight() + margins.top + margins.bottom;
+                itemBounds.top = pos;
+                itemBounds.height = views_[i]->getMeasuredHeight() + margins.top + margins.bottom;
             }
 
-            Bounds innerBounds;
+            Boundsf innerBounds;
             ApplyGravity(itemBounds, margins,
                 views_[i]->getMeasuredWidth(), views_[i]->getMeasuredHeight(),
                 gravity, innerBounds);
@@ -459,7 +459,7 @@ namespace UI
             views_[i]->setBounds(innerBounds);
             views_[i]->layout();
 
-            pos += spacing_ + (orientation_ == ORIENT_HORIZONTAL ? itemBounds.w : itemBounds.h);
+            pos += spacing_ + (orientation_ == ORIENT_HORIZONTAL ? itemBounds.width : itemBounds.height);
         }
     }
 }

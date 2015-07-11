@@ -40,7 +40,7 @@ namespace UI
 
         root_ = new AnchorLayout(new LayoutParams(FILL_PARENT, FILL_PARENT));
 
-        float yres = screenManager()->getUIContext()->getBounds().h;
+        float yres = screenManager()->getUIContext()->getBounds().height;
 
         box_ = new LinearLayout(ORIENT_VERTICAL,
             new AnchorLayoutParams(550.0, fillVertical() ? yres - 30.0 : (float)WRAP_CONTENT, dc.getBounds().centerX(), dc.getBounds().centerY(), NONE, NONE, true));

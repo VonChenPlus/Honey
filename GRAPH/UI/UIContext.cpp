@@ -1,5 +1,5 @@
 #include "UIContext.h"
-using MATH::Bounds;
+using MATH::Boundsf;
 using THIN3D::Thin3DContext;
 using THIN3D::Thin3DShaderSet;
 using THIN3D::Thin3DTexture;
@@ -37,7 +37,7 @@ namespace UI
         fontScaleX_ = 1.0f;
         fontScaleY_ = 1.0f;
         fontStyle_ = new FontStyle();
-        bounds_ = Bounds(0, 0, GLOBAL::dpXRes(), GLOBAL::dpYRes());
+        bounds_ = Boundsf(0, 0, GLOBAL::dpXRes(), GLOBAL::dpYRes());
     }
 
     UIContext::~UIContext() {
@@ -103,9 +103,9 @@ namespace UI
     }
 
     // TODO: Support transformed bounds using stencil
-    void UIContext::pushScissor(const Bounds &bounds) {
+    void UIContext::pushScissor(const Boundsf &bounds) {
         flush();
-        Bounds clipped = bounds;
+        Boundsf clipped = bounds;
         if (scissorStack_.size())
             clipped.clip(scissorStack_.back());
         scissorStack_.push_back(clipped);
@@ -118,7 +118,7 @@ namespace UI
         activateTopScissor();
     }
 
-    Bounds UIContext::getScissorBounds() {
+    Boundsf UIContext::getScissorBounds() {
         if (!scissorStack_.empty())
             return scissorStack_.back();
         else
@@ -127,12 +127,12 @@ namespace UI
 
     void UIContext::activateTopScissor() {
         if (scissorStack_.size()) {
-            const Bounds &bounds = scissorStack_.back();
+            const Boundsf &bounds = scissorStack_.back();
             float scale = 1.0f / GLOBAL::dpiScale();
-            int x = scale * bounds.x;
-            int y = scale * bounds.y;
-            int w = scale * bounds.w;
-            int h = scale * bounds.h;
+            int x = scale * bounds.left;
+            int y = scale * bounds.top;
+            int w = scale * bounds.width;
+            int h = scale * bounds.height;
             thin3d_->setScissorRect(x, y, w, h);
             thin3d_->setScissorEnabled(true);
         }
@@ -185,11 +185,11 @@ namespace UI
         }
     }
 
-    void UIContext::drawTextRect(const char *str, const Bounds &bounds, uint32 color, int align) {
+    void UIContext::drawTextRect(const char *str, const Boundsf &bounds, uint32 color, int align) {
         if (!textDrawer_ || (align & FLAG_DYNAMIC_ASCII)) {
             float sizeFactor = (float)fontStyle_->sizePts / 24.0f;
             uidrawbuffer_->setFontScale(fontScaleX_ * sizeFactor, fontScaleY_ * sizeFactor);
-            uidrawbuffer_->drawTextRect(fontStyle_->atlasFont, str, bounds.x, bounds.y, bounds.w, bounds.h, color, align);
+            uidrawbuffer_->drawTextRect(fontStyle_->atlasFont, str, bounds.left, bounds.top, bounds.width, bounds.height, color, align);
         }
         else {
             textDrawer_->setFontScale(fontScaleX_, fontScaleY_);
@@ -198,20 +198,20 @@ namespace UI
         }
     }
 
-    void UIContext::fillRect(const Drawable &drawable, const Bounds &bounds) {
+    void UIContext::fillRect(const Drawable &drawable, const Boundsf &bounds) {
         // Only draw if alpha is non-zero.
         if ((drawable.color & 0xFF000000) == 0)
             return;
 
         switch (drawable.type) {
         case DRAW_SOLID_COLOR:
-            uidrawbuffer_->drawImageStretch(theme->whiteImage, bounds.x, bounds.y, bounds.x2(), bounds.y2(), drawable.color);
+            uidrawbuffer_->drawImageStretch(theme->whiteImage, bounds.left, bounds.top, bounds.right(), bounds.bottom(), drawable.color);
             break;
         case DRAW_4GRID:
-            uidrawbuffer_->drawImage4Grid(drawable.image, bounds.x, bounds.y, bounds.x2(), bounds.y2(), drawable.color);
+            uidrawbuffer_->drawImage4Grid(drawable.image, bounds.left, bounds.top, bounds.right(), bounds.bottom(), drawable.color);
             break;
         case DRAW_STRETCH_IMAGE:
-            uidrawbuffer_->drawImageStretch(drawable.image, bounds.x, bounds.y, bounds.x2(), bounds.y2(), drawable.color);
+            uidrawbuffer_->drawImageStretch(drawable.image, bounds.left, bounds.top, bounds.right(), bounds.bottom(), drawable.color);
             break;
         case DRAW_NOTHING:
             break;

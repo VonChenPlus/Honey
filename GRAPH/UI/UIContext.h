@@ -33,9 +33,9 @@ namespace UI
         void reBindTexture() const;
 
         // TODO: Support transformed bounds using stencil
-        void pushScissor(const MATH::Bounds &bounds);
+        void pushScissor(const MATH::Boundsf &bounds);
         void popScissor();
-        MATH::Bounds getScissorBounds();
+        MATH::Boundsf getScissorBounds();
 
         void activateTopScissor();
 
@@ -53,12 +53,12 @@ namespace UI
         void measureTextCount(const FontStyle &style, const char *str, int count, float *x, float *y, int align = 0) const;
         void measureText(const FontStyle &style, const char *str, float *x, float *y, int align = 0) const;
         void drawText(const char *str, float x, float y, uint32 color, int align = 0);
-        void drawTextRect(const char *str, const MATH::Bounds &bounds, uint32 color, int align = 0);
-        void fillRect(const Drawable &drawable, const MATH::Bounds &bounds);
+        void drawTextRect(const char *str, const MATH::Boundsf &bounds, uint32 color, int align = 0);
+        void fillRect(const Drawable &drawable, const MATH::Boundsf &bounds);
 
         // in dps, like dp_xres and dp_yres
-        void setBounds(const MATH::Bounds &b) { bounds_ = b; }
-        const MATH::Bounds &getBounds() const { return bounds_; }
+        void setBounds(const MATH::Boundsf &b) { bounds_ = b; }
+        const MATH::Boundsf &getBounds() const { return bounds_; }
         THIN3D::Thin3DContext *getThin3DContext() { return thin3d_; }
 
     private:
@@ -66,7 +66,7 @@ namespace UI
         void uiEnd();
 
         THIN3D::Thin3DContext *thin3d_;
-        MATH::Bounds bounds_;
+        MATH::Boundsf bounds_;
 
         float fontScaleX_;
         float fontScaleY_;
@@ -82,7 +82,7 @@ namespace UI
         GFX::DrawBuffer *uidrawbuffer_;
         GFX::DrawBuffer *uidrawbufferTop_;
 
-        std::vector<MATH::Bounds> scissorStack_;
+        std::vector<MATH::Boundsf> scissorStack_;
     };
 }
 
