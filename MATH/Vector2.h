@@ -55,6 +55,13 @@ namespace MATH
             y = MATH_CLAMP((y), (min.y), (max.y));
         }
 
+        static void clamp(const Vector2 &cur,
+                          const Vector2& min, const Vector2& max,
+                          Vector2& result) {
+            result = cur;
+            result.clamp(min, max);
+        }
+
         T distance(const Vector2& v) const {
             T dx = v.x - x;
             T dy = v.y - y;
@@ -313,6 +320,12 @@ namespace MATH
     static const Vector2f Vec2fONE(1.0f, 1.0f);
     static const Vector2f Vec2fUNITX(1.0f, 0.0f);
     static const Vector2f Vec2fUNITY(0.0f, 1.0f);
+
+    typedef Vector2<int> Vector2i;
+    static const Vector2i Vec2iZERO(0, 0);
+    static const Vector2i Vec2iONE(1, 1);
+    static const Vector2i Vec2iUNITX(1, 0);
+    static const Vector2i Vec2iUNITY(0, 1);
 }
 
 #endif // VECTOR2_H
