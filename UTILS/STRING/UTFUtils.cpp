@@ -10,19 +10,6 @@ namespace UTILS
 {
     namespace STRING
     {
-        void UTF16ToWString(const std::u16string &utf16, std::wstring &outWsting) {
-            if (utf16.empty()) {
-                outWsting.clear();
-                return;
-            }
-
-            Size length = utf16.length();
-            outWsting.resize(length);
-            for (Size index = 0; index < length; ++index) {
-                outWsting[index] = utf16[index];
-            }
-        }
-
         void UTF8ToUTF16(const std::string &utf8, std::u16string &outUtf16) {
             if (utf8.empty()) {
                 outUtf16.clear();
@@ -87,6 +74,19 @@ namespace UTILS
 
             if (!llvm::convertUTF16ToUTF8String(utf16, outUtf8)) {
                 throw _HException_Normal("convertUTF16ToUTF8String Error!");
+            }
+        }
+
+        void UTF16ToWString(const std::u16string &utf16, std::wstring &outWsting) {
+            if (utf16.empty()) {
+                outWsting.clear();
+                return;
+            }
+
+            Size length = utf16.length();
+            outWsting.resize(length);
+            for (Size index = 0; index < length; ++index) {
+                outWsting[index] = utf16[index];
             }
         }
 
