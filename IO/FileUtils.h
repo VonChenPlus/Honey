@@ -43,20 +43,11 @@ namespace IO
         GETFILES_GETHIDDEN = 1
     };
 
-    Size GetFilesInDirectory(const char *directory, std::vector<FileInfo> *files, const char *filter = 0, int flags = 0);
     void DeleteFile(const char *file);
     void DeleteDirectory(const char *file);
     bool IsDirectory(const std::string &filename);
     void MakeDirectory(const std::string &path);
     std::string GetDirectory(const std::string &path);
-
-    // other
-    bool Exists(const std::string &filename);
-
-    // Driver
-    #ifdef _WIN32
-    std::vector<std::string> GetWindowsDrives();
-    #endif
 }
 
 #endif // FILEUTILS_H

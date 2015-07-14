@@ -80,21 +80,6 @@ namespace UTILS
             const char *c_;
             int index_;
         };
-
-        int UTF8StringNonASCIICount(const char *utf8string);
-        bool UTF8StringHasNonASCII(const char *utf8string);
-
-        // UTF8 to Win32 UTF-16
-        // Should be used when calling Win32 api calls
-        #ifdef _WIN32
-        std::string ConvertWStringToUTF8(const std::wstring &wstr);
-        std::string ConvertWStringToUTF8(const wchar_t *wstr);
-        #endif
-
-        // Dest size in units, not bytes.
-        void ConvertUTF8ToWString(wchar_t *dest, Size destSize, const std::string &source);
-        std::wstring ConvertUTF8ToWString(const std::string &source);
-
     }
 }
 

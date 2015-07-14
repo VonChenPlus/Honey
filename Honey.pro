@@ -71,3 +71,8 @@ HEADERS += $$P/EXTERNALS/rg_etc1/*.h
 # d3des
 SOURCES += $$P/EXTERNALS/d3des/*.c
 HEADERS += $$P/EXTERNALS/d3des/*.h
+
+#ConvertUTF
+SOURCES += $$P/EXTERNALS/ConvertUTF/*.c
+SOURCES += $$P/EXTERNALS/ConvertUTF/*.cpp
+HEADERS += $$P/EXTERNALS/ConvertUTF/*.h

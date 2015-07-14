@@ -22,11 +22,8 @@
 #include <sys/stat.h>
 #include <ctype.h>
 
-#include "UTILS/TEXT/UTF8.h"
-using UTILS::TEXT::ConvertUTF8ToWString;
-#ifdef _WIN32
-using UTILS::TEXT::ConvertWStringToUTF8;
-#endif
+#include "UTILS/STRING/UTFUtils.h"
+using UTILS::STRING::UTF8ToWString;
 #include "UTILS/STRING/HString.h"
 using UTILS::STRING::StringFromFormat;
 
@@ -57,7 +54,7 @@ namespace IO
     FILE *OpenFile(const std::string &filename, const char *mode) {
         FILE *file = NULLPTR;
     #if defined(_WIN32) && defined(UNICODE)
-        file = _wfopen(ConvertUTF8ToWString(filename).c_str(), ConvertUTF8ToWString(mode).c_str());
+        file = _wfopen(UTF8ToWString(filename).c_str(), UTF8ToWString(mode).c_str());
     #else
         file =  fopen(filename.c_str(), mode);
     #endif
@@ -176,7 +173,7 @@ namespace IO
 
     #ifdef _WIN32
         WIN32_FILE_ATTRIBUTE_DATA attrs;
-        if (!GetFileAttributesExW(ConvertUTF8ToWString(path).c_str(), GetFileExInfoStandard, &attrs)) {
+        if (!GetFileAttributesExW(UTF8ToWString(path).c_str(), GetFileExInfoStandard, &attrs)) {
             throw _HException_Normal("GetFileAttributes failed");
         }
         fileInfo->size = (uint64)attrs.nFileSizeLow | ((uint64)attrs.nFileSizeHigh << 32);
@@ -227,106 +224,10 @@ namespace IO
             return false;
     }
 
-    Size GetFilesInDirectory(const char *directory, std::vector<FileInfo> *files, const char *filter, int flags) {
-        Size foundEntries = 0;
-        std::set<std::string> filters;
-        std::string tmp;
-        if (filter) {
-            while (*filter) {
-                if (*filter == ':') {
-                    filters.insert(tmp);
-                    tmp = "";
-                }
-                else {
-                    tmp.push_back(*filter);
-                }
-                filter++;
-            }
-        }
-        if (tmp.size())
-            filters.insert(tmp);
-    #ifdef _WIN32
-        // Find the first file in the directory.
-        WIN32_FIND_DATA ffd;
-    #ifdef UNICODE
-
-        HANDLE hFind = FindFirstFile((ConvertUTF8ToWString(directory) + L"\\*").c_str(), &ffd);
-    #else
-        HANDLE hFind = FindFirstFile((std::string(directory) + "\\*").c_str(), &ffd);
-    #endif
-        if (hFind == INVALID_HANDLE_VALUE) {
-            FindClose(hFind);
-            return 0;
-        }
-        // windows loop
-        do {
-            const std::string virtualName = ConvertWStringToUTF8(ffd.cFileName);
-    #else
-        struct dirent_large { struct dirent entry; char padding[FILENAME_MAX+1]; };
-        struct dirent_large diren;
-        struct dirent *result = NULLPTR;
-
-        //std::string directoryWithSlash = directory;
-        //if (directoryWithSlash.back() != '/')
-        //	directoryWithSlash += "/";
-
-        DIR *dirp = opendir(directory);
-        if (!dirp)
-            return 0;
-        // non windows loop
-        while (!readdir_r(dirp, (dirent*) &diren, &result) && result) {
-            const std::string virtualName(result->d_name);
-    #endif
-            // check for "." and ".."
-            if (((virtualName[0] == '.') && (virtualName[1] == '\0')) ||
-                ((virtualName[0] == '.') && (virtualName[1] == '.') &&
-                (virtualName[2] == '\0')))
-                continue;
-
-            // Remove dotfiles (should be made optional?)
-            if (!(flags & GETFILES_GETHIDDEN) && virtualName[0] == '.')
-                continue;
-
-            FileInfo info;
-            info.name = virtualName;
-            std::string dir = directory;
-
-            // Only append a slash if there isn't one on the end.
-            Size lastSlash = dir.find_last_of("/");
-            if (lastSlash != (dir.length() - 1))
-                dir.append("/");
-
-            info.fullName = dir + virtualName;
-            info.isDirectory = IsDirectory(info.fullName);
-            info.exists = true;
-            info.size = 0;
-            if (!info.isDirectory) {
-                std::string ext = GetFileExtension(info.fullName);
-                if (filter) {
-                    if (filters.find(ext) == filters.end())
-                        continue;
-                }
-            }
-
-            if (files)
-                files->push_back(info);
-            foundEntries++;
-    #ifdef _WIN32
-        } while (FindNextFile(hFind, &ffd) != 0);
-        FindClose(hFind);
-    #else
-        }
-        closedir(dirp);
-    #endif
-        if (files)
-            std::sort(files->begin(), files->end());
-        return foundEntries;
-    }
-
     void DeleteFile(const char *file)
     {
     #ifdef _WIN32
-        if (!::DeleteFile(ConvertUTF8ToWString(file).c_str())) {
+        if (!::DeleteFile(UTF8ToWString(file).c_str())) {
             throw _HException_(StringFromFormat("Error deleting %s: %i", file, GetLastError()), HException::IO);
         }
     #else
@@ -339,7 +240,7 @@ namespace IO
 
     void DeleteDirectory(const char *dir) {
     #ifdef _WIN32
-        if (!RemoveDirectory(ConvertUTF8ToWString(dir).c_str())) {
+        if (!RemoveDirectory(UTF8ToWString(dir).c_str())) {
             throw _HException_(StringFromFormat("Error deleting directory %s: %i", dir, GetLastError()), HException::IO);
         }
     #else
@@ -383,44 +284,4 @@ namespace IO
         mkdir(path.c_str(), 0777);
     #endif
     }
-
-    // Returns true if file filename exists
-    bool Exists(const std::string &filename) {
-    #ifdef _WIN32
-        std::wstring wstr = ConvertUTF8ToWString(filename);
-        return GetFileAttributes(wstr.c_str()) != 0xFFFFFFFF;
-    #else
-        struct stat64 file_info;
-
-        std::string copy(filename);
-        StripTailDirSlashes(copy);
-
-        int result = stat64(copy.c_str(), &file_info);
-
-        return (result == 0);
-    #endif
-    }
-
-    #ifdef _WIN32
-    // Returns a vector with the device names
-    std::vector<std::string> GetWindowsDrives() {
-        std::vector<std::string> drives;
-
-        const DWORD buffsize = GetLogicalDriveStrings(0, NULLPTR);
-        std::vector<TCHAR> buff(buffsize);
-        if (GetLogicalDriveStrings(buffsize, buff.data()) == buffsize - 1) {
-            auto drive = buff.data();
-            while (*drive) {
-                std::string str(ConvertWStringToUTF8(drive));
-                str.pop_back();	// we don't want the final backslash
-                str += "/";
-                drives.push_back(str);
-
-                // advance to next drive
-                while (*drive++) {}
-            }
-        }
-        return drives;
-    }
-    #endif
 }
