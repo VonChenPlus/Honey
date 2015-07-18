@@ -22,7 +22,7 @@ using IMAGE::PNGLoadPtr;
 #include "EXTERNALS/jpge/jpgd.h"
 #include "EXTERNALS/rg_etc1/rg_etc1.h"
 #include "GRAPH/GFX/GLExtensions.h"
-#include "UTILS/STRING/HString.h"
+#include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace GLOBAL

@@ -21,7 +21,6 @@ SOURCES += \
     $$P/MATH/*.cpp \
     $$P/IO/*.cpp \
     $$P/THREAD/*.cpp \
-    $$P/UTILS/TEXT/*.cpp \
     $$P/UTILS/HASH/*.cpp \
     $$P/UTILS/STRING/*.cpp \
     $$P/UTILS/TIME/*.cpp \
@@ -37,7 +36,6 @@ HEADERS += \
     $$P/MATH/*.h \
     $$P/IO/*.h \
     $$P/THREAD/*.h \
-    $$P/UTILS/TEXT/*.h \
     $$P/UTILS/STRING/*.h \
     $$P/UTILS/TIME/*.h \
     $$P/UTILS/COLOR/*.h \

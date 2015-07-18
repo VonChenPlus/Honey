@@ -1,7 +1,7 @@
 #include "GLDebug.h"
 #include "GRAPH/GFX/GLCommon.h"
 #include "BASE/Honey.h"
-#include "UTILS/STRING/HString.h"
+#include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace GFX

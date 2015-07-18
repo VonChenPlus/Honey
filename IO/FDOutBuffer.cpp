@@ -2,7 +2,7 @@
 
 #include "IO/TCPSocket.h"
 #include "IO/SocketUtils.h"
-#include "UTILS/STRING/HString.h"
+#include "UTILS/STRING/StringUtils.h"
 
 namespace IO
 {

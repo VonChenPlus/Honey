@@ -17,7 +17,7 @@ using THIN3D::FLOATx2;
 using THIN3D::UNORM8x4;
 using THIN3D::VS_TEXTURE_COLOR_2D;
 #include "MATH/MathDef.h"
-#include "UTILS/TEXT/UTF8.h"
+#include "UTILS/STRING/UTF8.h"
 using UTILS::TEXT::UTF8;
 #include "Atlas.h"
 

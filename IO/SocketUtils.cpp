@@ -20,7 +20,7 @@
 #include <algorithm>
 #undef min
 
-#include "UTILS/STRING/HString.h"
+#include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace IO

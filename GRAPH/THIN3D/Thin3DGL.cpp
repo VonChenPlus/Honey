@@ -6,7 +6,7 @@ using IMAGE::ZIM_CLAMP;
 using MATH::IsPowerOf2;
 using IMAGE::ZIM_HAS_MIPS;
 using IMAGE::ZIM_GEN_MIPS;
-#include "UTILS/STRING/HString.h"
+#include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace GLOBAL

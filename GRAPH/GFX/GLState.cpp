@@ -6,7 +6,7 @@
 
 #include "BASE/Honey.h"
 #include "GRAPH/GFX/GLExtensions.h"
-#include "UTILS/STRING/HString.h"
+#include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace GLOBAL

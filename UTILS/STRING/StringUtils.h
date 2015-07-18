@@ -25,37 +25,15 @@ namespace UTILS
         #endif
 
         // Other simple string utilities.
-        inline bool StartsWith(const std::string &str, const std::string &what) {
-            if (str.size() < what.size())
-                return false;
-            return str.substr(0, what.size()) == what;
-        }
-
-        inline bool EndsWith(const std::string &str, const std::string &what) {
-            if (str.size() < what.size())
-                return false;
-          return str.substr(str.size() - what.size()) == what;
-        }
+        bool StartsWith(const std::string &str, const std::string &what);
+        bool EndsWith(const std::string &str, const std::string &what);
 
         // Only use on strings where you're only concerned about ASCII.
-        inline bool StartsWithNoCase(const std::string &str, const std::string &what) {
-            if (str.size() < what.size())
-                return false;
-            return strncasecmp(str.c_str(), what.c_str(), what.size()) == 0;
-        }
-
-        inline bool EndsWithNoCase(const std::string &str, const std::string &what) {
-            if (str.size() < what.size())
-                return false;
-            const Size offset = str.size() - what.size();
-            return strncasecmp(str.c_str() + offset, what.c_str(), what.size()) == 0;
-        }
+        bool StartsWithNoCase(const std::string &str, const std::string &what);
+        bool EndsWithNoCase(const std::string &str, const std::string &what);
 
         void DataToHexString(const uint8 *data, Size size, std::string *output);
-        inline void StringToHexString(const std::string &data, std::string *output) {
-            DataToHexString((uint8 *)(&data[0]), data.size(), output);
-        }
-
+        void StringToHexString(const std::string &data, std::string *output);
         // highly unsafe and not recommended.
         unsigned int ParseHexString(const char* _szValue);
 

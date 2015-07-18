@@ -24,7 +24,7 @@
 
 #include "UTILS/STRING/UTFUtils.h"
 using UTILS::STRING::UTF8ToWString;
-#include "UTILS/STRING/HString.h"
+#include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace IO

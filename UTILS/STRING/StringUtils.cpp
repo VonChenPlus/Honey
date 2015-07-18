@@ -1,4 +1,4 @@
-#include "HString.h"
+#include "StringUtils.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -21,6 +21,35 @@ namespace UTILS
 {
     namespace STRING
     {
+        bool StartsWith(const std::string &str, const std::string &what) {
+            if (str.size() < what.size())
+                return false;
+            return str.substr(0, what.size()) == what;
+        }
+
+        bool EndsWith(const std::string &str, const std::string &what) {
+            if (str.size() < what.size())
+                return false;
+            return str.substr(str.size() - what.size()) == what;
+        }
+
+        bool StartsWithNoCase(const std::string &str, const std::string &what) {
+            if (str.size() < what.size())
+                return false;
+            return strncasecmp(str.c_str(), what.c_str(), what.size()) == 0;
+        }
+
+        bool EndsWithNoCase(const std::string &str, const std::string &what) {
+            if (str.size() < what.size())
+                return false;
+            const Size offset = str.size() - what.size();
+            return strncasecmp(str.c_str() + offset, what.c_str(), what.size()) == 0;
+        }
+
+        void StringToHexString(const std::string &data, std::string *output) {
+            DataToHexString((uint8 *)(&data[0]), data.size(), output);
+        }
+
         void StringTrimEndNonAlphaNum(char *str) {
             Size n = strlen(str);
             while (!isalnum(str[n]) && n > 0) {
@@ -47,7 +76,6 @@ namespace UTILS
                 str++;
             }
         }
-
 
         unsigned int ParseHexString(const char *_szValue) {
             int Value = 0;

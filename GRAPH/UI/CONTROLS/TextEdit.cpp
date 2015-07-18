@@ -6,7 +6,7 @@ using MATH::Boundsf;
 using GFX::ALIGN_CENTER;
 using GFX::ALIGN_VCENTER;
 using GFX::ALIGN_LEFT;
-#include "UTILS/TEXT/UTF8.h"
+#include "UTILS/STRING/UTF8.h"
 using UTILS::TEXT::u8_dec;
 using UTILS::TEXT::u8_inc;
 using UTILS::TEXT::u8_wc_toutf8;

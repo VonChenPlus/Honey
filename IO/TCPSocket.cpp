@@ -20,7 +20,7 @@
 #define errorNumber WSAGetLastError()
 #endif
 
-#include "UTILS/STRING/HString.h"
+#include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
 
 namespace IO

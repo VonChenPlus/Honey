@@ -9,7 +9,7 @@
 #include "IO/FileUtils.h"
 using IO::ReadLocalFile;
 using IO::OpenFile;
-#include "UTILS/STRING/HString.h"
+#include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
 #include "MATH/MathDef.h"
 using MATH::IsPowerOf2;
