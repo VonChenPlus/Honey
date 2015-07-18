@@ -6,10 +6,6 @@ using MATH::Boundsf;
 using GFX::ALIGN_CENTER;
 using GFX::ALIGN_VCENTER;
 using GFX::ALIGN_LEFT;
-#include "UTILS/STRING/UTF8.h"
-using UTILS::TEXT::u8_dec;
-using UTILS::TEXT::u8_inc;
-using UTILS::TEXT::u8_wc_toutf8;
 
 namespace UI
 {
@@ -94,10 +90,10 @@ namespace UI
                 ctrlDown_ = true;
                 break;
             case NKCODE_DPAD_LEFT:  // ASCII left arrow
-                u8_dec(text_.c_str(), &caret_);
+                caret_--;
                 break;
             case NKCODE_DPAD_RIGHT: // ASCII right arrow
-                u8_inc(text_.c_str(), &caret_);
+                caret_++;
                 break;
             case NKCODE_MOVE_HOME:
             case NKCODE_PAGE_UP:
@@ -110,7 +106,7 @@ namespace UI
             case NKCODE_FORWARD_DEL:
                 if (caret_ < (int)text_.size()) {
                     int endCaret = caret_;
-                    u8_inc(text_.c_str(), &endCaret);
+                    endCaret++;
                     undo_ = text_;
                     text_.erase(text_.begin() + caret_, text_.begin() + endCaret);
                     textChanged = true;
@@ -119,7 +115,7 @@ namespace UI
             case NKCODE_DEL:
                 if (caret_ > 0) {
                     int begCaret = caret_;
-                    u8_dec(text_.c_str(), &begCaret);
+                    begCaret--;
                     undo_ = text_;
                     text_.erase(text_.begin() + begCaret, text_.begin() + caret_);
                     caret_--;
@@ -159,10 +155,10 @@ namespace UI
                             if (clipText.size() > maxPaste) {
                                 int end = 0;
                                 while ((size_t)end < maxPaste) {
-                                    u8_inc(clipText.c_str(), &end);
+                                    end++;
                                 }
                                 if (end > 0) {
-                                    u8_dec(clipText.c_str(), &end);
+                                    end--;
                                 }
                                 clipText = clipText.substr(0, end);
                             }
@@ -199,8 +195,8 @@ namespace UI
             int unichar = input.keyCode;
             if (unichar >= 0x20 && !ctrlDown_) {  // Ignore control characters.
                 // Insert it! (todo: do it with a string insert)
-                char buf[8];
-                buf[u8_wc_toutf8(buf, unichar)] = '\0';
+                char buf[8] = {0};
+                buf[0] = unichar;
                 if (strlen(buf) + text_.size() < maxLen_) {
                     undo_ = text_;
                     insertAtCaret(buf);

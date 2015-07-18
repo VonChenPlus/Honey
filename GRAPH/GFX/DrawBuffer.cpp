@@ -17,9 +17,7 @@ using THIN3D::FLOATx2;
 using THIN3D::UNORM8x4;
 using THIN3D::VS_TEXTURE_COLOR_2D;
 #include "MATH/MathDef.h"
-#include "UTILS/STRING/UTF8.h"
-using UTILS::TEXT::UTF8;
-#include "Atlas.h"
+#include "GRAPH/GFX/Atlas.h"
 
 namespace GLOBAL
 {
@@ -355,20 +353,16 @@ namespace GFX
         drawTexRect(xb, y1, x2, y2, um, v1, u2, v2, color);
     }
 
-    void DrawBuffer::measureTextCount(int font, const char *text, int count, float *w, float *h) {
+    void DrawBuffer::measureTextCount(int font, const char *text, int count, float *width, float *height) {
         const AtlasFont &atlasfont = *atlas->fonts[font];
 
         unsigned int cval;
         float wacc = 0;
         float maxX = 0.0f;
         int lines = 1;
-        UTF8 utf(text);
-        while (true) {
-            if (utf.end())
-                break;
-            if (utf.byteIndex() >= count)
-                break;
-            cval = utf.next();
+        int index = 0;
+        while (index < count) {
+            cval = text[index++];
             // Translate non-breaking space to space.
             if (cval == 0xA0) {
                 cval = ' ';
@@ -379,7 +373,7 @@ namespace GFX
                 lines++;
                 continue;
             }
-            else if (cval == '&' && utf.peek() != '&') {
+            else if (cval == '&' && index < count && text[index] != '&') {
                 // Ignore lone ampersands
                 continue;
             }
@@ -388,8 +382,9 @@ namespace GFX
                 wacc += c->wx * fontscalex;
             }
         }
-        if (w) *w = std::max(wacc, maxX);
-        if (h) *h = atlasfont.height * fontscaley * lines;
+        
+        if (width) *width = std::max(wacc, maxX);
+        if (height) *height = atlasfont.height * fontscaley * lines;
     }
 
     void DrawBuffer::measureText(int font, const char *text, float *w, float *h) {
@@ -459,11 +454,10 @@ namespace GFX
         else
             y += atlasfont.ascend*fontscaley;
         float sx = x;
-        UTF8 utf(text);
-        while (true) {
-            if (utf.end())
-                break;
-            cval = utf.next();
+        Size count = strlen(text);
+        Size index = 0;
+        while (index < count) {
+            cval = text[index++];
             // Translate non-breaking space to space.
             if (cval == 0xA0) {
                 cval = ' ';
@@ -473,7 +467,7 @@ namespace GFX
                 x = sx;
                 continue;
             }
-            else if (cval == '&' && utf.peek() != '&') {
+            else if (cval == '&' && index < count && text[index] != '&') {
                 // Ignore lone ampersands
                 continue;
             }
