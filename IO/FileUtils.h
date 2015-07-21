@@ -48,6 +48,16 @@ namespace IO
     bool IsDirectory(const std::string &filename);
     void MakeDirectory(const std::string &path);
     std::string GetDirectory(const std::string &path);
+
+//    class FileUitls
+//    {
+//    public:
+//        virtual ~FileUtils();
+//
+////        virtual std::string getStringFromFile(const std::string& filename);
+
+//    private:
+//    };
 }
 
 #endif // FILEUTILS_H

@@ -33,7 +33,6 @@ private: \
 	t(const t &other);  \
 	void operator =(const t &other);
 
-typedef char HBYTE;
 typedef uint8_t uint8;
 typedef uint16_t uint16;
 typedef uint32_t uint32;
@@ -45,7 +44,8 @@ typedef int64_t int64;
 typedef size_t Size;
 typedef intptr_t IntPtr;
 typedef uintptr_t UIntPtr;
-typedef unsigned int Color;
+typedef uint32 Color;
+typedef char HBYTE;
 
 #ifdef _WIN32
 
