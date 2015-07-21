@@ -33,6 +33,9 @@ private: \
 	t(const t &other);  \
 	void operator =(const t &other);
 
+#define SAFE_DELETE(p)           do { delete (p); (p) = nullptr; } while(0)
+#define SAFE_DELETE_ARRAY(p)     do { if(p) { delete[] (p); (p) = nullptr; } } while(0)
+
 typedef uint8_t uint8;
 typedef uint16_t uint16;
 typedef uint32_t uint32;

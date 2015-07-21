@@ -3,8 +3,10 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "BASE/Honey.h"
+#include "BASE/HData.h"
 
 namespace IO
 {
@@ -49,15 +51,23 @@ namespace IO
     void MakeDirectory(const std::string &path);
     std::string GetDirectory(const std::string &path);
 
-//    class FileUitls
-//    {
-//    public:
-//        virtual ~FileUtils();
-//
-////        virtual std::string getStringFromFile(const std::string& filename);
+    class FileUtils
+    {
+    public:
+        virtual ~FileUtils();
 
-//    private:
-//    };
+        virtual std::string getStringFromFile(const std::string& filename);
+
+        virtual std::string fullPathForFilename(const std::string &filename) const;
+
+        virtual bool isAbsolutePath(const std::string& path) const;
+
+    private:
+        HData getData(const std::string& filename, const std::string &mode);
+
+    private:
+        mutable std::unordered_map<std::string, std::string> fullPathCache_;
+    };
 }
 
 #endif // FILEUTILS_H

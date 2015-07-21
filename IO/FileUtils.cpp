@@ -284,4 +284,43 @@ namespace IO
         mkdir(path.c_str(), 0777);
     #endif
     }
+
+    std::string FileUtils::fullPathForFilename(const std::string &filename) const {
+        if (filename.empty()){
+            throw _HException_Normal("filename is Empty!");
+        }
+
+        if (isAbsolutePath(filename)) {
+            return filename;
+        }
+
+        // Already Cached ?
+        auto cacheIter = fullPathCache_.find(filename);
+        if(cacheIter != fullPathCache_.end()) {
+            return cacheIter->second;
+        }
+
+
+
+        // The file wasn't found, return empty string.
+        return "";
+    }
+
+    bool FileUtils::isAbsolutePath(const std::string& path) const {
+        return (path[0] == '/');
+    }
+
+    HData FileUtils::getData(const std::string& filename, const std::string &mode) {
+        if (filename.empty() || mode.empty()) {
+            throw _HException_Normal("FileUitls::getData Params Error!");
+        }
+
+        HData ret;
+        HBYTE* buffer = NULLPTR;
+        Size size = 0;
+        Size readSize = 0;
+
+
+        return ret;
+    }
 }

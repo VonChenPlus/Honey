@@ -22,12 +22,6 @@ namespace MATH
     #define MATH_RANDOM_MINUS1_1()  ((2.0f*((float)rand()/RAND_MAX))-1.0f)  // Returns a random float between -1 and 1.
     #define MATH_RANDOM_0_1()       ((float)rand()/RAND_MAX)                // Returns a random float between 0 and 1.
 
-    #define MATH_FLOAT_MAX      std::numeric_limits<float>::max()
-    #define MATH_FLOAT_MIN      std::numeric_limits<float>::min()
-
-    #define MATH_DOUBLE_MAX     std::numeric_limits<double>::max()
-    #define MATH_DOUBLE_MIN     std::numeric_limits<double>::min()
-
     #define MATH_INT8_MAX       std::numeric_limits<int8>::max()
     #define MATH_INT8_MIN       std::numeric_limits<int8>::min()
     #define MATH_UINT8_MAX      std::numeric_limits<uint8>::max()
