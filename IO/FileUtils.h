@@ -7,65 +7,59 @@
 
 #include "BASE/Honey.h"
 #include "BASE/HData.h"
+#include "BASE/HValue.h"
 
 namespace IO
 {
-    // File IO
-    FILE *OpenFile(const std::string &filename, const char *mode);
-
-    // Whole-file reading/writing
-    void WriteStringToFile(bool text_file, const std::string &str, const char *filename);
-    void ReadFileToString(bool text_file, const char *filename, std::string &str);
-
-    void WriteDataToFile(bool text_file, const void* data, const unsigned int size, const char *filename);
-    void ReadDataFromFile(bool text_file, unsigned char* &data, const unsigned int size, const char *filename);
-
-    // Direct readers. deallocate using delete [].
-    uint8 *ReadLocalFile(const char *filename, Size *size);
-
-    // File Operator
-    struct FileInfo
-    {
-        std::string name;
-        std::string fullName;
-        bool exists;
-        bool isDirectory;
-        bool isWritable;
-        uint64 size;
-        bool operator <(const FileInfo &other) const;
-    };
-
-    std::string GetFileExtension(const std::string &fn);
-    std::string GetFileName(std::string path);
-    void GetFileInfo(const char *path, FileInfo *fileInfo);
-
-    // Directory Operator
-    enum
-    {
-        GETFILES_GETHIDDEN = 1
-    };
-
-    void DeleteFile(const char *file);
-    void DeleteDirectory(const char *file);
-    bool IsDirectory(const std::string &filename);
-    void MakeDirectory(const std::string &path);
-    std::string GetDirectory(const std::string &path);
-
     class FileUtils
     {
     public:
-        virtual ~FileUtils();
+        static FileUtils &getInstance();
+        virtual ~FileUtils() {}
 
-        virtual std::string getStringFromFile(const std::string& filename);
+        FILE *openFile(const std::string& filename, const std::string &mode);
 
-        virtual std::string fullPathForFilename(const std::string &filename) const;
+        std::string getStringFromFile(const std::string& filename);
+        HData getDataFromFile(const std::string& filename);
+
+        void writeStringToFile(std::string dataStr, const std::string& fullPath);
+        void writeDataToFile(HData retData, const std::string& fullPath);
+
+        std::string getFilenameForNick(const std::string &filename) const;
+        std::string fullPathForFilename(const std::string &filename) const;
+        std::string getPathForFilename(const std::string& filename, const std::string& resolutionDirectory, const std::string& searchPath) const;
+        std::string getFullPathForDirectoryAndFilename(const std::string& directory, const std::string& filename) const;
 
         virtual bool isAbsolutePath(const std::string& path) const;
+        bool isFileExist(const std::string& filename) const;
+        bool isDirectoryExist(const std::string& dirPath) const;
+
+        virtual bool createDirectory(const std::string& dirPath) = 0;
+        virtual bool removeDirectory(const std::string& dirPath) = 0;
+        virtual bool removeFile(const std::string &filepath) = 0;
+
+        long getFileSize(const std::string &filepath);
+
+        void setFilenameLookupDictionary(const ValueMap& filenameLookupDict);
+        void setSearchResolutionsOrder(const std::vector<std::string>& searchResolutionsOrder);
+        void addSearchResolutionsOrder(const std::string &order,const bool front=false);
+        void setSearchPaths(const std::vector<std::string>& searchPaths);
+        void addSearchPath(const std::string & path, const bool front=false);
+
+    protected:
+        FileUtils() {}
+
+        virtual std::string getSuitableFOpen(const std::string& filenameUtf8) const;
+        virtual bool isFileExistInternal(const std::string& filename) const = 0;
+        virtual bool isDirectoryExistInternal(const std::string& dirPath) const = 0;
 
     private:
-        HData getData(const std::string& filename, const std::string &mode);
+        HData getData(const std::string& filename, const std::string &mode = "rb");
 
     private:
+        ValueMap filenameLookupDict_;
+        std::vector<std::string> searchResolutionsOrderArray_;
+        std::vector<std::string> searchPathArray_;
         mutable std::unordered_map<std::string, std::string> fullPathCache_;
     };
 }

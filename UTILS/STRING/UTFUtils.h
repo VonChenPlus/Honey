@@ -18,6 +18,7 @@ namespace UTILS
         #ifdef _WIN32
         void WStringToString(const std::wstring &wstring, std::string &outString);
         void StringToWstring(const std::string &string, std::wstring &outWstring);
+        void UTF8ToString(const std::string &utf8, std::string &outString);
         #endif
 
         long UTF8StringLength(const std::string& utf8);

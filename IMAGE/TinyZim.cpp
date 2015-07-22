@@ -7,8 +7,6 @@
 #include "EXTERNALS/zlib/zlib.h"
 #include "EXTERNALS/rg_etc1/rg_etc1.h"
 #include "IO/FileUtils.h"
-using IO::ReadLocalFile;
-using IO::OpenFile;
 #include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
 #include "MATH/MathDef.h"
@@ -127,10 +125,10 @@ namespace IMAGE
     }
 
     int LoadZIM(const char *filename, int *width, int *height, int *format, uint8 **image) {
-        Size size;
-        uint8 *buffer = ReadLocalFile(filename, &size);
-        int retval = LoadZIMPtr(buffer, (int)size, width, height, format, image);
-        delete[] buffer;
+        Size fileSize;
+        HData buffer = IO::FileUtils::getInstance().getDataFromFile(filename);
+        fileSize = buffer.getSize();
+        int retval = LoadZIMPtr((const uint8 *)(buffer.getBytes()), fileSize, width, height, format, image);
         return retval;
     }
 
@@ -303,7 +301,7 @@ namespace IMAGE
     }
 
     void SaveZIM(const char *filename, int width, int height, int pitch, int flags, const uint8_t *image_data) {
-        FILE *f = OpenFile(filename, "wb");
+        FILE *f = IO::FileUtils::getInstance().openFile(filename, "wb");
         static const char magic[5] = "ZIMG";
         fwrite(magic, 1, 4, f);
         fwrite(&width, 1, 4, f);

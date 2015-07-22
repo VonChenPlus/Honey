@@ -10,7 +10,6 @@ using IMAGE::ZIM_FORMAT_MASK;
 using IMAGE::PNGLoadPtr;
 #include "EXTERNALS/jpge/jpgd.h"
 #include "IO/FileUtils.h"
-using IO::ReadLocalFile;
 #include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
 #include <QImage>
@@ -226,10 +225,10 @@ namespace THIN3D
     void Thin3DTexture::loadFromFile(const std::string &filename, T3DImageType type) {
         filename_ = "";
         Size fileSize;
-        uint8 *buffer = ReadLocalFile(filename.c_str(), &fileSize);
-        loadFromFileData(buffer, fileSize, type);
+        HData buffer = IO::FileUtils::getInstance().getDataFromFile(filename);
+        fileSize = buffer.getSize();
+        loadFromFileData((const uint8 *)(buffer.getBytes()), fileSize, type);
         filename_ = filename;
-        delete[] buffer;
     }
 
     Thin3DTexture *Thin3DContext::createTextureFromFile(const char *filename, T3DImageType type) {

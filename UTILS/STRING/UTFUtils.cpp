@@ -542,6 +542,17 @@ namespace UTILS
             MultiByteToWideChar(CP_ACP, 0, (LPCSTR) string.c_str(), nLen, (LPWSTR) &outWstring[0], nResult);
         }
 
+        void UTF8ToString(const std::string &utf8, std::string &outString) {
+            if (utf8.empty()) {
+                outString.clear();
+                return;
+            }
+
+            std::wstring wstring;
+            UTF8ToWString(utf8, wstring);
+            WStringToString(wstring, outString);
+        }
+
 #endif
 
         long UTF8StringLength(const std::string& utf8) {

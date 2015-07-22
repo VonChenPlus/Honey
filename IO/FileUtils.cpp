@@ -29,260 +29,174 @@ using UTILS::STRING::StringFromFormat;
 
 namespace IO
 {
-    #if defined(__FreeBSD__) || defined(__APPLE__)
-        #define stat64 stat
-    #endif
-
-    // Hack
-    #ifdef __SYMBIAN32__
-    static inline int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result) {
-        struct dirent *readdir_entry;
-
-        readdir_entry = readdir(dirp);
-        if (readdir_entry == NULLPTR)
-        {
-            *result = NULLPTR;
-            return errno;
-        }
-
-        *entry = *readdir_entry;
-        *result = entry;
-        return 0;
-    }
-    #endif
-
-    FILE *OpenFile(const std::string &filename, const char *mode) {
-        FILE *file = NULLPTR;
-    #if defined(_WIN32) && defined(UNICODE)
-        file = _wfopen(UTF8ToWString(filename).c_str(), UTF8ToWString(mode).c_str());
-    #else
-        file =  fopen(filename.c_str(), mode);
-    #endif
-        if (file == NULLPTR)
-            throw _HException_("OpenFile failed", HException::IO);
-        return file;
-    }
-
-    void WriteStringToFile(bool text_file, const std::string &str, const char *filename) {
-        FILE *file = OpenFile(filename, text_file ? "w" : "wb");
-        Size len = str.size();
-        if (len != fwrite(str.data(), 1, str.size(), file))
-        {
-            fclose(file);
-            throw _HException_("fwrite failed", HException::IO);
-        }
-        fclose(file);
-    }
-
-    void WriteDataToFile(bool text_file, const void* data, const unsigned int size, const char *filename) {
-        FILE *file = OpenFile(filename, text_file ? "w" : "wb");
-        Size len = size;
-        if (len != fwrite(data, 1, len, file)) {
-            fclose(file);
-            throw _HException_("fwrite failed", HException::IO);
-        }
-        fclose(file);
-    }
-
-    uint64 GetSize(FILE *file) {
-        // This will only support 64-bit when large file support is available.
-        // That won't be the case on some versions of Android, at least.
-    #if defined(ANDROID) || (defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS < 64)
-        int fd = fileno(file);
-
-        off64_t pos = lseek64(fd, 0, SEEK_CUR);
-        off64_t size = lseek64(fd, 0, SEEK_END);
-        if (size != pos && lseek64(fd, pos, SEEK_SET) != pos) {
-            throw _HException_("lseek64 failed", HException::IO);
-        }
-        return size;
-    #else
-        uint64_t pos = ftello(file);
-        if (fseek(file, 0, SEEK_END) != 0) {
-            throw _HException_("fseek failed", HException::IO);
-        }
-        uint64_t size = ftello(file);
-        // Reset the seek position to where it was when we started.
-        if (size != pos && fseeko(file, pos, SEEK_SET) != 0) {
-            throw _HException_("fseeko failed", HException::IO);
-        }
-        return size;
-    #endif
-    }
-
-    void ReadFileToString(bool text_file, const char *filename, std::string &str) {
-        FILE *file = OpenFile(filename, text_file ? "r" : "rb");
-        Size len = (Size)GetSize(file);
-        char *buf = new char[len + 1];
-        buf[fread(buf, 1, len, file)] = 0;
-        str = std::string(buf, len);
-        fclose(file);
-        delete[] buf;
-    }
-
-
-    void ReadDataFromFile(bool text_file, unsigned char* &data, const unsigned int size, const char *filename) {
-        FILE *file = OpenFile(filename, text_file ? "r" : "rb");
-        Size len = (Size)GetSize(file);
-        if(len > size) {
-            fclose(file);
-            throw _HException_Normal("truncating length");
-        }
-        data[fread(data, 1, size, file)] = 0;
-        fclose(file);
-    }
-
-    // The return is non-const because - why not?
-    uint8 *ReadLocalFile(const char *filename, Size *size) {
-        FILE *file = OpenFile(filename, "rb");
-        Size fSize = (Size)GetSize(file);
-        uint8 *contents = new uint8[fSize+1];
-        fSize = fread(contents, 1, fSize, file);
-        fclose(file);
-        contents[fSize] = 0;
-        *size = fSize;
-        return contents;
-    }
-
-    #define DIR_SEP "/"
-    #define DIR_SEP_CHR '\\'
-
-    #ifndef METRO
-
-    // Remove any ending forward slashes from directory paths
-    // Modifies argument.
-    static void StripTailDirSlashes(std::string &fname) {
-        if (fname.length() > 1) {
-            Size i = fname.length() - 1;
-            while (fname[i] == DIR_SEP_CHR)
-                fname[i--] = '\0';
-        }
-        return;
-    }
-
-    // Returns true if filename is a directory
-    bool IsDirectory(const std::string &filename) {
-        FileInfo info;
-        GetFileInfo(filename.c_str(), &info);
-        return info.isDirectory;
-    }
-
-    void GetFileInfo(const char *path, FileInfo *fileInfo) {
-        // TODO: Expand relative paths?
-        fileInfo->fullName = path;
-
     #ifdef _WIN32
-        WIN32_FILE_ATTRIBUTE_DATA attrs;
-        if (!GetFileAttributesExW(UTF8ToWString(path).c_str(), GetFileExInfoStandard, &attrs)) {
-            throw _HException_Normal("GetFileAttributes failed");
-        }
-        fileInfo->size = (uint64)attrs.nFileSizeLow | ((uint64)attrs.nFileSizeHigh << 32);
-        fileInfo->isDirectory = (attrs.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
-        fileInfo->isWritable = (attrs.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0;
-        fileInfo->exists = true;
-    #else
-        struct stat64 file_info;
-
-        std::string copy(path);
-        StripTailDirSlashes(copy);
-
-        int result = stat64(copy.c_str(), &file_info);
-
-        if (result < 0) {
-            throw _HException_Normal("GetFileAttributes failed");
-        }
-
-        fileInfo->isDirectory = S_ISDIR(file_info.st_mode);
-        fileInfo->isWritable = false;
-        fileInfo->size = file_info.st_size;
-        fileInfo->exists = true;
-        // HACK: approximation
-        if (file_info.st_mode & 0200)
-            fileInfo->isWritable = true;
-    #endif
-    }
-
-    std::string GetFileExtension(const std::string &fn) {
-        int pos = (int)fn.rfind(".");
-        if (pos < 0) return "";
-        std::string ext = fn.substr(pos+1);
-        for (Size i = 0; i < ext.size(); i++)
-        {
-            ext[i] = tolower(ext[i]);
-        }
-        return ext;
-    }
-
-    bool FileInfo::operator <(const FileInfo &other) const {
-        if (isDirectory && !other.isDirectory)
-            return true;
-        else if (!isDirectory && other.isDirectory)
-            return false;
-        if (strcasecmp(name.c_str(), other.name.c_str()) < 0)
-            return true;
-        else
-            return false;
-    }
-
-    void DeleteFile(const char *file)
+    class FileUtilsWin final : public FileUtils
     {
-    #ifdef _WIN32
-        if (!::DeleteFile(UTF8ToWString(file).c_str())) {
-            throw _HException_(StringFromFormat("Error deleting %s: %i", file, GetLastError()), HException::IO);
+    public:
+        bool createDirectory(const std::string& dirPath) override {
+            return mkdir(dirPath.c_str()) == 0;
         }
+
+        bool removeDirectory(const std::string& dirPath) {
+            return !!::RemoveDirectory(UTF8ToWString(dirPath).c_str());
+        }
+
+        bool removeFile(const std::string &filepath) {
+            return !!::DeleteFile(UTF8ToWString(filepath).c_str());
+        }
+
+    private:
+        std::string getSuitableFOpen(const std::string& filenameUtf8) const override {
+            std::string string;
+            UTILS::STRING::UTF8ToString(filenameUtf8, string);
+            return string;
+        }
+
+        bool isFileExistInternal(const std::string& strFilePath) const override {
+            if (strFilePath.empty()) {
+                return false;
+            }
+
+            DWORD attr = GetFileAttributesW(UTF8ToWString(strFilePath).c_str());
+            if(attr == INVALID_FILE_ATTRIBUTES || (attr & FILE_ATTRIBUTE_DIRECTORY))
+                return false;   //  not a file
+            return true;
+        }
+
+        bool isDirectoryExistInternal(const std::string& dirPath) const override {
+            unsigned long fAttrib = GetFileAttributesW(UTF8ToWString(dirPath).c_str());
+            if (fAttrib != INVALID_FILE_ATTRIBUTES &&
+                (fAttrib & FILE_ATTRIBUTE_DIRECTORY)) {
+                return true;
+            }
+            return false;
+        }
+    };
     #else
-        int err = unlink(file);
-        if (err) {
-            throw _HException_(StringFromFormat("Error unlinking %s: %i", file, err), HException::IO);
+    class FileUtilsLinux final : public FileUtils
+    {
+    public:
+        bool createDirectory(const std::string& dirPath) override {
+            mkdir(path.c_str(), 0777);
         }
+
+        bool removeDirectory(const std::string& dirPath) {
+            rmdir(dir);
+        }
+
+        bool removeFile(const std::string &filepath) {
+            return unlink(file) == 0;
+        }
+
+    private:
+        bool isFileExistInternal(const std::string &strFilePath) const override {
+            if (strFilePath.empty()) {
+                return false;
+            }
+
+            struct stat sts;
+            return (stat(strFilePath.c_str(), &sts) != -1) ? true : false;
+        }
+
+        bool isDirectoryExistInternal(const std::string& dirPath) const override{
+            if (strFilePath.empty()) {
+                return false;
+            }
+
+            struct stat sts;
+            int result = stat(strFilePath.c_str(), &sts);
+            if (result < 0)
+                return false;
+
+            return S_ISDIR(sts.st_mode);
+        }
+    };
     #endif
+
+    FileUtils &FileUtils::getInstance() {
+        #ifdef _WIN32
+        static FileUtilsWin instance;
+        #else
+        static FileUtilsLinux instance;
+        #endif
+        return instance;
     }
 
-    void DeleteDirectory(const char *dir) {
-    #ifdef _WIN32
-        if (!RemoveDirectory(UTF8ToWString(dir).c_str())) {
-            throw _HException_(StringFromFormat("Error deleting directory %s: %i", dir, GetLastError()), HException::IO);
+    FILE *FileUtils::openFile(const std::string& filename, const std::string &mode) {
+        if (filename.empty() || mode.empty()) {
+            throw _HException_Normal("FileUitls::getData Params Error!");
         }
-    #else
-        rmdir(dir);
-    #endif
+
+        do {
+            // Read the file from hardware
+            std::string fullPath = fullPathForFilename(filename);
+            FILE *fp = fopen(getSuitableFOpen(fullPath).c_str(), mode.c_str());
+            if (fp == NULLPTR) {
+                throw _HException_("fopen failed", HException::IO);
+            }
+            return fp;
+        } while(0);
+
+        return NULLPTR;
     }
 
-    #endif
+    std::string FileUtils::getStringFromFile(const std::string& filename) {
+        HData data = getData(filename, "rt");
+        if (data.isNull())
+            return "";
 
-    std::string GetDirectory(const std::string &path) {
-        if (path == "/")
-            return path;
-        int n = (int)path.size() - 1;
-        while (n >= 0 && path[n] != '\\' && path[n] != '/')
-            n--;
-        std::string cutpath = n > 0 ? path.substr(0, n) : "";
-        for (Size i = 0; i < cutpath.size(); i++)
-        {
-            if (cutpath[i] == '\\') cutpath[i] = '/';
-        }
-    #ifndef _WIN32
-        if (!cutpath.size()) {
-            return "/";
-        }
-    #endif
-        return cutpath;
+        std::string ret((const char*)data.getBytes());
+        ret.append('\0');
+        return ret;
     }
 
-    std::string GetFileName(std::string path) {
-        Size off = GetDirectory(path).size() + 1;
-        if (off < path.size())
-            return path.substr(off);
-        else
-            return path;
+    void FileUtils::writeStringToFile(std::string dataStr, const std::string& fullPath) {
+        HData retData;
+        retData.copy((HBYTE *)dataStr.c_str(), dataStr.size());
+
+        return writeDataToFile(retData, fullPath);
     }
 
-    void MakeDirectory(const std::string &path) {
-    #ifdef _WIN32
-        mkdir(path.c_str());
-    #else
-        mkdir(path.c_str(), 0777);
-    #endif
+
+    void FileUtils::writeDataToFile(HData retData, const std::string& fullPath) {
+        if (retData.isNull() || fullPath.empty()) {
+            throw _HException_Normal("FileUitls::writeDataToFile Params Error!");
+        }
+
+        size_t size = 0;
+        const char* mode = "wb";
+
+        do {
+            // Read the file from hardware
+            FILE *fp = fopen(getSuitableFOpen(fullPath).c_str(), mode);
+            if (fp == NULLPTR) {
+                throw _HException_("fopen failed", HException::IO);
+            }
+
+            size = retData.getSize();
+            fwrite(retData.getBytes(), size, 1, fp);
+            fclose(fp);
+        } while (0);
+    }
+
+    HData FileUtils::getDataFromFile(const std::string& filename) {
+        return getData(filename);
+    }
+
+    std::string FileUtils::getFilenameForNick(const std::string &nickname) const {
+        std::string newFileName;
+
+        // in Lookup Filename dictionary ?
+        auto iter = filenameLookupDict_.find(nickname);
+
+        if (iter == filenameLookupDict_.end()) {
+            newFileName = nickname;
+        }
+        else {
+            newFileName = iter->second.asString();
+        }
+
+        return newFileName;
     }
 
     std::string FileUtils::fullPathForFilename(const std::string &filename) const {
@@ -300,14 +214,197 @@ namespace IO
             return cacheIter->second;
         }
 
+        // Get the new file name.
+        const std::string newFilename(getFilenameForNick(filename));
+        std::string fullpath;
 
+        for (const auto& searchIt : searchPathArray_) {
+            for (const auto& resolutionIt : searchResolutionsOrderArray_) {
+                fullpath = getPathForFilename(newFilename, resolutionIt, searchIt);
+                if (fullpath.length() > 0) {
+                    // Using the filename passed in as key.
+                    fullPathCache_.insert(std::make_pair(filename, fullpath));
+                    return fullpath;
+                }
+            }
+        }
 
-        // The file wasn't found, return empty string.
         return "";
+    }
+
+    std::string FileUtils::getPathForFilename(const std::string& filename, const std::string& resolutionDirectory, const std::string& searchPath) const {
+        std::string file = filename;
+        std::string file_path = "";
+        size_t pos = filename.find_last_of("/");
+        if (pos != std::string::npos) {
+            file_path = filename.substr(0, pos+1);
+            file = filename.substr(pos+1);
+        }
+
+        // searchPath + file_path + resourceDirectory
+        std::string path = searchPath;
+        path += file_path;
+        path += resolutionDirectory;
+
+        path = getFullPathForDirectoryAndFilename(path, file);
+
+        return path;
+    }
+
+    std::string FileUtils::getFullPathForDirectoryAndFilename(const std::string& directory, const std::string& filename) const {
+        // get directory+filename, safely adding '/' as necessary
+        std::string ret = directory;
+        if (directory.size() && directory[directory.size()-1] != '/') {
+            ret += '/';
+        }
+        ret += filename;
+
+        // if the file doesn't exist, return an empty string
+        if (!isFileExistInternal(ret)) {
+            ret = "";
+        }
+        return ret;
     }
 
     bool FileUtils::isAbsolutePath(const std::string& path) const {
         return (path[0] == '/');
+    }
+
+    bool FileUtils::isFileExist(const std::string& filename) const {
+        if (isAbsolutePath(filename)) {
+            return isFileExistInternal(filename);
+        }
+        else {
+            std::string fullpath = fullPathForFilename(filename);
+            if (fullpath.empty())
+                return false;
+            else
+                return true;
+        }
+    }
+
+    bool FileUtils::isDirectoryExist(const std::string& dirPath) const {
+        if (isAbsolutePath(dirPath)) {
+            return isDirectoryExistInternal(dirPath);
+        }
+
+        // Already Cached ?
+        auto cacheIter = fullPathCache_.find(dirPath);
+        if( cacheIter != fullPathCache_.end() ) {
+            return isDirectoryExistInternal(cacheIter->second);
+        }
+
+        std::string fullpath;
+        for (const auto& searchIt : searchPathArray_) {
+            for (const auto& resolutionIt : searchResolutionsOrderArray_) {
+                // searchPath + file_path + resourceDirectory
+                fullpath = searchIt + dirPath + resolutionIt;
+                if (isDirectoryExistInternal(fullpath))
+                {
+                    fullPathCache_.insert(std::make_pair(dirPath, fullpath));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    long FileUtils::getFileSize(const std::string &filepath) {
+        std::string fullpath = filepath;
+        if (!isAbsolutePath(filepath))
+        {
+            fullpath = fullPathForFilename(filepath);
+            if (fullpath.empty())
+                return 0;
+        }
+
+        struct stat info;
+        // Get data associated with "crt_stat.c":
+        int result = stat( fullpath.c_str(), &info );
+
+        // Check if statistics are valid:
+        if( result != 0 ) {
+            // Failed
+            return -1;
+        }
+        else {
+            return (long)(info.st_size);
+        }
+    }
+
+    void FileUtils::setFilenameLookupDictionary(const ValueMap& filenameLookupDict) {
+        fullPathCache_.clear();
+        filenameLookupDict_ = filenameLookupDict;
+    }
+
+    void FileUtils::setSearchResolutionsOrder(const std::vector<std::string>& searchResolutionsOrder) {
+        bool existDefault = false;
+        fullPathCache_.clear();
+        searchResolutionsOrderArray_.clear();
+        for(const auto& iter : searchResolutionsOrder)
+        {
+            std::string resolutionDirectory = iter;
+            if (!existDefault && resolutionDirectory == "") {
+                existDefault = true;
+            }
+
+            if (resolutionDirectory.length() > 0 && resolutionDirectory[resolutionDirectory.length()-1] != '/') {
+                resolutionDirectory += "/";
+            }
+
+            searchResolutionsOrderArray_.push_back(resolutionDirectory);
+        }
+
+        if (!existDefault) {
+            searchResolutionsOrderArray_.push_back("");
+        }
+    }
+
+    void FileUtils::addSearchResolutionsOrder(const std::string &order,const bool front) {
+        std::string resOrder = order;
+        if (!resOrder.empty() && resOrder[resOrder.length()-1] != '/')
+            resOrder.append("/");
+
+        if (front) {
+            searchResolutionsOrderArray_.insert(searchResolutionsOrderArray_.begin(), resOrder);
+        }
+        else {
+            searchResolutionsOrderArray_.push_back(resOrder);
+        }
+    }
+
+    void FileUtils::setSearchPaths(const std::vector<std::string>& searchPaths) {
+        fullPathCache_.clear();
+        searchPathArray_.clear();
+        for (const auto& iter : searchPaths) {
+            std::string prefix;
+            std::string path;
+
+            path = prefix + (iter);
+            if (path.length() > 0 && path[path.length()-1] != '/') {
+                path += "/";
+            }
+            searchPathArray_.push_back(path);
+        }
+    }
+
+    void FileUtils::addSearchPath(const std::string &searchpath,const bool front) {
+        std::string prefix;
+
+        std::string path = prefix + searchpath;
+        if (path.length() > 0 && path[path.length()-1] != '/') {
+            path += "/";
+        }
+        if (front) {
+            searchPathArray_.insert(searchPathArray_.begin(), path);
+        }
+        else {
+            searchPathArray_.push_back(path);
+        }
+    }
+
+    std::string FileUtils::getSuitableFOpen(const std::string& filenameUtf8) const {
+        return filenameUtf8;
     }
 
     HData FileUtils::getData(const std::string& filename, const std::string &mode) {
@@ -320,6 +417,30 @@ namespace IO
         Size size = 0;
         Size readSize = 0;
 
+        do {
+            // Read the file from hardware
+            std::string fullPath = fullPathForFilename(filename);
+            FILE *fp = fopen(getSuitableFOpen(fullPath).c_str(), mode.c_str());
+            if (fp == NULLPTR) {
+                throw _HException_("fopen failed", HException::IO);
+            }
+
+            fseek(fp,0,SEEK_END);
+            size = ftell(fp);
+            fseek(fp,0,SEEK_SET);
+
+            buffer = (HBYTE*)malloc(sizeof(HBYTE) * size);
+
+            readSize = fread(buffer, sizeof(unsigned char), size, fp);
+            fclose(fp);
+        } while (0);
+
+        if (NULLPTR == buffer || 0 == readSize) {
+            throw _HException_("Get data from file failed", HException::IO);
+        }
+        else {
+            ret.fastSet(buffer, readSize);
+        }
 
         return ret;
     }
