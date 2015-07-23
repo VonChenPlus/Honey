@@ -77,15 +77,15 @@ namespace IO
     {
     public:
         bool createDirectory(const std::string& dirPath) override {
-            mkdir(path.c_str(), 0777);
+            return mkdir(dirPath.c_str(), 0777) == 0;
         }
 
         bool removeDirectory(const std::string& dirPath) {
-            rmdir(dir);
+            return rmdir(dirPath.c_str()) == 0;
         }
 
         bool removeFile(const std::string &filepath) {
-            return unlink(file) == 0;
+            return unlink(filepath.c_str()) == 0;
         }
 
     private:
@@ -99,12 +99,12 @@ namespace IO
         }
 
         bool isDirectoryExistInternal(const std::string& dirPath) const override{
-            if (strFilePath.empty()) {
+            if (dirPath.empty()) {
                 return false;
             }
 
             struct stat sts;
-            int result = stat(strFilePath.c_str(), &sts);
+            int result = stat(dirPath.c_str(), &sts);
             if (result < 0)
                 return false;
 
