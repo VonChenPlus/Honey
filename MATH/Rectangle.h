@@ -71,7 +71,6 @@ namespace MATH
 
         inline void translate(const Vector2<T> &p) {
             origin.add(p);
-            return result;
         }
 
         inline bool equals(const Rectangle &rhs) const {
