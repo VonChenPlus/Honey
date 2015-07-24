@@ -6,7 +6,7 @@
 namespace MATH
 {
     template <typename T>
-    class Vector4
+    class Vector4 final
     {
     public:
         Vector4()
@@ -248,6 +248,14 @@ namespace MATH
 
         inline bool operator!=(const Vector4& v) const {
             return !(*this == v);
+        }
+
+        inline operator float *() {
+            return (float *)this;
+        }
+
+        inline operator const float *() const {
+            return (const float *)this;
         }
 
     public:

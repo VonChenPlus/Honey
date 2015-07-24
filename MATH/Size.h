@@ -6,7 +6,7 @@
 namespace MATH
 {
     template <typename T>
-    class Size
+    class Size final
     {
     public:
         Size()

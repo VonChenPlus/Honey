@@ -9,7 +9,7 @@
 namespace MATH
 {
     template <typename T>
-    class Rectangle
+    class Rectangle final
     {
     public:
         Rectangle() {}

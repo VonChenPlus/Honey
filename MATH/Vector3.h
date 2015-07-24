@@ -9,7 +9,7 @@ namespace MATH
      * Defines a 3-element floating point vector.
      */
     template <typename T>
-    class Vector3
+    class Vector3 final
     {
     public:
         Vector3()
@@ -22,6 +22,10 @@ namespace MATH
             : x(_x)
             , y(_y)
             , z(_z) {
+        }
+
+        Vector3(const Vector3& p1, const Vector3& p2) {
+            set(p1, p2);
         }
 
         Vector3(const Vector3 &copy) {
@@ -76,6 +80,11 @@ namespace MATH
             // USE_NEON64
         }
 
+        static void cross(const Vector3& v1, const Vector3& v2, Vector3* dst) {
+            *dst = v1;
+            dst->cross(v2);
+        }
+
         T distance(const Vector3& v) const {
             T dx = v.x - x;
             T dy = v.y - y;
@@ -92,6 +101,10 @@ namespace MATH
 
         inline T dot(const Vector3& v) const {
             return (x * v.x + y * v.y + z * v.z);
+        }
+
+        static T dot(const Vector3& v1, const Vector3& v2) {
+            return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
         }
 
         T length() const {
@@ -168,6 +181,12 @@ namespace MATH
             x -= v.x;
             y -= v.y;
             z -= v.z;
+        }
+
+        static void subtract(const Vector3& v1, const Vector3& v2, Vector3* dst) {
+            dst->x = v1.x - v2.x;
+            dst->y = v1.y - v2.y;
+            dst->z = v1.z - v2.z;
         }
 
         /**
@@ -272,6 +291,14 @@ namespace MATH
 
         Vector3 operator %(const Vector3 &v) const {
             return Vector3(y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x);
+        }
+
+        inline operator float *() {
+            return (float *)this;
+        }
+
+        inline operator const float *() const {
+            return (const float *)this;
         }
 
     public:

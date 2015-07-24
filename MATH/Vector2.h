@@ -9,7 +9,7 @@ namespace MATH
      * Defines a 2-element floating point vector.
      */
     template <typename T>
-    class Vector2
+    class Vector2 final
     {
     public:
         Vector2()
@@ -308,6 +308,14 @@ namespace MATH
 
         static inline Vector2 forAngle(const double &a) {
             return Vector2((T)cos(a), (T)sin(a));
+        }
+
+        inline operator float *() {
+            return (float *)this;
+        }
+
+        inline operator const float *() const {
+            return (const float *)this;
         }
 
     public:

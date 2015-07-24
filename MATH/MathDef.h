@@ -18,6 +18,7 @@ namespace MATH
     #define MATH_PIOVER2        1.57079632679489661923f
     #define MATH_1_PI           0.31830988618379067154
     #define MATH_E              2.71828182845904523536f
+    #define MATH_TOLERANCE              2e-37f
 
     #define MATH_RANDOM_MINUS1_1()  ((2.0f*((float)rand()/RAND_MAX))-1.0f)  // Returns a random float between -1 and 1.
     #define MATH_RANDOM_0_1()       ((float)rand()/RAND_MAX)                // Returns a random float between 0 and 1.
