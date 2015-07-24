@@ -39,10 +39,10 @@ namespace MATH
         }
 
         inline bool intersect(const Rectangle &rhs) const {
-            return !(getMaxX() < rhs.getMinX() ||
-                    rhs.getMaxX() < getMinX() ||
-                    getMaxY() < rhs.getMinY() ||
-                    rhs.getMaxY() < getMinY());
+            return !(maxX() < rhs.minX() ||
+                    rhs.maxX() < minX() ||
+                    maxY() < rhs.minY() ||
+                    rhs.maxY() < minY());
         }
 
         inline bool contains(const Vector2f &p) const {
