@@ -28,7 +28,7 @@ namespace MATH
         }
 
         explicit Size(const Vector2<T>& point)
-            : widht(point.x)
+            : width(point.x)
             , height(point.y) {
 
         }

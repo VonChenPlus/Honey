@@ -13,16 +13,24 @@ namespace MATH
     {
     public:
         Rectangle() {}
-        Rectangle(Vector2<T> topLeft_, Vector2<T> bottomRight_)
-            : origin(topLeft_)
-            , size(bottomRight_ - topLieft) {
+        Rectangle(Vector2<T> topLeft, Vector2<T> bottomRight)
+            : origin(topLeft)
+            , size(bottomRight - topLeft) {
 
         }
 
-        Rectangle(T left, T top, T right, T bottom)
+        Rectangle(T left, T top, T width, T height)
             : origin(left, top)
-            , size(right - left, bottom - right) {
+            , size(width, height) {
+        }
 
+        Rectangle(const Rectangle &other) {
+            setRect(other.minX(), other.minY(), other.width(), other.height());
+        }
+
+        Rectangle& operator= (const Rectangle& other) {
+            setRect(other.minX(), other.minY(), other.width(), other.height());
+            return *this;
         }
 
         inline void setRect(T xPos, T yPos, T width, T height) {
@@ -30,30 +38,39 @@ namespace MATH
             size.setSize(width, height);
         }
 
-        inline Rectangle intersect(const Rectangle &rhs) const {
-            Rectangle result;
-            result.origin.x = std::max(x(), rhs.x());
-            result.origin.y = std::max(y(), rhs.y());
-            result.size.width = std::max(std::min(right(), rhs.right()), result.x()) - result.x();
-            result.size.height = std::max(std::min(bottom(), rhs.bottom), result.y()) - result.y();
-            return result;
+        inline bool intersect(const Rectangle &rhs) const {
+            return !(getMaxX() < rhs.getMinX() ||
+                    rhs.getMaxX() < getMinX() ||
+                    getMaxY() < rhs.getMinY() ||
+                    rhs.getMaxY() < getMinY());
         }
 
-        inline Rectangle unionBoundary(const Rectangle &rhs) const {
-            if (rhs.empty()) return *this;
-            if (empty()) return rhs;
-
-            Rectangle result;
-            result.origin.x = std::min(x(), rhs.x());
-            result.origin.y = std::min(y(), rhs.y());
-            result.size.width = std::max(right(), rhs.right()) - result.x();
-            result.size.height = std::max(bottom(), rhs.bottom()) - result.y();
-            return result;
+        inline bool contains(const Vector2f &p) const {
+            return (minX() <= p.x) && (minY() <= p.y) && (maxX() > p.x) && (maxY() > p.y);
         }
 
-        inline Rectangle translate(const Vector2<T> &p) const {
-            Rectangle result = *this;
-            result.origin.add(p);
+        inline void intersect(const Rectangle &rhs) {
+            origin.x = std::max(minX(), rhs.minX());
+            origin.y = std::max(minY(), rhs.minY());
+            size.width = std::max(std::min(maxX(), rhs.maxX()), minX()) - minX();
+            size.height = std::max(std::min(maxY(), rhs.maxY()), minY()) - minY();
+        }
+
+        inline void merge(const Rectangle &rhs) {
+            if (rhs.empty()) return;
+            if (empty()) {
+                *this = rhs;
+                return;
+            }
+
+            origin.x = std::min(minX(), rhs.minX());
+            origin.y = std::min(minY(), rhs.minY());
+            size.width = std::max(maxX(), rhs.maxX()) - minX();
+            size.height = std::max(maxY(), rhs.maxY()) - minY();
+        }
+
+        inline void translate(const Vector2<T> &p) {
+            origin.add(p);
             return result;
         }
 
@@ -72,17 +89,17 @@ namespace MATH
         }
 
         inline bool enclosed(const Rectangle &rhs) const {
-          return (x() >= rhs.x())
-                  && (y() >= rhs.y())
-                  && (right() <= rhs.right())
-                  && (bottom() <= rhs.bottom());
+          return (minX() >= rhs.minX())
+                  && (minY() >= rhs.minY())
+                  && (maxX() <= rhs.maxX())
+                  && (maxY() <= rhs.maxY());
         }
 
         inline bool overlaps(const Rectangle &rhs) const {
-          return x() < rhs.right() &&
-                  y() < rhs.bottom() &&
-                  right() > rhs.x() &&
-                  bottom() > rhs.y();
+          return minX() < rhs.maxX() &&
+                  minY() < rhs.maxY() &&
+                  maxX() > rhs.minX() &&
+                  maxY() > rhs.minY();
         }
 
         inline T area() const {
@@ -92,48 +109,36 @@ namespace MATH
             return Vector2<T>(width(), height());
         }
 
-        inline bool contains(const Vector2f &p) const {
-            return (x() <= p.x) && (y() <= p.y) && ( right() > p.x) && (bottom() > p.y);
-        }
-
         inline T width() const {
             return size.width;
-        }
-
-        inline void width(T _width) {
-            size.width = _width;
         }
 
         inline T height() const {
             return size.height;
         }
 
-        inline void height(T _height) {
-            size.height = height;
-        }
-
-        inline T x() const {
+        inline T minX() const {
             return origin.x;
         }
 
-        inline T y() const {
+        inline T minY() const {
             return origin.y;
         }
 
-        inline T right() const {
+        inline T maxX() const {
             return origin.x + size.width;
         }
 
-        inline void right(T _right) {
-            size.width = _right - origin.x;
-        }
-
-        inline T bottom() const {
+        inline T maxY() const {
             return origin.y + size.height;
         }
 
-        inline void bottom(T _bottom) {
-            size.height = _bottom - origin.y;
+        inline T midX() const {
+            return T(origin.x + size.width / 2.0f);
+        }
+
+        inline T midY() const {
+            return T(origin.y + size.height / 2.0f);
         }
 
     public:
