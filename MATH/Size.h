@@ -59,6 +59,10 @@ namespace MATH
             return Size(width / (double)value, height / (double)value);
         }
 
+        operator Vector2<T>() const {
+            return Vector2<T>(width, height);
+        }
+
         void setSize(T _width, T _height) {
             width = _width;
             height = _height;
@@ -66,6 +70,12 @@ namespace MATH
 
         bool equals(const Size& target) const {
             return MATHEQUALS<T>(width, target.width) && MATHEQUALS<T>(height, target.height);
+        }
+
+        bool empty() const {
+            if (width < 0 || height < 0)
+                return true;
+            return false;
         }
 
     public:

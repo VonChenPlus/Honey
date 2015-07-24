@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "MATH/Vector.h"
+#include "MATH/Size.h"
 
 namespace MATH
 {
@@ -13,99 +14,131 @@ namespace MATH
     public:
         Rectangle() {}
         Rectangle(Vector2<T> topLeft_, Vector2<T> bottomRight_)
-            : topLeft(topLeft_)
-            , bottomRight(bottomRight_) {
+            : origin(topLeft_)
+            , size(bottomRight_ - topLieft) {
 
         }
 
         Rectangle(T left, T top, T right, T bottom)
-            : topLeft(left, top)
-            , bottomRight(right, bottom) {
+            : origin(left, top)
+            , size(right - left, bottom - right) {
 
         }
 
         inline void setRect(T xPos, T yPos, T width, T height) {
-            topLeft.x = xPos;
-            topLeft.y = yPos;
-            bottomRight.x = xPos + width;
-            bottomRight.y = yPos + height;
+            origin.set(xPos, yPos);
+            size.setSize(width, height);
         }
 
         inline Rectangle intersect(const Rectangle &rhs) const {
-          Rectangle result;
-          result.topLeft.x = std::max(topLeft.x, rhs.topLeft.x);
-          result.topLeft.y = std::max(topLeft.y, rhs.topLeft.y);
-          result.bottomRight.x = std::max(std::min(bottomRight.x, rhs.bottomRight.x), result.topLeft.x);
-          result.bottomRight.y = std::max(std::min(bottomRight.y, rhs.bottomRight.y), result.topLeft.y);
-          return result;
+            Rectangle result;
+            result.origin.x = std::max(x(), rhs.x());
+            result.origin.y = std::max(y(), rhs.y());
+            result.size.width = std::max(std::min(right(), rhs.right()), result.x()) - result.x();
+            result.size.height = std::max(std::min(bottom(), rhs.bottom), result.y()) - result.y();
+            return result;
         }
 
         inline Rectangle unionBoundary(const Rectangle &rhs) const {
-          if (rhs.empty()) return *this;
-          if (empty()) return rhs;
+            if (rhs.empty()) return *this;
+            if (empty()) return rhs;
 
-          Rectangle result;
-          result.topLeft.x = std::min(topLeft.x, rhs.topLeft.x);
-          result.topLeft.y = std::min(topLeft.y, rhs.topLeft.y);
-          result.bottomRight.x = std::max(bottomRight.x, rhs.bottomRight.x);
-          result.bottomRight.y = std::max(bottomRight.y, rhs.bottomRight.y);
-          return result;
+            Rectangle result;
+            result.origin.x = std::min(x(), rhs.x());
+            result.origin.y = std::min(y(), rhs.y());
+            result.size.width = std::max(right(), rhs.right()) - result.x();
+            result.size.height = std::max(bottom(), rhs.bottom()) - result.y();
+            return result;
         }
 
         inline Rectangle translate(const Vector2<T> &p) const {
-          return Rectangle(Vector2<T>::add(topLeft, p), Vector2f::add(bottomRight, p));
+            Rectangle result = *this;
+            result.origin.add(p);
+            return result;
         }
 
-        inline bool equals(const Rectangle &r) const {
-            return r.topLeft.equals(topLeft)
-                    && r.bottomRight.equals(bottomRight);
+        inline bool equals(const Rectangle &rhs) const {
+            return rhs.origin.equals(origin)
+                    && rhs.size.equals(size);
         }
 
         inline bool empty() const {
-            return !(topLeft < bottomRight);
+            return size.empty();
         }
 
         inline void clear() {
-            topLeft = Vector2<T>();
-            bottomRight = Vector2<T>();
+            origin = Vector2<T>();
+            size = Size<T>();
         }
 
         inline bool enclosed(const Rectangle &rhs) const {
-          return (topLeft.x >= rhs.topLeft.x)
-                  && (topLeft.y >= rhs.topLeft.y)
-                  && (bottomRight.x <= rhs.bottomRight.x)
-                  && (bottomRight.y <= rhs.bottomRight.y);
+          return (x() >= rhs.x())
+                  && (y() >= rhs.y())
+                  && (right() <= rhs.right())
+                  && (bottom() <= rhs.bottom());
         }
 
         inline bool overlaps(const Rectangle &rhs) const {
-          return topLeft.x < rhs.bottomRight.x &&
-                  topLeft.y < rhs.bottomRight.y &&
-                  bottomRight.x > rhs.topLeft.x &&
-                  bottomRight.y > rhs.topLeft.y;
+          return x() < rhs.right() &&
+                  y() < rhs.bottom() &&
+                  right() > rhs.x() &&
+                  bottom() > rhs.y();
         }
 
         inline T area() const {
-            return empty() ? 0 : (bottomRight.x - topLeft.x) * (bottomRight.y - topLeft.y);}
+            return empty() ? 0 : size.width * size.height; }
 
         inline Vector2<T> dimensions() const {
             return Vector2<T>(width(), height());
         }
 
+        inline bool contains(const Vector2f &p) const {
+            return (x() <= p.x) && (y() <= p.y) && ( right() > p.x) && (bottom() > p.y);
+        }
+
         inline T width() const {
-            return bottomRight.x - topLeft.x;
+            return size.width;
+        }
+
+        inline void width(T _width) {
+            size.width = _width;
         }
 
         inline T height() const {
-            return bottomRight.y - topLeft.y;
+            return size.height;
         }
 
-        inline bool contains(const Vector2f &p) const {
-          return (topLeft.x <= p.x) && (topLeft.y <= p.y) && ( bottomRight.x > p.x) && (bottomRight.y > p.y);
+        inline void height(T _height) {
+            size.height = height;
+        }
+
+        inline T x() const {
+            return origin.x;
+        }
+
+        inline T y() const {
+            return origin.y;
+        }
+
+        inline T right() const {
+            return origin.x + size.width;
+        }
+
+        inline void right(T _right) {
+            size.width = _right - origin.x;
+        }
+
+        inline T bottom() const {
+            return origin.y + size.height;
+        }
+
+        inline void bottom(T _bottom) {
+            size.height = _bottom - origin.y;
         }
 
     public:
-        Vector2<T> topLeft;
-        Vector2<T> bottomRight;
+        Vector2<T> origin;
+        Size<T> size;
       };
 
     typedef Rectangle<float> Rectf;
