@@ -136,7 +136,7 @@ namespace GFX
 
         static void doAlign(int flags, float *x, float *y, float *w, float *h);
 
-        void setDrawMatrix(const MATH::Matrix4x4 &m) {
+        void setDrawMatrix(const MATH::Matrix4 &m) {
             drawMatrix_ = m;
         }
 
@@ -148,7 +148,7 @@ namespace GFX
             uint32 rgba;
         };
 
-        MATH::Matrix4x4 drawMatrix_;
+        MATH::Matrix4 drawMatrix_;
 
         THIN3D::Thin3DContext *t3d_;
         THIN3D::Thin3DBuffer *vbuf_;

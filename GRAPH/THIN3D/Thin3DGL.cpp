@@ -1,6 +1,6 @@
 #include "Thin3DGL.h"
 #include "IMAGE/TinyZim.h"
-using MATH::Matrix4x4;
+using MATH::Matrix4;
 using IMAGE::ZIM_CLAMP;
 #include "MATH/MathDef.h"
 using MATH::IsPowerOf2;
@@ -276,11 +276,11 @@ namespace THIN3D
         }
     }
 
-    void Thin3DGLShaderSet::setMatrix4x4(const char *name, const Matrix4x4 &value) {
+    void Thin3DGLShaderSet::setMatrix4(const char *name, const Matrix4 &value) {
         glUseProgram(program_);
         int loc = getUniformLoc(name);
         if (loc != -1) {
-            glUniformMatrix4fv(loc, 1, false, value.getReadPtr());
+            glUniformMatrix4fv(loc, 1, false, value);
         }
     }
 

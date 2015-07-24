@@ -285,7 +285,7 @@ namespace THIN3D
     public:
         // TODO: Make some faster way of doing these. Support uniform buffers (and fake them on GL 2.0?)
         virtual void setVector(const char *name, float *value, int n) = 0;
-        virtual void setMatrix4x4(const char *name, const MATH::Matrix4x4 &value) = 0;
+        virtual void setMatrix4(const char *name, const MATH::Matrix4 &value) = 0;
     };
 
     struct T3DBlendStateDesc

@@ -99,7 +99,7 @@ namespace GFX
         if (count_ == 0)
             return;
 
-        shaderSet_->setMatrix4x4("WorldViewProj", drawMatrix_);
+        shaderSet_->setMatrix4("WorldViewProj", drawMatrix_);
     #ifdef USE_VBO
         vbuf_->subData((const uint8 *)verts_, 0, sizeof(Vertex) * count_);
         int offset = 0;

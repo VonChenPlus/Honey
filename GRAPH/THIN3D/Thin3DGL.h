@@ -187,7 +187,7 @@ namespace THIN3D
 
         void setVector(const char *name, float *value, int n);
 
-        void setMatrix4x4(const char *name, const MATH::Matrix4x4 &value) override;
+        void setMatrix4(const char *name, const MATH::Matrix4 &value) override;
 
         void glLost();
 

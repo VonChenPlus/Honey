@@ -232,7 +232,7 @@ namespace UI
         // Outputs of layout. X/Y are absolute screen coordinates, hierarchy is "gone" here.
         MATH::Boundsf bounds_;
 
-        scoped_ptr<MATH::Matrix4x4> transform_;
+        scoped_ptr<MATH::Matrix4> transform_;
 
     private:
         bool *enabledPtr_;

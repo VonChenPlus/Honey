@@ -5,7 +5,7 @@
 
 namespace MATH
 {
-    class Matrix4x4;
+    class Matrix4;
 
     class Quaternion final
     {
@@ -22,8 +22,6 @@ namespace MATH
         void setXRotation(const float r) { w = cosf(r / 2); x = sinf(r / 2); y = z = 0; }
         void setYRotation(const float r) { w = cosf(r / 2); y = sinf(r / 2); x = z = 0; }
         void setZRotation(const float r) { w = cosf(r / 2); z = sinf(r / 2); x = y = 0; }
-        void toMatrix(Matrix4x4 *out) const;
-        static Quaternion fromMatrix(Matrix4x4 &m);
 
         Quaternion operator *(Quaternion &q) const {
             return Quaternion(
