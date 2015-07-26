@@ -10,78 +10,61 @@ namespace MATH
     class Quaternion final
     {
     public:
-        float x,y,z,w;
+        float x;
+        float y;
+        float z;
+        float w;
 
-        Quaternion() { }
-        Quaternion(const float _x, const float _y, const float _z, const float _w) {
-            x=_x; y=_y; z=_z; w=_w;
-        }
-        void setIdentity() {
-            x=y=z=0; w=1.0f;
-        }
-        void setXRotation(const float r) { w = cosf(r / 2); x = sinf(r / 2); y = z = 0; }
-        void setYRotation(const float r) { w = cosf(r / 2); y = sinf(r / 2); x = z = 0; }
-        void setZRotation(const float r) { w = cosf(r / 2); z = sinf(r / 2); x = y = 0; }
+        Quaternion();
+        Quaternion(float xx, float yy, float zz, float ww);
+        Quaternion(float* array);
+        Quaternion(const Matrix4& m);
+        Quaternion(const Vector3f& axis, float angle);
+        Quaternion(const Quaternion& copy);
+        ~Quaternion();
 
-        Quaternion operator *(Quaternion &q) const {
-            return Quaternion(
-                (w * q.w) - (x * q.x) - (y * q.y) - (z * q.z),
-                (w * q.x) + (x * q.w) + (y * q.z) - (z * q.y),
-                (w * q.y) + (y * q.w) + (z * q.x) - (x * q.z),
-                (w * q.z) + (z * q.w) + (x * q.y) - (y * q.x)
-                );
-        }
-        Quaternion operator -() {
-            return Quaternion(-x,-y,-z,-w);
-        }
-        void setRotation(Vector3f axis, float angle) {
-            axis /= axis.length();
-            angle *= .5f;
-            float sine = sinf(angle);
-            w = cosf(angle);
-            x = sine * axis.x;
-            y = sine * axis.y;
-            z = sine * axis.z;
-        }
-        void toAxisAngle(Vector3f &v, float &angle) {
-            normalize();
-            if (w==1.0f && x==0.0f && y==0.0f && z==0.0f) {
-                v = Vector3f(0,1,0);
-                angle = 0.0f;
-                return;
-            }
-            float cos_a = w;
-            angle = acosf(cos_a) * 2;
-            float sin_a = sqrtf( 1.0f - cos_a * cos_a );
-            if (fabsf(sin_a) < 0.00005f) sin_a = 1;
-            float inv_sin_a=1.0f/sin_a;
-            v.x = x * inv_sin_a;
-            v.y = y * inv_sin_a;
-            v.z = z * inv_sin_a;
-        }
-        enum
-        {
-            QUAT_SHORT,
-            QUAT_LONG,
-            QUAT_CW,
-            QUAT_CCW
-        };
-        Quaternion slerp(const Quaternion &to, const float a) const;
-        Quaternion multiply(const Quaternion &q) const;
-        float &operator [] (int i) {
-            return *((&x) + i);
-        }
-        float operator [] (int i) const {
-            return *((&x) + i);
-        }
-        //not sure about this, maybe mag is supposed to sqrt
-        float magnitude() const {
-            return x*x + y*y + z*z + w*w;
-        }
-        void normalize() {
-            float f = 1.0f/sqrtf(magnitude());
-            x*=f; y*=f; z*=f; w*=f;
-        }
+        static const Quaternion& identity();
+        static const Quaternion& zero();
+        static void createFromRotationMatrix(const Matrix4& m, Quaternion* dst);
+        static void createFromAxisAngle(const Vector3f& axis, float angle, Quaternion* dst);
+        static void multiply(const Quaternion& q1, const Quaternion& q2, Quaternion* dst);
+        static void lerp(const Quaternion& q1, const Quaternion& q2, float t, Quaternion* dst);
+        static void slerp(const Quaternion& q1, const Quaternion& q2, float t, Quaternion* dst);
+        static void squad(const Quaternion& q1, const Quaternion& q2, const Quaternion& s1, const Quaternion& s2, float t, Quaternion* dst);
+
+        bool isIdentity() const;
+        bool isZero() const;
+
+        void conjugate();
+        Quaternion getConjugated() const;
+
+        bool inverse();
+        Quaternion getInversed() const;
+
+        void multiply(const Quaternion& q);
+
+        void normalize();
+        Quaternion getNormalized() const;
+
+        void set(float xx, float yy, float zz, float ww);
+        void set(float* array);
+        void set(const Matrix4& m);
+        void set(const Vector3f& axis, float angle);
+        void set(const Quaternion& q);
+        void setIdentity();
+
+        float toAxisAngle(Vector3f* e) const;
+
+        inline const Quaternion operator*(const Quaternion& q) const;
+        inline Vector3f operator*(const Vector3f& v) const;
+        inline Quaternion& operator*=(const Quaternion& q);
+
+        static const Quaternion ZERO;
+
+    private:
+        static void slerp(float q1x, float q1y, float q1z, float q1w, float q2x, float q2y, float q2z, float q2w, float t, float* dstx, float* dsty, float* dstz, float* dstw);
+
+        static void slerpForSquad(const Quaternion& q1, const Quaternion& q2, float t, Quaternion* dst);
     };
 }
 

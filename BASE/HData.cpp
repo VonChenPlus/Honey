@@ -72,7 +72,7 @@ void HData::fastSet(HBYTE* bytes, const Size size) {
 
 void HData::clear() {
     free(bytes_);
-    bytes_ = nullptr;
+    bytes_ = NULLPTR;
     size_ = 0;
 }
 

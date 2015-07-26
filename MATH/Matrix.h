@@ -22,50 +22,35 @@ namespace MATH
         ~Matrix4();
 
         static void createLookAt(const Vector3f& eyePosition, const Vector3f& targetPosition, const Vector3f& up, Matrix4* dst);
-
         static void createLookAt(float eyePositionX, float eyePositionY, float eyePositionZ,
                                  float targetCenterX, float targetCenterY, float targetCenterZ,
                                  float upX, float upY, float upZ, Matrix4* dst);
-
         static void createPerspective(float fieldOfView, float aspectRatio, float zNearPlane, float zFarPlane, Matrix4* dst);
-
         static void createOrthographic(float width, float height, float zNearPlane, float zFarPlane, Matrix4* dst);
-
         static void createOrthographicOffCenter(float left, float right, float bottom, float top,
                                                 float zNearPlane, float zFarPlane, Matrix4* dst);
-
         static void createBillboard(const Vector3f& objectPosition, const Vector3f& cameraPosition,
                                     const Vector3f& cameraUpVector, Matrix4* dst);
-
         static void createBillboard(const Vector3f& objectPosition, const Vector3f& cameraPosition,
                                     const Vector3f& cameraUpVector, const Vector3f& cameraForwardVector,
                                     Matrix4* dst);
-
         static void createScale(const Vector3f& scale, Matrix4* dst);
-
         static void createScale(float xScale, float yScale, float zScale, Matrix4* dst);
-
         static void createRotation(const Quaternion& quat, Matrix4* dst);
-
         static void createRotation(const Vector3f& axis, float angle, Matrix4* dst);
-
         static void createRotationX(float angle, Matrix4* dst);
-
         static void createRotationY(float angle, Matrix4* dst);
-
         static void createRotationZ(float angle, Matrix4* dst);
-
         static void createTranslation(const Vector3f& translation, Matrix4* dst);
-
         static void createTranslation(float xTranslation, float yTranslation, float zTranslation, Matrix4* dst);
+        static void add(const Matrix4& m1, const Matrix4& m2, Matrix4* dst);
+        static void multiply(const Matrix4& mat, float scalar, Matrix4* dst);
+        static void multiply(const Matrix4& m1, const Matrix4& m2, Matrix4* dst);
+        static void subtract(const Matrix4& m1, const Matrix4& m2, Matrix4* dst);
 
         void add(float scalar);
-
         void add(float scalar, Matrix4* dst);
-
         void add(const Matrix4& mat);
-
-        static void add(const Matrix4& m1, const Matrix4& m2, Matrix4* dst);
 
         bool decompose(Vector3f* scale, Quaternion* rotation, Vector3f* translation) const;
 
@@ -89,10 +74,7 @@ namespace MATH
 
         void multiply(float scalar);
         void multiply(float scalar, Matrix4* dst) const;
-        static void multiply(const Matrix4& mat, float scalar, Matrix4* dst);
-
         void multiply(const Matrix4& mat);
-        static void multiply(const Matrix4& m1, const Matrix4& m2, Matrix4* dst);
 
         void negate();
         Matrix4 getNegated() const;
@@ -123,7 +105,6 @@ namespace MATH
         void setZero();
 
         void subtract(const Matrix4& mat);
-        static void subtract(const Matrix4& m1, const Matrix4& m2, Matrix4* dst);
 
         inline void transformPoint(Vector3f* point) const { transformVector(point->x, point->y, point->z, 1.0f, point); }
         inline void transformPoint(const Vector3f& point, Vector3f* dst) const { transformVector(point.x, point.y, point.z, 1.0f, dst); }

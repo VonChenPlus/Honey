@@ -28,14 +28,6 @@
 #pragma warning(disable:4305)  // truncation from double to float
 #endif
 
-#define DISALLOW_COPY_AND_ASSIGN(t) \
-private: \
-	t(const t &other);  \
-	void operator =(const t &other);
-
-#define SAFE_DELETE(p)           do { delete (p); (p) = nullptr; } while(0)
-#define SAFE_DELETE_ARRAY(p)     do { if(p) { delete[] (p); (p) = nullptr; } } while(0)
-
 typedef uint8_t uint8;
 typedef uint16_t uint16;
 typedef uint32_t uint32;
@@ -158,8 +150,17 @@ typedef char TCHAR;
 #endif
 
 #ifndef UNUSED
-#define UNUSED(x) (void)x
+    #define UNUSED(x) (void)x
 #endif
+
+
+#define DISALLOW_COPY_AND_ASSIGN(t) \
+private: \
+    t(const t &other);  \
+    void operator =(const t &other);
+
+#define SAFE_DELETE(p)           do { delete (p); (p) = nullptr; } while(0)
+#define SAFE_DELETE_ARRAY(p)     do { if(p) { delete[] (p); (p) = nullptr; } } while(0)
 
 // Implement C99 functions and similar that are missing in MSVC.
 #if defined(_MSC_VER) && _MSC_VER < 1900
