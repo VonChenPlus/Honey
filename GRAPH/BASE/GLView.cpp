@@ -1,6 +1,8 @@
 #include "GRAPH/BASE/GLView.h"
 #include "GRAPH/BASE/Touch.h"
+#include "GRAPH/BASE/Director.h"
 #include "EXTERNALS/glew/GL/glew.h"
+#include "MATH/MathDef.h"
 #include <map>
 
 namespace GRAPH
@@ -80,11 +82,6 @@ namespace GRAPH
 
     }
 
-    void GLView::pollInputEvents()
-    {
-        pollEvents();
-    }
-
     void GLView::pollEvents()
     {
     }
@@ -99,12 +96,12 @@ namespace GRAPH
 
             if (_resolutionPolicy == ResolutionPolicy::NO_BORDER)
             {
-                _scaleX = _scaleY = MAX(_scaleX, _scaleY);
+                _scaleX = _scaleY = std::max(_scaleX, _scaleY);
             }
 
             else if (_resolutionPolicy == ResolutionPolicy::SHOW_ALL)
             {
-                _scaleX = _scaleY = MIN(_scaleX, _scaleY);
+                _scaleX = _scaleY = std::min(_scaleX, _scaleY);
             }
 
             else if ( _resolutionPolicy == ResolutionPolicy::FIXED_HEIGHT) {
@@ -144,34 +141,34 @@ namespace GRAPH
         updateDesignResolutionSize();
     }
 
-    const MATH::Size& GLView::getDesignResolutionSize() const
+    const MATH::Sizef& GLView::getDesignResolutionSize() const
     {
         return _designResolutionSize;
     }
 
-    const MATH::Size& GLView::getFrameSize() const
+    const MATH::Sizef& GLView::getFrameSize() const
     {
         return _screenSize;
     }
 
     void GLView::setFrameSize(float width, float height)
     {
-        _designResolutionSize = _screenSize = Size(width, height);
+        _designResolutionSize = _screenSize = MATH::Sizef(width, height);
     }
 
-    MATH::Recti GLView::getVisibleRect() const
+    MATH::Rectf GLView::getVisibleRect() const
     {
-        MATH::Recti ret;
+        MATH::Rectf ret;
         ret.size = getVisibleSize();
         ret.origin = getVisibleOrigin();
         return ret;
     }
 
-    MATH::Size GLView::getVisibleSize() const
+    MATH::Sizef GLView::getVisibleSize() const
     {
         if (_resolutionPolicy == ResolutionPolicy::NO_BORDER)
         {
-            return MATH::Size(_screenSize.width/_scaleX, _screenSize.height/_scaleY);
+            return MATH::Sizef(_screenSize.width/_scaleX, _screenSize.height/_scaleY);
         }
         else
         {
@@ -214,7 +211,7 @@ namespace GRAPH
         return (GL_FALSE == glIsEnabled(GL_SCISSOR_TEST)) ? false : true;
     }
 
-    MATH::Recti GLView::getScissorRect() const
+    MATH::Rectf GLView::getScissorRect() const
     {
         GLfloat params[4];
         glGetFloatv(GL_SCISSOR_BOX, params);
@@ -222,7 +219,7 @@ namespace GRAPH
         float y = (params[1] - _viewPortRect.origin.y) / _scaleY;
         float w = params[2] / _scaleX;
         float h = params[3] / _scaleY;
-        return Rect(x, y, w, h);
+        return MATH::Rectf(x, y, w, h);
     }
 
     void GLView::setViewName(const std::string& viewname )
@@ -258,7 +255,6 @@ namespace GRAPH
 
                 // The touches is more than MAX_TOUCHES ?
                 if (unusedIndex == -1) {
-                    CCLOG("The touches is more than MAX_TOUCHES, unusedIndex = %d", unusedIndex);
                     continue;
                 }
 
@@ -297,7 +293,6 @@ namespace GRAPH
             auto iter = g_touchIdReorderMap.find(id);
             if (iter == g_touchIdReorderMap.end())
             {
-                CCLOG("if the index doesn't exist, it is an error");
                 continue;
             }
 

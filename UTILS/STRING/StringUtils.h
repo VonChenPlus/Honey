@@ -32,7 +32,7 @@ namespace UTILS
         bool StartsWithNoCase(const std::string &str, const std::string &what);
         bool EndsWithNoCase(const std::string &str, const std::string &what);
 
-        void DataToHexString(const uint8 *data, Size size, std::string *output);
+        void DataToHexString(const uint8 *data, size_t size, std::string *output);
         void StringToHexString(const std::string &data, std::string *output);
         // highly unsafe and not recommended.
         unsigned int ParseHexString(const char* _szValue);

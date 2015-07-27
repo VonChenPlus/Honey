@@ -145,7 +145,7 @@ namespace THIN3D
         }
     }
 
-    static T3DImageType DetectImageFileType(const uint8 *data, Size size) {
+    static T3DImageType DetectImageFileType(const uint8 *data, size_t size) {
         UNUSED(size);
         if (!memcmp(data, "ZIMG", 4)) {
             return ZIM;
@@ -160,7 +160,7 @@ namespace THIN3D
         return TYPE_UNKNOWN;
     }
 
-    static void LoadTextureLevels(const uint8 *data, Size size, T3DImageType type, int width[16], int height[16], int *num_levels, T3DImageFormat *fmt, uint8 *image[16], int *zim_flags) {
+    static void LoadTextureLevels(const uint8 *data, size_t size, T3DImageType type, int width[16], int height[16], int *num_levels, T3DImageFormat *fmt, uint8 *image[16], int *zim_flags) {
         if (type == DETECT) {
             type = DetectImageFileType(data, size);
         }
@@ -198,7 +198,7 @@ namespace THIN3D
         }
     }
 
-    void Thin3DTexture::loadFromFileData(const uint8 *data, Size dataSize, T3DImageType type) {
+    void Thin3DTexture::loadFromFileData(const uint8 *data, size_t dataSize, T3DImageType type) {
         int width[16], height[16];
         uint8 *image[16] = { NULLPTR };
 
@@ -224,7 +224,7 @@ namespace THIN3D
 
     void Thin3DTexture::loadFromFile(const std::string &filename, T3DImageType type) {
         filename_ = "";
-        Size fileSize;
+        size_t fileSize;
         HData buffer = IO::FileUtils::getInstance().getDataFromFile(filename);
         fileSize = buffer.getSize();
         loadFromFileData((const uint8 *)(buffer.getBytes()), fileSize, type);

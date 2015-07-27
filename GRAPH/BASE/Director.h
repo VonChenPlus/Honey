@@ -59,7 +59,7 @@ namespace GRAPH
      Since the Director is a singleton, the standard way to use it is by calling:
      _ Director::getInstance()->methodName();
      */
-    class CC_DLL Director : public Ref
+    class Director : public HObject
     {
     public:
         /** Director will trigger an event when projection type is changed. */
@@ -94,12 +94,6 @@ namespace GRAPH
          * @js _getInstance
          */
         static Director* getInstance();
-
-        /**
-         * @deprecated Use getInstance() instead.
-         * @js NA
-         */
-        CC_DEPRECATED_ATTRIBUTE static Director* sharedDirector() { return Director::getInstance(); }
 
         /**
          * @js ctor
@@ -554,7 +548,7 @@ namespace GRAPH
         Projection _projection;
 
         /* window size in points */
-        Size _winSizeInPoints;
+        MATH::Sizef _winSizeInPoints;
 
         /* content scale factor */
         float _contentScaleFactor;

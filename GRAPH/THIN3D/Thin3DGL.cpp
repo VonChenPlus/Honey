@@ -54,7 +54,7 @@ namespace THIN3D
         GLOBAL::glState().stencilTest.disable();
     }
 
-    Thin3DGLBuffer::Thin3DGLBuffer(Size size, uint32 flags) {
+    Thin3DGLBuffer::Thin3DGLBuffer(size_t size, uint32 flags) {
         UNUSED(size);
         glGenBuffers(1, &buffer_);
         target_ = (flags & T3DBufferUsage::INDEXDATA) ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER;
@@ -72,13 +72,13 @@ namespace THIN3D
         glDeleteBuffers(1, &buffer_);
     }
 
-    void Thin3DGLBuffer::setData(const uint8 *data, Size size) {
+    void Thin3DGLBuffer::setData(const uint8 *data, size_t size) {
         bind();
         glBufferData(target_, size, data, usage_);
         knownSize_ = size;
     }
 
-    void Thin3DGLBuffer::subData(const uint8 *data, Size offset, Size size) {
+    void Thin3DGLBuffer::subData(const uint8 *data, size_t offset, size_t size) {
         bind();
         if (size > knownSize_) {
             // Allocate the buffer.
@@ -147,7 +147,7 @@ namespace THIN3D
             }
         }
         IntPtr b = (IntPtr)base;
-        for (Size i = 0; i < components_.size(); i++) {
+        for (size_t i = 0; i < components_.size(); i++) {
             switch (components_[i].type) {
             case FLOATx2:
                 glVertexAttribPointer(components_[i].semantic, 2, GL_FLOAT, GL_FALSE, stride_, (void *)(b + (IntPtr)components_[i].offset));
@@ -431,7 +431,7 @@ namespace THIN3D
         return bs;
     }
 
-    Thin3DBuffer *Thin3DGLContext::createBuffer(Size size, uint32 usageFlags) {
+    Thin3DBuffer *Thin3DGLContext::createBuffer(size_t size, uint32 usageFlags) {
         return new Thin3DGLBuffer(size, usageFlags);
     }
 

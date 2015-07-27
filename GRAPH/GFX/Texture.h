@@ -25,7 +25,7 @@ namespace GFX
         void destroy();
 
         // PNG from memory buffer
-        void loadPNG(const uint8 *data, Size size, bool genMips = true);
+        void loadPNG(const uint8 *data, size_t size, bool genMips = true);
         void loadZIM(const char *filename);
         void loadPNG(const char *filename, bool genMips = true);
         void loadJPEG(const char *filename, bool genMips = true);

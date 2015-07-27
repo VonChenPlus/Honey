@@ -454,8 +454,8 @@ namespace GFX
         else
             y += atlasfont.ascend*fontscaley;
         float sx = x;
-        Size count = strlen(text);
-        Size index = 0;
+        size_t count = strlen(text);
+        size_t index = 0;
         while (index < count) {
             cval = text[index++];
             // Translate non-breaking space to space.

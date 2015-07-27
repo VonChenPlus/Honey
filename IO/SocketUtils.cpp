@@ -25,7 +25,7 @@ using UTILS::STRING::StringFromFormat;
 
 namespace IO
 {
-    void ReadWithProgress(int fd, Size length, HBuffer &buffer, float *progress) {
+    void ReadWithProgress(int fd, size_t length, HBuffer &buffer, float *progress) {
         std::vector<HBYTE> buf;
         if (length >= 1024 * 64 * 16) {
             buf.resize(1024 * 64);
@@ -37,7 +37,7 @@ namespace IO
             buf.resize(1024);
         }
 
-        Size total = 0;
+        size_t total = 0;
         do {
             int retval = recv(fd, &buf[0], (int)buf.size(), 0);
             if (retval == 0) {
@@ -54,7 +54,7 @@ namespace IO
         } while (errorNumber == SOCKEINTR && total < length);
     }
 
-    void WriteWithProgress(int fd, Size length, HBuffer &buffer, float *progress) {
+    void WriteWithProgress(int fd, size_t length, HBuffer &buffer, float *progress) {
         std::vector<HBYTE> buf;
         if (length >= 1024 * 64 * 16) {
             buf.resize(1024 * 64);
@@ -66,9 +66,9 @@ namespace IO
             buf.resize(1024);
         }
 
-        Size total = 0;
+        size_t total = 0;
         do {
-            Size bufSize = std::min(buf.size(), buffer.size());
+            size_t bufSize = std::min(buf.size(), buffer.size());
             buffer.read(bufSize, &buf[0]);
             int retval = send(fd, &buf[0], (int)bufSize, 0);
             if (retval == 0) {

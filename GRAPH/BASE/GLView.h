@@ -120,7 +120,7 @@ namespace GRAPH
          *
          * @return The frame size of EGL view.
          */
-        virtual const Size& getFrameSize() const;
+        virtual const MATH::Sizef& getFrameSize() const;
 
         /**
          * Set the frame size of EGL view.
@@ -135,7 +135,7 @@ namespace GRAPH
          *
          * @param zoomFactor The zoom factor for frame.
          */
-        virtual void setFrameZoomFactor(float zoomFactor) {}
+        virtual void setFrameZoomFactor(float) {}
 
         /** Get zoom factor for frame. This methods are for
          * debugging big resolution (e.g.new ipad) app on desktop.
@@ -149,7 +149,7 @@ namespace GRAPH
          *
          * @param isVisible Hide or Show the mouse cursor if there is one.
          */
-        virtual void setCursorVisible(bool isVisible) {}
+        virtual void setCursorVisible(bool) {}
 
         /** Get retina factor.
          *
@@ -158,7 +158,7 @@ namespace GRAPH
         virtual int getRetinaFactor() const { return 1; }
 
         /** Only works on ios platform. Set Content Scale of the Factor. */
-        virtual bool setContentScaleFactor(float scaleFactor) { return false; }
+        virtual bool setContentScaleFactor(float) { return false; }
 
         /** Only works on ios platform. Get Content Scale of the Factor. */
         virtual float getContentScaleFactor() const { return 1.0; }
@@ -174,7 +174,7 @@ namespace GRAPH
          *
          * @return The visible area size of opengl viewport.
          */
-        virtual Size getVisibleSize() const;
+        virtual MATH::Sizef getVisibleSize() const;
 
         /**
          * Get the visible origin point of opengl viewport.
@@ -188,7 +188,7 @@ namespace GRAPH
          *
          * @return The visible rectangle of opengl viewport.
          */
-        virtual MATH::Recti getVisibleRect() const;
+        virtual MATH::Rectf getVisibleRect() const;
 
         /**
          * Set the design resolution size.
@@ -206,7 +206,7 @@ namespace GRAPH
          *
          * @return The design resolution size.
          */
-        virtual const MATH::Size&  getDesignResolutionSize() const;
+        virtual const MATH::Sizef&  getDesignResolutionSize() const;
 
         /**
          * Set opengl view port rectangle with points.
@@ -240,7 +240,7 @@ namespace GRAPH
          *
          * @return The current scissor rectangle.
          */
-        virtual Rect getScissorRect() const;
+        virtual MATH::Rectf getScissorRect() const;
 
         /** Set the view name.
          *
@@ -330,9 +330,9 @@ namespace GRAPH
         void handleTouchesOfEndOrCancel(EventTouch::EventCode eventCode, int num, intptr_t ids[], float xs[], float ys[]);
 
         // real screen size
-        MATH::Size _screenSize;
+        MATH::Sizef _screenSize;
         // resolution size, it is the size appropriate for the app resources.
-        MATH::Size _designResolutionSize;
+        MATH::Sizef _designResolutionSize;
         // the view port size
         MATH::Recti _viewPortRect;
         // the view name

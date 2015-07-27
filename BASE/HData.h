@@ -17,10 +17,10 @@ public:
     HData& operator= (HData&& other);
 
     HBYTE* getBytes() const;
-    Size getSize() const;
+    size_t getSize() const;
 
-    void copy(const HBYTE* bytes, const Size size);
-    void fastSet(HBYTE* bytes, const Size size);
+    void copy(const HBYTE* bytes, const size_t size);
+    void fastSet(HBYTE* bytes, const size_t size);
     void clear();
     bool isNull() const;
 
@@ -29,7 +29,7 @@ private:
 
 private:
     HBYTE* bytes_;
-    Size size_;
+    size_t size_;
 };
 
 #endif // HDATA_H

@@ -232,15 +232,15 @@ namespace THIN3D
     class Thin3DBuffer : public Thin3DObject
     {
     public:
-        virtual void setData(const uint8 *data, Size size) = 0;
-        virtual void subData(const uint8 *data, Size offset, Size size) = 0;
+        virtual void setData(const uint8 *data, size_t size) = 0;
+        virtual void subData(const uint8 *data, size_t offset, size_t size) = 0;
     };
 
     class Thin3DTexture : public Thin3DObject
     {
     public:
         void loadFromFile(const std::string &filename, T3DImageType type = T3DImageType::DETECT);
-        void loadFromFileData(const uint8 *data, Size dataSize, T3DImageType type = T3DImageType::DETECT);
+        void loadFromFileData(const uint8 *data, size_t dataSize, T3DImageType type = T3DImageType::DETECT);
 
         virtual void create(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels) = 0;
         virtual void setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8 *data) = 0;
@@ -310,7 +310,7 @@ namespace THIN3D
 
         virtual Thin3DDepthStencilState *createDepthStencilState(bool depthTestEnabled, bool depthWriteEnabled, T3DComparison depthCompare) = 0;
         virtual Thin3DBlendState *createBlendState(const T3DBlendStateDesc &desc) = 0;
-        virtual Thin3DBuffer *createBuffer(Size size, uint32 usageFlags) = 0;
+        virtual Thin3DBuffer *createBuffer(size_t size, uint32 usageFlags) = 0;
         virtual Thin3DShaderSet *createShaderSet(Thin3DShader *vshader, Thin3DShader *fshader) = 0;
         virtual Thin3DVertexFormat *createVertexFormat(const std::vector<Thin3DVertexComponent> &components, int stride, Thin3DShader *vshader) = 0;
 

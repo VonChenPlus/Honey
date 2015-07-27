@@ -154,7 +154,7 @@ namespace GFX
         // Currently here are a bunch of project-specific workarounds.
         // They shouldn't really hurt anything else very much though.
 
-        Size len = strlen(filename);
+        size_t len = strlen(filename);
         char fn[1024];
         strncpy(fn, filename, sizeof(fn));
         fn[1023] = 0;
@@ -241,7 +241,7 @@ namespace GFX
         free(image_data);
     }
 
-    void Texture::loadPNG(const uint8 *data, Size size, bool genMips) {
+    void Texture::loadPNG(const uint8 *data, size_t size, bool genMips) {
         unsigned char *image_data;
         PNGLoadPtr(data, size, &width_, &height_, &image_data);
         GL_CHECK();

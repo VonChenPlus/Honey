@@ -42,7 +42,7 @@ namespace UTILS
         bool EndsWithNoCase(const std::string &str, const std::string &what) {
             if (str.size() < what.size())
                 return false;
-            const Size offset = str.size() - what.size();
+            const size_t offset = str.size() - what.size();
             return strncasecmp(str.c_str() + offset, what.c_str(), what.size()) == 0;
         }
 
@@ -51,7 +51,7 @@ namespace UTILS
         }
 
         void StringTrimEndNonAlphaNum(char *str) {
-            Size n = strlen(str);
+            size_t n = strlen(str);
             while (!isalnum(str[n]) && n > 0) {
                 str[n--] = '\0';
             }
@@ -79,10 +79,10 @@ namespace UTILS
 
         unsigned int ParseHexString(const char *_szValue) {
             int Value = 0;
-            Size Finish = strlen(_szValue);
+            size_t Finish = strlen(_szValue);
             if (Finish > 8 ) { Finish = 8; }
 
-            for (Size Count = 0; Count < Finish; Count++) {
+            for (size_t Count = 0; Count < Finish; Count++) {
                 Value = (Value << 4);
                 switch( _szValue[Count] ) {
                 case '0': break;
@@ -115,9 +115,9 @@ namespace UTILS
             return Value;
         }
 
-        void DataToHexString(const uint8 *data, Size size, std::string *output) {
+        void DataToHexString(const uint8 *data, size_t size, std::string *output) {
             HBuffer buffer;
-            for (Size i = 0; i < size; i++) {
+            for (size_t i = 0; i < size; i++) {
                 buffer.writeAsFormat("%02x ", data[i]);
                 if (i && !(i & 15))
                     buffer.writeAsFormat("\n");
@@ -169,7 +169,7 @@ namespace UTILS
 
         // Turns "  hej " into "hej". Also handles tabs.
         std::string StripSpaces(const std::string &str) {
-            const Size s = str.find_first_not_of(" \t\r\n");
+            const size_t s = str.find_first_not_of(" \t\r\n");
 
             if (str.npos != s)
                 return str.substr(s, str.find_last_not_of(" \t\r\n") - s + 1);
@@ -216,7 +216,7 @@ namespace UTILS
         }
 
         std::string ReplaceAll(std::string result, const std::string& src, const std::string& dest) {
-            Size pos = 0;
+            size_t pos = 0;
 
             if (src == dest)
                 return result;

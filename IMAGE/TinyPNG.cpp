@@ -30,7 +30,7 @@ namespace IMAGE
         png_image_finish_read(&png, NULLPTR, *image_data_ptr, stride, NULLPTR);
     }
 
-    void PNGLoadPtr(const unsigned char *input_ptr, Size input_len, int *pwidth, int *pheight, unsigned char **image_data_ptr) {
+    void PNGLoadPtr(const unsigned char *input_ptr, size_t input_len, int *pwidth, int *pheight, unsigned char **image_data_ptr) {
         png_image png;
         memset(&png, 0, sizeof(png));
         png.version = PNG_IMAGE_VERSION;

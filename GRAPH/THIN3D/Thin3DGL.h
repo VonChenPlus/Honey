@@ -112,12 +112,12 @@ namespace THIN3D
     class Thin3DGLBuffer : public Thin3DBuffer, GFX::GfxResourceHolder
     {
     public:
-        Thin3DGLBuffer(Size size, uint32 flags);
+        Thin3DGLBuffer(size_t size, uint32 flags);
         ~Thin3DGLBuffer() override;
 
-        void setData(const uint8 *data, Size size) override;
+        void setData(const uint8 *data, size_t size) override;
 
-        void subData(const uint8 *data, Size offset, Size size) override;
+        void subData(const uint8 *data, size_t offset, size_t size) override;
 
         void bind();
 
@@ -128,7 +128,7 @@ namespace THIN3D
         GLuint target_;
         GLuint usage_;
 
-        Size knownSize_;
+        size_t knownSize_;
     };
 
     // Not registering this as a resource holder, instead ShaderSet is registered. It will
@@ -233,7 +233,7 @@ namespace THIN3D
 
         Thin3DDepthStencilState *createDepthStencilState(bool depthTestEnabled, bool depthWriteEnabled, T3DComparison depthCompare) override;
         Thin3DBlendState *createBlendState(const T3DBlendStateDesc &desc) override;
-        Thin3DBuffer *createBuffer(Size size, uint32 usageFlags) override;
+        Thin3DBuffer *createBuffer(size_t size, uint32 usageFlags) override;
         Thin3DShaderSet *createShaderSet(Thin3DShader *vshader, Thin3DShader *fshader) override;
         Thin3DVertexFormat *createVertexFormat(const std::vector<Thin3DVertexComponent> &components, int stride, Thin3DShader *vshader) override;
         Thin3DTexture *createTexture(T3DTextureType type, T3DImageFormat format, int width, int height, int depth, int mipLevels) override;

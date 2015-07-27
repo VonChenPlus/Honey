@@ -13,7 +13,6 @@ INCLUDEPATH += $$P
 
 SOURCES += \
     $$P/BASE/*.cpp \
-    $$P/GRAPH/BASE/*.cpp \
     $$P/GRAPH/GFX/*.cpp \
     $$P/GRAPH/THIN3D/*.cpp \
     $$P/GRAPH/UI/*.cpp \
@@ -25,12 +24,10 @@ SOURCES += \
     $$P/UTILS/HASH/*.cpp \
     $$P/UTILS/STRING/*.cpp \
     $$P/UTILS/TIME/*.cpp \
-    $$P/UTILS/COLOR/*.cpp \
-    GRAPH/BASE/Director.cpp
+    $$P/UTILS/COLOR/*.cpp
 
 HEADERS += \
     $$P/BASE/*.h \
-    $$P/GRAPH/BASE/*.h \
     $$P/GRAPH/GFX/*.h \
     $$P/GRAPH/THIN3D/*.h \
     $$P/GRAPH/UI/*.h \
@@ -42,8 +39,7 @@ HEADERS += \
     $$P/UTILS/STRING/*.h \
     $$P/UTILS/TIME/*.h \
     $$P/UTILS/COLOR/*.h \
-    $$P/UTILS/RANDOM/*.h \
-    GRAPH/BASE/Director.h
+    $$P/UTILS/RANDOM/*.h
     
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)

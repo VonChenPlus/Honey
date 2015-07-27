@@ -10,7 +10,7 @@ namespace IMAGE
     void PNGLoad(const char *file, int *pwidth,
                 int *pheight, unsigned char **image_data_ptr);
 
-    void PNGLoadPtr(const unsigned  char *input_ptr, Size input_len, int *pwidth,
+    void PNGLoadPtr(const unsigned  char *input_ptr, size_t input_len, int *pwidth,
                 int *pheight, unsigned char **image_data_ptr);
 }
 

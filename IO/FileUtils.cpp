@@ -414,8 +414,8 @@ namespace IO
 
         HData ret;
         HBYTE* buffer = NULLPTR;
-        Size size = 0;
-        Size readSize = 0;
+        size_t size = 0;
+        size_t readSize = 0;
 
         do {
             // Read the file from hardware
