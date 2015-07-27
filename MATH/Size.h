@@ -84,7 +84,7 @@ namespace MATH
     };
 
     typedef Size<float> Sizef;
-    static const Sizef SizeZERO(0.0f, 0.0f);
+    static const Sizef SizefZERO(0.0f, 0.0f);
 }
 
 #endif // SIZE_H
