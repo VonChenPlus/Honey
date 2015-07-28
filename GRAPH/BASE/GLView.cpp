@@ -1,7 +1,7 @@
 #include "GRAPH/BASE/GLView.h"
 #include "GRAPH/BASE/Touch.h"
 #include "GRAPH/BASE/Director.h"
-#include "EXTERNALS/glew/GL/glew.h"
+#include "GRAPH/BASE/GLCommon.h"
 #include "MATH/MathDef.h"
 #include <map>
 
