@@ -11,6 +11,7 @@
 #include "MATH/Rectangle.h"
 #include "MATH/Size.h"
 #include "GRAPH/BASE/Types.h"
+#include "GRAPH/BASE/Fonts.h"
 
 namespace GRAPH
 {
@@ -287,7 +288,7 @@ namespace GRAPH
         void generateMipmap();
 
         /** Get content size. */
-        const Size& getContentSizeInPixels();
+        const MATH::Sizef& getContentSizeInPixels();
 
         /** Whether or not the texture has their Alpha premultiplied. */
         bool hasPremultipliedAlpha() const;
@@ -343,7 +344,7 @@ namespace GRAPH
         {
         public:
             MATH::Rectf capInsetSize;
-            std::unordered_map<SpriteFrame*, Rect> capInsetMap;
+            std::unordered_map<SpriteFrame*, MATH::Rectf> capInsetMap;
         };
 
         /**
@@ -362,7 +363,7 @@ namespace GRAPH
          *
          * @return The capInset of the SpriteFrame object.
          */
-        const Rect& getSpriteFrameCapInset(SpriteFrame* spriteFrame)const;
+        const MATH::Rectf& getSpriteFrameCapInset(SpriteFrame* spriteFrame)const;
         /**
          * Remove the spriteFrame capInset info when the spriteFrame is removed.
          *

@@ -1,6 +1,8 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include <functional>
+#include <vector>
 #include "BASE/HObject.h"
 #include "MATH/Vector.h"
 #include "MATH/Quaternion.h"
@@ -8,6 +10,7 @@
 #include "MATH/Rectangle.h"
 #include "GRAPH/BASE/GLCommon.h"
 #include "GRAPH/BASE/Color.h"
+#include "MATH/AffineTransform.h"
 
 namespace GRAPH
 {
@@ -27,6 +30,7 @@ namespace GRAPH
     class GLProgramState;
     class Material;
     class Camera;
+    class Node;
 
     /**
      * @addtogroup _2d
@@ -77,8 +81,8 @@ namespace GRAPH
     typedef void (HObject::*SEL_CallFunc)();
     typedef void (HObject::*SEL_CallFuncN)(Node*);
     typedef void (HObject::*SEL_CallFuncND)(Node*, void*);
-    typedef void (HObject::*SEL_CallFuncO)(Ref*);
-    typedef void (HObject::*SEL_MenuHandler)(Ref*);
+    typedef void (HObject::*SEL_CallFuncO)(HObject*);
+    typedef void (HObject::*SEL_MenuHandler)(HObject*);
     typedef void (HObject::*SEL_SCHEDULE)(float);
 
     #define CC_CALLFUNC_SELECTOR(_SELECTOR) static_cast<SEL_CallFunc>(&_SELECTOR)
@@ -142,14 +146,6 @@ namespace GRAPH
          */
         virtual void setLocalZOrder(int localZOrder);
 
-        CC_DEPRECATED_ATTRIBUTE virtual void setZOrder(int localZOrder) { setLocalZOrder(localZOrder); }
-
-        /*
-         Helper function used by `setLocalZOrder`. Don't use it unless you know what you are doing.
-         @js NA
-         */
-        CC_DEPRECATED_ATTRIBUTE virtual void _setLocalZOrder(int z);
-
         /**
          * Gets the local Z order of this node.
          *
@@ -158,7 +154,6 @@ namespace GRAPH
          * @return The local (relative to its siblings) Z order.
          */
         virtual int getLocalZOrder() const { return _localZOrder; }
-        CC_DEPRECATED_ATTRIBUTE virtual int getZOrder() const { return getLocalZOrder(); }
 
         /**
          Defines the oder in which the nodes are renderer.
@@ -409,7 +404,6 @@ namespace GRAPH
          * @js setVertexZ
          */
         virtual void setPositionZ(float positionZ);
-        CC_DEPRECATED_ATTRIBUTE virtual void setVertexZ(float vertexZ) { setPositionZ(vertexZ); }
 
         /**
          * Gets position Z coordinate of this node.
@@ -420,7 +414,6 @@ namespace GRAPH
          * @js getVertexZ
          */
         virtual float getPositionZ() const;
-        CC_DEPRECATED_ATTRIBUTE virtual float getVertexZ() const { return getPositionZ(); }
 
         /**
          * Changes the X skew angle of the node in degrees.
@@ -512,7 +505,7 @@ namespace GRAPH
          *
          * @param contentSize   The untransformed size of the node.
          */
-        virtual void setContentSize(const Size& contentSize);
+        virtual void setContentSize(const MATH::Sizef& contentSize);
         /**
          * Returns the untransformed size of the node.
          *
@@ -520,7 +513,7 @@ namespace GRAPH
          *
          * @return The untransformed size of the node.
          */
-        virtual const Size& getContentSize() const;
+        virtual const MATH::Sizef& getContentSize() const;
 
 
         /**
@@ -793,8 +786,8 @@ namespace GRAPH
          *
          * @return the array the node's children.
          */
-        virtual Vector<Node*>& getChildren() { return _children; }
-        virtual const Vector<Node*>& getChildren() const { return _children; }
+        virtual std::vector<Node*>& getChildren() { return _children; }
+        virtual const std::vector<Node*>& getChildren() const { return _children; }
 
         /**
          * Returns the amount of children.
@@ -979,7 +972,7 @@ namespace GRAPH
          *
          * @param userObject    A user assigned Object.
          */
-        virtual void setUserObject(Ref *userObject);
+        virtual void setUserObject(HObject *userObject);
 
         /// @} end of Tag & User Data
 
@@ -1445,7 +1438,7 @@ namespace GRAPH
          * @return The transformation matrix.
          */
         virtual const MATH::Matrix4& getNodeToParentTransform() const;
-        virtual AffineTransform getNodeToParentAffineTransform() const;
+        virtual MATH::AffineTransform getNodeToParentAffineTransform() const;
 
         /**
          * Sets the transformation matrix manually.
@@ -1461,7 +1454,7 @@ namespace GRAPH
          * @return The transformation matrix.
          */
         virtual const MATH::Matrix4& getParentToNodeTransform() const;
-        virtual AffineTransform getParentToNodeAffineTransform() const;
+        virtual MATH::AffineTransform getParentToNodeAffineTransform() const;
 
         /**
          * Returns the world affine transform matrix. The matrix is in Pixels.
@@ -1469,7 +1462,7 @@ namespace GRAPH
          * @return transformation matrix, in pixels.
          */
         virtual MATH::Matrix4 getNodeToWorldTransform() const;
-        virtual AffineTransform getNodeToWorldAffineTransform() const;
+        virtual MATH::AffineTransform getNodeToWorldAffineTransform() const;
 
         /**
          * Returns the inverse world affine transform matrix. The matrix is in Pixels.
@@ -1477,7 +1470,7 @@ namespace GRAPH
          * @return The transformation matrix.
          */
         virtual MATH::Matrix4 getWorldToNodeTransform() const;
-        virtual AffineTransform getWorldToNodeAffineTransform() const;
+        virtual MATH::AffineTransform getWorldToNodeAffineTransform() const;
 
         /// @} end of Transformations
 
@@ -1546,7 +1539,7 @@ namespace GRAPH
          * @param additionalTransform An additional transform matrix.
          */
         void setAdditionalTransform(MATH::Matrix4* additionalTransform);
-        void setAdditionalTransform(const AffineTransform& additionalTransform);
+        void setAdditionalTransform(const MATH::AffineTransform& additionalTransform);
 
         /// @} end of Coordinate Converters
 
@@ -1604,7 +1597,7 @@ namespace GRAPH
         virtual bool isCascadeColorEnabled() const;
         virtual void setCascadeColorEnabled(bool cascadeColorEnabled);
 
-        virtual void setOpacityModifyRGB(bool value) {CC_UNUSED_PARAM(value);}
+        virtual void setOpacityModifyRGB(bool) {}
         virtual bool isOpacityModifyRGB() const { return false; }
 
         void setOnEnterCallback(const std::function<void()>& callback) { _onEnterCallback = callback; }
@@ -1690,7 +1683,7 @@ namespace GRAPH
         MATH::Vector2f _anchorPointInPoints;     ///< anchor point in points
         MATH::Vector2f _anchorPoint;             ///< anchor point normalized (NOT in points)
 
-        Size _contentSize;              ///< untransformed size of the node
+        MATH::Sizef _contentSize;              ///< untransformed size of the node
         bool _contentSizeDirty;         ///< whether or not the contentSize is dirty
 
         MATH::Matrix4 _modelViewTransform;    ///< ModelView transform of the Node.
@@ -1707,7 +1700,7 @@ namespace GRAPH
         int _localZOrder;               ///< Local order (relative to its siblings) used to sort the node
         float _globalZOrder;            ///< Global order used to sort the node
 
-        Vector<Node*> _children;        ///< array of children nodes
+        std::vector<Node*> _children;        ///< array of children nodes
         Node *_parent;                  ///< weak reference to parent node
         Director* _director;            //cached director pointer to improve rendering performance
         int _tag;                         ///< a tag. Can be any number you assigned just to identify this node

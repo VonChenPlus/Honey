@@ -4,6 +4,8 @@
 #include <stack>
 #include "BASE/HObject.h"
 #include "GRAPH/BASE/GLView.h"
+#include "MATH/Matrix.h"
+#include "GRAPH/BASE/Scene.h"
 
 namespace GRAPH
 {
@@ -193,16 +195,16 @@ namespace GRAPH
         // window size
 
         /** Returns the size of the OpenGL view in points. */
-        const Size& getWinSize() const;
+        const MATH::Sizef& getWinSize() const;
 
         /** Returns the size of the OpenGL view in pixels. */
-        Size getWinSizeInPixels() const;
+        MATH::Sizef getWinSizeInPixels() const;
 
         /**
          * Returns visible size of the OpenGL view in points.
          * The value is equal to `Director::getWinSize()` if don't invoke `GLView::setDesignResolutionSize()`.
          */
-        Size getVisibleSize() const;
+        MATH::Sizef getVisibleSize() const;
 
         /** Returns visible origin coordinate of the OpenGL view in points. */
         MATH::Vector2f getVisibleOrigin() const;
@@ -429,7 +431,7 @@ namespace GRAPH
          * @param mat The matrix that to be added.
          * @js NA
          */
-        void loadMatrix(MATRIX_STACK_TYPE type, const Mat4& mat);
+        void loadMatrix(MATRIX_STACK_TYPE type, const MATH::Matrix4& mat);
         /**
          * Multipies a matrix to the top of specified type of matrix stack.
          *
@@ -437,12 +439,12 @@ namespace GRAPH
          * @param mat The matrix that to be multipied.
          * @js NA
          */
-        void multiplyMatrix(MATRIX_STACK_TYPE type, const Mat4& mat);
+        void multiplyMatrix(MATRIX_STACK_TYPE type, const MATH::Matrix4& mat);
         /**
          * Gets the top matrix of specified type of matrix stack.
          * @js NA
          */
-        const Mat4& getMatrix(MATRIX_STACK_TYPE type);
+        const MATH::Matrix4& getMatrix(MATRIX_STACK_TYPE type);
         /**
          * Cleras all types of matrix stack, and add indentity matrix to these matrix stacks.
          * @js NA
@@ -474,9 +476,9 @@ namespace GRAPH
 
         void initMatrixStack();
 
-        std::stack<Mat4> _modelViewMatrixStack;
-        std::stack<Mat4> _projectionMatrixStack;
-        std::stack<Mat4> _textureMatrixStack;
+        std::stack<MATH::Matrix4> _modelViewMatrixStack;
+        std::stack<MATH::Matrix4> _projectionMatrixStack;
+        std::stack<MATH::Matrix4> _textureMatrixStack;
 
         /** Scheduler associated with this director
          @since v2.0
@@ -536,7 +538,7 @@ namespace GRAPH
         bool _sendCleanupToScene;
 
         /* scheduled scenes */
-        Vector<Scene*> _scenesStack;
+        std::vector<Scene*> _scenesStack;
 
         /* last time the main loop was updated */
         struct timeval *_lastUpdate;

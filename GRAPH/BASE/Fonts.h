@@ -75,7 +75,7 @@ namespace GRAPH
             : _fontSize(0)
             , _alignment(TextHAlignment::CENTER)
             , _vertAlignment(TextVAlignment::TOP)
-            , _dimensions(Size::ZERO)
+            , _dimensions(MATH::SizefZERO)
             , _fontFillColor(Color3B::WHITE)
             , _fontAlpha(255)
         {}
@@ -98,7 +98,6 @@ namespace GRAPH
         FontShadow            _shadow;
         /// font stroke
         FontStroke            _stroke;
-
     };
 }
 
