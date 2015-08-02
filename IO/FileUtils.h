@@ -22,6 +22,9 @@ namespace IO
         std::string getStringFromFile(const std::string& filename);
         HData getDataFromFile(const std::string& filename);
 
+        ValueMap getValueMapFromFile(const std::string& filename);
+        ValueMap getValueMapFromData(const HBYTE* filedata, int filesize);
+
         void writeStringToFile(std::string dataStr, const std::string& fullPath);
         void writeDataToFile(HData retData, const std::string& fullPath);
 

@@ -4,6 +4,9 @@
 #include "GRAPH/BASE/Scene.h"
 #include "GRAPH/RENDERER/Renderer.h"
 #include "GRAPH/RENDERER/GLProgramState.h"
+#include "GRAPH/RENDERER/GLProgramCache.h"
+#include "GRAPH/RENDERER/GLProgram.h"
+#include "GRAPH/RENDERER/GLStateCache.h"
 
 namespace GRAPH
 {
@@ -390,10 +393,10 @@ namespace GRAPH
         GLshort indices[6] = {0, 1, 2, 3, 2, 1};
 
         {
-            GL::bindVAO(0);
+            bindVAO(0);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-            GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
+            enableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
 
             // vertices
             glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), &quad.tl.vertices);
@@ -434,7 +437,7 @@ namespace GRAPH
         }
     }
 
-    void Camera::setFrameBufferObject(experimental::FrameBuffer *fbo)
+    void Camera::setFrameBufferObject(FrameBuffer *fbo)
     {
         SAFE_RETAIN(fbo);
         SAFE_RELEASE_NULL(_fbo);
@@ -449,7 +452,7 @@ namespace GRAPH
     {
         if(nullptr == _fbo)
         {
-            experimental::FrameBuffer::applyDefaultFBO();
+            FrameBuffer::applyDefaultFBO();
         }
         else
         {

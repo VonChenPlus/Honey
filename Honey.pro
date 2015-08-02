@@ -25,7 +25,6 @@ SOURCES += \
     $$P/UTILS/STRING/*.cpp \
     $$P/UTILS/TIME/*.cpp \
     $$P/UTILS/COLOR/*.cpp
-
 HEADERS += \
     $$P/BASE/*.h \
     $$P/GRAPH/GFX/*.h \
@@ -36,6 +35,7 @@ HEADERS += \
     $$P/MATH/*.h \
     $$P/IO/*.h \
     $$P/THREAD/*.h \
+    $$P/UTILS/HASH/*.h \
     $$P/UTILS/STRING/*.h \
     $$P/UTILS/TIME/*.h \
     $$P/UTILS/COLOR/*.h \
@@ -74,3 +74,7 @@ HEADERS += $$P/EXTERNALS/d3des/*.h
 SOURCES += $$P/EXTERNALS/ConvertUTF/*.c
 SOURCES += $$P/EXTERNALS/ConvertUTF/*.cpp
 HEADERS += $$P/EXTERNALS/ConvertUTF/*.h
+
+#tinyxml2
+SOURCES += $$P/EXTERNALS/tinyxml2/*.cpp
+HEADERS += $$P/EXTERNALS/tinyxml2/*.h

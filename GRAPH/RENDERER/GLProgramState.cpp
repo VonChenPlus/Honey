@@ -782,4 +782,65 @@ namespace GRAPH
         if (itr != _customAutoBindingResolvers.end())
             _customAutoBindingResolvers.erase(itr);
     }
+
+    GLProgramStateCache* GLProgramStateCache::s_instance = nullptr;
+
+    GLProgramStateCache::GLProgramStateCache()
+    {
+    }
+
+    GLProgramStateCache::~GLProgramStateCache()
+    {
+        _glProgramStates.clear();
+    }
+
+    GLProgramStateCache* GLProgramStateCache::getInstance()
+    {
+        if (s_instance == nullptr)
+            s_instance = new (std::nothrow) GLProgramStateCache();
+
+        return s_instance;
+    }
+
+    void GLProgramStateCache::destroyInstance()
+    {
+        SAFE_DELETE(s_instance);
+    }
+
+    GLProgramState* GLProgramStateCache::getGLProgramState(GLProgram* glprogram)
+    {
+        const auto& itr = _glProgramStates.find(glprogram);
+        if (itr != _glProgramStates.end())
+        {
+            return itr->second;
+        }
+
+        auto ret = new (std::nothrow) GLProgramState;
+        if(ret && ret->init(glprogram)) {
+            _glProgramStates.insert(glprogram, ret);
+            ret->release();
+            return ret;
+        }
+
+        SAFE_RELEASE(ret);
+        return ret;
+    }
+
+    void GLProgramStateCache::removeUnusedGLProgramState()
+    {
+        for( auto it=_glProgramStates.cbegin(); it!=_glProgramStates.cend(); /* nothing */) {
+            auto value = it->second;
+            if( value->getReferenceCount() == 1 ) {
+                //value->release();
+                _glProgramStates.erase(it++);
+            } else {
+                ++it;
+            }
+        }
+    }
+
+    void GLProgramStateCache::removeAllGLProgramState()
+    {
+        _glProgramStates.clear();
+    }
 }

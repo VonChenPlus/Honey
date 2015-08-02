@@ -26,6 +26,7 @@
 using UTILS::STRING::UTF8ToWString;
 #include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
+#include "IO/DictMaker.h"
 
 namespace IO
 {
@@ -181,6 +182,18 @@ namespace IO
 
     HData FileUtils::getDataFromFile(const std::string& filename) {
         return getData(filename);
+    }
+
+    ValueMap FileUtils::getValueMapFromFile(const std::string& filename) {
+        const std::string fullPath = fullPathForFilename(filename.c_str());
+        DictMaker tMaker;
+        return tMaker.dictionaryWithContentsOfFile(fullPath.c_str());
+    }
+
+    ValueMap FileUtils::getValueMapFromData(const HBYTE* filedata, int filesize)
+    {
+        DictMaker tMaker;
+        return tMaker.dictionaryWithDataOfFile(filedata, filesize);
     }
 
     std::string FileUtils::getFilenameForNick(const std::string &nickname) const {

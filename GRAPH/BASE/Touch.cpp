@@ -1,4 +1,5 @@
 #include "GRAPH/BASE/Touch.h"
+#include "GRAPH/BASE/Director.h"
 
 namespace GRAPH
 {

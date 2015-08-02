@@ -27,12 +27,7 @@ namespace GRAPH
     class TextureCache;
     class Renderer;
     class Camera;
-
-    class Console;
-    namespace experimental
-    {
-        class FrameBuffer;
-    }
+    class FrameBuffer;
 
     /**
      * @brief Matrix stack type.
@@ -396,12 +391,6 @@ namespace GRAPH
          */
         Renderer* getRenderer() const { return _renderer; }
 
-        /** Returns the Console associated with this director.
-         * @since v3.0
-         * @js NA
-         */
-        Console* getConsole() const { return _console; }
-
         /* Gets delta time since last tick to main loop. */
         float getDeltaTime() const;
 
@@ -562,10 +551,7 @@ namespace GRAPH
         Renderer *_renderer;
 
         /* Default FrameBufferObject*/
-        experimental::FrameBuffer* _defaultFBO;
-
-        /* Console for the director */
-        Console *_console;
+        FrameBuffer* _defaultFBO;
 
         bool _isStatusLabelUpdated;
 

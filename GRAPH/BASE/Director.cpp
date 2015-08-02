@@ -1,6 +1,7 @@
 ﻿#include "GRAPH/BASE/Director.h"
 #include <string>
 #include "MATH/Matrix.h"
+#include "UTILS/TIME/HTime.h"
 
 namespace GRAPH
 {
@@ -61,7 +62,7 @@ namespace GRAPH
         _frameRate = 0.0f;
         _FPSLabel = _drawnBatchesLabel = _drawnVerticesLabel = nullptr;
         _totalFrames = 0;
-        _lastUpdate = new struct timeval;
+        _lastUpdate = new struct timeval();
         _secondsPerFrame = 1.0f;
 
         // paused ?
@@ -73,14 +74,12 @@ namespace GRAPH
         // restart ?
         _restartDirectorInNextLoop = false;
 
-        _winSizeInPoints = Size::ZERO;
+        _winSizeInPoints = MATH::SizefZERO;
 
         _openGLView = nullptr;
         _defaultFBO = nullptr;
 
         _contentScaleFactor = 1.0f;
-
-        _console = new (std::nothrow) Console;
 
         // scheduler
         _scheduler = new (std::nothrow) Scheduler();

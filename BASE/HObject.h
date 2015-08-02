@@ -9,8 +9,8 @@
 #ifndef SAFE_RELEASE_NULL
     #define SAFE_RELEASE_NULL(p)     do { if(p) { (p)->release(); (p) = nullptr; } } while(0)
 #endif
-#ifndef CC_SAFE_RETAIN
-    #define CC_SAFE_RETAIN(p)     do { if(p) { (p)->retain(); } } while(0)
+#ifndef SAFE_RETAIN
+    #define SAFE_RETAIN(p)     do { if(p) { (p)->retain(); } } while(0)
 #endif
 
 class HObject

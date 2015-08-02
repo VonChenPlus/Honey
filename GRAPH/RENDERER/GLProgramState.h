@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <functional>
+#include <map>
 #include "BASE/HObject.h"
 #include "GRAPH/BASE/Types.h"
 #include "MATH/Matrix.h"
@@ -55,7 +56,7 @@ namespace GRAPH
         void setVec3v(ssize_t size, const MATH::Vector3f* pointer);
         void setVec4(const MATH::Vector4f& value);
         void setVec4v(ssize_t size, const MATH::Vector4f* pointer);
-        void setMATH::Matrix4(const MATH::Matrix4& value);
+        void setMatrix4(const MATH::Matrix4& value);
         /**
          @}
          */
@@ -279,7 +280,7 @@ namespace GRAPH
         void setUniformVec3v(const std::string& uniformName, ssize_t size, const MATH::Vector3f* pointer);
         void setUniformVec4(const std::string& uniformName, const MATH::Vector4f& value);
         void setUniformVec4v(const std::string& uniformName, ssize_t size, const MATH::Vector4f* pointer);
-        void setUniformMATH::Matrix4(const std::string& uniformName, const MATH::Matrix4& value);
+        void setUniformMatrix4(const std::string& uniformName, const MATH::Matrix4& value);
         void setUniformCallback(const std::string& uniformName, const std::function<void(GLProgram*, Uniform*)> &callback);
         void setUniformTexture(const std::string& uniformName, Texture2D *texture);
         void setUniformTexture(const std::string& uniformName, GLuint textureId);
@@ -297,7 +298,7 @@ namespace GRAPH
         void setUniformVec3v(GLint uniformLocation, ssize_t size, const MATH::Vector3f* pointer);
         void setUniformVec4(GLint uniformLocation, const MATH::Vector4f& value);
         void setUniformVec4v(GLint uniformLocation, ssize_t size, const MATH::Vector4f* pointer);
-        void setUniformMATH::Matrix4(GLint uniformLocation, const MATH::Matrix4& value);
+        void setUniformMatrix4(GLint uniformLocation, const MATH::Matrix4& value);
         void setUniformCallback(GLint uniformLocation, const std::function<void(GLProgram*, Uniform*)> &callback);
         void setUniformTexture(GLint uniformLocation, Texture2D *texture);
         void setUniformTexture(GLint uniformLocation, GLuint textureId);
@@ -432,6 +433,33 @@ namespace GRAPH
         // Map of custom auto binding resolvers.
         static std::vector<AutoBindingResolver*> _customAutoBindingResolvers;
 
+    };
+
+    /**
+     Some GLprogram state could be shared. GLProgramStateCache is used to cache this, and will reuse the
+     old GLProgramState, which will accelerate the creation of game objects such as sprites, particles etc.
+     */
+    class GLProgramStateCache
+    {
+    public:
+        /**Get the GLProgramStateCache singleton instance.*/
+        static GLProgramStateCache* getInstance();
+        /**Destroy the GLProgramStateCache singleton.*/
+        static void destroyInstance();
+
+        /**Get the shared GLProgramState by the owner GLProgram.*/
+        GLProgramState* getGLProgramState(GLProgram* program);
+        /**Remove all the cached GLProgramState.*/
+        void removeAllGLProgramState();
+        /**Remove unused GLProgramState.*/
+        void removeUnusedGLProgramState();
+
+    protected:
+        GLProgramStateCache();
+        ~GLProgramStateCache();
+
+        std::map<GLProgram*, GLProgramState*> _glProgramStates;
+        static GLProgramStateCache* s_instance;
     };
 }
 
