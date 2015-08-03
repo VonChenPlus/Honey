@@ -22,13 +22,13 @@ public:
     void release();
     void autorelease();
 
-    uint32 getHObjecterenceCount();
+    uint32 getReferenceCount();
 
 protected:
     HObject();
 
 private:
-    uint32 HObjecterenceCount_;
+    uint32 referenceCount_;
 };
 
 class HObjectArray

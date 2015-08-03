@@ -2,7 +2,7 @@
 #include <string.h>
 
 HObject::HObject()
-    : HObjecterenceCount_(1) {
+    : referenceCount_(1) {
 
 }
 
@@ -11,13 +11,13 @@ HObject::~HObject() {
 }
 
 void HObject::retain() {
-    ++HObjecterenceCount_;
+    ++referenceCount_;
 }
 
 void HObject::release() {
-    --HObjecterenceCount_;
+    --referenceCount_;
 
-    if (HObjecterenceCount_ == 0) {
+    if (referenceCount_ == 0) {
         delete this;
     }
 }
