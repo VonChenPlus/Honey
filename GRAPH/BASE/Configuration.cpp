@@ -1,4 +1,5 @@
 #include "GRAPH/BASE/Configuration.h"
+#include "IO/FileUtils.h"
 
 namespace GRAPH
 {
@@ -225,7 +226,7 @@ namespace GRAPH
     //
     void Configuration::loadConfigFile(const std::string& filename)
     {
-        ValueMap dict = FileUtils::getInstance()->getValueMapFromFile(filename);
+        ValueMap dict = IO::FileUtils::getInstance().getValueMapFromFile(filename);
         // search for metadata
         bool validMetadata = false;
         auto metadataIter = dict.find("metadata");

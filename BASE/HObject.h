@@ -22,13 +22,52 @@ public:
     void release();
     void autorelease();
 
-    uint32 getReferenceCount();
+    uint32 getHObjecterenceCount();
 
 protected:
     HObject();
 
 private:
-    uint32 referenceCount_;
+    uint32 HObjecterenceCount_;
+};
+
+class HObjectArray
+{
+public:
+    HObjectArray(int64 capacity);
+    ~HObjectArray();
+
+    void doubleCapacity();
+    void ensureExtraCapacity(int64 extra);
+    void shrink();
+    int64 getIndexOfObject(HObject* object);
+    bool containsObject(HObject* object);
+
+    void appendObject(HObject* object);
+    void appendObjectWithResize(HObject* object);
+    void appendArray(HObjectArray *plusArr);
+    void appendArrayWithResize(HObjectArray *plusArr);
+
+    void insertObjectAtIndex(HObject* object, int64 index);
+    void swapObjectsAtIndexes(int64 index1, int64 index2);
+
+    void fastRemoveObjectAtIndex(int64 index);
+    void fastRemoveObject(HObject* object);
+
+    void removeAllObjects();
+    void removeObjectAtIndex(int64 index, bool releaseObj = true);
+    void removeObject(HObject* object, bool releaseObj = true);
+    void removeArray(HObjectArray *minusArr);
+    void fullRemoveArray(HObjectArray *minusArr);
+
+    HObject *operator[](int index) {
+        return array_[index];
+    }
+
+private:
+    int64 number_;
+    int64 maximum_;
+    HObject** array_;
 };
 
 #endif // HOBJECT_H

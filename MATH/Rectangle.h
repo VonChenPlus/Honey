@@ -146,6 +146,7 @@ namespace MATH
       };
 
     typedef Rectangle<float> Rectf;
+    static const Rectf RectfZERO(0.0f, 0.0f, 0.0f, 0.0f);
     typedef Rectangle<int> Recti;
 }
 

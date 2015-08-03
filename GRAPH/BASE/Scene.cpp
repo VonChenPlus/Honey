@@ -28,13 +28,14 @@ THE SOFTWARE.
 #include "GRAPH/BASE/Scene.h"
 #include "GRAPH/BASE/Director.h"
 #include <algorithm>
+#include "MATH/Vector.h"
 
 namespace GRAPH
 {
     Scene::Scene()
     {
         _ignoreAnchorPointForPosition = true;
-        setAnchorPoint(Vec2(0.5f, 0.5f));
+        setAnchorPoint(MATH::Vector2f(0.5f, 0.5f));
 
         _cameraOrderDirty = true;
 

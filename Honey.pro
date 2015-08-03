@@ -25,6 +25,7 @@ SOURCES += \
     $$P/UTILS/STRING/*.cpp \
     $$P/UTILS/TIME/*.cpp \
     $$P/UTILS/COLOR/*.cpp
+
 HEADERS += \
     $$P/BASE/*.h \
     $$P/GRAPH/GFX/*.h \

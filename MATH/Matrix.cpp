@@ -893,6 +893,45 @@ namespace MATH
         return mat;
     }
 
+    inline const Matrix4 Matrix4::operator+(const Matrix4& mat) const {
+        Matrix4 result(*this);
+        result.add(mat);
+        return result;
+    }
+
+    inline Matrix4& Matrix4::operator+=(const Matrix4& mat) {
+        add(mat);
+        return *this;
+    }
+
+    inline const Matrix4 Matrix4::operator-(const Matrix4& mat) const {
+        Matrix4 result(*this);
+        result.subtract(mat);
+        return result;
+    }
+
+    inline Matrix4& Matrix4::operator-=(const Matrix4& mat) {
+        subtract(mat);
+        return *this;
+    }
+
+    inline const Matrix4 Matrix4::operator-() const {
+        Matrix4 mat(*this);
+        mat.negate();
+        return mat;
+    }
+
+    inline const Matrix4 Matrix4::operator*(const Matrix4& mat) const {
+        Matrix4 result(*this);
+        result.multiply(mat);
+        return result;
+    }
+
+    inline Matrix4& Matrix4::operator*=(const Matrix4& mat) {
+        multiply(mat);
+        return *this;
+    }
+
     const Matrix4 Matrix4::IDENTITY = Matrix4(
                         1.0f, 0.0f, 0.0f, 0.0f,
                         0.0f, 1.0f, 0.0f, 0.0f,

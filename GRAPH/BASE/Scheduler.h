@@ -173,7 +173,7 @@ namespace GRAPH
          If paused is true, then it won't be called until it is resumed.
          If 'interval' is 0, it will be called every frame, but if so, it's recommended to use 'scheduleUpdate' instead.
          If the 'callback' is already scheduled, then only the interval parameter will be updated without re-scheduling it again.
-         repeat let the action be repeated repeat + 1 times, use CC_REPEAT_FOREVER to let the action run continuously
+         repeat let the action be repeated repeat + 1 times, use REPEAT_FOREVER to let the action run continuously
          delay is the amount of time the action will wait before it'll start.
          @param callback The callback function.
          @param target The target of the callback function.
@@ -202,7 +202,7 @@ namespace GRAPH
          If paused is true, then it won't be called until it is resumed.
          If 'interval' is 0, it will be called every frame, but if so, it's recommended to use 'scheduleUpdate' instead.
          If the selector is already scheduled, then only the interval parameter will be updated without re-scheduling it again.
-         repeat let the action be repeated repeat + 1 times, use CC_REPEAT_FOREVER to let the action run continuously
+         repeat let the action be repeated repeat + 1 times, use REPEAT_FOREVER to let the action run continuously
          delay is the amount of time the action will wait before it'll start
 
          @param selector The callback function.

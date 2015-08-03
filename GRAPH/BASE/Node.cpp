@@ -1518,12 +1518,12 @@ namespace GRAPH
 
     void Node::schedule(SEL_SCHEDULE selector)
     {
-        this->schedule(selector, 0.0f, CC_REPEAT_FOREVER, 0.0f);
+        this->schedule(selector, 0.0f, REPEAT_FOREVER, 0.0f);
     }
 
     void Node::schedule(SEL_SCHEDULE selector, float interval)
     {
-        this->schedule(selector, interval, CC_REPEAT_FOREVER, 0.0f);
+        this->schedule(selector, interval, REPEAT_FOREVER, 0.0f);
     }
 
     void Node::schedule(SEL_SCHEDULE selector, float interval, unsigned int repeat, float delay)

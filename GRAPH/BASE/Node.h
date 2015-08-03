@@ -1300,7 +1300,7 @@ namespace GRAPH
          *
          * @param selector  The SEL_SCHEDULE selector to be scheduled.
          * @param interval  Tick interval in seconds. 0 means tick every frame. If interval = 0, it's recommended to use scheduleUpdate() instead.
-         * @param repeat    The selector will be excuted (repeat + 1) times, you can use CC_REPEAT_FOREVER for tick infinitely.
+         * @param repeat    The selector will be excuted (repeat + 1) times, you can use REPEAT_FOREVER for tick infinitely.
          * @param delay     The amount of time that the first tick will wait before execution.
          * @lua NA
          */
@@ -1369,7 +1369,7 @@ namespace GRAPH
          *
          * @param callback  The lambda function to be schedule.
          * @param interval  Tick interval in seconds. 0 means tick every frame.
-         * @param repeat    The selector will be executed (repeat + 1) times, you can use CC_REPEAT_FOREVER for tick infinitely.
+         * @param repeat    The selector will be executed (repeat + 1) times, you can use REPEAT_FOREVER for tick infinitely.
          * @param delay     The amount of time that the first tick will wait before execution.
          * @param key       The key of the lambda function. To be used if you want to unschedule it.
          * @lua NA
