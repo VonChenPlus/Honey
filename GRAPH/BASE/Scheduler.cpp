@@ -28,7 +28,7 @@ namespace GRAPH
     // Hash Element used for "selectors with interval"
     typedef struct _hashSelectorEntry
     {
-        ccArray             *timers;
+        HObjectArray             *timers;
         void                *target;
         int                 timerIndex;
         Timer               *currentTimer;
@@ -206,7 +206,7 @@ namespace GRAPH
 
     void Scheduler::removeHashElement(_hashSelectorEntry *element)
     {
-        ccArrayFree(element->timers);
+        delete element->timers;
         HASH_DEL(_hashForTimers, element);
         free(element);
     }

@@ -64,6 +64,9 @@ public:
         return array_[index];
     }
 
+    int64 number() { return number_; }
+    int64 maximun() { return maximum_; }
+
 private:
     int64 number_;
     int64 maximum_;

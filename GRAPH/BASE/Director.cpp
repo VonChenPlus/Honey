@@ -2,6 +2,15 @@
 #include <string>
 #include "MATH/Matrix.h"
 #include "UTILS/TIME/HTime.h"
+#include "GRAPH/BASE/Scheduler.h"
+#include "GRAPH/BASE/ActionManager.h"
+#include "GRAPH/BASE/EventDispatcher.h"
+#include "GRAPH/BASE/Event.h"
+#include "GRAPH/RENDERER/Renderer.h"
+#include "GRAPH/RENDERER/RenderState.h"
+#include "GRAPH/BASE/Configuration.h"
+#include "GRAPH/RENDERER/Texture2D.h"
+#include "GRAPH/RENDERER/FrameBuffer.h"
 
 namespace GRAPH
 {
@@ -60,7 +69,6 @@ namespace GRAPH
         // FPS
         _accumDt = 0.0f;
         _frameRate = 0.0f;
-        _FPSLabel = _drawnBatchesLabel = _drawnVerticesLabel = nullptr;
         _totalFrames = 0;
         _lastUpdate = new struct timeval();
         _secondsPerFrame = 1.0f;
@@ -108,10 +116,6 @@ namespace GRAPH
 
     Director::~Director(void)
     {
-        SAFE_RELEASE(_FPSLabel);
-        SAFE_RELEASE(_drawnVerticesLabel);
-        SAFE_RELEASE(_drawnBatchesLabel);
-
         SAFE_RELEASE(_runningScene);
         SAFE_RELEASE(_notificationNode);
         SAFE_RELEASE(_scheduler);
@@ -124,9 +128,6 @@ namespace GRAPH
         delete _eventProjectionChanged;
 
         delete _renderer;
-
-        delete _console;
-
 
         SAFE_RELEASE(_eventDispatcher);
 
@@ -143,25 +144,23 @@ namespace GRAPH
         Configuration *conf = Configuration::getInstance();
 
         // default FPS
-        double fps = conf->getValue("cocos2d.x.fps", Value(kDefaultFPS)).asDouble();
+        double fps = conf->getValue("cocos2d.x.fps", HValue(kDefaultFPS)).asDouble();
         _oldAnimationInterval = _animationInterval = 1.0 / fps;
 
         // Display FPS
-        _displayStats = conf->getValue("cocos2d.x.display_fps", Value(false)).asBool();
+        _displayStats = conf->getValue("cocos2d.x.display_fps", HValue(false)).asBool();
 
         // GL projection
-        std::string projection = conf->getValue("cocos2d.x.gl.projection", Value("3d")).asString();
+        std::string projection = conf->getValue("cocos2d.x.gl.projection", HValue("3d")).asString();
         if (projection == "3d")
             _projection = Projection::_3D;
         else if (projection == "2d")
             _projection = Projection::_2D;
         else if (projection == "custom")
             _projection = Projection::CUSTOM;
-        else
-            CCASSERT(false, "Invalid projection value");
 
         // Default pixel format for PNG images with alpha
-        std::string pixel_format = conf->getValue("cocos2d.x.texture.pixel_format_for_png", Value("rgba8888")).asString();
+        std::string pixel_format = conf->getValue("cocos2d.x.texture.pixel_format_for_png", HValue("rgba8888")).asString();
         if (pixel_format == "rgba8888")
             Texture2D::setDefaultAlphaPixelFormat(Texture2D::PixelFormat::RGBA8888);
         else if(pixel_format == "rgba4444")
@@ -170,7 +169,7 @@ namespace GRAPH
             Texture2D::setDefaultAlphaPixelFormat(Texture2D::PixelFormat::RGB5A1);
 
         // PVR v2 has alpha premultiplied ?
-        bool pvr_alpha_premultipled = conf->getValue("cocos2d.x.texture.pvrv2_has_alpha_premultiplied", Value(false)).asBool();
+        bool pvr_alpha_premultipled = conf->getValue("cocos2d.x.texture.pvrv2_has_alpha_premultiplied", HValue(false)).asBool();
         Image::setPVRImagesHavePremultipliedAlpha(pvr_alpha_premultipled);
     }
 
@@ -201,7 +200,7 @@ namespace GRAPH
         }
 
         _renderer->clear();
-        experimental::FrameBuffer::clearAllFBOs();
+        FrameBuffer::clearAllFBOs();
         /* to avoid flickr, nextScene MUST be here: after tick and before draw.
          * FIXME: Which bug is this one. It seems that it can't be reproduced with v0.9
          */
@@ -277,10 +276,12 @@ namespace GRAPH
 
         *_lastUpdate = now;
     }
+
     float Director::getDeltaTime() const
     {
         return _deltaTime;
     }
+
     void Director::setOpenGLView(GLView *openGLView)
     {
         if (_openGLView != openGLView)
@@ -311,7 +312,7 @@ namespace GRAPH
                 _eventDispatcher->setEnabled(true);
             }
 
-            _defaultFBO = experimental::FrameBuffer::getOrCreateDefaultFBO(_openGLView);
+            _defaultFBO = FrameBuffer::getOrCreateDefaultFBO(_openGLView);
             _defaultFBO->retain();
         }
     }
@@ -496,7 +497,7 @@ namespace GRAPH
 
     void Director::setProjection(Projection projection)
     {
-        MATH::Size size = _winSizeInPoints;
+        MATH::Sizef size = _winSizeInPoints;
 
         setViewport();
 
@@ -526,7 +527,7 @@ namespace GRAPH
 
                 multiplyMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, matrixPerspective);
 
-                Vec3 eye(size.width/2, size.height/2, zeye), center(size.width/2, size.height/2, 0.0f), up(0.0f, 1.0f, 0.0f);
+                MATH::Vector3f eye(size.width/2, size.height/2, zeye), center(size.width/2, size.height/2, 0.0f), up(0.0f, 1.0f, 0.0f);
                 MATH::Matrix4::createLookAt(eye, center, up, &matrixLookup);
                 multiplyMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, matrixLookup);
 
@@ -544,7 +545,7 @@ namespace GRAPH
         }
 
         _projection = projection;
-        GL::setProjectionMatrixDirty();
+        setProjectionMatrixDirty();
 
         _eventDispatcher->dispatchEvent(_eventProjectionChanged);
     }
@@ -558,10 +559,6 @@ namespace GRAPH
         {
             SpriteFrameCache::getInstance()->removeUnusedSpriteFrames();
             _textureCache->removeUnusedTextures();
-
-            // Note: some tests such as ActionsTest are leaking refcounted textures
-            // There should be no test textures left in the cache
-            log("%s\n", _textureCache->getCachedTextureInfo().c_str());
         }
         FileUtils::getInstance()->purgeCachedEntries();
     }
@@ -575,11 +572,11 @@ namespace GRAPH
     {
         if (on)
         {
-            GL::blendFunc(CC_BLEND_SRC, CC_BLEND_DST);
+            blendFunc(CC_BLEND_SRC, CC_BLEND_DST);
         }
         else
         {
-            GL::blendFunc(GL_ONE, GL_ZERO);
+            blendFunc(GL_ONE, GL_ZERO);
         }
     }
 
@@ -692,9 +689,6 @@ namespace GRAPH
 
     void Director::runWithScene(Scene *scene)
     {
-        CCASSERT(scene != nullptr, "This command can only be used to start the Director. There is already a scene present.");
-        CCASSERT(_runningScene == nullptr, "_runningScene should be null");
-
         pushScene(scene);
         startAnimation();
     }
@@ -1010,11 +1004,6 @@ namespace GRAPH
                 _drawnVerticesLabel->setString(buffer);
                 prevVerts = currentVerts;
             }
-
-            const MATH::Matrix4& identity = MATH::Matrix4::IDENTITY;
-            _drawnVerticesLabel->visit(_renderer, identity, 0);
-            _drawnBatchesLabel->visit(_renderer, identity, 0);
-            _FPSLabel->visit(_renderer, identity, 0);
         }
     }
 
@@ -1068,7 +1057,6 @@ namespace GRAPH
         Image* image = new (std::nothrow) Image();
         bool isOK = image->initWithImageData(data, dataLength);
         if (! isOK) {
-            CCLOGERROR("%s", "Fails: init fps_images");
             return;
         }
 
@@ -1083,33 +1071,7 @@ namespace GRAPH
          So I added a new method called 'setIgnoreContentScaleFactor' for 'AtlasNode',
          this is not exposed to game developers, it's only used for displaying FPS now.
          */
-        float scaleFactor = 1 / CC_CONTENT_SCALE_FACTOR();
-
-        _FPSLabel = LabelAtlas::create();
-        _FPSLabel->retain();
-        _FPSLabel->setIgnoreContentScaleFactor(true);
-        _FPSLabel->initWithString(fpsString, texture, 12, 32 , '.');
-        _FPSLabel->setScale(scaleFactor);
-
-        _drawnBatchesLabel = LabelAtlas::create();
-        _drawnBatchesLabel->retain();
-        _drawnBatchesLabel->setIgnoreContentScaleFactor(true);
-        _drawnBatchesLabel->initWithString(drawBatchString, texture, 12, 32, '.');
-        _drawnBatchesLabel->setScale(scaleFactor);
-
-        _drawnVerticesLabel = LabelAtlas::create();
-        _drawnVerticesLabel->retain();
-        _drawnVerticesLabel->setIgnoreContentScaleFactor(true);
-        _drawnVerticesLabel->initWithString(drawVerticesString, texture, 12, 32, '.');
-        _drawnVerticesLabel->setScale(scaleFactor);
-
-
         Texture2D::setDefaultAlphaPixelFormat(currentFormat);
-
-        const int height_spacing = 22 / CC_CONTENT_SCALE_FACTOR();
-        _drawnVerticesLabel->setPosition(MATH::Vector2f(0, height_spacing*2) + CC_DIRECTOR_STATS_POSITION);
-        _drawnBatchesLabel->setPosition(MATH::Vector2f(0, height_spacing*1) + CC_DIRECTOR_STATS_POSITION);
-        _FPSLabel->setPosition(MATH::Vector2f(0, height_spacing*0)+CC_DIRECTOR_STATS_POSITION);
     }
 
     void Director::setContentScaleFactor(float scaleFactor)
@@ -1167,16 +1129,7 @@ namespace GRAPH
     // so we now only support DisplayLinkDirector
     void DisplayLinkDirector::startAnimation()
     {
-        if (gettimeofday(_lastUpdate, nullptr) != 0)
-        {
-            CCLOG("cocos2d: DisplayLinkDirector: Error on gettimeofday");
-        }
-
         _invalid = false;
-
-    #ifndef WP8_SHADER_COMPILER
-        Application::getInstance()->setAnimationInterval(_animationInterval);
-    #endif
 
         // fix issue #3509, skip one fps to avoid incorrect time calculation.
         setNextDeltaTimeZero(true);

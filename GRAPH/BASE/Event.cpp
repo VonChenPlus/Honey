@@ -12,4 +12,10 @@ namespace GRAPH
     Event::~Event()
     {
     }
+
+    EventCustom::EventCustom(const std::string& eventName)
+        : Event(Type::CUSTOM)
+        , _userData(nullptr)
+        , _eventName(eventName) {
+    }
 }

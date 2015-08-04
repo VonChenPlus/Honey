@@ -505,10 +505,6 @@ namespace GRAPH
         float _accumDt;
         float _frameRate;
 
-        LabelAtlas *_FPSLabel;
-        LabelAtlas *_drawnBatchesLabel;
-        LabelAtlas *_drawnVerticesLabel;
-
         /** Whether or not the Director is paused */
         bool _paused;
 

@@ -92,7 +92,7 @@ namespace GRAPH
 
     void bindTexture2D(GLuint textureId)
     {
-        GL::bindTexture2DN(0, textureId);
+        bindTexture2DN(0, textureId);
     }
 
     void bindTexture2DN(GLuint textureUnit, GLuint textureId)

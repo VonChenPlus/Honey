@@ -3,7 +3,9 @@
 #include "GRAPH/BASE/Director.h"
 #include "GRAPH/BASE/GLCommon.h"
 #include "MATH/MathDef.h"
+#include "GRAPH/RENDERER/FrameBuffer.h"
 #include <map>
+#include "GRAPH/BASE/Camera.h"
 
 namespace GRAPH
 {
@@ -191,7 +193,7 @@ namespace GRAPH
 
     void GLView::setViewPortInPoints(float x , float y , float w , float h)
     {
-        experimental::Viewport vp = {(float)(x * _scaleX + _viewPortRect.origin.x),
+        Viewport vp = {(float)(x * _scaleX + _viewPortRect.origin.x),
             (float)(y * _scaleY + _viewPortRect.origin.y),
             (float)(w * _scaleX),
             (float)(h * _scaleY)};

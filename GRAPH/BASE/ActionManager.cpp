@@ -1,5 +1,7 @@
 #include "GRAPH/BASE/ActionManager.h"
 #include "UTILS/HASH/uthash.h"
+#include "BASE/HObject.h"
+#include "GRAPH/BASE/Action.h"
 
 namespace GRAPH
 {
@@ -8,7 +10,7 @@ namespace GRAPH
     //
     typedef struct _hashElement
     {
-        struct _ccArray     *actions;
+        HObjectArray     *actions;
         Node                *target;
         int                 actionIndex;
         Action              *currentAction;
@@ -34,7 +36,7 @@ namespace GRAPH
 
     void ActionManager::deleteHashElement(tHashElement *element)
     {
-        ccArrayFree(element->actions);
+        delete element->actions;
         HASH_DEL(_targets, element);
         element->target->release();
         free(element);
@@ -45,18 +47,18 @@ namespace GRAPH
         // 4 actions per Node by default
         if (element->actions == nullptr)
         {
-            element->actions = ccArrayNew(4);
-        }else
-        if (element->actions->num == element->actions->max)
+            element->actions = new HObjectArray(4);
+        }
+        else if (element->actions->number() == element->actions->maximun())
         {
-            ccArrayDoubleCapacity(element->actions);
+            element->actions->doubleCapacity();
         }
 
     }
 
     void ActionManager::removeActionAtIndex(ssize_t index, tHashElement *element)
     {
-        Action *action = (Action*)element->actions->arr[index];
+        Action *action = (Action*)(*element->actions)[index];
 
         if (action == element->currentAction && (! element->currentActionSalvaged))
         {
@@ -64,7 +66,7 @@ namespace GRAPH
             element->currentActionSalvaged = true;
         }
 
-        ccArrayRemoveObjectAtIndex(element->actions, index, true);
+        element->actions->removeObjectAtIndex(index, true);
 
         // update actionIndex in case we are in tick. looping over the actions
         if (element->actionIndex >= index)
@@ -72,7 +74,7 @@ namespace GRAPH
             element->actionIndex--;
         }
 
-        if (element->actions->num == 0)
+        if (element->actions->number() == 0)
         {
             if (_currentTarget == element)
             {
@@ -116,7 +118,7 @@ namespace GRAPH
             if (! element->paused)
             {
                 element->paused = true;
-                idsWithActions.pushBack(element->target);
+                idsWithActions.push_back(element->target);
             }
         }
 
@@ -149,8 +151,7 @@ namespace GRAPH
 
          actionAllocWithHashElement(element);
 
-         ccArrayAppendObject(element->actions, action);
-
+         element->actions->appendObject(action);
          action->startWithTarget(target);
     }
 
@@ -178,13 +179,13 @@ namespace GRAPH
         HASH_FIND_PTR(_targets, &target, element);
         if (element)
         {
-            if (ccArrayContainsObject(element->actions, element->currentAction) && (! element->currentActionSalvaged))
+            if (element->actions->containsObject(element->currentAction) && (! element->currentActionSalvaged))
             {
                 element->currentAction->retain();
                 element->currentActionSalvaged = true;
             }
 
-            ccArrayRemoveAllObjects(element->actions);
+            element->actions->removeAllObjects();
             if (_currentTarget == element)
             {
                 _currentTargetSalvaged = true;
@@ -209,8 +210,8 @@ namespace GRAPH
         HASH_FIND_PTR(_targets, &target, element);
         if (element)
         {
-            auto i = ccArrayGetIndexOfObject(element->actions, action);
-            if (i != CC_INVALID_INDEX)
+            auto i = element->actions->getIndexOfObject(action);
+            if (i != -1)
             {
                 removeActionAtIndex(i, element);
             }
@@ -224,10 +225,10 @@ namespace GRAPH
 
         if (element)
         {
-            auto limit = element->actions->num;
+            auto limit = element->actions->number();
             for (int i = 0; i < limit; ++i)
             {
-                Action *action = (Action*)element->actions->arr[i];
+                Action *action = (Action*)(*element->actions)[i];
 
                 if (action->getTag() == (int)tag && action->getOriginalTarget() == target)
                 {
@@ -245,10 +246,10 @@ namespace GRAPH
 
         if (element)
         {
-            auto limit = element->actions->num;
+            auto limit = element->actions->number();
             for (int i = 0; i < limit;)
             {
-                Action *action = (Action*)element->actions->arr[i];
+                Action *action = (Action*)(*element->actions)[i];
 
                 if (action->getTag() == (int)tag && action->getOriginalTarget() == target)
                 {
@@ -276,10 +277,10 @@ namespace GRAPH
         {
             if (element->actions != nullptr)
             {
-                auto limit = element->actions->num;
+                auto limit = element->actions->number();
                 for (int i = 0; i < limit; ++i)
                 {
-                    Action *action = (Action*)element->actions->arr[i];
+                    Action *action = (Action*)(*element->actions)[i];
 
                     if (action->getTag() == (int)tag)
                     {
@@ -300,7 +301,7 @@ namespace GRAPH
         HASH_FIND_PTR(_targets, &target, element);
         if (element)
         {
-            return element->actions ? element->actions->num : 0;
+            return element->actions ? element->actions->number() : 0;
         }
 
         return 0;
@@ -317,10 +318,10 @@ namespace GRAPH
             if (! _currentTarget->paused)
             {
                 // The 'actions' MutableArray may change while inside this loop.
-                for (_currentTarget->actionIndex = 0; _currentTarget->actionIndex < _currentTarget->actions->num;
+                for (_currentTarget->actionIndex = 0; _currentTarget->actionIndex < _currentTarget->actions->number();
                     _currentTarget->actionIndex++)
                 {
-                    _currentTarget->currentAction = (Action*)_currentTarget->actions->arr[_currentTarget->actionIndex];
+                    _currentTarget->currentAction = (Action*)(*_currentTarget->actions)[_currentTarget->actionIndex];
                     if (_currentTarget->currentAction == nullptr)
                     {
                         continue;
@@ -336,7 +337,8 @@ namespace GRAPH
                         // accidentally deallocating itself before finishing its step, we retained
                         // it. Now that step is done, it's safe to release it.
                         _currentTarget->currentAction->release();
-                    } else
+                    }
+                    else
                     if (_currentTarget->currentAction->isDone())
                     {
                         _currentTarget->currentAction->stop();
@@ -356,7 +358,7 @@ namespace GRAPH
             elt = (tHashElement*)(elt->hh.next);
 
             // only delete currentTarget if no actions were scheduled during the cycle (issue #481)
-            if (_currentTargetSalvaged && _currentTarget->actions->num == 0)
+            if (_currentTargetSalvaged && _currentTarget->actions->number() == 0)
             {
                 deleteHashElement(_currentTarget);
             }
