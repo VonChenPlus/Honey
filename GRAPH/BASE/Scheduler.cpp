@@ -16,6 +16,74 @@ namespace GRAPH
         bool                markedForDeletion; // selector will no longer be called and entry will be removed at end of the next tick
     } tListEntry;
 
+    #define DL_APPEND(head,add)                                                                    \
+        DL_APPEND2(head,add,prev,next)
+
+    #define DL_APPEND2(head,add,prev,next)                                                         \
+    do {                                                                                           \
+      if (head) {                                                                                  \
+          (add)->prev = (head)->prev;                                                              \
+          (head)->prev->next = (add);                                                              \
+          (head)->prev = (add);                                                                    \
+          (add)->next = NULL;                                                                      \
+      }                                                                                            \
+      else {                                                                                       \
+          (head)=(add);                                                                            \
+          (head)->prev = (head);                                                                   \
+          (head)->next = NULL;                                                                     \
+      }                                                                                            \
+    } while (0)
+
+    #define DL_PREPEND(head,add)                                                                   \
+        DL_PREPEND2(head,add,prev,next)
+
+    #define DL_PREPEND2(head,add,prev,next)                                                        \
+    do {                                                                                           \
+     (add)->next = head;                                                                           \
+     if (head) {                                                                                   \
+       (add)->prev = (head)->prev;                                                                 \
+       (head)->prev = (add);                                                                       \
+     } else {                                                                                      \
+       (add)->prev = (add);                                                                        \
+     }                                                                                             \
+     (head) = (add);                                                                               \
+    } while (0)
+
+    #define DL_DELETE(head,del)                                                                    \
+        DL_DELETE2(head,del,prev,next)
+
+    #define DL_DELETE2(head,del,prev,next)                                                         \
+    do {                                                                                           \
+      assert((del)->prev != NULL);                                                                 \
+      if ((del)->prev == (del)) {                                                                  \
+          (head)=NULL;                                                                             \
+      } else if ((del)==(head)) {                                                                  \
+          (del)->next->prev = (del)->prev;                                                         \
+          (head) = (del)->next;                                                                    \
+      } else {                                                                                     \
+          (del)->prev->next = (del)->next;                                                         \
+          if ((del)->next) {                                                                       \
+              (del)->next->prev = (del)->prev;                                                     \
+          } else {                                                                                 \
+              (head)->prev = (del)->prev;                                                          \
+          }                                                                                        \
+      }                                                                                            \
+    } while (0)
+
+
+    #define DL_FOREACH(head,el)                                                                    \
+        DL_FOREACH2(head,el,next)
+
+    #define DL_FOREACH2(head,el,next)                                                              \
+        for(el=head;el;el=(el)->next)
+
+    /* this version is safe for deleting the elements during iteration */
+    #define DL_FOREACH_SAFE(head,el,tmp)                                                           \
+        DL_FOREACH_SAFE2(head,el,tmp,next)
+
+    #define DL_FOREACH_SAFE2(head,el,tmp,next)                                                     \
+      for((el)=(head);(el) && (tmp = (el)->next, 1); (el) = tmp)
+
     typedef struct _hashUpdateEntry
     {
         tListEntry          **list;        // Which list does it belong to ?
@@ -234,13 +302,13 @@ namespace GRAPH
 
         if (element->timers == nullptr)
         {
-            element->timers = ccArrayNew(10);
+            element->timers = new HObjectArray(10);
         }
         else
         {
-            for (int i = 0; i < element->timers->num; ++i)
+            for (int i = 0; i < element->timers->number(); ++i)
             {
-                TimerTargetCallback *timer = dynamic_cast<TimerTargetCallback*>(element->timers->arr[i]);
+                TimerTargetCallback *timer = dynamic_cast<TimerTargetCallback*>((*element->timers)[i]);
 
                 if (timer && key == timer->getKey())
                 {
@@ -248,12 +316,13 @@ namespace GRAPH
                     return;
                 }
             }
-            ccArrayEnsureExtraCapacity(element->timers, 1);
+
+            element->timers->ensureExtraCapacity(1);
         }
 
         TimerTargetCallback *timer = new (std::nothrow) TimerTargetCallback();
         timer->initWithCallback(this, callback, target, key, interval, repeat, delay);
-        ccArrayAppendObject(element->timers, timer);
+        element->timers->appendObject(timer);
         timer->release();
     }
 
@@ -270,9 +339,9 @@ namespace GRAPH
 
         if (element)
         {
-            for (int i = 0; i < element->timers->num; ++i)
+            for (int i = 0; i < element->timers->number(); ++i)
             {
-                TimerTargetCallback *timer = static_cast<TimerTargetCallback*>(element->timers->arr[i]);
+                TimerTargetCallback *timer = static_cast<TimerTargetCallback*>((*element->timers)[i]);
 
                 if (key == timer->getKey())
                 {
@@ -282,7 +351,7 @@ namespace GRAPH
                         element->currentTimerSalvaged = true;
                     }
 
-                    ccArrayRemoveObjectAtIndex(element->timers, i, true);
+                    element->timers->removeObjectAtIndex(i, true);
 
                     // update timerIndex in case we are in tick:, looping over the actions
                     if (element->timerIndex >= i)
@@ -290,7 +359,7 @@ namespace GRAPH
                         element->timerIndex--;
                     }
 
-                    if (element->timers->num == 0)
+                    if (element->timers->number() == 0)
                     {
                         if (_currentTarget == element)
                         {
@@ -396,7 +465,6 @@ namespace GRAPH
             {
                 if (_updateHashLocked)
                 {
-                    CCLOG("warning: you CANNOT change update priority in scheduled function");
                     hashElement->entry->markedForDeletion = false;
                     hashElement->entry->paused = paused;
                     return;
@@ -448,9 +516,9 @@ namespace GRAPH
         }
         else
         {
-            for (int i = 0; i < element->timers->num; ++i)
+            for (int i = 0; i < element->timers->number(); ++i)
             {
-                TimerTargetCallback *timer = static_cast<TimerTargetCallback*>(element->timers->arr[i]);
+                TimerTargetCallback *timer = static_cast<TimerTargetCallback*>((*element->timers)[i]);
 
                 if (key == timer->getKey())
                 {

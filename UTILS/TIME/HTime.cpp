@@ -1,13 +1,5 @@
 #include "HTime.h"
-
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <sys/time.h>
-#include <unistd.h>
-#endif
 #include <stdio.h>
-
 #include "BASE/Honey.h"
 
 namespace UTILS

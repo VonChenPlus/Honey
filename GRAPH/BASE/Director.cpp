@@ -167,10 +167,6 @@ namespace GRAPH
             Texture2D::setDefaultAlphaPixelFormat(Texture2D::PixelFormat::RGBA4444);
         else if(pixel_format == "rgba5551")
             Texture2D::setDefaultAlphaPixelFormat(Texture2D::PixelFormat::RGB5A1);
-
-        // PVR v2 has alpha premultiplied ?
-        bool pvr_alpha_premultipled = conf->getValue("cocos2d.x.texture.pvrv2_has_alpha_premultiplied", HValue(false)).asBool();
-        Image::setPVRImagesHavePremultipliedAlpha(pvr_alpha_premultipled);
     }
 
     void Director::setGLDefaultValues()
@@ -614,7 +610,7 @@ namespace GRAPH
         // Calculate z=0 using -> transform*[0, 0, 0, 1]/w
         float zClip = transform.m[14]/transform.m[15];
 
-        Size glSize = _openGLView->getDesignResolutionSize();
+        MATH::Sizef glSize = _openGLView->getDesignResolutionSize();
         MATH::Vector4f clipCoord(2.0f*uiPoint.x/glSize.width - 1.0f, 1.0f - 2.0f*uiPoint.y/glSize.height, zClip, 1);
 
         MATH::Vector4f glCoord;

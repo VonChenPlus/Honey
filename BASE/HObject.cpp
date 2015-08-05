@@ -163,23 +163,20 @@ void HObjectArray::removeObjectAtIndex(int64 index, bool releaseObj/* = true*/) 
     }
 }
 
-void HObjectArray::removeObject(HObject* object, bool releaseObj/* = true*/)
-{
+void HObjectArray::removeObject(HObject* object, bool releaseObj/* = true*/) {
     auto index = getIndexOfObject(object);
     if (index != -1) {
         removeObjectAtIndex(index, releaseObj);
     }
 }
 
-void HObjectArray::removeArray(HObjectArray *minusArr)
-{
+void HObjectArray::removeArray(HObjectArray *minusArr) {
     for (int64 i = 0; i < minusArr->number_; i++) {
         removeObject((*minusArr)[i]);
     }
 }
 
-void HObjectArray::fullRemoveArray(HObjectArray *minusArr)
-{
+void HObjectArray::fullRemoveArray(HObjectArray *minusArr) {
     int64 back = 0;
 
     for (int64 i = 0; i < number_; i++) {

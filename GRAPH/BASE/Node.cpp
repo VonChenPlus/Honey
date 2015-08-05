@@ -3,6 +3,11 @@
 #include <algorithm>
 #include <string>
 #include <regex>
+#include "GRAPH/BASE/Director.h"
+#include "GRAPH/BASE/ActionManager.h"
+#include "GRAPH/BASE/Scheduler.h"
+#include "GRAPH/BASE/EventDispatcher.h"
+#include "GRAPH/RENDERER/GLProgramState.h"
 
 namespace GRAPH
 {
@@ -33,7 +38,7 @@ namespace GRAPH
     , _normalizedPositionDirty(false)
     , _skewX(0.0f)
     , _skewY(0.0f)
-    , _contentSize(Size::ZERO)
+    , _contentSize(MATH::SizefZERO)
     , _contentSizeDirty(true)
     , _transformDirty(true)
     , _inverseDirty(true)

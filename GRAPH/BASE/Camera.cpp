@@ -354,7 +354,7 @@ namespace GRAPH
         }
     }
 
-    void Camera::clearBackground(float depth)
+    void Camera::clearBackground(float)
     {
         GLboolean oldDepthTest;
         GLint oldDepthFunc;

@@ -1,11 +1,12 @@
 #include "GRAPH/BASE/GLView.h"
+#include <map>
 #include "GRAPH/BASE/Touch.h"
 #include "GRAPH/BASE/Director.h"
 #include "GRAPH/BASE/GLCommon.h"
 #include "MATH/MathDef.h"
 #include "GRAPH/RENDERER/FrameBuffer.h"
-#include <map>
 #include "GRAPH/BASE/Camera.h"
+#include "GRAPH/BASE/EventDispatcher.h"
 
 namespace GRAPH
 {

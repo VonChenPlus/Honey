@@ -1,11 +1,13 @@
 #include "GRAPH/BASE/EventDispatcher.h"
 #include <algorithm>
-
-
-#define DUMP_LISTENER_ITEM_PRIORITY_INFO 0
+#include "GRAPH/BASE/Node.h"
+#include "GRAPH/BASE/Director.h"
+#include "GRAPH/BASE/Camera.h"
 
 namespace GRAPH
 {
+    #define DUMP_LISTENER_ITEM_PRIORITY_INFO 0
+
     class DispatchGuard
     {
     public:
@@ -479,7 +481,7 @@ namespace GRAPH
                 auto l = *iter;
                 if (l == listener)
                 {
-                    CC_SAFE_RETAIN(l);
+                    SAFE_RETAIN(l);
                     l->setRegistered(false);
                     if (l->getAssociatedNode() != nullptr)
                     {
@@ -490,7 +492,7 @@ namespace GRAPH
                     if (_inDispatch == 0)
                     {
                         listeners->erase(iter);
-                        CC_SAFE_RELEASE(l);
+                        SAFE_RELEASE(l);
                     }
 
                     isFound = true;
@@ -525,7 +527,7 @@ namespace GRAPH
                 _priorityDirtyFlagMap.erase(listener->getListenerID());
                 auto list = iter->second;
                 iter = _listenerMap.erase(iter);
-                CC_SAFE_DELETE(list);
+                SAFE_DELETE(list);
             }
             else
             {
@@ -589,8 +591,6 @@ namespace GRAPH
         // priority < 0
         if (fixedPriorityListeners)
         {
-            CCASSERT(listeners->getGt0Index() <= static_cast<ssize_t>(fixedPriorityListeners->size()), "Out of range exception!");
-
             if (!fixedPriorityListeners->empty())
             {
                 for (; i < listeners->getGt0Index(); ++i)
@@ -1206,7 +1206,7 @@ namespace GRAPH
                     if (_inDispatch == 0)
                     {
                         iter = listenerVector->erase(iter);
-                        CC_SAFE_RELEASE(l);
+                        SAFE_RELEASE(l);
                     }
                     else
                     {
