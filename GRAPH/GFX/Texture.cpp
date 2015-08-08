@@ -196,7 +196,8 @@ namespace GFX
 
     void Texture::loadPNG(const char *filename, bool genMips) {
         unsigned char *image_data;
-        PNGLoad(filename, &width_, &height_, &image_data);
+        int color, datalen;
+        PNGLoad(filename, &width_, &height_, &color, &image_data, &datalen);
         GL_CHECK();
         glGenTextures(1, &id_);
         glBindTexture(GL_TEXTURE_2D, id_);
@@ -243,7 +244,8 @@ namespace GFX
 
     void Texture::loadPNG(const uint8 *data, size_t size, bool genMips) {
         unsigned char *image_data;
-        PNGLoadPtr(data, size, &width_, &height_, &image_data);
+        int color, datalen;
+        PNGLoadPtr(data, size, &width_, &height_, &color, &image_data, &datalen);
         GL_CHECK();
         // TODO: should check for power of 2 tex size and disallow genMips when not.
         glGenTextures(1, &id_);

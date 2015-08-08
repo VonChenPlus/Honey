@@ -178,7 +178,8 @@ namespace THIN3D
             }
             break;
         case PNG: {
-                PNGLoadPtr((const unsigned char *)data, size, &width[0], &height[0], &image[0]);
+                int color, datalen;
+                PNGLoadPtr((const unsigned char *)data, size, &width[0], &height[0], &color, &image[0], &datalen);
                 *num_levels = 1;
                 *fmt = RGBA8888;
             }

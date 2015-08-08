@@ -11,6 +11,11 @@
 #include "GRAPH/BASE/Configuration.h"
 #include "GRAPH/RENDERER/Texture2D.h"
 #include "GRAPH/RENDERER/FrameBuffer.h"
+#include "GRAPH/RENDERER/GLStateCache.h"
+#include "GRAPH/RENDERER/GLProgramCache.h"
+#include "GRAPH/RENDERER/TextureCache.h"
+#include "GRAPH/RENDERER/GLProgramState.h"
+#include "BASE/AutoreleasePool.h"
 
 namespace GRAPH
 {
@@ -568,7 +573,7 @@ namespace GRAPH
     {
         if (on)
         {
-            blendFunc(CC_BLEND_SRC, CC_BLEND_DST);
+            blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         }
         else
         {
@@ -584,7 +589,7 @@ namespace GRAPH
     void Director::setClearColor(const Color4F& clearColor)
     {
         _renderer->setClearColor(clearColor);
-        auto defaultFBO = experimental::FrameBuffer::getOrCreateDefaultFBO(_openGLView);
+        auto defaultFBO = FrameBuffer::getOrCreateDefaultFBO(_openGLView);
 
         if(defaultFBO) defaultFBO->setClearColor(clearColor);
     }
@@ -827,9 +832,6 @@ namespace GRAPH
         stopAnimation();
 
         SAFE_RELEASE_NULL(_notificationNode);
-        SAFE_RELEASE_NULL(_FPSLabel);
-        SAFE_RELEASE_NULL(_drawnBatchesLabel);
-        SAFE_RELEASE_NULL(_drawnVerticesLabel);
 
         // purge bitmap cache
         FontFNT::purgeCachedData();
@@ -883,29 +885,23 @@ namespace GRAPH
         getScheduler()->scheduleUpdate(getActionManager(), Scheduler::PRIORITY_SYSTEM, false);
 
         // release the objects
-        PoolManager::getInstance()->getCurrentPool()->clear();
+        PoolManager::getInstance().getCurrentPool()->clear();
     }
 
     void Director::setNextScene()
     {
-        bool runningIsTransition = dynamic_cast<TransitionScene*>(_runningScene) != nullptr;
-        bool newIsTransition = dynamic_cast<TransitionScene*>(_nextScene) != nullptr;
-
         // If it is not a transition, call onExit/cleanup
-         if (! newIsTransition)
+         if (_runningScene)
          {
-             if (_runningScene)
-             {
-                 _runningScene->onExitTransitionDidStart();
-                 _runningScene->onExit();
-             }
+             _runningScene->onExitTransitionDidStart();
+             _runningScene->onExit();
+         }
 
-             // issue #709. the root node (scene) should receive the cleanup message too
-             // otherwise it might be leaked.
-             if (_sendCleanupToScene && _runningScene)
-             {
-                 _runningScene->cleanup();
-             }
+         // issue #709. the root node (scene) should receive the cleanup message too
+         // otherwise it might be leaked.
+         if (_sendCleanupToScene && _runningScene)
+         {
+             _runningScene->cleanup();
          }
 
         if (_runningScene)
@@ -916,7 +912,7 @@ namespace GRAPH
         _nextScene->retain();
         _nextScene = nullptr;
 
-        if ((! runningIsTransition) && _runningScene)
+        if (_runningScene)
         {
             _runningScene->onEnter();
             _runningScene->onEnterTransitionDidFinish();
@@ -1148,7 +1144,7 @@ namespace GRAPH
             drawScene();
 
             // release the objects
-            PoolManager::getInstance()->getCurrentPool()->clear();
+            PoolManager::getInstance().getCurrentPool()->clear();
         }
     }
 

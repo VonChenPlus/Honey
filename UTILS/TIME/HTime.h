@@ -2,7 +2,7 @@
 #define TIMEUTIL_H
 
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
 #else
 #include <sys/time.h>
 #include <unistd.h>

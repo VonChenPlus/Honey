@@ -1,5 +1,6 @@
 #include "GRAPH/RENDERER/RenderCommand.h"
 #include "GRAPH/BASE/Node.h"
+#include "GRAPH/BASE/Camera.h"
 
 namespace GRAPH
 {

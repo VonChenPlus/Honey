@@ -38,11 +38,11 @@ namespace IO
             return mkdir(dirPath.c_str()) == 0;
         }
 
-        bool removeDirectory(const std::string& dirPath) {
+        bool removeDirectory(const std::string& dirPath) override{
             return !!::RemoveDirectory(UTF8ToWString(dirPath).c_str());
         }
 
-        bool removeFile(const std::string &filepath) {
+        bool removeFile(const std::string &filepath) override{
             return !!::DeleteFile(UTF8ToWString(filepath).c_str());
         }
 
@@ -81,11 +81,11 @@ namespace IO
             return mkdir(dirPath.c_str(), 0777) == 0;
         }
 
-        bool removeDirectory(const std::string& dirPath) {
+        bool removeDirectory(const std::string& dirPath) override{
             return rmdir(dirPath.c_str()) == 0;
         }
 
-        bool removeFile(const std::string &filepath) {
+        bool removeFile(const std::string &filepath) override{
             return unlink(filepath.c_str()) == 0;
         }
 

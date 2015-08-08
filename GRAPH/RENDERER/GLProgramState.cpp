@@ -2,6 +2,7 @@
 #include "GRAPH/RENDERER/Texture2D.h"
 #include "GRAPH/BASE/Director.h"
 #include "GRAPH/BASE/Camera.h"
+#include "GRAPH/RENDERER/GLProgram.h"
 
 namespace GRAPH
 {

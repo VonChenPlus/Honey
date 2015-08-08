@@ -1,7 +1,7 @@
 #ifndef GLVIEW_H
 #define GLVIEW_H
 
-#include "GRAPH/BASE/EventTouch.h"
+#include "GRAPH/BASE/Event.h"
 #include "MATH/Size.h"
 #include "MATH/Rectangle.h"
 

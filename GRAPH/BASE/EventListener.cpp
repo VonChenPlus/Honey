@@ -25,11 +25,6 @@ namespace GRAPH
         return (_onEvent != nullptr);
     }
 
-    EventAcceleration::EventAcceleration(const Acceleration& acc)
-        : Event(Type::ACCELERATION)
-        , _acc(acc) {
-    }
-
     const std::string EventListenerAcceleration::LISTENER_ID = "__acceleration";
 
     EventListenerAcceleration::EventListenerAcceleration() {
@@ -80,13 +75,6 @@ namespace GRAPH
 
     bool EventListenerAcceleration::checkAvailable() {
         return true;
-    }
-
-    EventKeyboard::EventKeyboard(KeyCode keyCode, bool isPressed)
-        : Event(Type::KEYBOARD)
-        , _keyCode(keyCode)
-        , _isPressed(isPressed) {
-
     }
 
     const std::string EventListenerKeyboard::LISTENER_ID = "__keyboard";
@@ -147,45 +135,6 @@ namespace GRAPH
         }
 
         return false;
-    }
-
-    EventMouse::EventMouse(MouseEventType mouseEventCode)
-        : Event(Type::MOUSE)
-        , _mouseEventType(mouseEventCode)
-        , _mouseButton(-1)
-        , _x(0.0f)
-        , _y(0.0f)
-        , _scrollX(0.0f)
-        , _scrollY(0.0f)
-        , _startPointCaptured(false) {
-    }
-
-    MATH::Vector2f EventMouse::getLocationInView() const {
-        return _point;
-    }
-
-    MATH::Vector2f EventMouse::getPreviousLocationInView() const {
-        return _prevPoint;
-    }
-
-    MATH::Vector2f EventMouse::getStartLocationInView() const {
-        return _startPoint;
-    }
-
-    MATH::Vector2f EventMouse::getLocation() const {
-        return Director::getInstance()->convertToGL(_point);
-    }
-
-    MATH::Vector2f EventMouse::getPreviousLocation() const {
-        return Director::getInstance()->convertToGL(_prevPoint);
-    }
-
-    MATH::Vector2f EventMouse::getStartLocation() const {
-        return Director::getInstance()->convertToGL(_startPoint);
-    }
-
-    MATH::Vector2f EventMouse::getDelta() const {
-        return getLocation() - getPreviousLocation();
     }
 
     const std::string EventListenerMouse::LISTENER_ID = "__mouse";
@@ -259,13 +208,6 @@ namespace GRAPH
         return false;
     }
 
-    EventFocus::EventFocus(Node *widgetLoseFocus, Node* widgetGetFocus)
-        :Event(Type::FOCUS),
-        _widgetGetFocus(widgetGetFocus),
-        _widgetLoseFocus(widgetLoseFocus) {
-
-    }
-
     const std::string EventListenerFocus::LISTENER_ID = "__focus_event";
 
     EventListenerFocus::EventListenerFocus()
@@ -316,34 +258,6 @@ namespace GRAPH
         }
 
         return true;
-    }
-
-    MATH::Vector2f EventTouch::getLocationInView() const {
-        return _point;
-    }
-
-    MATH::Vector2f EventTouch::getPreviousLocationInView() const {
-        return _prevPoint;
-    }
-
-    MATH::Vector2f EventTouch::getStartLocationInView() const {
-        return _startPoint;
-    }
-
-    MATH::Vector2f EventTouch::getLocation() const {
-        return Director::getInstance()->convertToGL(_point);
-    }
-
-    MATH::Vector2f EventTouch::getPreviousLocation() const {
-        return Director::getInstance()->convertToGL(_prevPoint);
-    }
-
-    MATH::Vector2f EventTouch::getStartLocation() const {
-        return Director::getInstance()->convertToGL(_startPoint);
-    }
-
-    MATH::Vector2f EventTouch::getDelta() const {
-        return getLocation() - getPreviousLocation();
     }
 
     const std::string EventListenerTouchOneByOne::LISTENER_ID = "__touch_one_by_one";

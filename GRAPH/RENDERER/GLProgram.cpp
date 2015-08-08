@@ -1,5 +1,8 @@
 #include "GRAPH/RENDERER/GLProgram.h"
 #include "GRAPH/BASE/Director.h"
+#include "GRAPH/RENDERER/GLStateCache.h"
+#include "IO/FileUtils.h"
+#include "UTILS/RANDOM/HRandom.h"
 
 namespace GRAPH
 {
@@ -112,7 +115,7 @@ namespace GRAPH
             return ret;
         }
 
-        CC_SAFE_DELETE(ret);
+        SAFE_DELETE(ret);
         return nullptr;
     }
 
@@ -132,7 +135,7 @@ namespace GRAPH
             return ret;
         }
 
-        CC_SAFE_DELETE(ret);
+        SAFE_DELETE(ret);
         return nullptr;
     }
 
@@ -144,14 +147,11 @@ namespace GRAPH
     , _flags()
     {
         _director = Director::getInstance();
-        CCASSERT(nullptr != _director, "Director is null when init a GLProgram");
         memset(_builtInUniforms, 0, sizeof(_builtInUniforms));
     }
 
     GLProgram::~GLProgram()
     {
-        CCLOGINFO("%s %d deallocing GLProgram: %p", __FUNCTION__, __LINE__, this);
-
         if (_vertShader)
         {
             glDeleteShader(_vertShader);
@@ -166,7 +166,7 @@ namespace GRAPH
 
         if (_program)
         {
-            GL::deleteProgram(_program);
+            deleteProgram(_program);
         }
 
         for (auto e : _hashForUniforms)
@@ -184,7 +184,6 @@ namespace GRAPH
     bool GLProgram::initWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray, const std::string& compileTimeDefines)
     {
         _program = glCreateProgram();
-        CHECK_GL_ERROR_DEBUG();
 
         // convert defines here. If we do it in "compileShader" we will do it it twice.
         // a cache for the defines could be useful, but seems like overkill at this point
@@ -197,7 +196,6 @@ namespace GRAPH
         {
             if (!compileShader(&_vertShader, GL_VERTEX_SHADER, vShaderByteArray, replacedDefines))
             {
-                CCLOG("cocos2d: ERROR: Failed to compile vertex shader");
                 return false;
            }
         }
@@ -207,7 +205,6 @@ namespace GRAPH
         {
             if (!compileShader(&_fragShader, GL_FRAGMENT_SHADER, fShaderByteArray, replacedDefines))
             {
-                CCLOG("cocos2d: ERROR: Failed to compile fragment shader");
                 return false;
             }
         }
@@ -216,7 +213,6 @@ namespace GRAPH
         {
             glAttachShader(_program, _vertShader);
         }
-        CHECK_GL_ERROR_DEBUG();
 
         if (_fragShader)
         {
@@ -224,8 +220,6 @@ namespace GRAPH
         }
 
         _hashForUniforms.clear();
-
-        CHECK_GL_ERROR_DEBUG();
 
         return true;
     }
@@ -237,9 +231,8 @@ namespace GRAPH
 
     bool GLProgram::initWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines)
     {
-        auto fileUtils = FileUtils::getInstance();
-        std::string vertexSource = fileUtils->getStringFromFile(FileUtils::getInstance()->fullPathForFilename(vShaderFilename));
-        std::string fragmentSource = fileUtils->getStringFromFile(FileUtils::getInstance()->fullPathForFilename(fShaderFilename));
+        std::string vertexSource = IO::FileUtils::getInstance().getStringFromFile(IO::FileUtils::getInstance().fullPathForFilename(vShaderFilename));
+        std::string fragmentSource = IO::FileUtils::getInstance().getStringFromFile(IO::FileUtils::getInstance().fullPathForFilename(fShaderFilename));
 
         return initWithByteArrays(vertexSource.c_str(), fragmentSource.c_str(), compileTimeDefines);
     }
@@ -301,7 +294,6 @@ namespace GRAPH
         {
             GLchar ErrorLog[1024];
             glGetProgramInfoLog(_program, sizeof(ErrorLog), NULL, ErrorLog);
-            CCLOG("Error linking shader program: '%s'\n", ErrorLog);
         }
     }
 
@@ -343,13 +335,6 @@ namespace GRAPH
                         }
                         uniform.name = std::string(uniformName);
                         uniform.location = glGetUniformLocation(_program, uniformName);
-                        GLenum __gl_error_code = glGetError();
-                        if (__gl_error_code != GL_NO_ERROR)
-                        {
-                            CCLOG("error: 0x%x", (int)__gl_error_code);
-                        }
-                        assert(__gl_error_code == GL_NO_ERROR);
-
                         _userUniforms[uniform.name] = uniform;
                     }
                 }
@@ -359,8 +344,6 @@ namespace GRAPH
         {
             GLchar ErrorLog[1024];
             glGetProgramInfoLog(_program, sizeof(ErrorLog), NULL, ErrorLog);
-            CCLOG("Error linking shader program: '%s'\n", ErrorLog);
-
         }
 
     }
@@ -381,14 +364,6 @@ namespace GRAPH
         return nullptr;
     }
 
-    std::string GLProgram::getDescription() const
-    {
-        return StringUtils::format("<GLProgram = "
-                                          CC_FORMAT_PRINTF_SIZE_T
-                                          " | Program = %i, VertexShader = %i, FragmentShader = %i>",
-                                          (size_t)this, _program, _vertShader, _fragShader);
-    }
-
     bool GLProgram::compileShader(GLuint * shader, GLenum type, const GLchar* source)
     {
         return compileShader(shader, type, source, "");
@@ -404,11 +379,7 @@ namespace GRAPH
         }
 
         const GLchar *sources[] = {
-    #if CC_TARGET_PLATFORM == CC_PLATFORM_WINRT
             (type == GL_VERTEX_SHADER ? "precision mediump float;\n precision mediump int;\n" : "precision mediump float;\n precision mediump int;\n"),
-    #elif (CC_TARGET_PLATFORM != CC_PLATFORM_WIN32 && CC_TARGET_PLATFORM != CC_PLATFORM_LINUX && CC_TARGET_PLATFORM != CC_PLATFORM_MAC)
-            (type == GL_VERTEX_SHADER ? "precision highp float;\n precision highp int;\n" : "precision mediump float;\n precision mediump int;\n"),
-    #endif
             COCOS2D_SHADER_UNIFORMS,
             convertedDefines.c_str(),
             source};
@@ -426,16 +397,6 @@ namespace GRAPH
             GLchar* src = (GLchar *)malloc(sizeof(GLchar) * length);
 
             glGetShaderSource(*shader, length, nullptr, src);
-            CCLOG("cocos2d: ERROR: Failed to compile shader:\n%s", src);
-
-            if (type == GL_VERTEX_SHADER)
-            {
-                CCLOG("cocos2d: %s", getVertexShaderLog().c_str());
-            }
-            else
-            {
-                CCLOG("cocos2d: %s", getFragmentShaderLog().c_str());
-            }
             free(src);
 
             return false;;
@@ -503,8 +464,6 @@ namespace GRAPH
 
     bool GLProgram::link()
     {
-        CCASSERT(_program != 0, "Cannot link invalid program");
-
         GLint status = GL_TRUE;
 
         bindPredefinedVertexAttribs();
@@ -526,23 +485,12 @@ namespace GRAPH
 
         _vertShader = _fragShader = 0;
 
-    #if DEBUG || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
-        glGetProgramiv(_program, GL_LINK_STATUS, &status);
-
-        if (status == GL_FALSE)
-        {
-            CCLOG("cocos2d: ERROR: Failed to link program: %i", _program);
-            GL::deleteProgram(_program);
-            _program = 0;
-        }
-    #endif
-
         return (status == GL_TRUE);
     }
 
     void GLProgram::use()
     {
-        GL::useProgram(_program);
+        useProgram(_program);
     }
 
     static std::string logForOpenGLShader(GLuint shader)
@@ -583,12 +531,12 @@ namespace GRAPH
 
     std::string GLProgram::getVertexShaderLog() const
     {
-        return cocos2d::logForOpenGLShader(_vertShader);
+        return logForOpenGLShader(_vertShader);
     }
 
     std::string GLProgram::getFragmentShaderLog() const
     {
-        return cocos2d::logForOpenGLShader(_fragShader);
+        return logForOpenGLShader(_fragShader);
     }
 
     std::string GLProgram::getProgramLog() const
@@ -638,9 +586,6 @@ namespace GRAPH
 
     GLint GLProgram::getUniformLocationForName(const char* name) const
     {
-        CCASSERT(name != nullptr, "Invalid uniform name" );
-        CCASSERT(_program != 0, "Invalid operation. Cannot get uniform location when program is not initialized");
-
         return glGetUniformLocation(_program, name);
     }
 
@@ -835,7 +780,7 @@ namespace GRAPH
         setUniformsForBuiltins(_director->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW));
     }
 
-    void GLProgram::setUniformsForBuiltins(const Mat4 &matrixMV)
+    void GLProgram::setUniformsForBuiltins(const MATH::Matrix4 &matrixMV)
     {
         auto& matrixP = _director->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
 
@@ -846,13 +791,13 @@ namespace GRAPH
             setUniformLocationWithMatrix4fv(_builtInUniforms[UNIFORM_MV_MATRIX], matrixMV.m, 1);
 
         if (_flags.usesMVP) {
-            Mat4 matrixMVP = matrixP * matrixMV;
+            MATH::Matrix4 matrixMVP = matrixP * matrixMV;
             setUniformLocationWithMatrix4fv(_builtInUniforms[UNIFORM_MVP_MATRIX], matrixMVP.m, 1);
         }
 
         if (_flags.usesNormal)
         {
-            Mat4 mvInverse = matrixMV;
+            MATH::Matrix4 mvInverse = matrixMV;
             mvInverse.m[12] = mvInverse.m[13] = mvInverse.m[14] = 0.0f;
             mvInverse.inverse();
             mvInverse.transpose();
@@ -875,7 +820,7 @@ namespace GRAPH
         }
 
         if (_flags.usesRandom)
-            setUniformLocationWith4f(_builtInUniforms[GLProgram::UNIFORM_RANDOM01], CCRANDOM_0_1(), CCRANDOM_0_1(), CCRANDOM_0_1(), CCRANDOM_0_1());
+            setUniformLocationWith4f(_builtInUniforms[GLProgram::UNIFORM_RANDOM01], RANDOM_0_1(), RANDOM_0_1(), RANDOM_0_1(), RANDOM_0_1());
     }
 
     void GLProgram::reset()

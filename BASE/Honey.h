@@ -161,6 +161,7 @@ private: \
 
 #define SAFE_DELETE(p)           do { delete (p); (p) = nullptr; } while(0)
 #define SAFE_DELETE_ARRAY(p)     do { if(p) { delete[] (p); (p) = nullptr; } } while(0)
+#define SAFE_FREE(p)             do { if(p) { free(p); (p) = nullptr; } } while(0)
 
 // Implement C99 functions and similar that are missing in MSVC.
 #if defined(_MSC_VER) && _MSC_VER < 1900

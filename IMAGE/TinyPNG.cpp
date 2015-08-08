@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "EXTERNALS/libpng17/png.h"
 #include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
 
@@ -11,7 +10,7 @@ namespace IMAGE
 {
     // *image_data_ptr should be deleted with free()
     // return value of 1 == success.
-    void PNGLoad(const char *file, int *pwidth, int *pheight, unsigned char **image_data_ptr) {
+    void PNGLoad(const char *file, int *pwidth, int *pheight, int *pcolor, unsigned char **data, int *datalen) {
         png_image png;
         memset(&png, 0, sizeof(png));
         png.version = PNG_IMAGE_VERSION;
@@ -23,14 +22,15 @@ namespace IMAGE
         }
         *pwidth = png.width;
         *pheight = png.height;
-        png.format = PNG_FORMAT_RGBA;
+        *pcolor = png.colormap_entries;
 
         int stride = PNG_IMAGE_ROW_STRIDE(png);
-        *image_data_ptr = (unsigned char *)malloc(PNG_IMAGE_SIZE(png));
-        png_image_finish_read(&png, NULLPTR, *image_data_ptr, stride, NULLPTR);
+        *datalen = PNG_IMAGE_SIZE(png);
+        *data = (unsigned char *)malloc(*datalen);
+        png_image_finish_read(&png, NULLPTR, *data, stride, NULLPTR);
     }
 
-    void PNGLoadPtr(const unsigned char *input_ptr, size_t input_len, int *pwidth, int *pheight, unsigned char **image_data_ptr) {
+    void PNGLoadPtr(const unsigned char *input_ptr, size_t input_len, int *pwidth, int *pheight, int *pcolor, unsigned char **data, int *datalen) {
         png_image png;
         memset(&png, 0, sizeof(png));
         png.version = PNG_IMAGE_VERSION;
@@ -42,10 +42,11 @@ namespace IMAGE
         }
         *pwidth = png.width;
         *pheight = png.height;
-        png.format = PNG_FORMAT_RGBA;
+        *pcolor = png.colormap_entries;
 
         int stride = PNG_IMAGE_ROW_STRIDE(png);
-        *image_data_ptr = (unsigned char *)malloc(PNG_IMAGE_SIZE(png));
-        png_image_finish_read(&png, NULLPTR, *image_data_ptr, stride, NULLPTR);
+        *datalen = PNG_IMAGE_SIZE(png);
+        *data = (unsigned char *)malloc(*datalen);
+        png_image_finish_read(&png, NULLPTR, *data, stride, NULLPTR);
     }
 }

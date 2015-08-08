@@ -54,7 +54,6 @@ namespace GRAPH
 
     #define DL_DELETE2(head,del,prev,next)                                                         \
     do {                                                                                           \
-      assert((del)->prev != NULL);                                                                 \
       if ((del)->prev == (del)) {                                                                  \
           (head)=NULL;                                                                             \
       } else if ((del)==(head)) {                                                                  \
@@ -634,13 +633,13 @@ namespace GRAPH
 
         if (element)
         {
-            if (ccArrayContainsObject(element->timers, element->currentTimer)
+            if (element->timers->containsObject(element->currentTimer)
                 && (! element->currentTimerSalvaged))
             {
                 element->currentTimer->retain();
                 element->currentTimerSalvaged = true;
             }
-            ccArrayRemoveAllObjects(element->timers);
+            element->timers->removeAllObjects();
 
             if (_currentTarget == element)
             {
@@ -690,7 +689,6 @@ namespace GRAPH
         HASH_FIND_PTR(_hashForUpdates, &target, elementUpdate);
         if (elementUpdate)
         {
-            CCASSERT(elementUpdate->entry != nullptr, "");
             elementUpdate->entry->paused = true;
         }
     }
@@ -837,9 +835,9 @@ namespace GRAPH
             if (! _currentTarget->paused)
             {
                 // The 'timers' array may change while inside this loop
-                for (elt->timerIndex = 0; elt->timerIndex < elt->timers->num; ++(elt->timerIndex))
+                for (elt->timerIndex = 0; elt->timerIndex < elt->timers->number(); ++(elt->timerIndex))
                 {
-                    elt->currentTimer = (Timer*)(elt->timers->arr[elt->timerIndex]);
+                    elt->currentTimer = (Timer*)((*elt->timers)[elt->timerIndex]);
                     elt->currentTimerSalvaged = false;
 
                     elt->currentTimer->update(dt);
@@ -861,7 +859,7 @@ namespace GRAPH
             elt = (tHashTimerEntry *)elt->hh.next;
 
             // only delete currentTarget if no actions were scheduled during the cycle (issue #481)
-            if (_currentTargetSalvaged && _currentTarget->timers->num == 0)
+            if (_currentTargetSalvaged && _currentTarget->timers->number() == 0)
             {
                 removeHashElement(_currentTarget);
             }
@@ -917,7 +915,7 @@ namespace GRAPH
         }
     }
 
-    void Scheduler::schedule(SEL_SCHEDULE selector, Ref *target, float interval, unsigned int repeat, float delay, bool paused)
+    void Scheduler::schedule(SEL_SCHEDULE selector, HObject *target, float interval, unsigned int repeat, float delay, bool paused)
     {
         tHashTimerEntry *element = nullptr;
         HASH_FIND_PTR(_hashForTimers, &target, element);
@@ -932,43 +930,38 @@ namespace GRAPH
             // Is this the 1st element ? Then set the pause level to all the selectors of this target
             element->paused = paused;
         }
-        else
-        {
-            CCASSERT(element->paused == paused, "");
-        }
 
         if (element->timers == nullptr)
         {
-            element->timers = ccArrayNew(10);
+            element->timers = new HObjectArray(10);
         }
         else
         {
-            for (int i = 0; i < element->timers->num; ++i)
+            for (int i = 0; i < element->timers->number(); ++i)
             {
-                TimerTargetSelector *timer = dynamic_cast<TimerTargetSelector*>(element->timers->arr[i]);
+                TimerTargetSelector *timer = dynamic_cast<TimerTargetSelector*>((*element->timers)[i]);
 
                 if (timer && selector == timer->getSelector())
                 {
-                    CCLOG("CCScheduler#scheduleSelector. Selector already scheduled. Updating interval from: %.4f to %.4f", timer->getInterval(), interval);
                     timer->setInterval(interval);
                     return;
                 }
             }
-            ccArrayEnsureExtraCapacity(element->timers, 1);
+            element->timers->ensureExtraCapacity(1);
         }
 
         TimerTargetSelector *timer = new (std::nothrow) TimerTargetSelector();
         timer->initWithSelector(this, selector, target, interval, repeat, delay);
-        ccArrayAppendObject(element->timers, timer);
+        element->timers->appendObject(timer);
         timer->release();
     }
 
-    void Scheduler::schedule(SEL_SCHEDULE selector, Ref *target, float interval, bool paused)
+    void Scheduler::schedule(SEL_SCHEDULE selector, HObject *target, float interval, bool paused)
     {
         this->schedule(selector, target, interval, REPEAT_FOREVER, 0.0f, paused);
     }
 
-    bool Scheduler::isScheduled(SEL_SCHEDULE selector, Ref *target)
+    bool Scheduler::isScheduled(SEL_SCHEDULE selector, HObject *target)
     {
         tHashTimerEntry *element = nullptr;
         HASH_FIND_PTR(_hashForTimers, &target, element);
@@ -984,9 +977,9 @@ namespace GRAPH
         }
         else
         {
-            for (int i = 0; i < element->timers->num; ++i)
+            for (int i = 0; i < element->timers->number(); ++i)
             {
-                TimerTargetSelector *timer = static_cast<TimerTargetSelector*>(element->timers->arr[i]);
+                TimerTargetSelector *timer = static_cast<TimerTargetSelector*>((*element->timers)[i]);
 
                 if (selector == timer->getSelector())
                 {
@@ -1000,7 +993,7 @@ namespace GRAPH
         return false;  // should never get here
     }
 
-    void Scheduler::unschedule(SEL_SCHEDULE selector, Ref *target)
+    void Scheduler::unschedule(SEL_SCHEDULE selector, HObject *target)
     {
         // explicity handle nil arguments when removing an object
         if (target == nullptr || selector == nullptr)
@@ -1016,9 +1009,9 @@ namespace GRAPH
 
         if (element)
         {
-            for (int i = 0; i < element->timers->num; ++i)
+            for (int i = 0; i < element->timers->number(); ++i)
             {
-                TimerTargetSelector *timer = static_cast<TimerTargetSelector*>(element->timers->arr[i]);
+                TimerTargetSelector *timer = static_cast<TimerTargetSelector*>((*element->timers)[i]);
 
                 if (selector == timer->getSelector())
                 {
@@ -1028,7 +1021,7 @@ namespace GRAPH
                         element->currentTimerSalvaged = true;
                     }
 
-                    ccArrayRemoveObjectAtIndex(element->timers, i, true);
+                    element->timers->removeObjectAtIndex(i);
 
                     // update timerIndex in case we are in tick:, looping over the actions
                     if (element->timerIndex >= i)
@@ -1036,7 +1029,7 @@ namespace GRAPH
                         element->timerIndex--;
                     }
 
-                    if (element->timers->num == 0)
+                    if (element->timers->number() == 0)
                     {
                         if (_currentTarget == element)
                         {

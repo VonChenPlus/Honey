@@ -1,5 +1,6 @@
 #include "GRAPH/RENDERER/GLProgramCache.h"
 #include "GRAPH/RENDERER/GLProgram.h"
+#include "GRAPH/RENDERER/Shaders.h"
 
 namespace GRAPH
 {
@@ -407,47 +408,6 @@ namespace GRAPH
             case kShaderType_LabelOutline:
                 p->initWithByteArrays(ccLabel_vert, ccLabelOutline_frag);
                 break;
-            case kShaderType_3DPosition:
-                p->initWithByteArrays(cc3D_PositionTex_vert, cc3D_Color_frag);
-                break;
-            case kShaderType_3DPositionTex:
-                p->initWithByteArrays(cc3D_PositionTex_vert, cc3D_ColorTex_frag);
-                break;
-            case kShaderType_3DSkinPositionTex:
-                p->initWithByteArrays(cc3D_SkinPositionTex_vert, cc3D_ColorTex_frag);
-                break;
-            case kShaderType_3DPositionNormal:
-                {
-                    std::string def = getShaderMacrosForLight();
-                    p->initWithByteArrays((def + std::string(cc3D_PositionNormalTex_vert)).c_str(), (def + std::string(cc3D_ColorNormal_frag)).c_str());
-                }
-                break;
-            case kShaderType_3DPositionNormalTex:
-                {
-                    std::string def = getShaderMacrosForLight();
-                    p->initWithByteArrays((def + std::string(cc3D_PositionNormalTex_vert)).c_str(), (def + std::string(cc3D_ColorNormalTex_frag)).c_str());
-                }
-                break;
-            case kShaderType_3DSkinPositionNormalTex:
-                {
-                    std::string def = getShaderMacrosForLight();
-                    p->initWithByteArrays((def + std::string(cc3D_SkinPositionNormalTex_vert)).c_str(), (def + std::string(cc3D_ColorNormalTex_frag)).c_str());
-                }
-                break;
-            case kShaderType_3DParticleTex:
-               {
-                    p->initWithByteArrays(cc3D_Particle_vert, cc3D_Particle_tex_frag);
-               }
-                break;
-            case kShaderType_3DParticleColor:
-                p->initWithByteArrays(cc3D_Particle_vert, cc3D_Particle_color_frag);
-                break;
-            case kShaderType_3DSkyBox:
-                p->initWithByteArrays(cc3D_Skybox_vert, cc3D_Skybox_frag);
-                break;
-            case kShaderType_3DTerrain:
-                p->initWithByteArrays(cc3D_Terrain_vert, cc3D_Terrain_frag);
-                break;
             case kShaderType_CameraClear:
                 p->initWithByteArrays(ccCameraClearVert, ccCameraClearFrag);
                 break;
@@ -457,8 +417,6 @@ namespace GRAPH
 
         p->link();
         p->updateUniforms();
-
-        CHECK_GL_ERROR_DEBUG();
     }
 
     GLProgram* GLProgramCache::getGLProgram(const std::string &key)

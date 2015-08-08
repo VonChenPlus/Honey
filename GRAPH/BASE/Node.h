@@ -14,14 +14,12 @@
 
 namespace GRAPH
 {
-    class GridBase;
     class Touch;
     class Action;
     class LabelProtocol;
     class Scheduler;
     class ActionManager;
     class Component;
-    class ComponentContainer;
     class EventDispatcher;
     class Scene;
     class Renderer;
@@ -1189,13 +1187,6 @@ namespace GRAPH
         void stopAllActionsByTag(int tag);
 
         /**
-         * Removes all actions from the running action list by its flags.
-         *
-         * @param flags   A flag field that removes actions based on bitwise AND.
-         */
-        void stopActionsByFlags(unsigned int flags);
-
-        /**
          * Gets an action from the running action list by its tag.
          *
          * @see `setTag(int)`, `getTag()`.
@@ -1541,47 +1532,6 @@ namespace GRAPH
         void setAdditionalTransform(MATH::Matrix4* additionalTransform);
         void setAdditionalTransform(const MATH::AffineTransform& additionalTransform);
 
-        /// @} end of Coordinate Converters
-
-          /// @{
-        /// @name component functions
-        /**
-         * Gets a component by its name.
-         *
-         * @param name A given name of component.
-         * @return The Component by name.
-         */
-        Component* getComponent(const std::string& name);
-
-        /**
-         * Adds a component.
-         *
-         * @param component A given component.
-         * @return True if added success.
-         */
-        virtual bool addComponent(Component *component);
-
-        /**
-         * Removes a component by its name.
-         *
-         * @param name A given name of component.
-         * @return True if removed success.
-         */
-        virtual bool removeComponent(const std::string& name);
-
-        /**
-         * Removes a component by its pointer.
-         *
-         * @param component A given component.
-         * @return True if removed success.
-         */
-        virtual bool removeComponent(Component *component);
-        /**
-         * Removes all components
-         */
-        virtual void removeAllComponents();
-        /// @} end of component functions
-
         // overrides
         virtual GLubyte getOpacity() const;
         virtual GLubyte getDisplayedOpacity() const;
@@ -1730,8 +1680,6 @@ namespace GRAPH
 
         bool _reorderChildDirty;          ///< children order dirty flag
         bool _isTransitionFinished;       ///< flag to indicate whether the transition was finished
-
-        ComponentContainer *_componentContainer;        ///< Dictionary of components
 
         // opacity controls
         GLubyte		_displayedOpacity;

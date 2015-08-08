@@ -8,6 +8,10 @@
 #include "GRAPH/BASE/Scheduler.h"
 #include "GRAPH/BASE/EventDispatcher.h"
 #include "GRAPH/RENDERER/GLProgramState.h"
+#include "UTILS/STRING/StringUtils.h"
+#include "GRAPH/BASE/Camera.h"
+#include "GRAPH/BASE/Macros.h"
+#include "GRAPH/BASE/ActionManager.h"
 
 namespace GRAPH
 {
@@ -18,6 +22,25 @@ namespace GRAPH
         return( n1->getLocalZOrder() < n2->getLocalZOrder() ||
                ( n1->getLocalZOrder() == n2->getLocalZOrder() && n1->getOrderOfArrival() < n2->getOrderOfArrival() )
                );
+    }
+
+    void CGAffineToGL(const MATH::AffineTransform& t, GLfloat *m)
+    {
+        // | m[0] m[4] m[8]  m[12] |     | m11 m21 m31 m41 |     | a c 0 tx |
+        // | m[1] m[5] m[9]  m[13] |     | m12 m22 m32 m42 |     | b d 0 ty |
+        // | m[2] m[6] m[10] m[14] | <=> | m13 m23 m33 m43 | <=> | 0 0 1  0 |
+        // | m[3] m[7] m[11] m[15] |     | m14 m24 m34 m44 |     | 0 0 0  1 |
+
+        m[2] = m[3] = m[6] = m[7] = m[8] = m[9] = m[11] = m[14] = 0.0f;
+        m[10] = m[15] = 1.0f;
+        m[0] = t.a; m[4] = t.c; m[12] = t.tx;
+        m[1] = t.b; m[5] = t.d; m[13] = t.ty;
+    }
+
+    void GLToCGAffine(const GLfloat *m, MATH::AffineTransform *t)
+    {
+        t->a = m[0]; t->c = m[4]; t->tx = m[12];
+        t->b = m[1]; t->d = m[5]; t->ty = m[13];
     }
 
     // FIXME:: Yes, nodes might have a sort problem once every 15 days if the game runs at 60 FPS and each frame sprites are reordered.
@@ -63,7 +86,6 @@ namespace GRAPH
     , _ignoreAnchorPointForPosition(false)
     , _reorderChildDirty(false)
     , _isTransitionFinished(false)
-    , _componentContainer(nullptr)
     , _displayedOpacity(255)
     , _realOpacity(255)
     , _displayedColor(Color3B::WHITE)
@@ -111,10 +133,6 @@ namespace GRAPH
             child->_parent = nullptr;
         }
 
-        removeAllComponents();
-
-        SAFE_DELETE(_componentContainer);
-
         stopAllActions();
         unscheduleAllCallbacks();
         SAFE_RELEASE_NULL(_actionManager);
@@ -143,7 +161,7 @@ namespace GRAPH
 
     std::string Node::getDescription() const
     {
-        return StringUtils::format("<Node | Tag = %d", _tag);
+        return UTILS::STRING::StringFromFormat("<Node | Tag = %d", _tag);
     }
 
     // MARK: getters / setters
@@ -188,13 +206,6 @@ namespace GRAPH
         }
 
         _eventDispatcher->setDirtyForNode(this);
-    }
-
-    /// zOrder setter : private method
-    /// used internally to alter the zOrder variable. DON'T call this method manually
-    void Node::_setLocalZOrder(int z)
-    {
-        _localZOrder = z;
     }
 
     void Node::setGlobalZOrder(float globalZOrder)
@@ -256,7 +267,7 @@ namespace GRAPH
         // convert Euler angle to quaternion
         // when _rotationZ_X == _rotationZ_Y, _rotationQuat = RotationZ_X * RotationY * RotationX
         // when _rotationZ_X != _rotationZ_Y, _rotationQuat = RotationY * RotationX
-        float halfRadx = CC_DEGREES_TO_RADIANS(_rotationX / 2.f), halfRady = CC_DEGREES_TO_RADIANS(_rotationY / 2.f), halfRadz = _rotationZ_X == _rotationZ_Y ? -CC_DEGREES_TO_RADIANS(_rotationZ_X / 2.f) : 0;
+        float halfRadx = MATH_DEGREES_TO_RADIANS(_rotationX / 2.f), halfRady = MATH_DEGREES_TO_RADIANS(_rotationY / 2.f), halfRadz = _rotationZ_X == _rotationZ_Y ? -MATH_DEGREES_TO_RADIANS(_rotationZ_X / 2.f) : 0;
         float coshalfRadx = cosf(halfRadx), sinhalfRadx = sinf(halfRadx), coshalfRady = cosf(halfRady), sinhalfRady = sinf(halfRady), coshalfRadz = cosf(halfRadz), sinhalfRadz = sinf(halfRadz);
         _rotationQuat.x = sinhalfRadx * coshalfRady * coshalfRadz - coshalfRadx * sinhalfRady * sinhalfRadz;
         _rotationQuat.y = coshalfRadx * sinhalfRady * coshalfRadz + sinhalfRadx * coshalfRady * sinhalfRadz;
@@ -272,19 +283,19 @@ namespace GRAPH
         _rotationY = asinf(2.f * (w * y - z * x));
         _rotationZ_X = atan2f(2.f * (w * z + x * y), 1.f - 2.f * (y * y + z * z));
 
-        _rotationX = CC_RADIANS_TO_DEGREES(_rotationX);
-        _rotationY = CC_RADIANS_TO_DEGREES(_rotationY);
-        _rotationZ_X = _rotationZ_Y = -CC_RADIANS_TO_DEGREES(_rotationZ_X);
+        _rotationX = MATH_RADIANS_TO_DEGREES(_rotationX);
+        _rotationY = MATH_RADIANS_TO_DEGREES(_rotationY);
+        _rotationZ_X = _rotationZ_Y = -MATH_RADIANS_TO_DEGREES(_rotationZ_X);
     }
 
-    void Node::setRotationQuat(const Quaternion& quat)
+    void Node::setRotationQuat(const MATH::Quaternion& quat)
     {
         _rotationQuat = quat;
         updateRotation3D();
         _transformUpdated = _transformDirty = _inverseDirty = true;
     }
 
-    Quaternion Node::getRotationQuat() const
+    MATH::Quaternion Node::getRotationQuat() const
     {
         return _rotationQuat;
     }
@@ -293,13 +304,6 @@ namespace GRAPH
     {
         if (_rotationZ_X == rotationX)
             return;
-
-    #if CC_USE_PHYSICS
-        if (_physicsBody != nullptr)
-        {
-            CCLOG("Node WARNING: PhysicsBody doesn't support setRotationSkewX");
-        }
-    #endif
 
         _rotationZ_X = rotationX;
         _transformUpdated = _transformDirty = _inverseDirty = true;
@@ -317,13 +321,6 @@ namespace GRAPH
         if (_rotationZ_Y == rotationY)
             return;
 
-    #if CC_USE_PHYSICS
-        if (_physicsBody != nullptr)
-        {
-            CCLOG("Node WARNING: PhysicsBody doesn't support setRotationSkewY");
-        }
-    #endif
-
         _rotationZ_Y = rotationY;
         _transformUpdated = _transformDirty = _inverseDirty = true;
 
@@ -333,7 +330,6 @@ namespace GRAPH
     /// scale getter
     float Node::getScale(void) const
     {
-        CCASSERT( _scaleX == _scaleY, "CCNode#scale. ScaleX != ScaleY. Don't know which one to return");
         return _scaleX;
     }
 
@@ -345,12 +341,6 @@ namespace GRAPH
 
         _scaleX = _scaleY = _scaleZ = scale;
         _transformUpdated = _transformDirty = _inverseDirty = true;
-    #if CC_USE_PHYSICS
-        if (_physicsWorld && _physicsBodyAssociatedWith > 0)
-        {
-            _physicsWorld->_updateBodyTransform = true;
-        }
-    #endif
     }
 
     /// scaleX getter
@@ -368,12 +358,6 @@ namespace GRAPH
         _scaleX = scaleX;
         _scaleY = scaleY;
         _transformUpdated = _transformDirty = _inverseDirty = true;
-    #if CC_USE_PHYSICS
-        if (_physicsWorld && _physicsBodyAssociatedWith > 0)
-        {
-            _physicsWorld->_updateBodyTransform = true;
-        }
-    #endif
     }
 
     /// scaleX setter
@@ -384,12 +368,6 @@ namespace GRAPH
 
         _scaleX = scaleX;
         _transformUpdated = _transformDirty = _inverseDirty = true;
-    #if CC_USE_PHYSICS
-        if (_physicsWorld && _physicsBodyAssociatedWith > 0)
-        {
-            _physicsWorld->_updateBodyTransform = true;
-        }
-    #endif
     }
 
     /// scaleY getter
@@ -403,13 +381,6 @@ namespace GRAPH
     {
         if (_scaleZ == scaleZ)
             return;
-
-    #if CC_USE_PHYSICS
-        if (_physicsBody != nullptr)
-        {
-            CCLOG("Node WARNING: PhysicsBody doesn't support setScaleZ");
-        }
-    #endif
 
         _scaleZ = scaleZ;
         _transformUpdated = _transformDirty = _inverseDirty = true;
@@ -429,12 +400,6 @@ namespace GRAPH
 
         _scaleY = scaleY;
         _transformUpdated = _transformDirty = _inverseDirty = true;
-    #if CC_USE_PHYSICS
-        if (_physicsWorld && _physicsBodyAssociatedWith > 0)
-        {
-            _physicsWorld->_updateBodyTransform = true;
-        }
-    #endif
     }
 
 
@@ -466,12 +431,6 @@ namespace GRAPH
 
         _transformUpdated = _transformDirty = _inverseDirty = true;
         _usingNormalizedPosition = false;
-    #if CC_USE_PHYSICS
-        if (_physicsWorld && _physicsBodyAssociatedWith > 0)
-        {
-            _physicsWorld->_updateBodyTransform = true;
-        }
-    #endif
     }
 
     void Node::setPosition3D(const MATH::Vector3f& position)
@@ -536,12 +495,6 @@ namespace GRAPH
         _usingNormalizedPosition = true;
         _normalizedPositionDirty = true;
         _transformUpdated = _transformDirty = _inverseDirty = true;
-    #if CC_USE_PHYSICS
-        if (_physicsWorld && _physicsBodyAssociatedWith > 0)
-        {
-            _physicsWorld->_updateBodyTransform = true;
-        }
-    #endif
     }
 
     ssize_t Node::getChildrenCount() const
@@ -588,12 +541,12 @@ namespace GRAPH
     }
 
     /// contentSize getter
-    const Size& Node::getContentSize() const
+    const MATH::Sizef& Node::getContentSize() const
     {
         return _contentSize;
     }
 
-    void Node::setContentSize(const Size & size)
+    void Node::setContentSize(const MATH::Sizef & size)
     {
         if (! size.equals(_contentSize))
         {
@@ -669,13 +622,12 @@ namespace GRAPH
 
     void Node::setOrderOfArrival(int orderOfArrival)
     {
-        CCASSERT(orderOfArrival >=0, "Invalid orderOfArrival");
         _orderOfArrival = orderOfArrival;
     }
 
-    void Node::setUserObject(Ref* userObject)
+    void Node::setUserObject(HObject* userObject)
     {
-        CC_SAFE_RETAIN(userObject);
+        SAFE_RETAIN(userObject);
         SAFE_RELEASE(_userObject);
         _userObject = userObject;
     }
@@ -685,13 +637,13 @@ namespace GRAPH
         return _glProgramState;
     }
 
-    void Node::setGLProgramState(cocos2d::GLProgramState* glProgramState)
+    void Node::setGLProgramState(GLProgramState* glProgramState)
     {
         if (glProgramState != _glProgramState)
         {
             SAFE_RELEASE(_glProgramState);
             _glProgramState = glProgramState;
-            CC_SAFE_RETAIN(_glProgramState);
+            SAFE_RETAIN(_glProgramState);
 
             if (_glProgramState)
                 _glProgramState->setNodeBinding(this);
@@ -730,9 +682,9 @@ namespace GRAPH
         return dynamic_cast<Scene*>(sceneNode);
     }
 
-    Rect Node::getBoundingBox() const
+    MATH::Rectf Node::getBoundingBox() const
     {
-        Rect rect(0, 0, _contentSize.width, _contentSize.height);
+        MATH::Rectf rect(0, 0, _contentSize.width, _contentSize.height);
         return RectApplyAffineTransform(rect, getNodeToParentAffineTransform());
     }
 
@@ -746,8 +698,6 @@ namespace GRAPH
 
     Node* Node::getChildByTag(int tag) const
     {
-        CCASSERT(tag != Node::INVALID_TAG, "Invalid tag");
-
         for (const auto child : _children)
         {
             if(child && child->_tag == tag)
@@ -758,8 +708,6 @@ namespace GRAPH
 
     Node* Node::getChildByName(const std::string& name) const
     {
-        CCASSERT(name.length() != 0, "Invalid name");
-
         std::hash<std::string> h;
         size_t hash = h(name);
 
@@ -774,9 +722,6 @@ namespace GRAPH
 
     void Node::enumerateChildren(const std::string &name, std::function<bool (Node *)> callback) const
     {
-        CCASSERT(name.length() != 0, "Invalid name");
-        CCASSERT(callback != nullptr, "Invalid callback function");
-
         size_t length = name.length();
 
         size_t subStrStartPos = 0;  // sub string start index
@@ -893,17 +838,11 @@ namespace GRAPH
     */
     void Node::addChild(Node *child, int localZOrder, int tag)
     {
-        CCASSERT( child != nullptr, "Argument must be non-nil");
-        CCASSERT( child->_parent == nullptr, "child already added. It can't be added again");
-
         addChildHelper(child, localZOrder, tag, "", true);
     }
 
     void Node::addChild(Node* child, int localZOrder, const std::string &name)
     {
-        CCASSERT(child != nullptr, "Argument must be non-nil");
-        CCASSERT(child->_parent == nullptr, "child already added. It can't be added again");
-
         addChildHelper(child, localZOrder, INVALID_TAG, name, false);
     }
 
@@ -923,24 +862,6 @@ namespace GRAPH
 
         child->setParent(this);
         child->setOrderOfArrival(s_globalOrderOfArrival++);
-
-    #if CC_USE_PHYSICS
-        _physicsBodyAssociatedWith += child->_physicsBodyAssociatedWith;
-        auto parentNode = this;
-        while (parentNode->_parent)
-        {
-            parentNode = parentNode->_parent;
-            parentNode->_physicsBodyAssociatedWith += child->_physicsBodyAssociatedWith;
-        }
-
-        auto scene = dynamic_cast<Scene*>(parentNode);
-
-        // Recursive add children with which have physics body.
-        if (scene && scene->getPhysicsWorld())
-        {
-            scene->addChildToPhysicsWorld(child);
-        }
-    #endif
 
         if( _running )
         {
@@ -965,13 +886,11 @@ namespace GRAPH
 
     void Node::addChild(Node *child, int zOrder)
     {
-        CCASSERT( child != nullptr, "Argument must be non-nil");
         this->addChild(child, zOrder, child->_name);
     }
 
     void Node::addChild(Node *child)
     {
-        CCASSERT( child != nullptr, "Argument must be non-nil");
         this->addChild(child, child->_localZOrder, child->_name);
     }
 
@@ -1001,21 +920,15 @@ namespace GRAPH
         }
 
         ssize_t index = _children.getIndex(child);
-        if( index != CC_INVALID_INDEX )
+        if( index != -1 )
             this->detachChild( child, index, cleanup );
     }
 
     void Node::removeChildByTag(int tag, bool cleanup/* = true */)
     {
-        CCASSERT( tag != Node::INVALID_TAG, "Invalid tag");
-
         Node *child = this->getChildByTag(tag);
 
-        if (child == nullptr)
-        {
-            CCLOG("cocos2d: removeChildByTag(tag = %d): child not found!", tag);
-        }
-        else
+        if (child != nullptr)
         {
             this->removeChild(child, cleanup);
         }
@@ -1023,15 +936,9 @@ namespace GRAPH
 
     void Node::removeChildByName(const std::string &name, bool cleanup)
     {
-        CCASSERT(name.length() != 0, "Invalid name");
-
         Node *child = this->getChildByName(name);
 
-        if (child == nullptr)
-        {
-            CCLOG("cocos2d: removeChildByName(name = %s): child not found!", name.c_str());
-        }
-        else
+        if (child != nullptr)
         {
             this->removeChild(child, cleanup);
         }
@@ -1041,21 +948,6 @@ namespace GRAPH
     {
         this->removeAllChildrenWithCleanup(true);
     }
-
-    #if CC_USE_PHYSICS
-    void Node::removeFromPhysicsWorld()
-    {
-        if (_physicsBody != nullptr)
-        {
-            _physicsBody->removeFromWorld();
-        }
-
-        for (auto child : _children)
-        {
-            child->removeFromPhysicsWorld();
-        }
-    }
-    #endif
 
     void Node::removeAllChildrenWithCleanup(bool cleanup)
     {
@@ -1070,10 +962,6 @@ namespace GRAPH
                 child->onExitTransitionDidStart();
                 child->onExit();
             }
-
-    #if CC_USE_PHYSICS
-            child->removeFromPhysicsWorld();
-    #endif
 
             if (cleanup)
             {
@@ -1096,10 +984,6 @@ namespace GRAPH
             child->onExitTransitionDidStart();
             child->onExit();
         }
-
-    #if CC_USE_PHYSICS
-        child->removeFromPhysicsWorld();
-    #endif
 
         // If you don't do cleanup, the child's actions will not get removed and the
         // its scheduledSelectors_ dict will not get released!
@@ -1126,7 +1010,6 @@ namespace GRAPH
 
     void Node::reorderChild(Node *child, int zOrder)
     {
-        CCASSERT( child != nullptr, "Child must be non-nil");
         _reorderChildDirty = true;
         child->setOrderOfArrival(s_globalOrderOfArrival++);
         child->_localZOrder = zOrder;
@@ -1162,15 +1045,8 @@ namespace GRAPH
 
     uint32_t Node::processParentFlags(const MATH::Matrix4& parentTransform, uint32_t parentFlags)
     {
-    #if CC_USE_PHYSICS
-        if (_physicsBody && _updateTransformFromPhysics)
-        {
-            updateTransformFromPhysics(parentTransform, parentFlags);
-        }
-    #endif
         if(_usingNormalizedPosition)
         {
-            CCASSERT(_parent, "setNormalizedPosition() doesn't work with orphan nodes");
             if ((parentFlags & FLAGS_CONTENT_SIZE_DIRTY) || _normalizedPositionDirty)
             {
                 auto& s = _parent->getContentSize();
@@ -1195,15 +1071,8 @@ namespace GRAPH
         if(flags & FLAGS_DIRTY_MASK)
             _modelViewTransform = this->transform(parentTransform);
 
-    #if CC_USE_PHYSICS
-        if (_updateTransformFromPhysics) {
-            _transformUpdated = false;
-            _contentSizeDirty = false;
-        }
-    #else
         _transformUpdated = false;
         _contentSizeDirty = false;
-    #endif
 
         return flags;
     }
@@ -1280,19 +1149,6 @@ namespace GRAPH
         if (_onEnterCallback)
             _onEnterCallback();
 
-        if (_componentContainer && !_componentContainer->isEmpty())
-        {
-            _componentContainer->onEnter();
-        }
-
-    #if CC_ENABLE_SCRIPT_BINDING
-        if (_scriptType == kScriptTypeJavascript)
-        {
-            if (ScriptEngineManager::sendNodeEventToJS(this, kNodeOnEnter))
-                return;
-        }
-    #endif
-
         _isTransitionFinished = false;
 
         for( const auto &child: _children)
@@ -1301,13 +1157,6 @@ namespace GRAPH
         this->resume();
 
         _running = true;
-
-    #if CC_ENABLE_SCRIPT_BINDING
-        if (_scriptType == kScriptTypeLua)
-        {
-            ScriptEngineManager::sendNodeEventToLua(this, kNodeOnEnter);
-        }
-    #endif
     }
 
     void Node::onEnterTransitionDidFinish()
@@ -1315,24 +1164,9 @@ namespace GRAPH
         if (_onEnterTransitionDidFinishCallback)
             _onEnterTransitionDidFinishCallback();
 
-    #if CC_ENABLE_SCRIPT_BINDING
-        if (_scriptType == kScriptTypeJavascript)
-        {
-            if (ScriptEngineManager::sendNodeEventToJS(this, kNodeOnEnterTransitionDidFinish))
-                return;
-        }
-    #endif
-
         _isTransitionFinished = true;
         for( const auto &child: _children)
             child->onEnterTransitionDidFinish();
-
-    #if CC_ENABLE_SCRIPT_BINDING
-        if (_scriptType == kScriptTypeLua)
-        {
-            ScriptEngineManager::sendNodeEventToLua(this, kNodeOnEnterTransitionDidFinish);
-        }
-    #endif
     }
 
     void Node::onExitTransitionDidStart()
@@ -1340,23 +1174,8 @@ namespace GRAPH
         if (_onExitTransitionDidStartCallback)
             _onExitTransitionDidStartCallback();
 
-    #if CC_ENABLE_SCRIPT_BINDING
-        if (_scriptType == kScriptTypeJavascript)
-        {
-            if (ScriptEngineManager::sendNodeEventToJS(this, kNodeOnExitTransitionDidStart))
-                return;
-        }
-    #endif
-
         for( const auto &child: _children)
             child->onExitTransitionDidStart();
-
-    #if CC_ENABLE_SCRIPT_BINDING
-        if (_scriptType == kScriptTypeLua)
-        {
-            ScriptEngineManager::sendNodeEventToLua(this, kNodeOnExitTransitionDidStart);
-        }
-    #endif
     }
 
     void Node::onExit()
@@ -1364,32 +1183,12 @@ namespace GRAPH
         if (_onExitCallback)
             _onExitCallback();
 
-        if (_componentContainer && !_componentContainer->isEmpty())
-        {
-            _componentContainer->onExit();
-        }
-
-    #if CC_ENABLE_SCRIPT_BINDING
-        if (_scriptType == kScriptTypeJavascript)
-        {
-            if (ScriptEngineManager::sendNodeEventToJS(this, kNodeOnExit))
-                return;
-        }
-    #endif
-
         this->pause();
 
         _running = false;
 
         for( const auto &child: _children)
             child->onExit();
-
-    #if CC_ENABLE_SCRIPT_BINDING
-        if (_scriptType == kScriptTypeLua)
-        {
-            ScriptEngineManager::sendNodeEventToLua(this, kNodeOnExit);
-        }
-    #endif
     }
 
     void Node::setEventDispatcher(EventDispatcher* dispatcher)
@@ -1397,7 +1196,7 @@ namespace GRAPH
         if (dispatcher != _eventDispatcher)
         {
             _eventDispatcher->removeEventListenersForTarget(this);
-            CC_SAFE_RETAIN(dispatcher);
+            SAFE_RETAIN(dispatcher);
             SAFE_RELEASE(_eventDispatcher);
             _eventDispatcher = dispatcher;
         }
@@ -1408,7 +1207,7 @@ namespace GRAPH
         if( actionManager != _actionManager )
         {
             this->stopAllActions();
-            CC_SAFE_RETAIN(actionManager);
+            SAFE_RETAIN(actionManager);
             SAFE_RELEASE(_actionManager);
             _actionManager = actionManager;
         }
@@ -1418,7 +1217,6 @@ namespace GRAPH
 
     Action * Node::runAction(Action* action)
     {
-        CCASSERT( action != nullptr, "Argument must be non-nil");
         _actionManager->addAction(action, this, !_running);
         return action;
     }
@@ -1435,27 +1233,16 @@ namespace GRAPH
 
     void Node::stopActionByTag(int tag)
     {
-        CCASSERT( tag != Action::INVALID_TAG, "Invalid tag");
         _actionManager->removeActionByTag(tag, this);
     }
 
     void Node::stopAllActionsByTag(int tag)
     {
-        CCASSERT( tag != Action::INVALID_TAG, "Invalid tag");
         _actionManager->removeAllActionsByTag(tag, this);
-    }
-
-    void Node::stopActionsByFlags(unsigned int flags)
-    {
-        if (flags > 0)
-        {
-            _actionManager->removeActionsByFlags(flags, this);
-        }
     }
 
     Action * Node::getActionByTag(int tag)
     {
-        CCASSERT( tag != Action::INVALID_TAG, "Invalid tag");
         return _actionManager->getActionByTag(tag, this);
     }
 
@@ -1471,7 +1258,7 @@ namespace GRAPH
         if( scheduler != _scheduler )
         {
             this->unscheduleAllCallbacks();
-            CC_SAFE_RETAIN(scheduler);
+            SAFE_RETAIN(scheduler);
             SAFE_RELEASE(_scheduler);
             _scheduler = scheduler;
         }
@@ -1501,24 +1288,12 @@ namespace GRAPH
     {
         unscheduleUpdate();
 
-    #if CC_ENABLE_SCRIPT_BINDING
-        _updateScriptHandler = nHandler;
-    #endif
-
         _scheduler->scheduleUpdate(this, priority, !_running);
     }
 
     void Node::unscheduleUpdate()
     {
         _scheduler->unscheduleUpdate(this);
-
-    #if CC_ENABLE_SCRIPT_BINDING
-        if (_updateScriptHandler)
-        {
-            ScriptEngineManager::getInstance()->getScriptEngine()->removeScriptHandler(_updateScriptHandler);
-            _updateScriptHandler = 0;
-        }
-    #endif
     }
 
     void Node::schedule(SEL_SCHEDULE selector)
@@ -1533,9 +1308,6 @@ namespace GRAPH
 
     void Node::schedule(SEL_SCHEDULE selector, float interval, unsigned int repeat, float delay)
     {
-        CCASSERT( selector, "Argument must be non-nil");
-        CCASSERT( interval >=0, "Argument must be positive");
-
         _scheduler->schedule(selector, this, interval , repeat, delay, !_running);
     }
 
@@ -1597,40 +1369,16 @@ namespace GRAPH
         _eventDispatcher->pauseEventListenersForTarget(this);
     }
 
-    void Node::resumeSchedulerAndActions()
-    {
-        resume();
-    }
-
-    void Node::pauseSchedulerAndActions()
-    {
-        pause();
-    }
-
     // override me
     void Node::update(float fDelta)
     {
-    #if CC_ENABLE_SCRIPT_BINDING
-        if (0 != _updateScriptHandler)
-        {
-            //only lua use
-            SchedulerScriptData data(_updateScriptHandler,fDelta);
-            ScriptEvent event(kScheduleEvent,&data);
-            ScriptEngineManager::getInstance()->getScriptEngine()->sendEvent(&event);
-        }
-    #endif
-
-        if (_componentContainer && !_componentContainer->isEmpty())
-        {
-            _componentContainer->visit(fDelta);
-        }
     }
 
     // MARK: coordinates
 
-    AffineTransform Node::getNodeToParentAffineTransform() const
+    MATH::AffineTransform Node::getNodeToParentAffineTransform() const
     {
-        AffineTransform ret;
+        MATH::AffineTransform ret;
         GLToCGAffine(getNodeToParentTransform().m, &ret);
 
         return ret;
@@ -1675,8 +1423,8 @@ namespace GRAPH
                 // Rotation values
                 // Change rotation code to handle X and Y
                 // If we skew with the exact same value for both x and y then we're simply just rotating
-                float radiansX = -CC_DEGREES_TO_RADIANS(_rotationZ_X);
-                float radiansY = -CC_DEGREES_TO_RADIANS(_rotationZ_Y);
+                float radiansX = -MATH_DEGREES_TO_RADIANS(_rotationZ_X);
+                float radiansY = -MATH_DEGREES_TO_RADIANS(_rotationZ_Y);
                 float cx = cosf(radiansX);
                 float sx = sinf(radiansX);
                 float cy = cosf(radiansY);
@@ -1710,8 +1458,8 @@ namespace GRAPH
             {
                 float skewMatArray[16] =
                 {
-                    1, (float)tanf(CC_DEGREES_TO_RADIANS(_skewY)), 0, 0,
-                    (float)tanf(CC_DEGREES_TO_RADIANS(_skewX)), 1, 0, 0,
+                    1, (float)tanf(MATH_DEGREES_TO_RADIANS(_skewY)), 0, 0,
+                    (float)tanf(MATH_DEGREES_TO_RADIANS(_skewX)), 1, 0, 0,
                     0,  0,  1, 0,
                     0,  0,  0, 1
                 };
@@ -1747,7 +1495,7 @@ namespace GRAPH
         _transformUpdated = true;
     }
 
-    void Node::setAdditionalTransform(const AffineTransform& additionalTransform)
+    void Node::setAdditionalTransform(const MATH::AffineTransform& additionalTransform)
     {
         MATH::Matrix4 tmp;
         CGAffineToGL(additionalTransform, tmp.m);
@@ -1769,9 +1517,9 @@ namespace GRAPH
     }
 
 
-    AffineTransform Node::getParentToNodeAffineTransform() const
+    MATH::AffineTransform Node::getParentToNodeAffineTransform() const
     {
-        AffineTransform ret;
+        MATH::AffineTransform ret;
 
         GLToCGAffine(getParentToNodeTransform().m,&ret);
         return ret;
@@ -1789,9 +1537,9 @@ namespace GRAPH
     }
 
 
-    AffineTransform Node::getNodeToWorldAffineTransform() const
+    MATH::AffineTransform Node::getNodeToWorldAffineTransform() const
     {
-        AffineTransform t(this->getNodeToParentAffineTransform());
+        MATH::AffineTransform t(this->getNodeToParentAffineTransform());
 
         for (Node *p = _parent; p != nullptr; p = p->getParent())
             t = AffineTransformConcat(t, p->getNodeToParentAffineTransform());
@@ -1811,7 +1559,7 @@ namespace GRAPH
         return t;
     }
 
-    AffineTransform Node::getWorldToNodeAffineTransform() const
+    MATH::AffineTransform Node::getWorldToNodeAffineTransform() const
     {
         return AffineTransformInvert(this->getNodeToWorldAffineTransform());
     }
@@ -1825,18 +1573,18 @@ namespace GRAPH
     MATH::Vector2f Node::convertToNodeSpace(const MATH::Vector2f& worldPoint) const
     {
         MATH::Matrix4 tmp = getWorldToNodeTransform();
-        MATH::Vector3f MATH::Vector3f(worldPoint.x, worldPoint.y, 0);
+        MATH::Vector3f vec3(worldPoint.x, worldPoint.y, 0);
         MATH::Vector3f ret;
-        tmp.transformPoint(MATH::Vector3f,&ret);
+        tmp.transformPoint(vec3,&ret);
         return MATH::Vector2f(ret.x, ret.y);
     }
 
     MATH::Vector2f Node::convertToWorldSpace(const MATH::Vector2f& nodePoint) const
     {
         MATH::Matrix4 tmp = getNodeToWorldTransform();
-        MATH::Vector3f MATH::Vector3f(nodePoint.x, nodePoint.y, 0);
+        MATH::Vector3f vec3(nodePoint.x, nodePoint.y, 0);
         MATH::Vector3f ret;
-        tmp.transformPoint(MATH::Vector3f,&ret);
+        tmp.transformPoint(vec3,&ret);
         return MATH::Vector2f(ret.x, ret.y);
 
     }
@@ -1875,49 +1623,6 @@ namespace GRAPH
         // Recursively iterate over children
         for( const auto &child: _children)
             child->updateTransform();
-    }
-
-    // MARK: components
-
-    Component* Node::getComponent(const std::string& name)
-    {
-        if (_componentContainer)
-            return _componentContainer->get(name);
-
-        return nullptr;
-    }
-
-    bool Node::addComponent(Component *component)
-    {
-        // lazy alloc
-        if (!_componentContainer)
-            _componentContainer = new (std::nothrow) ComponentContainer(this);
-
-        return _componentContainer->add(component);
-    }
-
-    bool Node::removeComponent(const std::string& name)
-    {
-        if (_componentContainer)
-            return _componentContainer->remove(name);
-
-        return false;
-    }
-
-    bool Node::removeComponent(Component *component)
-    {
-        if (_componentContainer)
-        {
-            return _componentContainer->remove(component);
-        }
-
-        return false;
-    }
-
-    void Node::removeAllComponents()
-    {
-        if (_componentContainer)
-            _componentContainer->removeAll();
     }
 
     // MARK: Opacity and Color
@@ -2075,7 +1780,7 @@ namespace GRAPH
         }
     }
 
-    bool isScreenPointInRect(const MATH::Vector2f &pt, const Camera* camera, const MATH::Matrix4& w2l, const Rect& rect, MATH::Vector3f *p)
+    bool isScreenPointInRect(const MATH::Vector2f &pt, const Camera* camera, const MATH::Matrix4& w2l, const MATH::Rectf& rect, MATH::Vector3f *p)
     {
         if (nullptr == camera || rect.size.width <= 0 || rect.size.height <= 0)
         {
@@ -2118,7 +1823,7 @@ namespace GRAPH
         if (p) {
             *p = P;
         }
-        return rect.containsPoint(MATH::Vector2f(P.x, P.y));
+        return rect.contains(MATH::Vector2f(P.x, P.y));
     }
 
     // MARK: Camera
