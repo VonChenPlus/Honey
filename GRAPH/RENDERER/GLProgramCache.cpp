@@ -1,6 +1,7 @@
 #include "GRAPH/RENDERER/GLProgramCache.h"
 #include "GRAPH/RENDERER/GLProgram.h"
 #include "GRAPH/RENDERER/Shaders.h"
+#include "GRAPH/BASE/Configuration.h"
 
 namespace GRAPH
 {

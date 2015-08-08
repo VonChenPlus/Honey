@@ -1,5 +1,7 @@
 #include "GRAPH/RENDERER/GLStateCache.h"
 #include "GRAPH/BASE/Director.h"
+#include "GRAPH/RENDERER/RenderState.h"
+#include "GRAPH/BASE/Configuration.h"
 
 namespace GRAPH
 {

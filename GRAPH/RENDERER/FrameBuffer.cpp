@@ -36,7 +36,7 @@ namespace GRAPH
         return true;
     }
 
-    RenderTarget* RenderTarget::create(unsigned int width, unsigned int height, Texture2D::PixelFormat format/* = Texture2D::PixelFormat::RGBA8888*/)
+    RenderTarget* RenderTarget::create(unsigned int width, unsigned int height, IMAGE::PixelFormat format/* = IMAGE::PixelFormat::RGBA8888*/)
     {
         auto result = new (std::nothrow) RenderTarget();
         if(result && result->init(width, height,format))
@@ -51,7 +51,7 @@ namespace GRAPH
         }
     }
 
-    bool RenderTarget::init(unsigned int width, unsigned int height, Texture2D::PixelFormat format)
+    bool RenderTarget::init(unsigned int width, unsigned int height, IMAGE::PixelFormat format)
     {
         if(!RenderTargetBase::init(width, height))
         {

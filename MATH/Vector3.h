@@ -307,6 +307,13 @@ namespace MATH
         T z;
     };
 
+    template <typename T>
+    inline const Vector3<T> operator*(T x, const Vector3<T>& v) {
+        Vector3<T> result(v);
+        result.scale(x);
+        return result;
+    }
+
     typedef Vector3<float> Vector3f;
     static const Vector3f Vec3fZERO(0.0f, 0.0f, 0.0f);
     static const Vector3f Vec3fONE(1.0f, 1.0f, 1.0f);

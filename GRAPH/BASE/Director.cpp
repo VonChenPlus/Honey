@@ -75,7 +75,7 @@ namespace GRAPH
         _accumDt = 0.0f;
         _frameRate = 0.0f;
         _totalFrames = 0;
-        _lastUpdate = new struct timeval();
+        _lastUpdate = ::timeval();
         _secondsPerFrame = 1.0f;
 
         // paused ?
@@ -167,11 +167,11 @@ namespace GRAPH
         // Default pixel format for PNG images with alpha
         std::string pixel_format = conf->getValue("cocos2d.x.texture.pixel_format_for_png", HValue("rgba8888")).asString();
         if (pixel_format == "rgba8888")
-            Texture2D::setDefaultAlphaPixelFormat(Texture2D::PixelFormat::RGBA8888);
+            Texture2D::setDefaultAlphaPixelFormat(IMAGE::PixelFormat::RGBA8888);
         else if(pixel_format == "rgba4444")
-            Texture2D::setDefaultAlphaPixelFormat(Texture2D::PixelFormat::RGBA4444);
+            Texture2D::setDefaultAlphaPixelFormat(IMAGE::PixelFormat::RGBA4444);
         else if(pixel_format == "rgba5551")
-            Texture2D::setDefaultAlphaPixelFormat(Texture2D::PixelFormat::RGB5A1);
+            Texture2D::setDefaultAlphaPixelFormat(IMAGE::PixelFormat::RGB5A1);
     }
 
     void Director::setGLDefaultValues()
@@ -255,7 +255,7 @@ namespace GRAPH
 
     void Director::calculateDeltaTime()
     {
-        struct timeval now;
+        ::timeval now;
 
         if (gettimeofday(&now, nullptr) != 0)
         {
@@ -839,17 +839,10 @@ namespace GRAPH
         FontFreeType::shutdownFreeType();
 
         // purge all managed caches
-        AnimationCache::destroyInstance();
-        SpriteFrameCache::destroyInstance();
         GLProgramCache::destroyInstance();
         GLProgramStateCache::destroyInstance();
-        FileUtils::destroyInstance();
-        AsyncTaskPool::destoryInstance();
 
-        // cocos2d-x specific data structures
-        UserDefault::destroyInstance();
-
-        GL::invalidateStateCache();
+        invalidateStateCache();
 
         RenderState::finalize();
 
@@ -958,45 +951,7 @@ namespace GRAPH
             _isStatusLabelUpdated = false;
         }
 
-        static unsigned long prevCalls = 0;
-        static unsigned long prevVerts = 0;
-        static float prevDeltaTime  = 0.016f; // 60FPS
-        static const float FPS_FILTER = 0.10f;
-
         _accumDt += _deltaTime;
-
-        if (_displayStats && _FPSLabel && _drawnBatchesLabel && _drawnVerticesLabel)
-        {
-            char buffer[30];
-
-            float dt = _deltaTime * FPS_FILTER + (1-FPS_FILTER) * prevDeltaTime;
-            prevDeltaTime = dt;
-            _frameRate = 1/dt;
-
-            // Probably we don't need this anymore since
-            // the framerate is using a low-pass filter
-            // to make the FPS stable
-            if (_accumDt > CC_DIRECTOR_STATS_INTERVAL)
-            {
-                sprintf(buffer, "%.1f / %.3f", _frameRate, _secondsPerFrame);
-                _FPSLabel->setString(buffer);
-                _accumDt = 0;
-            }
-
-            auto currentCalls = (unsigned long)_renderer->getDrawnBatches();
-            auto currentVerts = (unsigned long)_renderer->getDrawnVertices();
-            if( currentCalls != prevCalls ) {
-                sprintf(buffer, "GL calls:%6lu", currentCalls);
-                _drawnBatchesLabel->setString(buffer);
-                prevCalls = currentCalls;
-            }
-
-            if( currentVerts != prevVerts) {
-                sprintf(buffer, "GL verts:%6lu", currentVerts);
-                _drawnVerticesLabel->setString(buffer);
-                prevVerts = currentVerts;
-            }
-        }
     }
 
     void Director::calculateMPF()
@@ -1040,8 +995,8 @@ namespace GRAPH
             FileUtils::getInstance()->purgeCachedEntries();
         }
 
-        Texture2D::PixelFormat currentFormat = Texture2D::getDefaultAlphaPixelFormat();
-        Texture2D::setDefaultAlphaPixelFormat(Texture2D::PixelFormat::RGBA4444);
+        IMAGE::PixelFormat currentFormat = Texture2D::getDefaultAlphaPixelFormat();
+        Texture2D::setDefaultAlphaPixelFormat(IMAGE::PixelFormat::RGBA4444);
         unsigned char *data = nullptr;
         ssize_t dataLength = 0;
         getFPSImageData(&data, &dataLength);

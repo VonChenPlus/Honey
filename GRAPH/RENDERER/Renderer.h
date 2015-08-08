@@ -7,13 +7,13 @@
 #include "BASE/Honey.h"
 #include "GRAPH/BASE/Types.h"
 #include "GRAPH/RENDERER/RenderCommand.h"
+#include "MATH/Size.h"
 
 namespace GRAPH
 {
     class EventListenerCustom;
     class QuadCommand;
     class TrianglesCommand;
-    class MeshCommand;
 
     /** Class that knows how to sort `RenderCommand` objects.
      Since the commands that have `z == 0` are "pushed back" in
@@ -194,7 +194,6 @@ namespace GRAPH
 
         uint32_t _lastMaterialID;
 
-        MeshCommand*              _lastBatchedMeshCommand;
         std::vector<TrianglesCommand*> _batchedCommands;
         std::vector<QuadCommand*> _batchQuadCommands;
 

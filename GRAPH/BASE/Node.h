@@ -2,7 +2,6 @@
 #define NODE_H
 
 #include <functional>
-#include <vector>
 #include "BASE/HObject.h"
 #include "MATH/Vector.h"
 #include "MATH/Quaternion.h"
@@ -11,6 +10,7 @@
 #include "GRAPH/BASE/GLCommon.h"
 #include "GRAPH/BASE/Color.h"
 #include "MATH/AffineTransform.h"
+#include "BASE/HVector.h"
 
 namespace GRAPH
 {
@@ -784,8 +784,8 @@ namespace GRAPH
          *
          * @return the array the node's children.
          */
-        virtual std::vector<Node*>& getChildren() { return _children; }
-        virtual const std::vector<Node*>& getChildren() const { return _children; }
+        virtual HVector<Node*>& getChildren() { return _children; }
+        virtual const HVector<Node*>& getChildren() const { return _children; }
 
         /**
          * Returns the amount of children.
@@ -1650,7 +1650,7 @@ namespace GRAPH
         int _localZOrder;               ///< Local order (relative to its siblings) used to sort the node
         float _globalZOrder;            ///< Global order used to sort the node
 
-        std::vector<Node*> _children;        ///< array of children nodes
+        HVector<Node*> _children;        ///< array of children nodes
         Node *_parent;                  ///< weak reference to parent node
         Director* _director;            //cached director pointer to improve rendering performance
         int _tag;                         ///< a tag. Can be any number you assigned just to identify this node

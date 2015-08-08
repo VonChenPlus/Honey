@@ -13,6 +13,9 @@ INCLUDEPATH += $$P
 
 SOURCES += \
     $$P/BASE/*.cpp \
+    $$P/GRAPH/BASE/*.cpp \
+    $$P/GRAPH/RENDERER/*.cpp \
+    $$P/GRAPH/RENDERER/SHADER/*.* \
     $$P/GRAPH/GFX/*.cpp \
     $$P/GRAPH/THIN3D/*.cpp \
     $$P/GRAPH/UI/*.cpp \
@@ -28,6 +31,8 @@ SOURCES += \
 
 HEADERS += \
     $$P/BASE/*.h \
+    $$P/GRAPH/BASE/*.h \
+    $$P/GRAPH/RENDERER/*.h \
     $$P/GRAPH/GFX/*.h \
     $$P/GRAPH/THIN3D/*.h \
     $$P/GRAPH/UI/*.h \
@@ -40,7 +45,8 @@ HEADERS += \
     $$P/UTILS/STRING/*.h \
     $$P/UTILS/TIME/*.h \
     $$P/UTILS/COLOR/*.h \
-    $$P/UTILS/RANDOM/*.h
+    $$P/UTILS/RANDOM/*.h \
+    BASE/HVector.h
     
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)

@@ -25,6 +25,7 @@ private:
 
 class PoolManager final
 {
+public:
     static PoolManager &getInstance();
 
     AutoreleasePool *getCurrentPool() const;

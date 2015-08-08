@@ -1,71 +1,13 @@
 #include "GRAPH/RENDERER/Texture2D.h"
+#include "GRAPH/BASE/Configuration.h"
 
 namespace GRAPH
 {
     namespace
     {
-        typedef Texture2D::PixelFormatInfoMap::value_type PixelFormatInfoMapValue;
-        static const PixelFormatInfoMapValue TexturePixelFormatInfoTablesValue[] =
-        {
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::BGRA8888, Texture2D::PixelFormatInfo(GL_BGRA, GL_BGRA, GL_UNSIGNED_BYTE, 32, false, true)),
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::RGBA8888, Texture2D::PixelFormatInfo(GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, 32, false, true)),
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::RGBA4444, Texture2D::PixelFormatInfo(GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, 16, false, true)),
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::RGB5A1, Texture2D::PixelFormatInfo(GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, 16, false, true)),
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::RGB565, Texture2D::PixelFormatInfo(GL_RGB, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, 16, false, false)),
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::RGB888, Texture2D::PixelFormatInfo(GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, 24, false, false)),
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::A8, Texture2D::PixelFormatInfo(GL_ALPHA, GL_ALPHA, GL_UNSIGNED_BYTE, 8, false, false)),
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::I8, Texture2D::PixelFormatInfo(GL_LUMINANCE, GL_LUMINANCE, GL_UNSIGNED_BYTE, 8, false, false)),
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::AI88, Texture2D::PixelFormatInfo(GL_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, 16, false, true)),
-
-    #ifdef GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::PVRTC2, Texture2D::PixelFormatInfo(GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG, 0xFFFFFFFF, 0xFFFFFFFF, 2, true, false)),
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::PVRTC2A, Texture2D::PixelFormatInfo(GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG, 0xFFFFFFFF, 0xFFFFFFFF, 2, true, true)),
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::PVRTC4, Texture2D::PixelFormatInfo(GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG, 0xFFFFFFFF, 0xFFFFFFFF, 4, true, false)),
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::PVRTC4A, Texture2D::PixelFormatInfo(GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG, 0xFFFFFFFF, 0xFFFFFFFF, 4, true, true)),
-    #endif
-
-    #ifdef GL_ETC1_RGB8_OES
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::ETC, Texture2D::PixelFormatInfo(GL_ETC1_RGB8_OES, 0xFFFFFFFF, 0xFFFFFFFF, 4, true, false)),
-    #endif
-
-    #ifdef GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::S3TC_DXT1, Texture2D::PixelFormatInfo(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, 0xFFFFFFFF, 0xFFFFFFFF, 4, true, false)),
-    #endif
-
-    #ifdef GL_COMPRESSED_RGBA_S3TC_DXT3_EXT
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::S3TC_DXT3, Texture2D::PixelFormatInfo(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, 0xFFFFFFFF, 0xFFFFFFFF, 8, true, false)),
-    #endif
-
-    #ifdef GL_COMPRESSED_RGBA_S3TC_DXT5_EXT
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::S3TC_DXT5, Texture2D::PixelFormatInfo(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 0xFFFFFFFF, 0xFFFFFFFF, 8, true, false)),
-    #endif
-
-    #ifdef GL_ATC_RGB_AMD
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::ATC_RGB, Texture2D::PixelFormatInfo(GL_ATC_RGB_AMD,
-                0xFFFFFFFF, 0xFFFFFFFF, 4, true, false)),
-    #endif
-
-    #ifdef GL_ATC_RGBA_EXPLICIT_ALPHA_AMD
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::ATC_EXPLICIT_ALPHA, Texture2D::PixelFormatInfo(GL_ATC_RGBA_EXPLICIT_ALPHA_AMD,
-                0xFFFFFFFF, 0xFFFFFFFF, 8, true, false)),
-    #endif
-
-    #ifdef GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD
-            PixelFormatInfoMapValue(Texture2D::PixelFormat::ATC_INTERPOLATED_ALPHA, Texture2D::PixelFormatInfo(GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD,
-                0xFFFFFFFF, 0xFFFFFFFF, 8, true, false)),
-    #endif
-        };
-    }
-
-    //CLASS IMPLEMENTATIONS:
-
-    //The PixpelFormat corresponding information
-    const Texture2D::PixelFormatInfoMap Texture2D::_pixelFormatInfoTables(TexturePixelFormatInfoTablesValue,
-                                                                         TexturePixelFormatInfoTablesValue + sizeof(TexturePixelFormatInfoTablesValue) / sizeof(TexturePixelFormatInfoTablesValue[0]));
-
     // If the image has alpha, you can create RGBA8 (32-bit) or RGBA4 (16-bit) or RGB5A1 (16-bit)
     // Default is: RGBA8888 (32-bit textures)
-    static Texture2D::PixelFormat g_defaultAlphaPixelFormat = Texture2D::PixelFormat::DEFAULT;
+    static IMAGE::PixelFormat g_defaultAlphaPixelFormat = IMAGE::PixelFormat::DEFAULT;
 
     //////////////////////////////////////////////////////////////////////////
     //conventer function
@@ -371,7 +313,7 @@ namespace GRAPH
     //////////////////////////////////////////////////////////////////////////
 
     Texture2D::Texture2D()
-    : _pixelFormat(Texture2D::PixelFormat::DEFAULT)
+    : _pixelFormat(IMAGE::PixelFormat::DEFAULT)
     , _pixelsWide(0)
     , _pixelsHigh(0)
     , _name(0)
@@ -387,13 +329,13 @@ namespace GRAPH
 
     Texture2D::~Texture2D()
     {
-        CC_SAFE_RELEASE(_shaderProgram);
+        SAFE_RELEASE(_shaderProgram);
 
-        CC_SAFE_DELETE(_ninePatchInfo);
+        SAFE_DELETE(_ninePatchInfo);
 
         if(_name)
         {
-            GL::deleteTexture(_name);
+            deleteTexture(_name);
         }
     }
 
@@ -401,13 +343,13 @@ namespace GRAPH
     {
         if(_name)
         {
-            GL::deleteTexture(_name);
+            deleteTexture(_name);
         }
         _name = 0;
     }
 
 
-    Texture2D::PixelFormat Texture2D::getPixelFormat() const
+    IMAGE::PixelFormat Texture2D::getPixelFormat() const
     {
         return _pixelFormat;
     }
@@ -427,16 +369,16 @@ namespace GRAPH
         return _name;
     }
 
-    Size Texture2D::getContentSize() const
+    MATH::Sizef Texture2D::getContentSize() const
     {
-        Size ret;
+        MATH::Sizef ret;
         ret.width = _contentSize.width / CC_CONTENT_SCALE_FACTOR();
         ret.height = _contentSize.height / CC_CONTENT_SCALE_FACTOR();
 
         return ret;
     }
 
-    const Size& Texture2D::getContentSizeInPixels()
+    const MATH::Sizef& Texture2D::getContentSizeInPixels()
     {
         return _contentSize;
     }
@@ -468,8 +410,8 @@ namespace GRAPH
 
     void Texture2D::setGLProgram(GLProgram* shaderProgram)
     {
-        CC_SAFE_RETAIN(shaderProgram);
-        CC_SAFE_RELEASE(_shaderProgram);
+        SAFE_RETAIN(shaderProgram);
+        SAFE_RELEASE(_shaderProgram);
         _shaderProgram = shaderProgram;
     }
 
@@ -478,7 +420,7 @@ namespace GRAPH
         return _hasPremultipliedAlpha;
     }
 
-    bool Texture2D::initWithData(const void *data, ssize_t dataLen, Texture2D::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const Size& contentSize)
+    bool Texture2D::initWithData(const void *data, ssize_t dataLen, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef& contentSize)
     {
         //if data has no mipmaps, we will consider it has only one mipmap
         MipmapInfo mipmap;
@@ -487,20 +429,19 @@ namespace GRAPH
         return initWithMipmaps(&mipmap, 1, pixelFormat, pixelsWide, pixelsHigh);
     }
 
-    bool Texture2D::initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, PixelFormat pixelFormat, int pixelsWide, int pixelsHigh)
+    bool Texture2D::initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh)
     {
         if (mipmapsNum <= 0)
         {
             return false;
         }
 
-
         if(_pixelFormatInfoTables.find(pixelFormat) == _pixelFormatInfoTables.end())
         {
             return false;
         }
 
-        const PixelFormatInfo& info = _pixelFormatInfoTables.at(pixelFormat);
+        const IMAGE::PixelFormatInfo& info = _pixelFormatInfoTables.at(pixelFormat);
 
         if (info.compressed && !Configuration::getInstance()->supportsPVRTC()
                             && !Configuration::getInstance()->supportsETC()
@@ -538,12 +479,12 @@ namespace GRAPH
 
         if(_name != 0)
         {
-            GL::deleteTexture(_name);
+            deleteTexture(_name);
             _name = 0;
         }
 
         glGenTextures(1, &_name);
-        GL::bindTexture2D(_name);
+        bindTexture2D(_name);
 
         if (mipmapsNum == 1)
         {
@@ -556,13 +497,6 @@ namespace GRAPH
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, _antialiasEnabled ? GL_LINEAR : GL_NEAREST );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-
-        // clean possible GL error
-        GLenum err = glGetError();
-        if (err != GL_NO_ERROR)
-        {
-            cocos2d::log("OpenGL error 0x%04X in %s %s %d\n", err, __FILE__, __FUNCTION__, __LINE__);
-        }
 
         // Specify OpenGL texture image
         int width = pixelsWide;
@@ -582,23 +516,11 @@ namespace GRAPH
                 glTexImage2D(GL_TEXTURE_2D, i, info.internalFormat, (GLsizei)width, (GLsizei)height, 0, info.format, info.type, data);
             }
 
-            if (i > 0 && (width != height || ccNextPOT(width) != width ))
-            {
-                CCLOG("cocos2d: Texture2D. WARNING. Mipmap level %u is not squared. Texture won't render correctly. width=%d != height=%d", i, width, height);
-            }
-
-            GLenum err = glGetError();
-            if (err != GL_NO_ERROR)
-            {
-                CCLOG("cocos2d: Texture2D: Error uploading compressed texture level: %u . glError: 0x%04X", i, err);
-                return false;
-            }
-
             width = MAX(width >> 1, 1);
             height = MAX(height >> 1, 1);
         }
 
-        _contentSize = Size((float)pixelsWide, (float)pixelsHigh);
+        _contentSize = MATH::Sizef((float)pixelsWide, (float)pixelsHigh);
         _pixelsWide = pixelsWide;
         _pixelsHigh = pixelsHigh;
         _pixelFormat = pixelFormat;
@@ -617,8 +539,8 @@ namespace GRAPH
     {
         if (_name)
         {
-            GL::bindTexture2D(_name);
-            const PixelFormatInfo& info = _pixelFormatInfoTables.at(_pixelFormat);
+            bindTexture2D(_name);
+            const IMAGE::PixelFormatInfo& info = _pixelFormatInfoTables.at(_pixelFormat);
             glTexSubImage2D(GL_TEXTURE_2D,0,offsetX,offsetY,width,height,info.format, info.type,data);
 
             return true;
@@ -706,7 +628,7 @@ namespace GRAPH
         }
     }
 
-    Texture2D::PixelFormat Texture2D::convertI8ToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
+    IMAGE::PixelFormat Texture2D::convertI8ToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
     {
         switch (format)
         {
@@ -755,7 +677,7 @@ namespace GRAPH
         return format;
     }
 
-    Texture2D::PixelFormat Texture2D::convertAI88ToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
+    IMAGE::PixelFormat Texture2D::convertAI88ToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
     {
         switch (format)
         {
@@ -805,7 +727,7 @@ namespace GRAPH
         return format;
     }
 
-    Texture2D::PixelFormat Texture2D::convertRGB888ToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
+    IMAGE::PixelFormat Texture2D::convertRGB888ToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
     {
         switch (format)
         {
@@ -853,7 +775,7 @@ namespace GRAPH
         return format;
     }
 
-    Texture2D::PixelFormat Texture2D::convertRGBA8888ToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
+    IMAGE::PixelFormat Texture2D::convertRGBA8888ToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
     {
 
         switch (format)
@@ -925,7 +847,7 @@ namespace GRAPH
     rgba(1) -> 12345678
 
     */
-    Texture2D::PixelFormat Texture2D::convertDataToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat originFormat, PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
+    IMAGE::PixelFormat Texture2D::convertDataToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat originFormat, PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
     {
         // don't need to convert
         if (format == originFormat || format == PixelFormat::AUTO)
@@ -1187,34 +1109,34 @@ namespace GRAPH
     {
         switch (_pixelFormat)
         {
-            case Texture2D::PixelFormat::RGBA8888:
+            case IMAGE::PixelFormat::RGBA8888:
                 return  "RGBA8888";
 
-            case Texture2D::PixelFormat::RGB888:
+            case IMAGE::PixelFormat::RGB888:
                 return  "RGB888";
 
-            case Texture2D::PixelFormat::RGB565:
+            case IMAGE::PixelFormat::RGB565:
                 return  "RGB565";
 
-            case Texture2D::PixelFormat::RGBA4444:
+            case IMAGE::PixelFormat::RGBA4444:
                 return  "RGBA4444";
 
-            case Texture2D::PixelFormat::RGB5A1:
+            case IMAGE::PixelFormat::RGB5A1:
                 return  "RGB5A1";
 
-            case Texture2D::PixelFormat::AI88:
+            case IMAGE::PixelFormat::AI88:
                 return  "AI88";
 
-            case Texture2D::PixelFormat::A8:
+            case IMAGE::PixelFormat::A8:
                 return  "A8";
 
-            case Texture2D::PixelFormat::I8:
+            case IMAGE::PixelFormat::I8:
                 return  "I8";
 
-            case Texture2D::PixelFormat::PVRTC4:
+            case IMAGE::PixelFormat::PVRTC4:
                 return  "PVRTC4";
 
-            case Texture2D::PixelFormat::PVRTC2:
+            case IMAGE::PixelFormat::PVRTC2:
                 return  "PVRTC2";
 
             default:
@@ -1231,17 +1153,17 @@ namespace GRAPH
     //
     // implementation Texture2D (PixelFormat)
 
-    void Texture2D::setDefaultAlphaPixelFormat(Texture2D::PixelFormat format)
+    void Texture2D::setDefaultAlphaPixelFormat(IMAGE::PixelFormat format)
     {
         g_defaultAlphaPixelFormat = format;
     }
 
-    Texture2D::PixelFormat Texture2D::getDefaultAlphaPixelFormat()
+    IMAGE::PixelFormat Texture2D::getDefaultAlphaPixelFormat()
     {
         return g_defaultAlphaPixelFormat;
     }
 
-    unsigned int Texture2D::getBitsPerPixelForFormat(Texture2D::PixelFormat format) const
+    unsigned int Texture2D::getBitsPerPixelForFormat(IMAGE::PixelFormat format) const
     {
         if (format == PixelFormat::NONE || format == PixelFormat::DEFAULT)
         {
@@ -1256,7 +1178,7 @@ namespace GRAPH
         return this->getBitsPerPixelForFormat(_pixelFormat);
     }
 
-    const Texture2D::PixelFormatInfoMap& Texture2D::getPixelFormatInfoMap()
+    const IMAGE::PixelFormatInfoMap& Texture2D::getPixelFormatInfoMap()
     {
         return _pixelFormatInfoTables;
     }

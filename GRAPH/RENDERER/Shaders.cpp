@@ -2,6 +2,8 @@
 
 namespace GRAPH
 {
+    #define STRINGIFY(A)  #A
+
     #include "SHADER/ccShader_Position_uColor.frag"
 
     #include "SHADER/ccShader_Position_uColor.vert"

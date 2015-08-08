@@ -8,7 +8,7 @@ namespace UTILS
 {
     namespace RANDOM
     {
-        #define RANDOM_MINUS1_1() rand_minus1_1
+        #define RANDOM_MINUS1_1() rand_minus1_1()
         inline float rand_minus1_1() {
             // FIXME: using the new c++11 random engine generator
             // without a proper way to set a seed is not useful.
@@ -19,7 +19,7 @@ namespace UTILS
         //    return cocos2d::random(-1.f, 1.f);
         }
 
-        #define RANDOM_0_1()
+        #define RANDOM_0_1() rand_0_1()
         inline float rand_0_1() {
             // FIXME: using the new c++11 random engine generator
             // without a proper way to set a seed is not useful.

@@ -1,5 +1,9 @@
-#include "GRAPH/RENDERER/Renderer.h"
 #include <algorithm>
+#include "GRAPH/RENDERER/Renderer.h"
+#include "GRAPH/RENDERER/RenderState.h"
+#include "GRAPH/BASE/Configuration.h"
+#include "GRAPH/RENDERER/GLStateCache.h"
+#include "GRAPH/RENDERER/GLProgram.h"
 
 namespace GRAPH
 {
@@ -82,7 +86,6 @@ namespace GRAPH
             }
         }
 
-        CCASSERT(false, "invalid index");
         return nullptr;
 
 
@@ -110,8 +113,6 @@ namespace GRAPH
         _isDepthEnabled = glIsEnabled(GL_DEPTH_TEST) != GL_FALSE;
         _isCullEnabled = glIsEnabled(GL_CULL_FACE) != GL_FALSE;
         glGetBooleanv(GL_DEPTH_WRITEMASK, &_isDepthWrite);
-
-        CHECK_GL_ERROR_DEBUG();
     }
 
     void RenderQueue::restoreRenderState()
@@ -141,8 +142,6 @@ namespace GRAPH
 
         glDepthMask(_isDepthWrite);
         RenderState::StateBlock::_defaultState->setDepthWrite(_isDepthEnabled);
-
-        CHECK_GL_ERROR_DEBUG();
     }
 
     //
@@ -162,9 +161,6 @@ namespace GRAPH
     ,_glViewAssigned(false)
     ,_isRendering(false)
     ,_isDepthTestFor2D(false)
-    #if CC_ENABLE_CACHE_TEXTURE_DATA
-    ,_cacheTextureListener(nullptr)
-    #endif
     {
         _groupCommandManager = new (std::nothrow) GroupCommandManager();
 
@@ -190,24 +186,12 @@ namespace GRAPH
         {
             glDeleteVertexArrays(1, &_buffersVAO);
             glDeleteVertexArrays(1, &_quadVAO);
-            GL::bindVAO(0);
+            bindVAO(0);
         }
-    #if CC_ENABLE_CACHE_TEXTURE_DATA
-        Director::getInstance()->getEventDispatcher()->removeEventListener(_cacheTextureListener);
-    #endif
     }
 
     void Renderer::initGLView()
     {
-    #if CC_ENABLE_CACHE_TEXTURE_DATA
-        _cacheTextureListener = EventListenerCustom::create(EVENT_RENDERER_RECREATED, [this](EventCustom* event){
-            /** listen the event that renderer was recreated on Android/WP8 */
-            this->setupBuffer();
-        });
-
-        Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(_cacheTextureListener, -1);
-    #endif
-
         //setup index data for quads
 
         for( int i=0; i < VBO_SIZE/4; i++)
@@ -241,7 +225,7 @@ namespace GRAPH
     {
         //generate vbo and vao for trianglesCommand
         glGenVertexArrays(1, &_buffersVAO);
-        GL::bindVAO(_buffersVAO);
+        bindVAO(_buffersVAO);
 
         glGenBuffers(2, &_buffersVBO[0]);
 
@@ -264,13 +248,13 @@ namespace GRAPH
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(_indices[0]) * INDEX_VBO_SIZE, _indices, GL_STATIC_DRAW);
 
         // Must unbind the VAO before changing the element buffer.
-        GL::bindVAO(0);
+        bindVAO(0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         //generate vbo and vao for quadCommand
         glGenVertexArrays(1, &_quadVAO);
-        GL::bindVAO(_quadVAO);
+        bindVAO(_quadVAO);
 
         glGenBuffers(2, &_quadbuffersVBO[0]);
 
@@ -293,11 +277,9 @@ namespace GRAPH
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(_quadIndices[0]) * INDEX_VBO_SIZE, _quadIndices, GL_STATIC_DRAW);
 
         // Must unbind the VAO before changing the element buffer.
-        GL::bindVAO(0);
+        bindVAO(0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        CHECK_GL_ERROR_DEBUG();
     }
 
     void Renderer::setupVBO()
@@ -310,7 +292,7 @@ namespace GRAPH
     void Renderer::mapBuffers()
     {
         // Avoid changing the element buffer for whatever VAO might be bound.
-        GL::bindVAO(0);
+        bindVAO(0);
 
         glBindBuffer(GL_ARRAY_BUFFER, _buffersVBO[0]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(_verts[0]) * VBO_SIZE, _verts, GL_DYNAMIC_DRAW);
@@ -327,8 +309,6 @@ namespace GRAPH
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(_quadIndices[0]) * INDEX_VBO_SIZE, _quadIndices, GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        CHECK_GL_ERROR_DEBUG();
     }
 
     void Renderer::addCommand(RenderCommand* command)
@@ -339,22 +319,16 @@ namespace GRAPH
 
     void Renderer::addCommand(RenderCommand* command, int renderQueue)
     {
-        CCASSERT(!_isRendering, "Cannot add command while rendering");
-        CCASSERT(renderQueue >=0, "Invalid render queue");
-        CCASSERT(command->getType() != RenderCommand::Type::UNKNOWN_COMMAND, "Invalid Command Type");
-
         _renderGroups[renderQueue].push_back(command);
     }
 
     void Renderer::pushGroup(int renderQueueID)
     {
-        CCASSERT(!_isRendering, "Cannot change render queue while rendering");
         _commandGroupStack.push(renderQueueID);
     }
 
     void Renderer::popGroup()
     {
-        CCASSERT(!_isRendering, "Cannot change render queue while rendering");
         _commandGroupStack.pop();
     }
 
@@ -380,8 +354,6 @@ namespace GRAPH
             //Draw batched Triangles if necessary
             if(cmd->isSkipBatching() || _filledVertex + cmd->getVertexCount() > VBO_SIZE || _filledIndex + cmd->getIndexCount() > INDEX_VBO_SIZE)
             {
-                CCASSERT(cmd->getVertexCount()>= 0 && cmd->getVertexCount() < VBO_SIZE, "VBO for vertex is not big enough, please break the data down or use customized render command");
-                CCASSERT(cmd->getIndexCount()>= 0 && cmd->getIndexCount() < INDEX_VBO_SIZE, "VBO for index is not big enough, please break the data down or use customized render command");
                 //Draw batched Triangles if VBO is full
                 drawBatchedTriangles();
             }
@@ -409,7 +381,6 @@ namespace GRAPH
             //Draw batched quads if necessary
             if(cmd->isSkipBatching()|| (_numberQuads + cmd->getQuadCount()) * 4 > VBO_SIZE )
             {
-                CCASSERT(cmd->getQuadCount()>= 0 && cmd->getQuadCount() * 4 < VBO_SIZE, "VBO for vertex is not big enough, please break the data down or use customized render command");
                 //Draw batched quads if VBO is full
                 drawBatchedQuads();
             }
@@ -475,10 +446,6 @@ namespace GRAPH
             flush();
             auto cmd = static_cast<PrimitiveCommand*>(command);
             cmd->execute();
-        }
-        else
-        {
-            CCLOGERROR("Unknown commands in renderQueue");
         }
     }
 

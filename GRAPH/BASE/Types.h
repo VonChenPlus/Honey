@@ -169,6 +169,38 @@ namespace GRAPH
         /// top right
         V3F_T2F    tr;
     };
+
+    struct BlendFunc
+    {
+        /** source blend function */
+        GLenum src;
+        /** destination blend function */
+        GLenum dst;
+
+        /** Blending disabled. Uses {GL_ONE, GL_ZERO} */
+        static const BlendFunc DISABLE;
+        /** Blending enabled for textures with Alpha premultiplied. Uses {GL_ONE, GL_ONE_MINUS_SRC_ALPHA} */
+        static const BlendFunc ALPHA_PREMULTIPLIED;
+        /** Blending enabled for textures with Alpha NON premultiplied. Uses {GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA} */
+        static const BlendFunc ALPHA_NON_PREMULTIPLIED;
+        /** Enables Additive blending. Uses {GL_SRC_ALPHA, GL_ONE} */
+        static const BlendFunc ADDITIVE;
+
+        bool operator==(const BlendFunc &a) const
+        {
+            return src == a.src && dst == a.dst;
+        }
+
+        bool operator!=(const BlendFunc &a) const
+        {
+            return src != a.src || dst != a.dst;
+        }
+
+        bool operator<(const BlendFunc &a) const
+        {
+            return src < a.src || (src == a.src && dst < a.dst);
+        }
+    };
 }
 
 #endif // TYPES_H

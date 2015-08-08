@@ -59,9 +59,9 @@ namespace GRAPH
     {
     public:
 
-        static RenderTarget* create(unsigned int width, unsigned int height, Texture2D::PixelFormat format = Texture2D::PixelFormat::RGBA8888);
+        static RenderTarget* create(unsigned int width, unsigned int height, IMAGE::PixelFormat format = IMAGE::PixelFormat::RGBA8888);
 
-        bool init(unsigned int width, unsigned int height, Texture2D::PixelFormat format);
+        bool init(unsigned int width, unsigned int height, IMAGE::PixelFormat format);
 
         virtual Texture2D* getTexture() const { return _texture; }
     public:

@@ -12,13 +12,16 @@
 #include "MATH/Size.h"
 #include "GRAPH/BASE/Types.h"
 #include "GRAPH/BASE/Fonts.h"
+#include "IMAGE/HImage.h"
 
 namespace GRAPH
 {
-    class Image;
-    class NinePatchInfo;
-    class SpriteFrame;
-    typedef struct _MipmapInfo MipmapInfo;
+    typedef struct _MipmapInfo
+    {
+        unsigned char* address;
+        int len;
+        _MipmapInfo():address(NULL),len(0){}
+    } MipmapInfo;
 
     namespace ui
     {
@@ -30,81 +33,6 @@ namespace GRAPH
     class Texture2D : public HObject
     {
     public:
-        /** @typedef Texture2D::PixelFormat
-         Possible texture pixel formats
-         */
-        enum class PixelFormat
-        {
-            //! auto detect the type
-            AUTO,
-            //! 32-bit texture: BGRA8888
-            BGRA8888,
-            //! 32-bit texture: RGBA8888
-            RGBA8888,
-            //! 24-bit texture: RGBA888
-            RGB888,
-            //! 16-bit texture without Alpha channel
-            RGB565,
-            //! 8-bit textures used as masks
-            A8,
-            //! 8-bit intensity texture
-            I8,
-            //! 16-bit textures used as masks
-            AI88,
-            //! 16-bit textures: RGBA4444
-            RGBA4444,
-            //! 16-bit textures: RGB5A1
-            RGB5A1,
-            //! 4-bit PVRTC-compressed texture: PVRTC4
-            PVRTC4,
-            //! 4-bit PVRTC-compressed texture: PVRTC4 (has alpha channel)
-            PVRTC4A,
-            //! 2-bit PVRTC-compressed texture: PVRTC2
-            PVRTC2,
-            //! 2-bit PVRTC-compressed texture: PVRTC2 (has alpha channel)
-            PVRTC2A,
-            //! ETC-compressed texture: ETC
-            ETC,
-            //! S3TC-compressed texture: S3TC_Dxt1
-            S3TC_DXT1,
-            //! S3TC-compressed texture: S3TC_Dxt3
-            S3TC_DXT3,
-            //! S3TC-compressed texture: S3TC_Dxt5
-            S3TC_DXT5,
-            //! ATITC-compressed texture: ATC_RGB
-            ATC_RGB,
-            //! ATITC-compressed texture: ATC_EXPLICIT_ALPHA
-            ATC_EXPLICIT_ALPHA,
-            //! ATITC-compresed texture: ATC_INTERPOLATED_ALPHA
-            ATC_INTERPOLATED_ALPHA,
-            //! Default texture format: AUTO
-            DEFAULT = AUTO,
-
-            NONE = -1
-        };
-
-
-        struct PixelFormatInfo {
-
-            PixelFormatInfo(GLenum anInternalFormat, GLenum aFormat, GLenum aType, int aBpp, bool aCompressed, bool anAlpha)
-                : internalFormat(anInternalFormat)
-                , format(aFormat)
-                , type(aType)
-                , bpp(aBpp)
-                , compressed(aCompressed)
-                , alpha(anAlpha)
-            {}
-
-            GLenum internalFormat;
-            GLenum format;
-            GLenum type;
-            int bpp;
-            bool compressed;
-            bool alpha;
-        };
-
-        typedef std::map<Texture2D::PixelFormat, const PixelFormatInfo> PixelFormatInfoMap;
-
         /**
          Extension to set the Min / Mag filter
          */
@@ -120,12 +48,12 @@ namespace GRAPH
 
          @param format
          If the UIImage contains alpha channel, then the options are:
-         - generate 32-bit textures: Texture2D::PixelFormat::RGBA8888 (default one)
-         - generate 24-bit textures: Texture2D::PixelFormat::RGB888
-         - generate 16-bit textures: Texture2D::PixelFormat::RGBA4444
-         - generate 16-bit textures: Texture2D::PixelFormat::RGB5A1
-         - generate 16-bit textures: Texture2D::PixelFormat::RGB565
-         - generate 8-bit textures: Texture2D::PixelFormat::A8 (only use it if you use just 1 color)
+         - generate 32-bit textures: IMAGE::PixelFormat::RGBA8888 (default one)
+         - generate 24-bit textures: IMAGE::PixelFormat::RGB888
+         - generate 16-bit textures: IMAGE::PixelFormat::RGBA4444
+         - generate 16-bit textures: IMAGE::PixelFormat::RGB5A1
+         - generate 16-bit textures: IMAGE::PixelFormat::RGB565
+         - generate 8-bit textures: IMAGE::PixelFormat::A8 (only use it if you use just 1 color)
 
          How does it work ?
          - If the image is an RGBA (with Alpha) then the default pixel format will be used (it can be a 8-bit, 16-bit or 32-bit texture)
@@ -135,12 +63,12 @@ namespace GRAPH
 
          @since v0.8
          */
-        static void setDefaultAlphaPixelFormat(Texture2D::PixelFormat format);
+        static void setDefaultAlphaPixelFormat(IMAGE::PixelFormat format);
 
         /** Returns the alpha pixel format.
          @since v0.8
          */
-        static Texture2D::PixelFormat getDefaultAlphaPixelFormat();
+        static IMAGE::PixelFormat getDefaultAlphaPixelFormat();
 
     public:
         /**
@@ -176,7 +104,7 @@ namespace GRAPH
          * @js NA
          * @lua NA
          */
-        bool initWithData(const void *data, ssize_t dataLen, Texture2D::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef& contentSize);
+        bool initWithData(const void *data, ssize_t dataLen, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef& contentSize);
 
         /** Initializes with mipmaps.
 
@@ -186,7 +114,7 @@ namespace GRAPH
          @param pixelsWide The image width.
          @param pixelsHigh The image height.
          */
-        bool initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, Texture2D::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh);
+        bool initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh);
 
         /** Update with texture data.
 
@@ -216,7 +144,7 @@ namespace GRAPH
         NOTE: It will not convert the pvr image file.
         @param image An UIImage object.
         */
-        bool initWithImage(Image * image);
+        bool initWithImage(IMAGE::Image * image);
 
         /**
         Initializes a texture from a UIImage object.
@@ -226,7 +154,7 @@ namespace GRAPH
         @param image An UIImage object.
         @param format Texture pixel formats.
         **/
-        bool initWithImage(Image * image, PixelFormat format);
+        bool initWithImage(IMAGE::Image * image, IMAGE::PixelFormat format);
 
         /** Initializes a texture from a string with dimensions, alignment, font name and font size.
 
@@ -297,7 +225,7 @@ namespace GRAPH
         bool hasMipmaps() const;
 
         /** Gets the pixel format of the texture. */
-        Texture2D::PixelFormat getPixelFormat() const;
+        IMAGE::PixelFormat getPixelFormat() const;
 
         /** Gets the width of the texture in pixels. */
         int getPixelsWide() const;
@@ -330,23 +258,7 @@ namespace GRAPH
         /** Get a shader program from the texture.*/
         GLProgram* getGLProgram() const;
 
-
-    public:
-        /** Get pixel info map, the key-value pairs is PixelFormat and PixelFormatInfo.*/
-        static const PixelFormatInfoMap& getPixelFormatInfoMap();
-
     private:
-        /**
-        * A struct for storing 9-patch image capInsets.
-        */
-
-        class NinePatchInfo
-        {
-        public:
-            MATH::Rectf capInsetSize;
-            std::unordered_map<SpriteFrame*, MATH::Rectf> capInsetMap;
-        };
-
         /**
          * Whether the texture contains a 9-patch capInset info or not.
          *
@@ -354,43 +266,18 @@ namespace GRAPH
          */
         bool isContain9PatchInfo()const;
 
-        /**
-         * Get spriteFrame capInset, If spriteFrame can't be found in 9-patch info map,
-         * then single 9-patch texture capInset will be returned.
-         * If the arg is nullptr, the capInset of single 9-patch texture will be returned.
-         *
-         * @param spriteFrame A SpriteFrame object pointer.
-         *
-         * @return The capInset of the SpriteFrame object.
-         */
-        const MATH::Rectf& getSpriteFrameCapInset(SpriteFrame* spriteFrame)const;
-        /**
-         * Remove the spriteFrame capInset info when the spriteFrame is removed.
-         *
-         * @param spriteFrame A SpriteFrame object pointer.
-         */
-        void removeSpriteFrameCapInset(SpriteFrame* spriteFrame);
-        /**
-         * Add capInset for sprite atlas.
-         * When handling single texture, pass nullptr in the first arg.
-         *
-         * @param spritframe The sprite frame object.
-         * @param capInsets The parsed capInset from a .9 patch image.
-         */
-        void addSpriteFrameCapInset(SpriteFrame* spritframe, const MATH::Rectf& capInsets);
-
         /**convert functions*/
 
         /**
         Convert the format to the format param you specified, if the format is PixelFormat::Automatic, it will detect it automatically and convert to the closest format for you.
         It will return the converted format to you. if the outData != data, you must delete it manually.
         */
-        static PixelFormat convertDataToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat originFormat, PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
+        static IMAGE::PixelFormat convertDataToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat originFormat, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
 
-        static PixelFormat convertI8ToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
-        static PixelFormat convertAI88ToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
-        static PixelFormat convertRGB888ToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
-        static PixelFormat convertRGBA8888ToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
+        static IMAGE::PixelFormat convertI8ToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
+        static IMAGE::PixelFormat convertAI88ToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
+        static IMAGE::PixelFormat convertRGB888ToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
+        static IMAGE::PixelFormat convertRGBA8888ToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
 
         //I8 to XXX
         static void convertI8ToRGB888(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
@@ -428,7 +315,7 @@ namespace GRAPH
 
     protected:
         /** pixel format of the texture */
-        Texture2D::PixelFormat _pixelFormat;
+        IMAGE::PixelFormat _pixelFormat;
 
         /** width in pixels */
         int _pixelsWide;
@@ -457,10 +344,9 @@ namespace GRAPH
         /** shader program used by drawAtPoint and drawInRect */
         GLProgram* _shaderProgram;
 
-        static const PixelFormatInfoMap _pixelFormatInfoTables;
+        static const IMAGE::PixelFormatInfoMap _pixelFormatInfoTables;
 
         bool _antialiasEnabled;
-        NinePatchInfo* _ninePatchInfo;
         friend class SpriteFrameCache;
         friend class TextureCache;
         friend class ui::Scale9Sprite;
