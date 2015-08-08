@@ -1,4 +1,7 @@
 #include "IMAGE/HImage.h"
+
+#include <string.h>
+
 #include "BASE/HData.h"
 #include "IO/FileUtils.h"
 #include "IMAGE/TinyPNG.h"
@@ -25,25 +28,25 @@ namespace IMAGE
                                                                          TexturePixelFormatInfoTablesValue + sizeof(TexturePixelFormatInfoTablesValue) / sizeof(TexturePixelFormatInfoTablesValue[0]));
 
     Image::Image()
-        : _data(nullptr)
-        , _dataLen(0)
-        , _renderFormat(PixelFormat::NONE)
-        , _width(0)
-        , _height(0)
-        , _fileType(Format::UNKNOWN)
-        , _hasPremultipliedAlpha(true) {
+        : data_(nullptr)
+        , dataLen_(0)
+        , width_(0)
+        , height_(0)
+        , fileType_(Format::UNKNOWN)
+        , renderFormat_(PixelFormat::NONE)
+        , hasPremultipliedAlpha_(true) {
 
     }
 
     Image::~Image() {
-        SAFE_FREE(_data);
+        SAFE_FREE(data_);
     }
 
     bool Image::initWithImageFile(const std::string& path) {
         bool ret = false;
-        _filePath = IO::FileUtils::getInstance().fullPathForFilename(path);
+        filePath_ = IO::FileUtils::getInstance().fullPathForFilename(path);
 
-        HData data = IO::FileUtils::getInstance().getDataFromFile(_filePath);
+        HData data = IO::FileUtils::getInstance().getDataFromFile(filePath_);
 
         if (!data.isNull()) {
             ret = initWithImageData((const unsigned char *)data.getBytes(), data.getSize());
@@ -54,7 +57,7 @@ namespace IMAGE
 
     bool Image::initWithImageFileThreadSafe(const std::string& fullpath) {
         bool ret = false;
-        _filePath = fullpath;
+        filePath_ = fullpath;
 
         HData data = IO::FileUtils::getInstance().getDataFromFile(fullpath);
 
@@ -77,9 +80,9 @@ namespace IMAGE
             unpackedData = const_cast<unsigned char*>(data);
             unpackedLen = dataLen;
 
-            _fileType = detectFormat(unpackedData, unpackedLen);
+            fileType_ = detectFormat(unpackedData, unpackedLen);
 
-            switch (_fileType) {
+            switch (fileType_) {
             case Format::PNG:
                 ret = initWithPngData(unpackedData, unpackedLen);
                 break;
@@ -142,42 +145,42 @@ namespace IMAGE
     }
 
     int Image::getBitPerPixel() {
-        return getPixelFormatInfoMap().at(_renderFormat).bpp;
+        return getPixelFormatInfoMap().at(renderFormat_).bpp;
     }
 
     bool Image::hasAlpha() {
-        return getPixelFormatInfoMap().at(_renderFormat).alpha;
+        return getPixelFormatInfoMap().at(renderFormat_).alpha;
     }
 
     bool Image::isCompressed() {
-        return getPixelFormatInfoMap().at(_renderFormat).compressed;
+        return getPixelFormatInfoMap().at(renderFormat_).compressed;
     }
 
     bool Image::initWithJpgData(const unsigned char * data, ssize_t dataLen) {
         int actual_components = 0;
-        _data = (unsigned char*)jpgd::decompress_jpeg_image_from_memory((const unsigned char*)data, (int)dataLen, &_width, &_height, &actual_components, 4);
-        _renderFormat = PixelFormat::RGB888;
+        data_ = (unsigned char*)jpgd::decompress_jpeg_image_from_memory((const unsigned char*)data, (int)dataLen, &width_, &height_, &actual_components, 4);
+        renderFormat_ = PixelFormat::RGB888;
 
         return true;
     }
 
     bool Image::initWithPngData(const unsigned char *data, ssize_t dataLen) {
         int color_type;
-        PNGLoadPtr((const unsigned char*)data, dataLen, &_width, &_height, &color_type, (unsigned char**)&_data, (int *)&_dataLen);
+        PNGLoadPtr((const unsigned char*)data, dataLen, &width_, &height_, &color_type, (unsigned char**)&data_, (int *)&dataLen_);
 
         switch (color_type)
         {
         case PNG_COLOR_TYPE_GRAY:
-            _renderFormat = PixelFormat::I8;
+            renderFormat_ = PixelFormat::I8;
             break;
         case PNG_COLOR_TYPE_GRAY_ALPHA:
-            _renderFormat = PixelFormat::AI88;
+            renderFormat_ = PixelFormat::AI88;
             break;
         case PNG_COLOR_TYPE_RGB:
-            _renderFormat = PixelFormat::RGB888;
+            renderFormat_ = PixelFormat::RGB888;
             break;
         case PNG_COLOR_TYPE_RGB_ALPHA:
-            _renderFormat = PixelFormat::RGBA8888;
+            renderFormat_ = PixelFormat::RGBA8888;
             break;
         default:
             break;
@@ -188,7 +191,7 @@ namespace IMAGE
             premultipliedAlpha();
         }
         else {
-            _hasPremultipliedAlpha = false;
+            hasPremultipliedAlpha_ = false;
         }
 
         return true;
@@ -202,25 +205,25 @@ namespace IMAGE
             return  false;
         }
 
-        _width = etc1_pkm_get_width(header);
-        _height = etc1_pkm_get_height(header);
+        width_ = etc1_pkm_get_width(header);
+        height_ = etc1_pkm_get_height(header);
 
-        if (0 == _width || 0 == _height) {
+        if (0 == width_ || 0 == height_) {
             return false;
         }
 
          //if it is not gles or device do not support ETC, decode texture by software
         int bytePerPixel = 3;
-        unsigned int stride = _width * bytePerPixel;
-        _renderFormat = PixelFormat::RGB888;
+        unsigned int stride = width_ * bytePerPixel;
+        renderFormat_ = PixelFormat::RGB888;
 
-        _dataLen =  _width * _height * bytePerPixel;
-        _data = static_cast<unsigned char*>(malloc(_dataLen * sizeof(unsigned char)));
+        dataLen_ =  width_ * height_ * bytePerPixel;
+        data_ = static_cast<unsigned char*>(malloc(dataLen_ * sizeof(unsigned char)));
 
-        if (etc1_decode_image(static_cast<const unsigned char*>(data) + ETC_PKM_HEADER_SIZE, static_cast<etc1_byte*>(_data), _width, _height, bytePerPixel, stride) != 0) {
-            _dataLen = 0;
-            if (_data != nullptr) {
-                free(_data);
+        if (etc1_decode_image(static_cast<const unsigned char*>(data) + ETC_PKM_HEADER_SIZE, static_cast<etc1_byte*>(data_), width_, height_, bytePerPixel, stride) != 0) {
+            dataLen_ = 0;
+            if (data_ != nullptr) {
+                free(data_);
             }
             return false;
         }
@@ -234,17 +237,17 @@ namespace IMAGE
         {
             if(0 == width || 0 == height) break;
 
-            _height   = height;
-            _width    = width;
-            _hasPremultipliedAlpha = preMulti;
-            _renderFormat = PixelFormat::RGBA8888;
+            height_   = height;
+            width_    = width;
+            hasPremultipliedAlpha_ = preMulti;
+            renderFormat_ = PixelFormat::RGBA8888;
 
             // only RGBA8888 supported
             int bytesPerComponent = 4;
-            _dataLen = height * width * bytesPerComponent;
-            _data = static_cast<unsigned char*>(malloc(_dataLen * sizeof(unsigned char)));
-            if(! _data) break;
-            memcpy(_data, data, _dataLen);
+            dataLen_ = height * width * bytesPerComponent;
+            data_ = static_cast<unsigned char*>(malloc(dataLen_ * sizeof(unsigned char)));
+            if(! data_) break;
+            memcpy(data_, data, dataLen_);
 
             ret = true;
         } while (0);
@@ -253,14 +256,13 @@ namespace IMAGE
     }
 
     void Image::premultipliedAlpha() {
-        unsigned int* fourBytes = (unsigned int*)_data;
-        for(int i = 0; i < _width * _height; i++)
-        {
-            unsigned char* p = _data + i * 4;
+        unsigned int* fourBytes = (unsigned int*)data_;
+        for(int i = 0; i < width_ * height_; i++) {
+            unsigned char* p = data_ + i * 4;
             fourBytes[i] = RGB_PREMULTIPLY_ALPHA(p[0], p[1], p[2], p[3]);
         }
 
-        _hasPremultipliedAlpha = true;
+        hasPremultipliedAlpha_ = true;
     }
 
     void Image::setPVRImagesHavePremultipliedAlpha(bool haveAlphaPremultiplied) {

@@ -110,13 +110,13 @@ namespace IMAGE
         bool initWithRawData(const unsigned char *data, ssize_t dataLen, int width, int height, int bitsPerComponent, bool preMulti = false);
 
         // Getters
-        inline unsigned char *   getData()               { return _data; }
-        inline ssize_t           getDataLen()            { return _dataLen; }
-        inline Format            getFileType()           {return _fileType; }
-        inline PixelFormat       getRenderFormat()       { return _renderFormat; }
-        inline int               getWidth()              { return _width; }
-        inline int               getHeight()             { return _height; }
-        inline bool              hasPremultipliedAlpha() { return _hasPremultipliedAlpha; }
+        inline unsigned char *   getData()               { return data_; }
+        inline ssize_t           getDataLen()            { return dataLen_; }
+        inline Format            getFileType()           {return fileType_; }
+        inline PixelFormat       getrenderFormat()       { return renderFormat_; }
+        inline int               getWidth()              { return width_; }
+        inline int               getHeight()             { return height_; }
+        inline bool              hasPremultipliedAlpha() { return hasPremultipliedAlpha_; }
 
         int                      getBitPerPixel();
         bool                     hasAlpha();
@@ -133,16 +133,15 @@ namespace IMAGE
         void premultipliedAlpha();
 
     protected:
-        static const int MIPMAP_MAX = 16;
-        unsigned char *_data;
-        ssize_t _dataLen;
-        int _width;
-        int _height;
-        Format _fileType;
-        PixelFormat _renderFormat;
+        unsigned char *data_;
+        ssize_t dataLen_;
+        int width_;
+        int height_;
+        Format fileType_;
+        PixelFormat renderFormat_;
         // false if we cann't auto detect the image is premultiplied or not.
-        bool _hasPremultipliedAlpha;
-        std::string _filePath;
+        bool hasPremultipliedAlpha_;
+        std::string filePath_;
 
     protected:
         // noncopyable

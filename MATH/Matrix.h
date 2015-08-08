@@ -121,13 +121,44 @@ namespace MATH
 
         Matrix4 getTransposed() const;
 
-        inline const Matrix4 operator+(const Matrix4& mat) const;
-        inline Matrix4& operator+=(const Matrix4& mat);
-        inline const Matrix4 operator-(const Matrix4& mat) const;
-        inline Matrix4& operator-=(const Matrix4& mat);
-        inline const Matrix4 operator-() const;
-        inline const Matrix4 operator*(const Matrix4& mat) const;
-        inline Matrix4& operator*=(const Matrix4& mat);
+        inline Matrix4 operator+(const Matrix4& mat) const {
+            Matrix4 result(*this);
+            result.add(mat);
+            return result;
+        }
+
+        inline Matrix4& operator+=(const Matrix4& mat) {
+            add(mat);
+            return *this;
+        }
+
+        inline Matrix4 operator-(const Matrix4& mat) const {
+            Matrix4 result(*this);
+            result.subtract(mat);
+            return result;
+        }
+
+        inline Matrix4& operator-=(const Matrix4& mat) {
+            subtract(mat);
+            return *this;
+        }
+
+        inline Matrix4 operator-() const {
+            Matrix4 mat(*this);
+            mat.negate();
+            return mat;
+        }
+
+        inline Matrix4 operator*(const Matrix4& mat) const {
+            Matrix4 result(*this);
+            result.multiply(mat);
+            return result;
+        }
+
+        inline Matrix4& operator*=(const Matrix4& mat) {
+            multiply(mat);
+            return *this;
+        }
 
         inline operator float *() {
             return (float *)this;
