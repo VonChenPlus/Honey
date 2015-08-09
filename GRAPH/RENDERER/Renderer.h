@@ -174,8 +174,6 @@ namespace GRAPH
 
         void flush2D();
 
-        void flush3D();
-
         void flushQuads();
         void flushTriangles();
 

@@ -4,6 +4,9 @@
 #include "GRAPH/BASE/Configuration.h"
 #include "GRAPH/RENDERER/GLStateCache.h"
 #include "GRAPH/RENDERER/GLProgram.h"
+#include "GRAPH/RENDERER/RenderCommand.h"
+#include "MATH/Rectangle.h"
+#include "GRAPH/BASE/Camera.h"
 
 namespace GRAPH
 {
@@ -154,7 +157,6 @@ namespace GRAPH
     //
     Renderer::Renderer()
     :_lastMaterialID(0)
-    ,_lastBatchedMeshCommand(nullptr)
     ,_filledVertex(0)
     ,_filledIndex(0)
     ,_numberQuads(0)
@@ -345,7 +347,6 @@ namespace GRAPH
         if( RenderCommand::Type::TRIANGLES_COMMAND == commandType)
         {
             //Draw if we have batched other commands which are not triangle command
-            flush3D();
             flushQuads();
 
             //Process triangle command
@@ -372,7 +373,6 @@ namespace GRAPH
         else if ( RenderCommand::Type::QUAD_COMMAND == commandType )
         {
             //Draw if we have batched other commands which are not quad command
-            flush3D();
             flushTriangles();
 
             //Process quad command
@@ -395,34 +395,6 @@ namespace GRAPH
                 drawBatchedQuads();
             }
         }
-        else if (RenderCommand::Type::MESH_COMMAND == commandType)
-        {
-            flush2D();
-            auto cmd = static_cast<MeshCommand*>(command);
-
-            if (cmd->isSkipBatching() || _lastBatchedMeshCommand == nullptr || _lastBatchedMeshCommand->getMaterialID() != cmd->getMaterialID())
-            {
-                flush3D();
-
-                if(cmd->isSkipBatching())
-                {
-                    // XXX: execute() will call bind() and unbind()
-                    // but unbind() shouldn't be call if the next command is a MESH_COMMAND with Material.
-                    // Once most of cocos2d-x moves to Pass/StateBlock, only bind() should be used.
-                    cmd->execute();
-                }
-                else
-                {
-                    cmd->preBatchDraw();
-                    cmd->batchDraw();
-                    _lastBatchedMeshCommand = cmd;
-                }
-            }
-            else
-            {
-                cmd->batchDraw();
-            }
-        }
         else if(RenderCommand::Type::GROUP_COMMAND == commandType)
         {
             flush();
@@ -439,12 +411,6 @@ namespace GRAPH
         {
             flush();
             auto cmd = static_cast<BatchCommand*>(command);
-            cmd->execute();
-        }
-        else if(RenderCommand::Type::PRIMITIVE_COMMAND == commandType)
-        {
-            flush();
-            auto cmd = static_cast<PrimitiveCommand*>(command);
             cmd->execute();
         }
     }
@@ -609,7 +575,6 @@ namespace GRAPH
         _filledIndex = 0;
         _numberQuads = 0;
         _lastMaterialID = 0;
-        _lastBatchedMeshCommand = nullptr;
     }
 
     void Renderer::clear()
@@ -644,13 +609,12 @@ namespace GRAPH
         }
 
         _isDepthTestFor2D = enable;
-        CHECK_GL_ERROR_DEBUG();
     }
 
     void Renderer::fillVerticesAndIndices(const TrianglesCommand* cmd)
     {
         memcpy(_verts + _filledVertex, cmd->getVertices(), sizeof(V3F_C4B_T2F) * cmd->getVertexCount());
-        const Mat4& modelView = cmd->getModelView();
+        const MATH::Matrix4& modelView = cmd->getModelView();
 
         for(ssize_t i=0; i< cmd->getVertexCount(); ++i)
         {
@@ -672,7 +636,7 @@ namespace GRAPH
 
     void Renderer::fillQuads(const QuadCommand *cmd)
     {
-        const Mat4& modelView = cmd->getModelView();
+        const MATH::Matrix4& modelView = cmd->getModelView();
         const V3F_C4B_T2F* quads =  (V3F_C4B_T2F*)cmd->getQuads();
         for(ssize_t i=0; i< cmd->getQuadCount() * 4; ++i)
         {
@@ -699,7 +663,7 @@ namespace GRAPH
         if (Configuration::getInstance()->supportsShareableVAO())
         {
             //Bind VAO
-            GL::bindVAO(_buffersVAO);
+            bindVAO(_buffersVAO);
             //Set VBO data
             glBindBuffer(GL_ARRAY_BUFFER, _buffersVBO[0]);
 
@@ -727,7 +691,7 @@ namespace GRAPH
 
             glBufferData(GL_ARRAY_BUFFER, sizeof(_verts[0]) * _filledVertex , _verts, GL_DYNAMIC_DRAW);
 
-            GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
+            enableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
 
             // vertices
             glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
@@ -778,7 +742,7 @@ namespace GRAPH
         if (Configuration::getInstance()->supportsShareableVAO())
         {
             //Unbind VAO
-            GL::bindVAO(0);
+            bindVAO(0);
         }
         else
         {
@@ -807,7 +771,7 @@ namespace GRAPH
         if (Configuration::getInstance()->supportsShareableVAO())
         {
             //Bind VAO
-            GL::bindVAO(_quadVAO);
+            bindVAO(_quadVAO);
             //Set VBO data
             glBindBuffer(GL_ARRAY_BUFFER, _quadbuffersVBO[0]);
 
@@ -834,7 +798,7 @@ namespace GRAPH
 
             glBufferData(GL_ARRAY_BUFFER, sizeof(_quadVerts[0]) * _numberQuads * 4 , _quadVerts, GL_DYNAMIC_DRAW);
 
-            GL::enableVertexAttribs(GL::VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
+            enableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
 
             // vertices
             glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
@@ -893,7 +857,7 @@ namespace GRAPH
         if (Configuration::getInstance()->supportsShareableVAO())
         {
             //Unbind VAO
-            GL::bindVAO(0);
+            bindVAO(0);
         }
         else
         {
@@ -908,22 +872,12 @@ namespace GRAPH
     void Renderer::flush()
     {
         flush2D();
-        flush3D();
     }
 
     void Renderer::flush2D()
     {
         flushQuads();
         flushTriangles();
-    }
-
-    void Renderer::flush3D()
-    {
-        if (_lastBatchedMeshCommand)
-        {
-            _lastBatchedMeshCommand->postBatchDraw();
-            _lastBatchedMeshCommand = nullptr;
-        }
     }
 
     void Renderer::flushQuads()
@@ -945,7 +899,7 @@ namespace GRAPH
     }
 
     // helpers
-    bool Renderer::checkVisibility(const Mat4 &transform, const Size &size)
+    bool Renderer::checkVisibility(const MATH::Matrix4 &transform, const MATH::Sizef &size)
     {
         auto scene = Director::getInstance()->getRunningScene();
         // only cull the default camera. The culling algorithm is valid for default camera.
@@ -953,7 +907,7 @@ namespace GRAPH
             return true;
 
         auto director = Director::getInstance();
-        Rect visiableRect(director->getVisibleOrigin(), director->getVisibleSize());
+        MATH::Rectf visiableRect(director->getVisibleOrigin(), director->getVisibleSize());
 
         // transform center point to screen space
         float hSizeX = size.width/2;
@@ -963,8 +917,8 @@ namespace GRAPH
         MATH::Vector2f v2p = Camera::getVisitingCamera()->projectGL(v3p);
 
         // convert content size to world coordinates
-        float wshw = std::max(fabsf(hSizeX * transform.m[0] + hSizeY * transform.m[4]), fabsf(hSizeX * transform.m[0] - hSizeY * transform.m[4]));
-        float wshh = std::max(fabsf(hSizeX * transform.m[1] + hSizeY * transform.m[5]), fabsf(hSizeX * transform.m[1] - hSizeY * transform.m[5]));
+        float wshw = std::max(abs(hSizeX * transform.m[0] + hSizeY * transform.m[4]), abs(hSizeX * transform.m[0] - hSizeY * transform.m[4]));
+        float wshh = std::max(abs(hSizeX * transform.m[1] + hSizeY * transform.m[5]), abs(hSizeX * transform.m[1] - hSizeY * transform.m[5]));
 
         // enlarge visable rect half size in screen coord
         visiableRect.origin.x -= wshw;

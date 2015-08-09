@@ -6,6 +6,7 @@
 #include "GRAPH/BASE/GLView.h"
 #include "MATH/Matrix.h"
 #include "GRAPH/BASE/Scene.h"
+#include "UTILS/TIME/HTime.h"
 
 namespace GRAPH
 {
@@ -113,11 +114,6 @@ namespace GRAPH
         inline float getAnimationInterval() { return _animationInterval; }
         /** Sets the FPS value. FPS = 1/internal. */
         virtual void setAnimationInterval(float interval) = 0;
-
-        /** Whether or not to display the FPS on the bottom-left corner. */
-        inline bool isDisplayStats() { return _displayStats; }
-        /** Display the FPS on the bottom-left corner. */
-        inline void setDisplayStats(bool displayStats) { _displayStats = displayStats; }
 
         /** Get seconds per frame. */
         inline float getSecondsPerFrame() { return _secondsPerFrame; }
@@ -451,11 +447,6 @@ namespace GRAPH
 
         void setNextScene();
 
-        void showStats();
-        void createStatsLabel();
-        void calculateMPF();
-        void getFPSImageData(unsigned char** datapointer, ssize_t* length);
-
         /** calculates delta time since last time it was called */
         void calculateDeltaTime();
 
@@ -501,7 +492,6 @@ namespace GRAPH
         /* landscape mode ? */
         bool _landscape;
 
-        bool _displayStats;
         float _accumDt;
         float _frameRate;
 
@@ -526,7 +516,7 @@ namespace GRAPH
         HObjectVector<Scene*> _scenesStack;
 
         /* last time the main loop was updated */
-        struct timeval *_lastUpdate;
+        ::timeval *_lastUpdate;
 
         /* whether or not the next delta time will be zero */
         bool _nextDeltaTimeZero;

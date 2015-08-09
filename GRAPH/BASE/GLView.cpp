@@ -7,6 +7,8 @@
 #include "GRAPH/RENDERER/FrameBuffer.h"
 #include "GRAPH/BASE/Camera.h"
 #include "GRAPH/BASE/EventDispatcher.h"
+#undef max
+#undef min
 
 namespace GRAPH
 {

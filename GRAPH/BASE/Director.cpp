@@ -16,6 +16,8 @@
 #include "GRAPH/RENDERER/TextureCache.h"
 #include "GRAPH/RENDERER/GLProgramState.h"
 #include "BASE/AutoreleasePool.h"
+#include "IO/FileUtils.h"
+#undef max
 
 namespace GRAPH
 {
@@ -75,7 +77,7 @@ namespace GRAPH
         _accumDt = 0.0f;
         _frameRate = 0.0f;
         _totalFrames = 0;
-        _lastUpdate = ::timeval();
+        _lastUpdate = new ::timeval();
         _secondsPerFrame = 1.0f;
 
         // paused ?
@@ -152,9 +154,6 @@ namespace GRAPH
         double fps = conf->getValue("cocos2d.x.fps", HValue(kDefaultFPS)).asDouble();
         _oldAnimationInterval = _animationInterval = 1.0 / fps;
 
-        // Display FPS
-        _displayStats = conf->getValue("cocos2d.x.display_fps", HValue(false)).asBool();
-
         // GL projection
         std::string projection = conf->getValue("cocos2d.x.gl.projection", HValue("3d")).asString();
         if (projection == "3d")
@@ -229,10 +228,6 @@ namespace GRAPH
             _notificationNode->visit(_renderer, MATH::Matrix4::IDENTITY, 0);
         }
 
-        if (_displayStats)
-        {
-            showStats();
-        }
         _renderer->render();
 
         _eventDispatcher->dispatchEvent(_eventAfterDraw);
@@ -246,18 +241,13 @@ namespace GRAPH
         {
             _openGLView->swapBuffers();
         }
-
-        if (_displayStats)
-        {
-            calculateMPF();
-        }
     }
 
     void Director::calculateDeltaTime()
     {
         ::timeval now;
 
-        if (gettimeofday(&now, nullptr) != 0)
+        if (UTILS::TIME::gettimeofday(&now, nullptr) != 0)
         {
             _deltaTime = 0;
             return;
@@ -272,7 +262,7 @@ namespace GRAPH
         else
         {
             _deltaTime = (now.tv_sec - _lastUpdate->tv_sec) + (now.tv_usec - _lastUpdate->tv_usec) / 1000000.0f;
-            _deltaTime = MAX(0, _deltaTime);
+            _deltaTime = std::max(0.0f, _deltaTime);
         }
 
         *_lastUpdate = now;
@@ -553,15 +543,10 @@ namespace GRAPH
 
     void Director::purgeCachedData(void)
     {
-        FontFNT::purgeCachedData();
-        FontAtlasCache::purgeCachedData();
-
         if (s_SharedDirector->getOpenGLView())
         {
-            SpriteFrameCache::getInstance()->removeUnusedSpriteFrames();
             _textureCache->removeUnusedTextures();
         }
-        FileUtils::getInstance()->purgeCachedEntries();
     }
 
     float Director::getZEye(void) const
@@ -833,11 +818,6 @@ namespace GRAPH
 
         SAFE_RELEASE_NULL(_notificationNode);
 
-        // purge bitmap cache
-        FontFNT::purgeCachedData();
-
-        FontFreeType::shutdownFreeType();
-
         // purge all managed caches
         GLProgramCache::destroyInstance();
         GLProgramStateCache::destroyInstance();
@@ -939,86 +919,6 @@ namespace GRAPH
         _deltaTime = 0;
         // fix issue #3509, skip one fps to avoid incorrect time calculation.
         setNextDeltaTimeZero(true);
-    }
-
-    // display the FPS using a LabelAtlas
-    // updates the FPS every frame
-    void Director::showStats()
-    {
-        if (_isStatusLabelUpdated)
-        {
-            createStatsLabel();
-            _isStatusLabelUpdated = false;
-        }
-
-        _accumDt += _deltaTime;
-    }
-
-    void Director::calculateMPF()
-    {
-        static float prevSecondsPerFrame = 0;
-        static const float MPF_FILTER = 0.10f;
-
-        struct timeval now;
-        gettimeofday(&now, nullptr);
-
-        _secondsPerFrame = (now.tv_sec - _lastUpdate->tv_sec) + (now.tv_usec - _lastUpdate->tv_usec) / 1000000.0f;
-
-        _secondsPerFrame = _secondsPerFrame * MPF_FILTER + (1-MPF_FILTER) * prevSecondsPerFrame;
-        prevSecondsPerFrame = _secondsPerFrame;
-    }
-
-    // returns the FPS image data pointer and len
-    void Director::getFPSImageData(unsigned char** datapointer, ssize_t* length)
-    {
-        // FIXME: fixed me if it should be used
-        *datapointer = cc_fps_images_png;
-        *length = cc_fps_images_len();
-    }
-
-    void Director::createStatsLabel()
-    {
-        Texture2D *texture = nullptr;
-        std::string fpsString = "00.0";
-        std::string drawBatchString = "000";
-        std::string drawVerticesString = "00000";
-        if (_FPSLabel)
-        {
-            fpsString = _FPSLabel->getString();
-            drawBatchString = _drawnBatchesLabel->getString();
-            drawVerticesString = _drawnVerticesLabel->getString();
-
-            SAFE_RELEASE_NULL(_FPSLabel);
-            SAFE_RELEASE_NULL(_drawnBatchesLabel);
-            SAFE_RELEASE_NULL(_drawnVerticesLabel);
-            _textureCache->removeTextureForKey("/cc_fps_images");
-            FileUtils::getInstance()->purgeCachedEntries();
-        }
-
-        IMAGE::PixelFormat currentFormat = Texture2D::getDefaultAlphaPixelFormat();
-        Texture2D::setDefaultAlphaPixelFormat(IMAGE::PixelFormat::RGBA4444);
-        unsigned char *data = nullptr;
-        ssize_t dataLength = 0;
-        getFPSImageData(&data, &dataLength);
-
-        Image* image = new (std::nothrow) Image();
-        bool isOK = image->initWithImageData(data, dataLength);
-        if (! isOK) {
-            return;
-        }
-
-        texture = _textureCache->addImage(image, "/cc_fps_images");
-        SAFE_RELEASE(image);
-
-        /*
-         We want to use an image which is stored in the file named ccFPSImage.c
-         for any design resolutions and all resource resolutions.
-
-         To achieve this, we need to ignore 'contentScaleFactor' in 'AtlasNode' and 'LabelAtlas'.
-         So I added a new method called 'setIgnoreContentScaleFactor' for 'AtlasNode',
-         this is not exposed to game developers, it's only used for displaying FPS now.
-         */
-        Texture2D::setDefaultAlphaPixelFormat(currentFormat);
     }
 
     void Director::setContentScaleFactor(float scaleFactor)

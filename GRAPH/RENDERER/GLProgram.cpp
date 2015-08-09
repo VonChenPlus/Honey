@@ -820,7 +820,7 @@ namespace GRAPH
         }
 
         if (_flags.usesRandom)
-            setUniformLocationWith4f(_builtInUniforms[GLProgram::UNIFORM_RANDOM01], RANDOM_0_1(), RANDOM_0_1(), RANDOM_0_1(), RANDOM_0_1());
+            setUniformLocationWith4f(_builtInUniforms[GLProgram::UNIFORM_RANDOM01], UTILS::RANDOM::RANDOM_0_1(), UTILS::RANDOM::RANDOM_0_1(), UTILS::RANDOM::RANDOM_0_1(), UTILS::RANDOM::RANDOM_0_1());
     }
 
     void GLProgram::reset()

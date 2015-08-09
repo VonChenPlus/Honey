@@ -2,6 +2,7 @@
 #define HOBJECT_H
 
 #include <vector>
+#include <unordered_map>
 #include "BASE/Honey.h"
 
 #ifndef SAFE_RELEASE
@@ -325,6 +326,199 @@ protected:
     }
 
     std::vector<T> data_;
+};
+
+template <class K, class V>
+class HObjectMap
+{
+public:
+    typedef std::unordered_map<K, V> RefMap;
+
+    typedef typename RefMap::iterator iterator;
+    typedef typename RefMap::const_iterator const_iterator;
+
+    iterator begin() { return data_.begin(); }
+    const_iterator begin() const { return data_.begin(); }
+
+    iterator end() { return data_.end(); }
+    const_iterator end() const { return data_.end(); }
+
+    const_iterator cbegin() const { return data_.cbegin(); }
+    const_iterator cend() const { return data_.cend(); }
+
+    HObjectMap<K, V>()
+        : data_() {
+    }
+
+    explicit HObjectMap<K, V>(ssize_t capacity)
+        : data_() {
+        data_.reserve(capacity);
+    }
+
+    HObjectMap<K, V>(const HObjectMap<K, V>& other)
+    {
+        data_ = other.data_;
+        addRefForAllObjects();
+    }
+
+    HObjectMap<K, V>(HObjectMap<K, V>&& other) {
+        data_ = std::move(other.data_);
+    }
+
+    ~HObjectMap<K, V>() {
+        clear();
+    }
+
+    void reserve(ssize_t capacity) {
+        data_.reserve(capacity);
+    }
+
+    ssize_t bucketCount() const {
+        return data_.bucket_count();
+    }
+
+    ssize_t bucketSize(ssize_t n) const {
+        return data_.bucket_size(n);
+    }
+
+    ssize_t bucket(const K& k) const {
+        return data_.bucket(k);
+    }
+
+    ssize_t size() const {
+        return data_.size();
+    }
+
+    bool empty() const {
+        return data_.empty();
+    }
+
+    std::vector<K> keys() const {
+        std::vector<K> keys;
+
+        if (!data_.empty()) {
+            keys.reserve(data_.size());
+
+            for (auto iter = data_.cbegin(); iter != data_.cend(); ++iter) {
+                keys.push_back(iter->first);
+            }
+        }
+        return keys;
+    }
+
+    std::vector<K> keys(V object) const {
+        std::vector<K> keys;
+
+        if (!data_.empty()) {
+            keys.reserve(data_.size() / 10);
+
+            for (auto iter = data_.cbegin(); iter != data_.cend(); ++iter) {
+                if (iter->second == object) {
+                    keys.push_back(iter->first);
+                }
+            }
+        }
+
+        keys.shrink_to_fit();
+
+        return keys;
+    }
+
+    const V at(const K& key) const {
+        auto iter = data_.find(key);
+        if (iter != data_.end())
+            return iter->second;
+        return nullptr;
+    }
+
+    V at(const K& key) {
+        auto iter = data_.find(key);
+        if (iter != data_.end())
+            return iter->second;
+        return nullptr;
+    }
+
+    const_iterator find(const K& key) const {
+        return data_.find(key);
+    }
+
+    iterator find(const K& key) {
+        return data_.find(key);
+    }
+
+    void insert(const K& key, V object) {
+        erase(key);
+        data_.insert(std::make_pair(key, object));
+        object->retain();
+    }
+
+    iterator erase(const_iterator position) {
+        position->second->release();
+        return data_.erase(position);
+    }
+
+    size_t erase(const K& k) {
+        auto iter = data_.find(k);
+        if (iter != data_.end())
+        {
+            iter->second->release();
+            data_.erase(iter);
+            return 1;
+        }
+
+        return 0;
+    }
+
+    void erase(const std::vector<K>& keys) {
+        for(const auto &key : keys) {
+            this->erase(key);
+        }
+    }
+
+    void clear() {
+        for (auto iter = data_.cbegin(); iter != data_.cend(); ++iter) {
+            iter->second->release();
+        }
+
+        data_.clear();
+    }
+
+    V getRandomObject() const {
+        if (!data_.empty())
+        {
+            ssize_t randIdx = rand() % data_.size();
+            const_iterator randIter = data_.begin();
+            std::advance(randIter , randIdx);
+            return randIter->second;
+        }
+        return nullptr;
+    }
+
+    HObjectMap<K, V>& operator= ( const HObjectMap<K, V>& other ) {
+        if (this != &other) {
+            clear();
+            data_ = other.data_;
+            addRefForAllObjects();
+        }
+        return *this;
+    }
+
+    HObjectMap<K, V>& operator= ( HObjectMap<K, V>&& other ) {
+        if (this != &other) {
+            clear();
+            data_ = std::move(other.data_);
+        }
+        return *this;
+    }
+
+protected:
+    void addRefForAllObjects() {
+        for (auto iter = data_.begin(); iter != data_.end(); ++iter) {
+            iter->second->retain();
+        }
+    }
+
+    RefMap data_;
 };
 
 #endif // HOBJECT_H

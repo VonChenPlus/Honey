@@ -199,7 +199,7 @@ namespace GRAPH
             int glProgram = (int)_glProgramState->getGLProgram()->getProgram();
             int intArray[4] = { glProgram, (int)_textureID, (int)_blendType.src, (int)_blendType.dst};
 
-            _materialID = UTILS::HASH::Fletcher((const void*)intArray, sizeof(intArray));
+            _materialID = UTILS::HASH::Fletcher((const uint8*)intArray, sizeof(intArray));
         }
     }
 
@@ -214,4 +214,71 @@ namespace GRAPH
         _glProgramState->apply(_mv);
     }
 
+    CustomCommand::CustomCommand()
+        : func(nullptr) {
+        _type = RenderCommand::Type::CUSTOM_COMMAND;
+    }
+
+    void CustomCommand::init(float depth, const MATH::Matrix4 &modelViewTransform, uint32_t flags)
+    {
+        RenderCommand::init(depth, modelViewTransform, flags);
+    }
+
+    void CustomCommand::init(float globalOrder)
+    {
+        _globalOrder = globalOrder;
+    }
+
+    CustomCommand::~CustomCommand() {
+    }
+
+    void CustomCommand::execute()
+    {
+        if(func)
+        {
+            func();
+        }
+    }
+
+    BatchCommand::BatchCommand()
+    : _textureID(0)
+    , _blendType(BlendFunc::DISABLE)
+    , _textureAtlas(nullptr)
+    {
+        _type = RenderCommand::Type::BATCH_COMMAND;
+        _shader = nullptr;
+    }
+
+    void BatchCommand::init(float globalOrder, GLProgram* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const Mat4& modelViewTransform, uint32_t flags)
+    {
+        RenderCommand::init(globalOrder, modelViewTransform, flags);
+        _textureID = textureAtlas->getTexture()->getName();
+        _blendType = blendType;
+        _shader = shader;
+
+        _textureAtlas = textureAtlas;
+
+        _mv = modelViewTransform;
+    }
+
+    void BatchCommand::init(float globalOrder, GLProgram* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const Mat4& modelViewTransform)
+    {
+        init(globalOrder, shader, blendType, textureAtlas, modelViewTransform, 0);
+    }
+
+    BatchCommand::~BatchCommand()
+    {
+    }
+
+    void BatchCommand::execute()
+    {
+        // Set material
+        _shader->use();
+        _shader->setUniformsForBuiltins(_mv);
+        bindTexture2D(_textureID);
+        blendFunc(_blendType.src, _blendType.dst);
+
+        // Draw
+        _textureAtlas->drawQuads();
+    }
 }

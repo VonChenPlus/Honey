@@ -8,6 +8,7 @@
 #include "GRAPH/BASE/Types.h"
 #include "MATH/Matrix.h"
 #include "GRAPH/RENDERER/GLProgramState.h"
+#include "GRAPH/RENDERER/TextureAtlas.h"
 
 namespace GRAPH
 {
@@ -26,8 +27,6 @@ namespace GRAPH
             BATCH_COMMAND,
             /**Group command, which can group command in a tree hierarchy.*/
             GROUP_COMMAND,
-            /**Mesh command, used to draw 3D meshes.*/
-            MESH_COMMAND,
             /**Primitive command, used to draw primitives such as lines, points and triangles.*/
             PRIMITIVE_COMMAND,
             /**Triangles command, used to draw triangles.*/
@@ -179,7 +178,7 @@ namespace GRAPH
         /**Get the blend function.*/
         inline BlendFunc getBlendType() const { return _blendType; }
         /**Get the model view matrix.*/
-        inline const Mat4& getModelView() const { return _mv; }
+        inline const MATH::Matrix4& getModelView() const { return _mv; }
 
     protected:
         /**Generate the material ID by textureID, glProgramState, and blend function.*/
@@ -196,6 +195,47 @@ namespace GRAPH
         /**Rendered triangles.*/
         Triangles _triangles;
         /**Model view matrix when rendering the triangles.*/
+        MATH::Matrix4 _mv;
+    };
+
+    class CustomCommand : public RenderCommand
+    {
+    public:
+        CustomCommand();
+        ~CustomCommand();
+
+    public:
+        void init(float globalZOrder, const MATH::Matrix4& modelViewTransform, uint32_t flags);
+        void init(float globalZOrder);
+
+        void execute();
+        std::function<void()> func;
+
+    protected:
+    };
+
+    class BatchCommand : public RenderCommand
+    {
+    public:
+        BatchCommand();
+        ~BatchCommand();
+
+        void init(float globalZOrder, GLProgram* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const MATH::Matrix4& modelViewTransform, uint32_t flags);
+        void execute();
+
+    protected:
+        //TODO: This member variable is not used. It should be removed.
+        int32_t _materialID;
+        /**Texture ID used for texture atlas rendering.*/
+        GLuint _textureID;
+        /**Shaders used for rendering.*/
+        GLProgram* _shader;
+        /**Blend function for rendering.*/
+        BlendFunc _blendType;
+        /**Texture atlas for rendering.*/
+        TextureAtlas *_textureAtlas;
+
+        /**ModelView transform.*/
         MATH::Matrix4 _mv;
     };
 }

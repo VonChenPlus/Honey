@@ -7,6 +7,7 @@
 
 #include "BASE/HObject.h"
 #include "GRAPH/BASE/GLCommon.h"
+#include "GRAPH/BASE/Types.h"
 
 namespace GRAPH
 {

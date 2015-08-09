@@ -56,7 +56,7 @@ namespace GRAPH
         void setVec3v(ssize_t size, const MATH::Vector3f* pointer);
         void setVec4(const MATH::Vector4f& value);
         void setVec4v(ssize_t size, const MATH::Vector4f* pointer);
-        void setMatrix4(const MATH::Matrix4& value);
+        void setMat4(const MATH::Matrix4& value);
         /**
          @}
          */
@@ -280,7 +280,7 @@ namespace GRAPH
         void setUniformVec3v(const std::string& uniformName, ssize_t size, const MATH::Vector3f* pointer);
         void setUniformVec4(const std::string& uniformName, const MATH::Vector4f& value);
         void setUniformVec4v(const std::string& uniformName, ssize_t size, const MATH::Vector4f* pointer);
-        void setUniformMatrix4(const std::string& uniformName, const MATH::Matrix4& value);
+        void setUniformMat4(const std::string& uniformName, const MATH::Matrix4& value);
         void setUniformCallback(const std::string& uniformName, const std::function<void(GLProgram*, Uniform*)> &callback);
         void setUniformTexture(const std::string& uniformName, Texture2D *texture);
         void setUniformTexture(const std::string& uniformName, GLuint textureId);
@@ -298,7 +298,7 @@ namespace GRAPH
         void setUniformVec3v(GLint uniformLocation, ssize_t size, const MATH::Vector3f* pointer);
         void setUniformVec4(GLint uniformLocation, const MATH::Vector4f& value);
         void setUniformVec4v(GLint uniformLocation, ssize_t size, const MATH::Vector4f* pointer);
-        void setUniformMatrix4(GLint uniformLocation, const MATH::Matrix4& value);
+        void setUniformMat4(GLint uniformLocation, const MATH::Matrix4& value);
         void setUniformCallback(GLint uniformLocation, const std::function<void(GLProgram*, Uniform*)> &callback);
         void setUniformTexture(GLint uniformLocation, Texture2D *texture);
         void setUniformTexture(GLint uniformLocation, GLuint textureId);
@@ -458,7 +458,7 @@ namespace GRAPH
         GLProgramStateCache();
         ~GLProgramStateCache();
 
-        std::map<GLProgram*, GLProgramState*> _glProgramStates;
+        HObjectMap<GLProgram*, GLProgramState*> _glProgramStates;
         static GLProgramStateCache* s_instance;
     };
 }

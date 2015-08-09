@@ -27,7 +27,9 @@ SOURCES += \
     $$P/UTILS/HASH/*.cpp \
     $$P/UTILS/STRING/*.cpp \
     $$P/UTILS/TIME/*.cpp \
-    $$P/UTILS/COLOR/*.cpp
+    $$P/UTILS/COLOR/*.cpp \
+    GRAPH/BASE/Fonts.cpp \
+    GRAPH/RENDERER/TextureAtlas.cpp
 
 HEADERS += \
     $$P/BASE/*.h \
@@ -45,7 +47,8 @@ HEADERS += \
     $$P/UTILS/STRING/*.h \
     $$P/UTILS/TIME/*.h \
     $$P/UTILS/COLOR/*.h \
-    $$P/UTILS/RANDOM/*.h
+    $$P/UTILS/RANDOM/*.h \
+    GRAPH/RENDERER/TextureAtlas.h
     
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)
