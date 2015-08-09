@@ -523,7 +523,7 @@ namespace GRAPH
         bool _sendCleanupToScene;
 
         /* scheduled scenes */
-        HVector<Scene*> _scenesStack;
+        HObjectVector<Scene*> _scenesStack;
 
         /* last time the main loop was updated */
         struct timeval *_lastUpdate;
