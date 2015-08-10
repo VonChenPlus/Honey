@@ -9,8 +9,6 @@ using UTILS::TIME::TimeNow;
 #include "GRAPH/UI/ScreenManager.h"
 #include "UTILS/RANDOM/HRandom.h"
 using UTILS::RANDOM::GMRandom;
-#include "UTILS/COLOR/Color.h"
-using UTILS::COLOR::ColorAlpha;
 
 namespace UI
 {
@@ -135,7 +133,7 @@ namespace UI
         I_E
     };
 
-    static const uint32_t colors[4] = {
+    static const GRAPH::Color4B colors[4] = {
         0xC0FFFFFF,
         0xC0FFFFFF,
         0xC0FFFFFF,
@@ -168,7 +166,9 @@ namespace UI
             float y = ybase[i] + dc.getBounds().top + 40 * cosf(i * 7.2f + t * 1.3f);
             float angle = sinf(i + t);
             int n = i & 3;
-            dc.draw()->drawImageRotated(symbols[n], x, y, 1.0f, angle, ColorAlpha(colors[n], alpha * 0.1f));
+            GRAPH::Color4B color = colors[n];
+            color.alpha = alpha * 0.1f;
+            dc.draw()->drawImageRotated(symbols[n], x, y, 1.0f, angle, color);
         }
 
         dc.flush();

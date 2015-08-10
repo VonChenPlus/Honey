@@ -148,7 +148,7 @@ namespace GRAPH
         return true;
     }
 
-    void TextureAtlas::listenRendererRecreated(EventCustom* event)
+    void TextureAtlas::listenRendererRecreated(EventCustom*)
     {
         if (Configuration::getInstance()->supportsShareableVAO())
         {

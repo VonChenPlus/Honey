@@ -64,7 +64,7 @@ namespace GRAPH
         return _texture;
     }
 
-    void RenderState::bind(Pass* pass)
+    void RenderState::bind(Pass*)
     {
         if (_texture)
             bindTexture2D(_texture->getName());

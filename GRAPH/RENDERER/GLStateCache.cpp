@@ -130,7 +130,7 @@ namespace GRAPH
         glDeleteTextures(1, &textureId);
     }
 
-    void deleteTextureN(GLuint textureUnit, GLuint textureId)
+    void deleteTextureN(GLuint, GLuint textureId)
     {
         deleteTexture(textureId);
     }

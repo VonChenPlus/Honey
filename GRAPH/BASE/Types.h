@@ -3,6 +3,7 @@
 
 #include "MATH/Vector.h"
 #include "GRAPH/BASE/Color.h"
+#include "GRAPH/BASE/GLCommon.h"
 
 namespace GRAPH
 {

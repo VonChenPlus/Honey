@@ -1,21 +1,17 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#include "GRAPH/BASE/GLCommon.h"
+#include "BASE/Honey.h"
 
 namespace GRAPH
 {
     struct Color4B;
     struct Color4F;
 
-    /**
-     * RGB color composed of bytes 3 bytes.
-     * @since v3.0
-     */
     struct Color3B
     {
         Color3B();
-        Color3B(GLubyte _r, GLubyte _g, GLubyte _b);
+        Color3B(HBYTE _r, HBYTE _g, HBYTE _b);
         explicit Color3B(const Color4B& color);
         explicit Color3B(const Color4F& color);
 
@@ -26,14 +22,13 @@ namespace GRAPH
         bool operator!=(const Color4B& right) const;
         bool operator!=(const Color4F& right) const;
 
-        bool equals(const Color3B& other)
-        {
+        bool equals(const Color3B& other) {
             return (*this == other);
         }
 
-        GLubyte r;
-        GLubyte g;
-        GLubyte b;
+        HBYTE red;
+        HBYTE green;
+        HBYTE blue;
 
         static const Color3B WHITE;
         static const Color3B YELLOW;
@@ -46,14 +41,11 @@ namespace GRAPH
         static const Color3B GRAY;
     };
 
-    /**
-     * RGBA color composed of 4 bytes.
-     * @since v3.0
-     */
     struct Color4B
     {
         Color4B();
-        Color4B(GLubyte _r, GLubyte _g, GLubyte _b, GLubyte _a);
+        Color4B(HBYTE _r, HBYTE _g, HBYTE _b, HBYTE _a);
+        Color4B(uint32 color);
         explicit Color4B(const Color3B& color);
         explicit Color4B(const Color4F& color);
 
@@ -63,11 +55,19 @@ namespace GRAPH
         bool operator!=(const Color4B& right) const;
         bool operator!=(const Color3B& right) const;
         bool operator!=(const Color4F& right) const;
+        inline operator uint32() {
+            return alpha << 24 | blue << 16 | green << 8 | red;
+        }
 
-        GLubyte r;
-        GLubyte g;
-        GLubyte b;
-        GLubyte a;
+        HBYTE red;
+        HBYTE green;
+        HBYTE blue;
+        HBYTE alpha;
+
+        static Color4B DarkenColor(Color4B);
+        static Color4B WhiteColor(Color4B);
+        static Color4B WhiteAlpha(float alpha);
+        static Color4B BlackAlpha(float alpha);
 
         static const Color4B WHITE;
         static const Color4B YELLOW;
@@ -80,11 +80,6 @@ namespace GRAPH
         static const Color4B GRAY;
     };
 
-
-    /**
-     * RGBA color composed of 4 floats.
-     * @since v3.0
-     */
     struct Color4F
     {
         Color4F();
@@ -99,15 +94,14 @@ namespace GRAPH
         bool operator!=(const Color3B& right) const;
         bool operator!=(const Color4B& right) const;
 
-        bool equals(const Color4F &other)
-        {
+        bool equals(const Color4F &other) {
             return (*this == other);
         }
 
-        GLfloat r;
-        GLfloat g;
-        GLfloat b;
-        GLfloat a;
+        float red;
+        float green;
+        float blue;
+        float alpha;
 
         static const Color4F WHITE;
         static const Color4F YELLOW;

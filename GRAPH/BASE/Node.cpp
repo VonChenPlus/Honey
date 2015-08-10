@@ -1032,7 +1032,7 @@ namespace GRAPH
         draw(renderer, _modelViewTransform, true);
     }
 
-    void Node::draw(Renderer* renderer, const MATH::Matrix4 &transform, uint32_t flags)
+    void Node::draw(Renderer*, const MATH::Matrix4 &, uint32_t)
     {
     }
 
@@ -1284,7 +1284,7 @@ namespace GRAPH
         _scheduler->scheduleUpdate(this, priority, !_running);
     }
 
-    void Node::scheduleUpdateWithPriorityLua(int nHandler, int priority)
+    void Node::scheduleUpdateWithPriorityLua(int, int priority)
     {
         unscheduleUpdate();
 
@@ -1370,7 +1370,7 @@ namespace GRAPH
     }
 
     // override me
-    void Node::update(float fDelta)
+    void Node::update(float)
     {
     }
 
@@ -1723,9 +1723,9 @@ namespace GRAPH
 
     void Node::updateDisplayedColor(const Color3B& parentColor)
     {
-        _displayedColor.r = _realColor.r * parentColor.r/255.0;
-        _displayedColor.g = _realColor.g * parentColor.g/255.0;
-        _displayedColor.b = _realColor.b * parentColor.b/255.0;
+        _displayedColor.red = _realColor.red * parentColor.red/255.0;
+        _displayedColor.green = _realColor.green * parentColor.green/255.0;
+        _displayedColor.blue = _realColor.blue * parentColor.blue/255.0;
         updateColor();
 
         if (_cascadeColorEnabled)

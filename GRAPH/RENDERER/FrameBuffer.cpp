@@ -298,7 +298,7 @@ namespace GRAPH
     void FrameBuffer::clearFBO()
     {
         applyFBO();
-        glClearColor(_clearColor.r, _clearColor.g, _clearColor.b, _clearColor.a);
+        glClearColor(_clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha);
         glClearDepth(_clearDepth);
         glClearStencil(_clearStencil);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);

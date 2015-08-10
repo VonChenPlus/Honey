@@ -2,191 +2,199 @@
 
 namespace GRAPH
 {
-    /**
-     * Color3B
-     */
-
     Color3B::Color3B()
-    : r(0)
-    , g(0)
-    , b(0)
-    {}
+        : red(0)
+        , green(0)
+        , blue(0) {
 
-    Color3B::Color3B(GLubyte _r, GLubyte _g, GLubyte _b)
-    : r(_r)
-    , g(_g)
-    , b(_b)
-    {}
+    }
+
+    Color3B::Color3B(HBYTE _r, HBYTE _g, HBYTE _b)
+        : red(_r)
+        , green(_g)
+        , blue(_b) {
+
+    }
 
     Color3B::Color3B(const Color4B& color)
-    : r(color.r)
-    , g(color.g)
-    , b(color.b)
-    {}
+        : red(color.red)
+        , green(color.green)
+        , blue(color.blue) {
+
+    }
 
     Color3B::Color3B(const Color4F& color)
-    : r(color.r * 255.0f)
-    , g(color.g * 255.0f)
-    , b(color.b * 255.0f)
-    {}
+        : red(color.red * 255.0f)
+        , green(color.green * 255.0f)
+        , blue(color.blue * 255.0f) {
 
-    bool Color3B::operator==(const Color3B& right) const
-    {
-        return (r == right.r && g == right.g && b == right.b);
     }
 
-    bool Color3B::operator==(const Color4B& right) const
-    {
-        return (r == right.r && g == right.g && b == right.b && 255 == right.a);
+    bool Color3B::operator==(const Color3B& right) const {
+        return (red == right.red && green == right.green && blue == right.blue);
     }
 
-    bool Color3B::operator==(const Color4F& right) const
-    {
-        return (right.a == 1.0f && Color4F(*this) == right);
+    bool Color3B::operator==(const Color4B& right) const {
+        return (red == right.red && green == right.green && blue == right.blue && 255 == right.alpha);
     }
 
-    bool Color3B::operator!=(const Color3B& right) const
-    {
+    bool Color3B::operator==(const Color4F& right) const {
+        return (right.alpha == 1.0f && Color4F(*this) == right);
+    }
+
+    bool Color3B::operator!=(const Color3B& right) const {
         return !(*this == right);
     }
 
-    bool Color3B::operator!=(const Color4B& right) const
-    {
+    bool Color3B::operator!=(const Color4B& right) const {
         return !(*this == right);
     }
 
-    bool Color3B::operator!=(const Color4F& right) const
-    {
+    bool Color3B::operator!=(const Color4F& right) const {
         return !(*this == right);
     }
-
-    /**
-     * Color4B
-     */
 
     Color4B::Color4B()
-    : r(0)
-    , g(0)
-    , b(0)
-    , a(0)
-    {}
+        : red(0)
+        , green(0)
+        , blue(0)
+        , alpha(0) {
 
-    Color4B::Color4B(GLubyte _r, GLubyte _g, GLubyte _b, GLubyte _a)
-    : r(_r)
-    , g(_g)
-    , b(_b)
-    , a(_a)
-    {}
+    }
+
+    Color4B::Color4B(HBYTE _r, HBYTE _g, HBYTE _b, HBYTE _a)
+        : red(_r)
+        , green(_g)
+        , blue(_b)
+        , alpha(_a) {
+
+    }
+
+    Color4B::Color4B(uint32 color)
+        : red(color & 0xFF)
+        , green(color & 0xFF00)
+        , blue(color & 0xFF0000)
+        , alpha(color & 0xFF000000) {
+
+    }
 
     Color4B::Color4B(const Color3B& color)
-    : r(color.r)
-    , g(color.g)
-    , b(color.b)
-    , a(255)
-    {}
+        : red(color.red)
+        , green(color.green)
+        , blue(color.blue)
+        , alpha(255) {
+
+    }
 
     Color4B::Color4B(const Color4F& color)
-    : r(color.r * 255)
-    , g(color.g * 255)
-    , b(color.b * 255)
-    , a(color.a * 255)
-    {}
+        : red(color.red * 255)
+        , green(color.green * 255)
+        , blue(color.blue * 255)
+        , alpha(color.alpha * 255) {
 
-    bool Color4B::operator==(const Color4B& right) const
-    {
-        return (r == right.r && g == right.g && b == right.b && a == right.a);
     }
 
-    bool Color4B::operator==(const Color3B& right) const
-    {
-        return (r == right.r && g == right.g && b == right.b && a == 255);
+    bool Color4B::operator==(const Color4B& right) const {
+        return (red == right.red && green == right.green && blue == right.blue && alpha == right.alpha);
     }
 
-    bool Color4B::operator==(const Color4F& right) const
-    {
+    bool Color4B::operator==(const Color3B& right) const {
+        return (red == right.red && green == right.green && blue == right.blue && alpha == 255);
+    }
+
+    bool Color4B::operator==(const Color4F& right) const {
         return (*this == Color4B(right));
     }
 
-    bool Color4B::operator!=(const Color4B& right) const
-    {
+    bool Color4B::operator!=(const Color4B& right) const {
         return !(*this == right);
     }
 
-    bool Color4B::operator!=(const Color3B& right) const
-    {
+    bool Color4B::operator!=(const Color3B& right) const {
         return !(*this == right);
     }
 
-    bool Color4B::operator!=(const Color4F& right) const
-    {
+    bool Color4B::operator!=(const Color4F& right) const {
         return !(*this == right);
     }
 
-    /**
-     * Color4F
-     */
+    Color4B Color4B::DarkenColor(Color4B color) {
+        uint32 _color = color;
+        return (_color & 0xFF000000) | ((_color >> 1)&0x7F7F7F);
+    }
+
+    Color4B Color4B::WhiteColor(Color4B color) {
+        uint32 _color = color;
+        return ((color & 0xFF000000) | ((color >> 1)&0x7F7F7F)) + 0x7F7F7F;
+    }
+
+    Color4B Color4B::WhiteAlpha(float alpha) {
+        if (alpha < 0.0f) alpha = 0.0f;
+        if (alpha > 1.0f) alpha = 1.0f;
+        return Color4B(255, 255, 255, alpha*255);
+    }
+
+    Color4B Color4B::BlackAlpha(float alpha) {
+        if (alpha < 0.0f) alpha = 0.0f;
+        if (alpha > 1.0f) alpha = 1.0f;
+        return Color4B(0, 0, 0, alpha*255);
+    }
 
     Color4F::Color4F()
-    : r(0.0f)
-    , g(0.0f)
-    , b(0.0f)
-    , a(0.0f)
-    {}
+        : red(0.0f)
+        , green(0.0f)
+        , blue(0.0f)
+        , alpha(0.0f) {
+
+    }
 
     Color4F::Color4F(float _r, float _g, float _b, float _a)
-    : r(_r)
-    , g(_g)
-    , b(_b)
-    , a(_a)
-    {}
+        : red(_r)
+        , green(_g)
+        , blue(_b)
+        , alpha(_a) {
+
+    }
 
     Color4F::Color4F(const Color3B& color)
-    : r(color.r / 255.0f)
-    , g(color.g / 255.0f)
-    , b(color.b / 255.0f)
-    , a(1.0f)
-    {}
+        : red(color.red / 255.0f)
+        , green(color.green / 255.0f)
+        , blue(color.blue / 255.0f)
+        , alpha(1.0f) {
+
+    }
 
     Color4F::Color4F(const Color4B& color)
-    : r(color.r / 255.0f)
-    , g(color.g / 255.0f)
-    , b(color.b / 255.0f)
-    , a(color.a / 255.0f)
-    {}
+        : red(color.red / 255.0f)
+        , green(color.green / 255.0f)
+        , blue(color.blue / 255.0f)
+        , alpha(color.alpha / 255.0f) {
 
-    bool Color4F::operator==(const Color4F& right) const
-    {
-        return (r == right.r && g == right.g && b == right.b && a == right.a);
     }
 
-    bool Color4F::operator==(const Color3B& right) const
-    {
-        return (a == 1.0f && Color3B(*this) == right);
+    bool Color4F::operator==(const Color4F& right) const {
+        return (red == right.red && green == right.green && blue == right.blue && alpha == right.alpha);
     }
 
-    bool Color4F::operator==(const Color4B& right) const
-    {
+    bool Color4F::operator==(const Color3B& right) const {
+        return (alpha == 1.0f && Color3B(*this) == right);
+    }
+
+    bool Color4F::operator==(const Color4B& right) const {
         return (*this == Color4F(right));
     }
 
-    bool Color4F::operator!=(const Color4F& right) const
-    {
+    bool Color4F::operator!=(const Color4F& right) const {
         return !(*this == right);
     }
 
-    bool Color4F::operator!=(const Color3B& right) const
-    {
+    bool Color4F::operator!=(const Color3B& right) const {
         return !(*this == right);
     }
 
-    bool Color4F::operator!=(const Color4B& right) const
-    {
+    bool Color4F::operator!=(const Color4B& right) const {
         return !(*this == right);
     }
-
-    /**
-     * Color constants
-     */
 
     const Color3B Color3B::WHITE  (255, 255, 255);
     const Color3B Color3B::YELLOW (255, 255,   0);

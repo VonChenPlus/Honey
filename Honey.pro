@@ -26,8 +26,7 @@ SOURCES += \
     $$P/THREAD/*.cpp \
     $$P/UTILS/HASH/*.cpp \
     $$P/UTILS/STRING/*.cpp \
-    $$P/UTILS/TIME/*.cpp \
-    $$P/UTILS/COLOR/*.cpp
+    $$P/UTILS/TIME/*.cpp
 
 HEADERS += \
     $$P/BASE/*.h \
@@ -43,8 +42,7 @@ HEADERS += \
     $$P/THREAD/*.h \
     $$P/UTILS/HASH/*.h \
     $$P/UTILS/STRING/*.h \
-    $$P/UTILS/TIME/*.h \
-    $$P/UTILS/COLOR/*.h \
+    $$P/UTILS/TIME/*.h
     $$P/UTILS/RANDOM/*.h
     
 # Zlib

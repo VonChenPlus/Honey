@@ -53,7 +53,7 @@ namespace GFX
         *h = (float)*h * fontScaleY_;
     }
 
-    void TextDrawer::drawString(DrawBuffer &target, const char *str, float x, float y, uint32 color, int align) {
+    void TextDrawer::drawString(DrawBuffer &target, const char *str, float x, float y, GRAPH::Color4B color, int align) {
         if (!strlen(str))
             return;
 
@@ -82,7 +82,7 @@ namespace GFX
         target.flush(true);
     }
 
-    void TextDrawer::drawStringRect(DrawBuffer &target, const char *str, const Boundsf &bounds, uint32 color, int align) {
+    void TextDrawer::drawStringRect(DrawBuffer &target, const char *str, const Boundsf &bounds, GRAPH::Color4B color, int align) {
         float x = bounds.left;
         float y = bounds.top;
         if (align & ALIGN_HCENTER) {

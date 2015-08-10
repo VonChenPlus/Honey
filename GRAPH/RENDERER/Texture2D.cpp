@@ -422,7 +422,7 @@ namespace GRAPH
         return _hasPremultipliedAlpha;
     }
 
-    bool Texture2D::initWithData(const void *data, ssize_t dataLen, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef& contentSize)
+    bool Texture2D::initWithData(const void *data, ssize_t dataLen, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef&)
     {
         //if data has no mipmaps, we will consider it has only one mipmap
         MipmapInfo mipmap;

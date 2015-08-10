@@ -5,8 +5,8 @@
 #include "MATH/Bounds.h"
 #include "GRAPH/THIN3D/Thin3D.h"
 #include "GRAPH/GFX/Texture.h"
-#include "UTILS/COLOR/Color.h"
 #include "GRAPH/GFX/Atlas.h"
+#include "GRAPH/BASE/Color.h"
 
 namespace GFX
 {
@@ -47,7 +47,7 @@ namespace GFX
     struct GradientStop
     {
         float t;
-        uint32 color;
+        GRAPH::Color4B color;
     };
 
     class DrawBuffer
@@ -67,33 +67,33 @@ namespace GFX
 
         void flush(bool set_blend_state = true);
 
-        void rect(float x, float y, float w, float h, uint32 color, int align = ALIGN_TOPLEFT);
-        void hLine(float x1, float y, float x2, uint32 color);
-        void vLine(float x, float y1, float y2, uint32 color);
-        void vLineAlpha50(float x, float y1, float y2, uint32 color);
+        void rect(float x, float y, float w, float h, GRAPH::Color4B color, int align = ALIGN_TOPLEFT);
+        void hLine(float x1, float y, float x2, GRAPH::Color4B color);
+        void vLine(float x, float y1, float y2, GRAPH::Color4B color);
+        void vLineAlpha50(float x, float y1, float y2, GRAPH::Color4B color);
 
-        void line(int atlas_image, float x1, float y1, float x2, float y2, float thickness, uint32 color);
+        void line(int atlas_image, float x1, float y1, float x2, float y2, float thickness, GRAPH::Color4B color);
 
-        void rectOutline(float x, float y, float w, float h, uint32 color, int align = ALIGN_TOPLEFT);
+        void rectOutline(float x, float y, float w, float h, GRAPH::Color4B color, int align = ALIGN_TOPLEFT);
 
-        void rectVGradient(float x, float y, float w, float h, uint32 colorTop, uint32 colorBottom);
-        void rectVDarkFaded(float x, float y, float w, float h, uint32 colorTop) {
-            rectVGradient(x, y, w, h, colorTop, UTILS::COLOR::DarkenColor(colorTop));
+        void rectVGradient(float x, float y, float w, float h, GRAPH::Color4B colorTop, GRAPH::Color4B colorBottom);
+        void rectVDarkFaded(float x, float y, float w, float h, GRAPH::Color4B colorTop) {
+            rectVGradient(x, y, w, h, colorTop, GRAPH::Color4B::DarkenColor(colorTop));
         }
 
         void multiVGradient(float x, float y, float w, float h, GradientStop *stops, int numStops);
 
-        void rectCenter(float x, float y, float w, float h, uint32 color) {
+        void rectCenter(float x, float y, float w, float h, GRAPH::Color4B color) {
             rect(x - w/2, y - h/2, w, h, color);
         }
-        void rect(float x, float y, float w, float h, float u, float v, float uw, float uh, uint32 color);
+        void rect(float x, float y, float w, float h, float u, float v, float uw, float uh, GRAPH::Color4B color);
 
-        void v(float x, float y, float z, uint32 color, float u, float v);
-        void v(float x, float y, uint32 color, float u, float _v) {
+        void v(float x, float y, float z, GRAPH::Color4B color, float u, float v);
+        void v(float x, float y, GRAPH::Color4B color, float u, float _v) {
             v(x, y, 0.0f, color, u, _v);
         }
 
-        void circle(float x, float y, float radius, float thickness, int segments, float startAngle, uint32 color, float u_mul);
+        void circle(float x, float y, float radius, float thickness, int segments, float startAngle, GRAPH::Color4B color, float u_mul);
 
         // New drawing APIs
 
@@ -103,31 +103,31 @@ namespace GFX
         }
         const Atlas *getAtlas() const { return atlas; }
         void measureImage(ImageID atlas_image, float *w, float *h);
-        void drawImage(ImageID atlas_image, float x, float y, float scale, Color color = COLOR(0xFFFFFF), int align = ALIGN_TOPLEFT);
-        void drawImageStretch(ImageID atlas_image, float x1, float y1, float x2, float y2, Color color = COLOR(0xFFFFFF));
-        void drawImageStretch(int atlas_image, const MATH::Boundsf &bounds, Color color = COLOR(0xFFFFFF)) {
+        void drawImage(ImageID atlas_image, float x, float y, float scale, GRAPH::Color4B = GRAPH::Color4B::WHITE, int align = ALIGN_TOPLEFT);
+        void drawImageStretch(ImageID atlas_image, float x1, float y1, float x2, float y2, GRAPH::Color4B = GRAPH::Color4B::WHITE);
+        void drawImageStretch(int atlas_image, const MATH::Boundsf &bounds, GRAPH::Color4B color = GRAPH::Color4B::WHITE) {
             drawImageStretch(atlas_image, bounds.left, bounds.top, bounds.right(), bounds.bottom(), color);
         }
-        void drawImageRotated(ImageID atlas_image, float x, float y, float scale, float angle, Color color = COLOR(0xFFFFFF), bool mirror_h = false);	// Always centers
-        void drawTexRect(float x1, float y1, float x2, float y2, float u1, float v1, float u2, float v2, Color color);
-        void drawTexRect(const MATH::Boundsf &bounds, float u1, float v1, float u2, float v2, Color color) {
+        void drawImageRotated(ImageID atlas_image, float x, float y, float scale, float angle, GRAPH::Color4B = GRAPH::Color4B::WHITE, bool mirror_h = false);	// Always centers
+        void drawTexRect(float x1, float y1, float x2, float y2, float u1, float v1, float u2, float v2, GRAPH::Color4B color);
+        void drawTexRect(const MATH::Boundsf &bounds, float u1, float v1, float u2, float v2, GRAPH::Color4B color) {
             drawTexRect(bounds.left, bounds.top, bounds.right(), bounds.bottom(), u1, v1, u2, v2, color);
         }
         // Results in 18 triangles. Kind of expensive for a button.
-        void drawImage4Grid(ImageID atlas_image, float x1, float y1, float x2, float y2, Color color = COLOR(0xFFFFFF), float corner_scale = 1.0);
+        void drawImage4Grid(ImageID atlas_image, float x1, float y1, float x2, float y2, GRAPH::Color4B = GRAPH::Color4B::WHITE, float corner_scale = 1.0);
         // This is only 6 triangles, much cheaper.
-        void drawImage2GridH(ImageID atlas_image, float x1, float y1, float x2, Color color = COLOR(0xFFFFFF), float scale = 1.0);
+        void drawImage2GridH(ImageID atlas_image, float x1, float y1, float x2, GRAPH::Color4B = GRAPH::Color4B::WHITE, float scale = 1.0);
 
         void measureText(int font, const char *text, float *w, float *h);
 
         // NOTE: Count is in plain chars not utf-8 chars!
         void measureTextCount(int font, const char *text, int count, float *w, float *h);
 
-        void drawTextRect(int font, const char *text, float x, float y, float w, float h, Color color = 0xFFFFFFFF, int align = 0);
-        void drawText(int font, const char *text, float x, float y, Color color = 0xFFFFFFFF, int align = 0);
-        void drawTextShadow(int font, const char *text, float x, float y, Color color = 0xFFFFFFFF, int align = 0);
+        void drawTextRect(int font, const char *text, float x, float y, float w, float h, GRAPH::Color4B = GRAPH::Color4B::WHITE, int align = 0);
+        void drawText(int font, const char *text, float x, float y, GRAPH::Color4B = GRAPH::Color4B::WHITE, int align = 0);
+        void drawTextShadow(int font, const char *text, float x, float y, GRAPH::Color4B = GRAPH::Color4B::WHITE, int align = 0);
 
-        void rotateSprite(ImageID atlas_image, float x, float y, float angle, float scale, Color color);
+        void rotateSprite(ImageID atlas_image, float x, float y, float angle, float scale, GRAPH::Color4B);
 
         void setFontScale(float xs, float ys) {
             fontscalex = xs;
@@ -145,7 +145,7 @@ namespace GFX
         {
             float x, y, z;
             float u, v;
-            uint32 rgba;
+            GRAPH::Color4B rgba;
         };
 
         MATH::Matrix4 drawMatrix_;

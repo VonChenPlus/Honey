@@ -38,7 +38,6 @@ typedef int32_t int32;
 typedef int64_t int64;
 typedef intptr_t IntPtr;
 typedef uintptr_t UIntPtr;
-typedef uint32 Color;
 typedef unsigned char HBYTE;
 typedef int64_t ssize_t;
 

@@ -10,7 +10,7 @@
 #include "BASE/SmartPtr.h"
 #include "GRAPH/UI/UIContext.h"
 #include "GRAPH/UI/Theme.h"
-#include "GRAPH/UI/Event.h"
+#include "GRAPH/UI/UIEvent.h"
 
 namespace UI
 {

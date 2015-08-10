@@ -110,7 +110,7 @@ namespace GFX
         count_ = 0;
     }
 
-    void DrawBuffer::v(float x, float y, float z, uint32 color, float u, float v) {
+    void DrawBuffer::v(float x, float y, float z, GRAPH::Color4B color, float u, float v) {
         if (count_ >= MAX_VERTS) {
             //FLOG("Overflowed the DrawBuffer");
             return;
@@ -125,24 +125,24 @@ namespace GFX
         vert->v = v;
     }
 
-    void DrawBuffer::rect(float x, float y, float w, float h, uint32 color, int align) {
+    void DrawBuffer::rect(float x, float y, float w, float h, GRAPH::Color4B color, int align) {
         doAlign(align, &x, &y, &w, &h);
         rectVGradient(x, y, w, h, color, color);
     }
 
-    void DrawBuffer::hLine(float x1, float y, float x2, uint32 color) {
+    void DrawBuffer::hLine(float x1, float y, float x2, GRAPH::Color4B color) {
         rect(x1, y, x2 - x1, GLOBAL::pixelInDPS(), color);
     }
 
-    void DrawBuffer::vLine(float x, float y1, float y2, uint32 color) {
+    void DrawBuffer::vLine(float x, float y1, float y2, GRAPH::Color4B color) {
         rect(x, y1, GLOBAL::pixelInDPS(), y2 - y1, color);
     }
 
-    void DrawBuffer::vLineAlpha50(float x, float y1, float y2, uint32 color) {
+    void DrawBuffer::vLineAlpha50(float x, float y1, float y2, GRAPH::Color4B color) {
         rect(x, y1, GLOBAL::pixelInDPS(), y2 - y1, (color | 0xFF000000) & 0x7F000000);
     }
 
-    void DrawBuffer::rectVGradient(float x, float y, float w, float h, uint32 colorTop, uint32 colorBottom) {
+    void DrawBuffer::rectVGradient(float x, float y, float w, float h, GRAPH::Color4B colorTop, GRAPH::Color4B colorBottom) {
         v(x,		 y,     0, colorTop,    0, 0);
         v(x + w, y,		 0, colorTop,    1, 0);
         v(x + w, y + h, 0, colorBottom, 1, 1);
@@ -151,7 +151,7 @@ namespace GFX
         v(x,		 y + h, 0, colorBottom, 0, 1);
     }
 
-    void DrawBuffer::rectOutline(float x, float y, float w, float h, uint32 color, int align) {
+    void DrawBuffer::rectOutline(float x, float y, float w, float h, GRAPH::Color4B color, int align) {
         UNUSED(align);
 
         hLine(x, y, x + w + GLOBAL::pixelInDPS(), color);
@@ -171,7 +171,7 @@ namespace GFX
 
     void DrawBuffer::rect(float x, float y, float w, float h,
         float u, float _v, float uw, float uh,
-        uint32 color) {
+        GRAPH::Color4B color) {
             v(x,	   y,     0, color, u, _v);
             v(x + w, y,	   0, color, u + uw, _v);
             v(x + w, y + h, 0, color, u + uw, _v + uh);
@@ -180,7 +180,7 @@ namespace GFX
             v(x,	   y + h, 0, color, u, _v + uh);
     }
 
-    void DrawBuffer::line(int atlas_image, float x1, float y1, float x2, float y2, float thickness, uint32 color) {
+    void DrawBuffer::line(int atlas_image, float x1, float y1, float x2, float y2, float thickness, GRAPH::Color4B color) {
         const AtlasImage &image = atlas->images[atlas_image];
 
         // No caps yet!
@@ -211,7 +211,7 @@ namespace GFX
         *h = (float)image.h;
     }
 
-    void DrawBuffer::drawImage(ImageID atlas_image, float x, float y, float scale, Color color, int align) {
+    void DrawBuffer::drawImage(ImageID atlas_image, float x, float y, float scale, GRAPH::Color4B color, int align) {
         const AtlasImage &image = atlas->images[atlas_image];
         float w = (float)image.w * scale;
         float h = (float)image.h * scale;
@@ -222,7 +222,7 @@ namespace GFX
         drawImageStretch(atlas_image, x, y, x + w, y + h, color);
     }
 
-    void DrawBuffer::drawImageStretch(ImageID atlas_image, float x1, float y1, float x2, float y2, Color color) {
+    void DrawBuffer::drawImageStretch(ImageID atlas_image, float x1, float y1, float x2, float y2, GRAPH::Color4B color) {
         const AtlasImage &image = atlas->images[atlas_image];
         v(x1,	y1, color, image.u1, image.v1);
         v(x2,	y1, color, image.u2, image.v1);
@@ -241,7 +241,7 @@ namespace GFX
         v[1] = x * sa + y *  ca + yc;
     }
 
-    void DrawBuffer::drawImageRotated(ImageID atlas_image, float x, float y, float scale, float angle, Color color, bool mirror_h) {
+    void DrawBuffer::drawImageRotated(ImageID atlas_image, float x, float y, float scale, float angle, GRAPH::Color4B color, bool mirror_h) {
         const AtlasImage &image = atlas->images[atlas_image];
         float w = (float)image.w * scale;
         float h = (float)image.h * scale;
@@ -279,7 +279,7 @@ namespace GFX
     }
 
     // TODO: add arc support
-    void DrawBuffer::circle(float xc, float yc, float radius, float thickness, int segments, float startAngle, uint32 color, float u_mul) {
+    void DrawBuffer::circle(float xc, float yc, float radius, float thickness, int segments, float startAngle, GRAPH::Color4B color, float u_mul) {
         UNUSED(startAngle);
 
         float angleDelta = MATH_PI * 2 / segments;
@@ -305,7 +305,7 @@ namespace GFX
         }
     }
 
-    void DrawBuffer::drawTexRect(float x1, float y1, float x2, float y2, float u1, float v1, float u2, float v2, Color color) {
+    void DrawBuffer::drawTexRect(float x1, float y1, float x2, float y2, float u1, float v1, float u2, float v2, GRAPH::Color4B color) {
         v(x1,	y1, color, u1, v1);
         v(x2,	y1, color, u2, v1);
         v(x2,	y2, color, u2, v2);
@@ -314,7 +314,7 @@ namespace GFX
         v(x1,	y2, color, u1, v2);
     }
 
-    void DrawBuffer::drawImage4Grid(ImageID atlas_image, float x1, float y1, float x2, float y2, Color color, float corner_scale) {
+    void DrawBuffer::drawImage4Grid(ImageID atlas_image, float x1, float y1, float x2, float y2, GRAPH::Color4B color, float corner_scale) {
         const AtlasImage &image = atlas->images[atlas_image];
 
         float u1 = image.u1, v1 = image.v1, u2 = image.u2, v2 = image.v2;
@@ -340,7 +340,7 @@ namespace GFX
         drawTexRect(xb, yb, x2, y2, um, vm, u2, v2, color);
     }
 
-    void DrawBuffer::drawImage2GridH(ImageID atlas_image, float x1, float y1, float x2, Color color, float corner_scale) {
+    void DrawBuffer::drawImage2GridH(ImageID atlas_image, float x1, float y1, float x2, GRAPH::Color4B color, float corner_scale) {
         const AtlasImage &image = atlas->images[atlas_image];
         float um = (image.u1 + image.u2) * 0.5f;
         float iw2 = (image.w * 0.5f) * corner_scale;
@@ -391,7 +391,7 @@ namespace GFX
         return measureTextCount(font, text, (int)strlen(text), w, h);
     }
 
-    void DrawBuffer::drawTextShadow(int font, const char *text, float x, float y, Color color, int flags) {
+    void DrawBuffer::drawTextShadow(int font, const char *text, float x, float y, GRAPH::Color4B color, int flags) {
         uint32 alpha = (color >> 1) & 0xFF000000;
         drawText(font, text, x + 2, y + 2, alpha, flags);
         drawText(font, text, x, y, color, flags);
@@ -411,7 +411,7 @@ namespace GFX
 
 
     // TODO: Actually use the rect properly, take bounds.
-    void DrawBuffer::drawTextRect(int font, const char *text, float x, float y, float w, float h, Color color, int align) {
+    void DrawBuffer::drawTextRect(int font, const char *text, float x, float y, float w, float h, GRAPH::Color4B color, int align) {
         if (align & ALIGN_HCENTER)
         {
             x += w / 2;
@@ -433,7 +433,7 @@ namespace GFX
     }
 
     // ROTATE_* doesn't yet work right.
-    void DrawBuffer::drawText(int font, const char *text, float x, float y, Color color, int align) {
+    void DrawBuffer::drawText(int font, const char *text, float x, float y, GRAPH::Color4B color, int align) {
         // rough estimate
         if (count_ + strlen(text) * 6 > MAX_VERTS) {
             flush(true);
