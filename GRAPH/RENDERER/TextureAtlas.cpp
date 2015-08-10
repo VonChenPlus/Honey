@@ -3,6 +3,12 @@
 #include "GRAPH/BASE/Configuration.h"
 #include "GRAPH/RENDERER/GLProgram.h"
 #include "GRAPH/BASE/Director.h"
+#include "GRAPH/RENDERER/Texture2D.h"
+#include "GRAPH/RENDERER/GLStateCache.h"
+#include "GRAPH/RENDERER/TextureCache.h"
+#include "GRAPH/RENDERER/Renderer.h"
+#undef max
+#undef min
 
 namespace GRAPH
 {
@@ -234,7 +240,7 @@ namespace GRAPH
 
     void TextureAtlas::updateQuad(V3F_C4B_T2F_Quad *quad, ssize_t index)
     {
-        _totalQuads = MAX( index+1, _totalQuads);
+        _totalQuads = std::max( index+1, _totalQuads);
 
         _quads[index] = *quad;
 

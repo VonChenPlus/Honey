@@ -80,12 +80,6 @@ namespace GRAPH
          * @lua NA
          */
         virtual ~Texture2D();
-        /**
-         Get texutre name, dimensions and coordinates message by a string.
-         * @js NA
-         * @lua NA
-         */
-        virtual std::string getDescription() const;
 
         /** Release only the gl texture.
          * @js NA
@@ -214,6 +208,18 @@ namespace GRAPH
         @since v0.99.0
         */
         void generateMipmap();
+
+        const char* getStringForFormat() const;
+
+        /** Returns the bits-per-pixel of the in-memory OpenGL texture
+        @since v1.0
+        */
+        unsigned int getBitsPerPixelForFormat() const;
+
+        /** Helper functions that returns bits per pixels for a given format.
+         @since v2.0
+         */
+        unsigned int getBitsPerPixelForFormat(IMAGE::PixelFormat format) const;
 
         /** Get content size. */
         const MATH::Sizef& getContentSizeInPixels();

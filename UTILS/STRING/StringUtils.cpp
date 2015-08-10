@@ -118,12 +118,12 @@ namespace UTILS
         void DataToHexString(const uint8 *data, size_t size, std::string *output) {
             HBuffer buffer;
             for (size_t i = 0; i < size; i++) {
-                buffer.writeAsFormat("%02x ", data[i]);
+                buffer.writeAsFormat((const HBYTE *)"%02x ", data[i]);
                 if (i && !(i & 15))
-                    buffer.writeAsFormat("\n");
+                    buffer.writeAsFormat((const HBYTE *)"\n");
             }
             output->resize(buffer.size());
-            buffer.read(buffer.size(), &(*output)[0]);
+            buffer.read(buffer.size(), (HBYTE *)&(*output)[0]);
         }
 
         std::string StringFromFormat(const char* format, ...) {

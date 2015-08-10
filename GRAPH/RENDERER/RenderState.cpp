@@ -487,6 +487,11 @@ namespace GRAPH
         }
     }
 
+    static bool parseBoolean(const std::string& value)
+    {
+        return (value.compare("true")==0);
+    }
+
     void RenderState::StateBlock::setState(const std::string& name, const std::string& value)
     {
         if (name.compare("blend") == 0)

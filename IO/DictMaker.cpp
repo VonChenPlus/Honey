@@ -33,17 +33,17 @@ namespace IO
 
         attsVector.push_back(NULLPTR);
 
-        SAXParser::startElement(saxParserImp_, (const uint8 *)element.Value(), (const uint8 **)(&attsVector[0]));
+        SAXParser::startElement(saxParserImp_, element.Value(), &attsVector[0]);
         return true;
     }
 
     bool XmlSaxHander::visitExit( const tinyxml2::XMLElement& element ) {
-        SAXParser::endElement(saxParserImp_, (const uint8 *)element.Value());
+        SAXParser::endElement(saxParserImp_, element.Value());
         return true;
     }
 
     bool XmlSaxHander::visit( const tinyxml2::XMLText& text ) {
-        SAXParser::textHandler(saxParserImp_, (const uint8 *)text.Value(), static_cast<int>(strlen(text.Value())));
+        SAXParser::textHandler(saxParserImp_, text.Value(), static_cast<int>(strlen(text.Value())));
         return true;
     }
 
@@ -56,7 +56,7 @@ namespace IO
 
     bool SAXParser::parse(const HBYTE* xmlData, size_t dataLength) {
         tinyxml2::XMLDocument tinyDoc;
-        tinyDoc.Parse(xmlData, dataLength);
+        tinyDoc.Parse((const char *)xmlData, dataLength);
         XmlSaxHander printer;
         printer.setSAXParserImp(this);
         return tinyDoc.Accept( &printer );
@@ -72,16 +72,16 @@ namespace IO
         return ret;
     }
 
-    void SAXParser::startElement(void *ctx, const uint8 *name, const uint8 **atts) {
-        ((SAXParser*)(ctx))->delegator_->startElement(ctx, (HBYTE*)name, (const HBYTE**)atts);
+    void SAXParser::startElement(void *ctx, const char *name, const char **atts) {
+        ((SAXParser*)(ctx))->delegator_->startElement(ctx, name, atts);
     }
 
-    void SAXParser::endElement(void *ctx, const uint8 *name) {
-        ((SAXParser*)(ctx))->delegator_->endElement(ctx, (HBYTE*)name);
+    void SAXParser::endElement(void *ctx, const char *name) {
+        ((SAXParser*)(ctx))->delegator_->endElement(ctx, name);
     }
 
-    void SAXParser::textHandler(void *ctx, const uint8 *name, int len) {
-        ((SAXParser*)(ctx))->delegator_->textHandler(ctx, (HBYTE*)name, len);
+    void SAXParser::textHandler(void *ctx, const char *name, int len) {
+        ((SAXParser*)(ctx))->delegator_->textHandler(ctx, name, len);
     }
 
     void SAXParser::setDelegator(SAXDelegator* delegator) {
@@ -103,7 +103,7 @@ namespace IO
         return rootDict_;
     }
 
-    ValueMap DictMaker::dictionaryWithDataOfFile(const char* filedata, int filesize) {
+    ValueMap DictMaker::dictionaryWithDataOfFile(const HBYTE* filedata, int filesize) {
         resultType_ = SAX_RESULT_DICT;
         SAXParser parser;
         parser.setDelegator(this);
@@ -119,7 +119,7 @@ namespace IO
         return rootArray_;
     }
 
-    void DictMaker::startElement(void *, const HBYTE *name, const HBYTE **) {
+    void DictMaker::startElement(void *, const char *name, const char **) {
         const std::string sName(name);
         if( sName == "dict" ) {
             if(resultType_ == SAX_RESULT_DICT && rootDict_.empty()) {

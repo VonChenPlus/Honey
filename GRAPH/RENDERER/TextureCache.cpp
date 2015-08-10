@@ -11,11 +11,6 @@
 
 namespace GRAPH
 {
-    TextureCache * TextureCache::getInstance()
-    {
-        return Director::getInstance()->getTextureCache();
-    }
-
     TextureCache::TextureCache()
     : _loadingThread(nullptr)
     , _asyncStructQueue(nullptr)
@@ -33,29 +28,11 @@ namespace GRAPH
         SAFE_DELETE(_loadingThread);
     }
 
-    void TextureCache::destroyInstance()
-    {
-    }
-
-    TextureCache * TextureCache::sharedTextureCache()
-    {
-        return Director::getInstance()->getTextureCache();
-    }
-
-    void TextureCache::purgeSharedTextureCache()
-    {
-    }
-
-    std::string TextureCache::getDescription() const
-    {
-        return UTILS::STRING::StringFromFormat("<TextureCache | Number of textures = %d>", static_cast<int>(_textures.size()))
-    }
-
     void TextureCache::addImageAsync(const std::string &path, const std::function<void(Texture2D*)>& callback)
     {
         Texture2D *texture = nullptr;
 
-        std::string fullpath = FileUtils::getInstance()->fullPathForFilename(path);
+        std::string fullpath = IO::FileUtils::getInstance().fullPathForFilename(path);
 
         auto it = _textures.find(fullpath);
         if( it != _textures.end() )
@@ -68,7 +45,7 @@ namespace GRAPH
         }
 
         // check if file exists
-        if ( fullpath.empty() || ! FileUtils::getInstance()->isFileExist( fullpath ) ) {
+        if ( fullpath.empty() || ! IO::FileUtils::getInstance().isFileExist( fullpath ) ) {
             if (callback) callback(nullptr);
             return;
         }
@@ -76,8 +53,8 @@ namespace GRAPH
         // lazy init
         if (_asyncStructQueue == nullptr)
         {
-            _asyncStructQueue = new (std::nothrow) deque<AsyncStruct*>();
-            _imageInfoQueue = new (std::nothrow) deque<ImageInfo*>();
+            _asyncStructQueue = new (std::nothrow) std::deque<AsyncStruct*>();
+            _imageInfoQueue = new (std::nothrow) std::deque<ImageInfo*>();
 
             // create a new thread to load images
             _loadingThread = new std::thread(&TextureCache::loadImage, this);
@@ -105,7 +82,7 @@ namespace GRAPH
 
     void TextureCache::unbindImageAsync(const std::string& filename)
     {
-        std::string fullpath = FileUtils::getInstance()->fullPathForFilename(filename);
+        std::string fullpath = IO::FileUtils::getInstance().fullPathForFilename(filename);
 
         _asyncMutex.lock();
 
@@ -179,7 +156,7 @@ namespace GRAPH
                 _asyncMutex.unlock();
             }
 
-            Image *image = nullptr;
+            IMAGE::Image *image = nullptr;
             bool generateImage = false;
 
             auto it = _textures.find(asyncStruct->filename);
@@ -204,7 +181,7 @@ namespace GRAPH
             {
                 const std::string& filename = asyncStruct->filename;
                 // generate image
-                image = new (std::nothrow) Image();
+                image = new (std::nothrow) IMAGE::Image();
                 if (image && !image->initWithImageFileThreadSafe(filename))
                 {
                     SAFE_RELEASE(image);
@@ -253,7 +230,7 @@ namespace GRAPH
             _asyncMutex.unlock();
 
             AsyncStruct *asyncStruct = imageInfo->asyncStruct;
-            Image *image = imageInfo->image;
+            IMAGE::Image *image = imageInfo->image;
 
             const std::string& filename = asyncStruct->filename;
 
@@ -264,8 +241,6 @@ namespace GRAPH
                 texture = new (std::nothrow) Texture2D();
 
                 texture->initWithImage(image);
-                //parse 9-patch info
-                this->parseNinePatchImage(image, texture, filename);
 
                 // cache the texture. retain it, since it is added in the map
                 _textures.insert( std::make_pair(filename, texture) );
@@ -303,7 +278,7 @@ namespace GRAPH
     Texture2D * TextureCache::addImage(const std::string &path)
     {
         Texture2D * texture = nullptr;
-        Image* image = nullptr;
+        IMAGE::Image* image = nullptr;
         // Split up directory and filename
         // MUTEX:
         // Needed since addImageAsync calls this method from a different thread
@@ -322,11 +297,11 @@ namespace GRAPH
             // all images are handled by UIImage except PVR extension that is handled by our own handler
             do
             {
-                image = new (std::nothrow) Image();
-                CC_BREAK_IF(nullptr == image);
+                image = new (std::nothrow) IMAGE::Image();
+                if (nullptr == image) break;
 
                 bool bRet = image->initWithImageFile(fullpath);
-                CC_BREAK_IF(!bRet);
+                if (!bRet) break;
 
                 texture = new (std::nothrow) Texture2D();
 
@@ -334,9 +309,6 @@ namespace GRAPH
                 {
                     // texture already retained, no need to re-retain it
                     _textures.insert( std::make_pair(fullpath, texture) );
-
-                    //parse 9-patch info
-                    this->parseNinePatchImage(image, texture, path);
                 }
             } while (0);
         }
@@ -346,18 +318,7 @@ namespace GRAPH
         return texture;
     }
 
-    void TextureCache::parseNinePatchImage(cocos2d::Image *image, cocos2d::Texture2D *texture,const std::string& path)
-    {
-        if(NinePatchImageParser::isNinePatchImage(path))
-        {
-            Rect frameRect = Rect(0,0,image->getWidth(), image->getHeight());
-            NinePatchImageParser parser(image, frameRect, false);
-            texture->addSpriteFrameCapInset(nullptr, parser.parseCapInset());
-        }
-
-    }
-
-    Texture2D* TextureCache::addImage(Image *image, const std::string &key)
+    Texture2D* TextureCache::addImage(IMAGE::Image *image, const std::string &key)
     {
         Texture2D * texture = nullptr;
 
@@ -388,9 +349,9 @@ namespace GRAPH
     bool TextureCache::reloadTexture(const std::string& fileName)
     {
         Texture2D * texture = nullptr;
-        Image * image = nullptr;
+        IMAGE::Image * image = nullptr;
 
-        std::string fullpath = FileUtils::getInstance()->fullPathForFilename(fileName);
+        std::string fullpath = IO::FileUtils::getInstance().fullPathForFilename(fileName);
         if (fullpath.size() == 0)
         {
             return false;
@@ -409,7 +370,7 @@ namespace GRAPH
         else
         {
             do {
-                image = new (std::nothrow) Image();
+                image = new (std::nothrow) IMAGE::Image();
                 if (nullptr == image) break;
 
                 bool bRet = image->initWithImageFile(fullpath);
@@ -487,7 +448,7 @@ namespace GRAPH
         auto it = _textures.find(key);
 
         if( it == _textures.end() ) {
-            key = FileUtils::getInstance()->fullPathForFilename(textureKeyName);
+            key = IO::FileUtils::getInstance().fullPathForFilename(textureKeyName);
             it = _textures.find(key);
         }
 
@@ -496,12 +457,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    void TextureCache::reloadAllTextures()
-    {
-        //will do nothing
-    }
-
-    const std::string TextureCache::getTextureFilePath( cocos2d::Texture2D *texture )const
+    const std::string TextureCache::getTextureFilePath( Texture2D *texture )const
     {
         for(auto& item : _textures)
         {
@@ -520,42 +476,5 @@ namespace GRAPH
         _needQuit = true;
         _sleepCondition.notify_one();
         if (_loadingThread) _loadingThread->join();
-    }
-
-    std::string TextureCache::getCachedTextureInfo() const
-    {
-        std::string buffer;
-        char buftmp[4096];
-
-        unsigned int count = 0;
-        unsigned int totalBytes = 0;
-
-        for( auto it = _textures.begin(); it != _textures.end(); ++it ) {
-
-            memset(buftmp,0,sizeof(buftmp));
-
-
-            Texture2D* tex = it->second;
-            unsigned int bpp = tex->getBitsPerPixelForFormat();
-            // Each texture takes up width * height * bytesPerPixel bytes.
-            auto bytes = tex->getPixelsWide() * tex->getPixelsHigh() * bpp / 8;
-            totalBytes += bytes;
-            count++;
-            snprintf(buftmp,sizeof(buftmp)-1,"\"%s\" rc=%lu id=%lu %lu x %lu @ %ld bpp => %lu KB\n",
-                   it->first.c_str(),
-                   (long)tex->getReferenceCount(),
-                   (long)tex->getName(),
-                   (long)tex->getPixelsWide(),
-                   (long)tex->getPixelsHigh(),
-                   (long)bpp,
-                   (long)bytes / 1024);
-
-            buffer += buftmp;
-        }
-
-        snprintf(buftmp, sizeof(buftmp)-1, "TextureCache dumpDebugInfo: %ld textures, for %lu KB (%.2f MB)\n", (long)count, (long)totalBytes / 1024, totalBytes / (1024.0f*1024.0f));
-        buffer += buftmp;
-
-        return buffer;
     }
 }

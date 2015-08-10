@@ -27,13 +27,6 @@ namespace GRAPH
          * @lua NA
          */
         virtual ~TextureCache();
-        /**
-         * @js NA
-         * @lua NA
-         */
-        virtual std::string getDescription() const;
-
-    //    Dictionary* snapshotTextures();
 
         /** Returns a Texture2D object given an filename.
         * If the filename was not previously loaded, it will create a new Texture2D.
@@ -115,13 +108,6 @@ namespace GRAPH
         */
         void removeTextureForKey(const std::string &key);
 
-        /** Output to CCLOG the current contents of this TextureCache.
-        * This will attempt to calculate the size of each texture, and the total texture memory in use.
-        *
-        * @since v1.0
-        */
-        std::string getCachedTextureInfo() const;
-
         //Wait for texture cahe to quit befor destroy instance.
         /**Called by director, please do not called outside.*/
         void waitForQuit();
@@ -138,7 +124,7 @@ namespace GRAPH
     private:
         void addImageAsyncCallBack(float dt);
         void loadImage();
-        void parseNinePatchImage(IMAGE::Image* image, Texture2D* texture, const std::string& path);
+
     public:
         struct AsyncStruct
         {

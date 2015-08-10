@@ -7,6 +7,9 @@
 #include "GRAPH/RENDERER/RenderCommand.h"
 #include "MATH/Rectangle.h"
 #include "GRAPH/BASE/Camera.h"
+#include "GRAPH/BASE/Director.h"
+#undef max
+#undef min
 
 namespace GRAPH
 {
@@ -925,7 +928,7 @@ namespace GRAPH
         visiableRect.origin.y -= wshh;
         visiableRect.size.width += wshw * 2;
         visiableRect.size.height += wshh * 2;
-        bool ret = visiableRect.containsPoint(v2p);
+        bool ret = visiableRect.contains(v2p);
         return ret;
     }
 

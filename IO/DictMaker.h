@@ -27,9 +27,9 @@ namespace IO
         bool parse(const HBYTE* xmlData, size_t dataLength);
         bool parse(const std::string& filename);
         void setDelegator(SAXDelegator* delegator);
-        static void startElement(void *ctx, const uint8 *name, const uint8 **atts);
-        static void endElement(void *ctx, const uint8 *name);
-        static void textHandler(void *ctx, const uint8 *name, int len);
+        static void startElement(void *ctx, const char *name, const char **atts);
+        static void endElement(void *ctx, const char *name);
+        static void textHandler(void *ctx, const char *name, int len);
 
     private:
         SAXDelegator*  delegator_;
@@ -76,10 +76,10 @@ namespace IO
         ~DictMaker();
 
         ValueMap dictionaryWithContentsOfFile(const std::string& fileName);
-        ValueMap dictionaryWithDataOfFile(const char* filedata, int filesize);
+        ValueMap dictionaryWithDataOfFile(const HBYTE* filedata, int filesize);
         ValueVector arrayWithContentsOfFile(const std::string& fileName);
 
-        void startElement(void *, const HBYTE *name, const HBYTE **);
+        void startElement(void *, const char *name, const char **);
         void endElement(void *, const char *name);
 
         void textHandler(void *, const char *ch, int len);

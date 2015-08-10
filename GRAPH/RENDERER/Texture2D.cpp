@@ -2,6 +2,11 @@
 #include "GRAPH/BASE/Configuration.h"
 #include "GRAPH/RENDERER/GLProgram.h"
 #include "GRAPH/RENDERER/GLProgramCache.h"
+#include "BASE/HData.h"
+#include "GRAPH/RENDERER/GLStateCache.h"
+#include "GRAPH/BASE/Director.h"
+#undef max
+#undef min
 
 namespace GRAPH
 {
@@ -369,8 +374,8 @@ namespace GRAPH
     MATH::Sizef Texture2D::getContentSize() const
     {
         MATH::Sizef ret;
-        ret.width = _contentSize.width / CC_CONTENT_SCALE_FACTOR();
-        ret.height = _contentSize.height / CC_CONTENT_SCALE_FACTOR();
+        ret.width = _contentSize.width / Director::getInstance()->getContentScaleFactor();
+        ret.height = _contentSize.height / Director::getInstance()->getContentScaleFactor();
 
         return ret;
     }
@@ -545,13 +550,8 @@ namespace GRAPH
         return false;
     }
 
-    std::string Texture2D::getDescription() const
-    {
-        return StringUtils::format("<Texture2D | Name = %u | Dimensions = %ld x %ld | Coordinates = (%.2f, %.2f)>", _name, (long)_pixelsWide, (long)_pixelsHigh, _maxS, _maxT);
-    }
-
     // implementation Texture2D (Image)
-    bool Texture2D::initWithImage(Image *image)
+    bool Texture2D::initWithImage(IMAGE::Image *image)
     {
         return initWithImage(image, g_defaultAlphaPixelFormat);
     }
@@ -581,13 +581,7 @@ namespace GRAPH
         size_t	         tempDataLen = image->getDataLen();
 
 
-        if (image->getNumberOfMipmaps() > 1)
-        {
-            initWithMipmaps(image->getMipmaps(), image->getNumberOfMipmaps(), image->getRenderFormat(), imageWidth, imageHeight);
-
-            return true;
-        }
-        else if (image->isCompressed())
+        if (image->isCompressed())
         {
             initWithData(tempData, tempDataLen, image->getRenderFormat(), imageWidth, imageHeight, imageSize);
             return true;
@@ -652,7 +646,7 @@ namespace GRAPH
         default:
             *outData = (unsigned char*)data;
             *outDataLen = dataLen;
-            return PixelFormat::I8;
+            return IMAGE::PixelFormat::I8;
         }
 
         return format;
@@ -745,7 +739,7 @@ namespace GRAPH
         default:
             *outData = (unsigned char*)data;
             *outDataLen = dataLen;
-            return PixelFormat::RGB888;
+            return IMAGE::PixelFormat::RGB888;
         }
         return format;
     }
@@ -793,7 +787,7 @@ namespace GRAPH
         default:
             *outData = (unsigned char*)data;
             *outDataLen = dataLen;
-            return PixelFormat::RGBA8888;
+            return IMAGE::PixelFormat::RGBA8888;
         }
 
         return format;
@@ -816,10 +810,10 @@ namespace GRAPH
     rgba(1) -> 12345678
 
     */
-    IMAGE::PixelFormat Texture2D::convertDataToFormat(const unsigned char* data, ssize_t dataLen, PixelFormat originFormat, PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
+    IMAGE::PixelFormat Texture2D::convertDataToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat originFormat, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
     {
         // don't need to convert
-        if (format == originFormat || format == PixelFormat::AUTO)
+        if (format == originFormat || format == IMAGE::PixelFormat::AUTO)
         {
             *outData = (unsigned char*)data;
             *outDataLen = dataLen;
@@ -844,7 +838,7 @@ namespace GRAPH
     }
 
     // implementation Texture2D (Text)
-    bool Texture2D::initWithString(const char *text, const std::string& fontName, float fontSize, const Size& dimensions/* = Size(0, 0)*/, TextHAlignment hAlignment/* =  TextHAlignment::CENTER */, TextVAlignment vAlignment/* =  TextVAlignment::TOP */)
+    bool Texture2D::initWithString(const char *text, const std::string& fontName, float fontSize, const MATH::Sizef& dimensions/* = Size(0, 0)*/, TextHAlignment hAlignment/* =  TextHAlignment::CENTER */, TextVAlignment vAlignment/* =  TextVAlignment::TOP */)
     {
         FontDefinition tempDef;
 
@@ -870,22 +864,22 @@ namespace GRAPH
         }
 
         bool ret = false;
-        Device::TextAlign align;
+        TextAlign align;
 
         if (TextVAlignment::TOP == textDefinition._vertAlignment)
         {
-            align = (TextHAlignment::CENTER == textDefinition._alignment) ? Device::TextAlign::TOP
-            : (TextHAlignment::LEFT == textDefinition._alignment) ? Device::TextAlign::TOP_LEFT : Device::TextAlign::TOP_RIGHT;
+            align = (TextHAlignment::CENTER == textDefinition._alignment) ? TextAlign::TOP
+            : (TextHAlignment::LEFT == textDefinition._alignment) ? TextAlign::TOP_LEFT : TextAlign::TOP_RIGHT;
         }
         else if (TextVAlignment::CENTER == textDefinition._vertAlignment)
         {
-            align = (TextHAlignment::CENTER == textDefinition._alignment) ? Device::TextAlign::CENTER
-            : (TextHAlignment::LEFT == textDefinition._alignment) ? Device::TextAlign::LEFT : Device::TextAlign::RIGHT;
+            align = (TextHAlignment::CENTER == textDefinition._alignment) ? TextAlign::CENTER
+            : (TextHAlignment::LEFT == textDefinition._alignment) ? TextAlign::LEFT : TextAlign::RIGHT;
         }
         else if (TextVAlignment::BOTTOM == textDefinition._vertAlignment)
         {
-            align = (TextHAlignment::CENTER == textDefinition._alignment) ? Device::TextAlign::BOTTOM
-            : (TextHAlignment::LEFT == textDefinition._alignment) ? Device::TextAlign::BOTTOM_LEFT : Device::TextAlign::BOTTOM_RIGHT;
+            align = (TextHAlignment::CENTER == textDefinition._alignment) ? TextAlign::BOTTOM
+            : (TextHAlignment::LEFT == textDefinition._alignment) ? TextAlign::BOTTOM_LEFT : TextAlign::BOTTOM_RIGHT;
         }
         else
         {
@@ -893,13 +887,13 @@ namespace GRAPH
         }
 
         IMAGE::PixelFormat      pixelFormat = g_defaultAlphaPixelFormat;
-        unsigned char* outTempData = nullptr;
+        HBYTE* outTempData = nullptr;
         ssize_t outTempDataLen = 0;
 
         int imageWidth;
         int imageHeight;
         auto textDef = textDefinition;
-        auto contentScaleFactor = CC_CONTENT_SCALE_FACTOR();
+        auto contentScaleFactor = Director::getInstance()->getContentScaleFactor();
         textDef._fontSize *= contentScaleFactor;
         textDef._dimensions.width *= contentScaleFactor;
         textDef._dimensions.height *= contentScaleFactor;
@@ -907,14 +901,17 @@ namespace GRAPH
         textDef._shadow._shadowEnabled = false;
 
         bool hasPremultipliedAlpha;
-        HData outData = Device::getTextureDataForText(text, textDef, align, imageWidth, imageHeight, hasPremultipliedAlpha);
+        // TODO
+        throw _HException_Normal("UnImpl getTextureDataForText");
+        //HData outData = getTextureDataForText(text, textDef, align, imageWidth, imageHeight, hasPremultipliedAlpha);
+        HData outData = HData::Null;
         if(outData.isNull())
         {
             return false;
         }
 
         MATH::Sizef  imageSize = MATH::Sizef((float)imageWidth, (float)imageHeight);
-        pixelFormat = convertDataToFormat(outData.getBytes(), imageWidth*imageHeight*4, PixelFormat::RGBA8888, pixelFormat, &outTempData, &outTempDataLen);
+        pixelFormat = convertDataToFormat(outData.getBytes(), imageWidth*imageHeight*4, IMAGE::PixelFormat::RGBA8888, pixelFormat, &outTempData, &outTempDataLen);
 
         ret = initWithData(outTempData, outTempDataLen, pixelFormat, imageWidth, imageHeight, imageSize);
 
@@ -930,7 +927,7 @@ namespace GRAPH
 
     // implementation Texture2D (Drawing)
 
-    void Texture2D::drawAtPoint(const Vec2& point)
+    void Texture2D::drawAtPoint(const MATH::Vector2f& point)
     {
         GLfloat    coordinates[] = {
             0.0f,    _maxT,
@@ -947,11 +944,11 @@ namespace GRAPH
             point.x,            height  + point.y,
             width + point.x,    height  + point.y };
 
-        GL::enableVertexAttribs( GL::VERTEX_ATTRIB_FLAG_POSITION | GL::VERTEX_ATTRIB_FLAG_TEX_COORD );
+        enableVertexAttribs( VERTEX_ATTRIB_FLAG_POSITION | VERTEX_ATTRIB_FLAG_TEX_COORD );
         _shaderProgram->use();
         _shaderProgram->setUniformsForBuiltins();
 
-        GL::bindTexture2D( _name );
+        bindTexture2D( _name );
 
 
         glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, vertices);
@@ -960,7 +957,7 @@ namespace GRAPH
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
-    void Texture2D::drawInRect(const Rect& rect)
+    void Texture2D::drawInRect(const MATH::Rectf& rect)
     {
         GLfloat    coordinates[] = {
             0.0f,    _maxT,
@@ -973,32 +970,20 @@ namespace GRAPH
             rect.origin.x,                            rect.origin.y + rect.size.height,        /*0.0f,*/
             rect.origin.x + rect.size.width,        rect.origin.y + rect.size.height,        /*0.0f*/ };
 
-        GL::enableVertexAttribs( GL::VERTEX_ATTRIB_FLAG_POSITION | GL::VERTEX_ATTRIB_FLAG_TEX_COORD );
+        enableVertexAttribs( VERTEX_ATTRIB_FLAG_POSITION | VERTEX_ATTRIB_FLAG_TEX_COORD );
         _shaderProgram->use();
         _shaderProgram->setUniformsForBuiltins();
 
-        GL::bindTexture2D( _name );
+        bindTexture2D( _name );
 
         glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, vertices);
         glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, 0, coordinates);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
-    void Texture2D::PVRImagesHavePremultipliedAlpha(bool haveAlphaPremultiplied)
-    {
-        Image::setPVRImagesHavePremultipliedAlpha(haveAlphaPremultiplied);
-    }
-
-
-    //
-    // Use to apply MIN/MAG filter
-    //
-    // implementation Texture2D (GLFilter)
-
     void Texture2D::generateMipmap()
-    {
-        CCASSERT(_pixelsWide == ccNextPOT(_pixelsWide) && _pixelsHigh == ccNextPOT(_pixelsHigh), "Mipmap texture only works in POT textures");
-        GL::bindTexture2D( _name );
+    {        
+        bindTexture2D( _name );
         glGenerateMipmap(GL_TEXTURE_2D);
         _hasMipmaps = true;
     }
@@ -1010,7 +995,7 @@ namespace GRAPH
 
     void Texture2D::setTexParameters(const TexParams &texParams)
     {
-        GL::bindTexture2D( _name );
+        bindTexture2D( _name );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texParams.minFilter );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texParams.magFilter );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texParams.wrapS );
@@ -1031,7 +1016,7 @@ namespace GRAPH
             return;
         }
 
-        GL::bindTexture2D( _name );
+        bindTexture2D( _name );
 
         if( ! _hasMipmaps )
         {
@@ -1059,7 +1044,7 @@ namespace GRAPH
             return;
         }
 
-        GL::bindTexture2D( _name );
+        bindTexture2D( _name );
 
         if( ! _hasMipmaps )
         {
@@ -1073,54 +1058,6 @@ namespace GRAPH
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     }
 
-    const char* Texture2D::getStringForFormat() const
-    {
-        switch (_pixelFormat)
-        {
-            case IMAGE::PixelFormat::RGBA8888:
-                return  "RGBA8888";
-
-            case IMAGE::PixelFormat::RGB888:
-                return  "RGB888";
-
-            case IMAGE::PixelFormat::RGB565:
-                return  "RGB565";
-
-            case IMAGE::PixelFormat::RGBA4444:
-                return  "RGBA4444";
-
-            case IMAGE::PixelFormat::RGB5A1:
-                return  "RGB5A1";
-
-            case IMAGE::PixelFormat::AI88:
-                return  "AI88";
-
-            case IMAGE::PixelFormat::A8:
-                return  "A8";
-
-            case IMAGE::PixelFormat::I8:
-                return  "I8";
-
-            case IMAGE::PixelFormat::PVRTC4:
-                return  "PVRTC4";
-
-            case IMAGE::PixelFormat::PVRTC2:
-                return  "PVRTC2";
-
-            default:
-                CCASSERT(false , "unrecognized pixel format");
-                CCLOG("stringForFormat: %ld, cannot give useful result", (long)_pixelFormat);
-                break;
-        }
-
-        return  nullptr;
-    }
-
-    //
-    // Texture options for images that contains alpha
-    //
-    // implementation Texture2D (PixelFormat)
-
     void Texture2D::setDefaultAlphaPixelFormat(IMAGE::PixelFormat format)
     {
         g_defaultAlphaPixelFormat = format;
@@ -1129,79 +1066,5 @@ namespace GRAPH
     IMAGE::PixelFormat Texture2D::getDefaultAlphaPixelFormat()
     {
         return g_defaultAlphaPixelFormat;
-    }
-
-    unsigned int Texture2D::getBitsPerPixelForFormat(IMAGE::PixelFormat format) const
-    {
-        if (format == PixelFormat::NONE || format == PixelFormat::DEFAULT)
-        {
-            return 0;
-        }
-
-        return _pixelFormatInfoTables.at(format).bpp;
-    }
-
-    unsigned int Texture2D::getBitsPerPixelForFormat() const
-    {
-        return this->getBitsPerPixelForFormat(_pixelFormat);
-    }
-
-    const IMAGE::PixelFormatInfoMap& Texture2D::getPixelFormatInfoMap()
-    {
-        return _pixelFormatInfoTables;
-    }
-
-    void Texture2D::addSpriteFrameCapInset(SpriteFrame* spritframe, const Rect& capInsets)
-    {
-        if(nullptr == _ninePatchInfo)
-        {
-            _ninePatchInfo = new NinePatchInfo;
-        }
-        if(nullptr == spritframe)
-        {
-            _ninePatchInfo->capInsetSize = capInsets;
-        }
-        else
-        {
-            _ninePatchInfo->capInsetMap[spritframe] = capInsets;
-        }
-    }
-
-    bool Texture2D::isContain9PatchInfo()const
-    {
-        return nullptr != _ninePatchInfo;
-    }
-
-    const Rect& Texture2D::getSpriteFrameCapInset( cocos2d::SpriteFrame *spriteFrame )const
-    {
-        if(nullptr == spriteFrame)
-        {
-            return this->_ninePatchInfo->capInsetSize;
-        }
-        else
-        {
-            auto &capInsetMap = this->_ninePatchInfo->capInsetMap;
-            if(capInsetMap.find(spriteFrame) != capInsetMap.end())
-            {
-                return capInsetMap.at(spriteFrame);
-            }
-            else
-            {
-                return this->_ninePatchInfo->capInsetSize;
-            }
-        }
-    }
-
-
-    void Texture2D::removeSpriteFrameCapInset(SpriteFrame* spriteFrame)
-    {
-        if(nullptr != this->_ninePatchInfo)
-        {
-            auto capInsetMap = this->_ninePatchInfo->capInsetMap;
-            if(capInsetMap.find(spriteFrame) != capInsetMap.end())
-            {
-                capInsetMap.erase(spriteFrame);
-            }
-        }
     }
 }

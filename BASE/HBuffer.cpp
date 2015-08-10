@@ -33,7 +33,7 @@ void HBuffer::writeAsFormat(const HBYTE *fmt, ...) {
     HBYTE buffer[2048];
     va_list vl;
     va_start(vl, fmt);
-    int retval = vsnprintf(buffer, sizeof(buffer), fmt, vl);
+    int retval = vsnprintf((char *)buffer, sizeof(buffer), (const char *)fmt, vl);
     if (retval >= (int)sizeof(buffer)) {
         throw _HException_Normal("vsnprintf truncated output");
     }

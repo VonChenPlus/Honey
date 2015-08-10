@@ -39,7 +39,7 @@ namespace IO
 
         size_t total = 0;
         do {
-            int retval = recv(fd, &buf[0], (int)buf.size(), 0);
+            int retval = recv(fd, (char *)&buf[0], (int)buf.size(), 0);
             if (retval == 0) {
                 return;
             }
@@ -70,7 +70,7 @@ namespace IO
         do {
             size_t bufSize = std::min(buf.size(), buffer.size());
             buffer.read(bufSize, &buf[0]);
-            int retval = send(fd, &buf[0], (int)bufSize, 0);
+            int retval = send(fd, (char *)&buf[0], (int)bufSize, 0);
             if (retval == 0) {
                 return;
             }

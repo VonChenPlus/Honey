@@ -108,12 +108,13 @@ namespace IMAGE
         bool initWithImageFile(const std::string& path);
         bool initWithImageData(const unsigned char *data, ssize_t dataLen);
         bool initWithRawData(const unsigned char *data, ssize_t dataLen, int width, int height, int bitsPerComponent, bool preMulti = false);
+        bool initWithImageFileThreadSafe(const std::string& fullpath);
 
         // Getters
         inline unsigned char *   getData()               { return data_; }
         inline ssize_t           getDataLen()            { return dataLen_; }
         inline Format            getFileType()           {return fileType_; }
-        inline PixelFormat       getrenderFormat()       { return renderFormat_; }
+        inline PixelFormat       getRenderFormat()       { return renderFormat_; }
         inline int               getWidth()              { return width_; }
         inline int               getHeight()             { return height_; }
         inline bool              hasPremultipliedAlpha() { return hasPremultipliedAlpha_; }
@@ -147,8 +148,6 @@ namespace IMAGE
         // noncopyable
         Image(const Image&    rImg);
         Image & operator=(const Image&);
-
-        bool initWithImageFileThreadSafe(const std::string& fullpath);
 
         Format detectFormat(const unsigned char * data, ssize_t dataLen);
         bool isPng(const unsigned char * data, ssize_t dataLen);

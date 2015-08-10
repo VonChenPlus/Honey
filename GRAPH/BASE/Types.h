@@ -25,6 +25,19 @@ namespace GRAPH
         RIGHT
     };
 
+    enum class TextAlign
+    {
+        CENTER        = 0x33, /** Horizontal center and vertical center. */
+        TOP           = 0x13, /** Horizontal center and vertical top. */
+        TOP_RIGHT     = 0x12, /** Horizontal right and vertical top. */
+        RIGHT         = 0x32, /** Horizontal right and vertical center. */
+        BOTTOM_RIGHT  = 0x22, /** Horizontal right and vertical bottom. */
+        BOTTOM        = 0x23, /** Horizontal center and vertical bottom. */
+        BOTTOM_LEFT   = 0x21, /** Horizontal left and vertical bottom. */
+        LEFT          = 0x31, /** Horizontal left and vertical center. */
+        TOP_LEFT      = 0x11, /** Horizontal left and vertical top. */
+    };
+
     struct Tex2F
     {
         Tex2F(float _u, float _v): u(_u), v(_v) {}

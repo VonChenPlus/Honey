@@ -131,7 +131,7 @@ namespace GRAPH
             int glProgram = (int)_glProgramState->getGLProgram()->getProgram();
             int intArray[4] = { glProgram, (int)_textureID, (int)_blendType.src, (int)_blendType.dst};
 
-            _materialID = XXH32((const void*)intArray, sizeof(intArray), 0);
+            _materialID = UTILS::HASH::Fletcher((const uint8*)intArray, sizeof(intArray));
         }
         else
         {
@@ -249,7 +249,7 @@ namespace GRAPH
         _shader = nullptr;
     }
 
-    void BatchCommand::init(float globalOrder, GLProgram* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const Mat4& modelViewTransform, uint32_t flags)
+    void BatchCommand::init(float globalOrder, GLProgram* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const MATH::Matrix4& modelViewTransform, uint32_t flags)
     {
         RenderCommand::init(globalOrder, modelViewTransform, flags);
         _textureID = textureAtlas->getTexture()->getName();
@@ -259,11 +259,6 @@ namespace GRAPH
         _textureAtlas = textureAtlas;
 
         _mv = modelViewTransform;
-    }
-
-    void BatchCommand::init(float globalOrder, GLProgram* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const Mat4& modelViewTransform)
-    {
-        init(globalOrder, shader, blendType, textureAtlas, modelViewTransform, 0);
     }
 
     BatchCommand::~BatchCommand()
