@@ -7,7 +7,7 @@
 using UTILS::TIME::TimeNow;
 #include "GRAPH/UI/KeyCodes.h"
 #include "GRAPH/UI/ScreenManager.h"
-#include "UTILS/RANDOM/HRandom.h"
+#include "UTILS/RANDOM/RandomUtils.h"
 using UTILS::RANDOM::GMRandom;
 
 namespace UI

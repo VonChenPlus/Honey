@@ -42,7 +42,7 @@ HEADERS += \
     $$P/THREAD/*.h \
     $$P/UTILS/HASH/*.h \
     $$P/UTILS/STRING/*.h \
-    $$P/UTILS/TIME/*.h
+    $$P/UTILS/TIME/*.h \
     $$P/UTILS/RANDOM/*.h
     
 # Zlib

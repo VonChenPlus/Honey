@@ -2,7 +2,7 @@
 #include "GRAPH/BASE/Director.h"
 #include "GRAPH/RENDERER/GLStateCache.h"
 #include "IO/FileUtils.h"
-#include "UTILS/RANDOM/HRandom.h"
+#include "UTILS/RANDOM/RandomUtils.h"
 
 namespace GRAPH
 {

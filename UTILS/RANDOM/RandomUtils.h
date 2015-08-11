@@ -1,5 +1,5 @@
-#ifndef GMRANDOM_H
-#define GMRANDOM_H
+#ifndef RANDOMUTILS_H
+#define RANDOMUTILS_H
 
 #include "BASE/Honey.h"
 #include <random>
@@ -56,5 +56,5 @@ namespace UTILS
         };
     }
 }
-#endif // GMRANDOM_H
+#endif // RANDOMUTILS_H
 
