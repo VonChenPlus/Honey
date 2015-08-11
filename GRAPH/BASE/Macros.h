@@ -3,7 +3,7 @@
 
 #include "MATH/MathDef.h"
 
-#define REPEAT_FOREVER (UINT_MAX -1)
+#define REPEAT_FOREVER (MATH_UINT32_MAX -1)
 
 #endif // MACROS_H
 

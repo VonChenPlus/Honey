@@ -1,3 +1,4 @@
+#include <string.h>
 #include "GRAPH/BASE/Configuration.h"
 #include "IO/FileUtils.h"
 

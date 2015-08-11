@@ -247,7 +247,7 @@ namespace GRAPH
     {
         ::timeval now;
 
-        if (UTILS::TIME::gettimeofday(&now, nullptr) != 0)
+        if (UTILS::TIME::GetTimeOfDay(&now, nullptr) != 0)
         {
             _deltaTime = 0;
             return;

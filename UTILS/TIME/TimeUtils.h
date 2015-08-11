@@ -13,9 +13,7 @@ namespace UTILS
     namespace TIME
     {
         double FetchCurrentTime();
-        #ifdef _WIN32
-        int gettimeofday(struct timeval * val, struct timezone *);
-        #endif
+        int GetTimeOfDay(struct timeval * val, struct timezone *zone);
 
         void TimeUpdate();
         double TimeNow();

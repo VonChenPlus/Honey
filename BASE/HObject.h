@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
 #include "BASE/Honey.h"
 
 #ifndef SAFE_RELEASE
@@ -103,13 +104,11 @@ public:
     const_reverse_iterator crend() const { return data_.crend(); }
 
     HObjectVector<T>()
-        : data_() {
-        static_assert(std::is_convertible<T, HObject*>::value, "Invalid Type for HObjectVector<T>!");
+        : data_() {        
     }
 
     explicit HObjectVector<T>(ssize_t capacity)
         : data_() {
-        static_assert(std::is_convertible<T, HObject*>::value, "Invalid Type for HObjectVector<T>!");
         reserve(capacity);
     }
 
@@ -118,14 +117,11 @@ public:
     }
 
     HObjectVector<T>(const HObjectVector<T>& other) {
-        static_assert(std::is_convertible<T, HObject*>::value, "Invalid Type for HObjectVector<T>!");
         data_ = other.data_;
         addRefForAllObjects();
     }
 
-    HObjectVector<T>(HObjectVector<T>&& other)
-    {
-        static_assert(std::is_convertible<T, Ref*>::value, "Invalid Type for cocos2d::HObjectVector<T>!");
+    HObjectVector<T>(HObjectVector<T>&& other) {
         data_ = std::move(other.data_);
     }
 

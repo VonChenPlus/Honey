@@ -56,6 +56,11 @@ namespace UTILS
 
         #endif
 
+        int GetTimeOfDay(struct timeval * val, struct timezone *zone)
+        {
+            return gettimeofday(val, zone);
+        }
+
         void TimeUpdate() {
             curtime = FetchCurrentTime();
         }
