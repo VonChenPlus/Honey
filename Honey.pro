@@ -74,11 +74,6 @@ HEADERS += $$P/EXTERNALS/rg_etc1/*.h
 SOURCES += $$P/EXTERNALS/d3des/*.c
 HEADERS += $$P/EXTERNALS/d3des/*.h
 
-#ConvertUTF
-SOURCES += $$P/EXTERNALS/ConvertUTF/*.c
-SOURCES += $$P/EXTERNALS/ConvertUTF/*.cpp
-HEADERS += $$P/EXTERNALS/ConvertUTF/*.h
-
 #tinyxml2
 SOURCES += $$P/EXTERNALS/tinyxml2/*.cpp
 HEADERS += $$P/EXTERNALS/tinyxml2/*.h
