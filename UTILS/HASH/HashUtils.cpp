@@ -1,4 +1,4 @@
-#include "Hash.h"
+#include "HashUtils.h"
 
 namespace UTILS
 {

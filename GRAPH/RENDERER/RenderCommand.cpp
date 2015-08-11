@@ -5,7 +5,7 @@
 #include "GRAPH/RENDERER/Renderer.h"
 #include "GRAPH/RENDERER/GLProgram.h"
 #include "GRAPH/RENDERER/GLStateCache.h"
-#include "UTILS/HASH/Hash.h"
+#include "UTILS/HASH/HashUtils.h"
 
 namespace GRAPH
 {

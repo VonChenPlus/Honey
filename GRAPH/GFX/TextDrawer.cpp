@@ -2,7 +2,7 @@
 using THIN3D::Thin3DContext;
 using THIN3D::LINEAR2D;
 using THIN3D::RGBA4444;
-#include "UTILS/HASH/Hash.h"
+#include "UTILS/HASH/HashUtils.h"
 using UTILS::HASH::Fletcher;
 using MATH::Boundsf;
 using THIN3D::Thin3DTexture;

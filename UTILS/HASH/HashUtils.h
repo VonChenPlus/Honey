@@ -1,5 +1,5 @@
-#ifndef HASH_H
-#define HASH_H
+#ifndef HASHUTILS_H
+#define HASHUTILS_H
 
 #include "BASE/Honey.h"
 
@@ -12,4 +12,4 @@ namespace UTILS
     }
 }
 
-#endif // HASH_H
+#endif // HASHUTILS_H
