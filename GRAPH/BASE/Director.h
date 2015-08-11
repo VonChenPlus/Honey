@@ -6,7 +6,7 @@
 #include "GRAPH/BASE/GLView.h"
 #include "MATH/Matrix.h"
 #include "GRAPH/BASE/Scene.h"
-#include "UTILS/TIME/HTime.h"
+#include "UTILS/TIME/TimeUtils.h"
 
 namespace GRAPH
 {

@@ -6,7 +6,7 @@
 #endif
 
 #include "THREAD/HThreadDef.h"
-#include "UTILS/TIME/HTime.h"
+#include "UTILS/TIME/TimeUtils.h"
 
 namespace THREAD
 {

@@ -125,7 +125,7 @@ namespace GRAPH
 
     Color4B Color4B::WhiteColor(Color4B color) {
         uint32 _color = color;
-        return ((color & 0xFF000000) | ((color >> 1)&0x7F7F7F)) + 0x7F7F7F;
+        return ((_color & 0xFF000000) | ((_color >> 1)&0x7F7F7F)) + 0x7F7F7F;
     }
 
     Color4B Color4B::WhiteAlpha(float alpha) {
