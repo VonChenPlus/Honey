@@ -67,7 +67,7 @@ namespace GRAPH
         * @param key The "key" parameter will be used as the "key" for the cache.
         * If "key" is nil, then a new texture will be created each time.
         */
-        Texture2D* addImage(IMAGE::Image *image, const std::string &key);
+        Texture2D* addImage(IMAGE::SmartImage *image, const std::string &key);
 
         /** Returns an already created texture. Returns nil if the texture doesn't exist.
         @param key It's the related/absolute path of the file image.
@@ -139,7 +139,7 @@ namespace GRAPH
         typedef struct _ImageInfo
         {
             AsyncStruct *asyncStruct;
-            IMAGE::Image        *image;
+            IMAGE::SmartImage        *image;
         } ImageInfo;
 
         std::thread* _loadingThread;

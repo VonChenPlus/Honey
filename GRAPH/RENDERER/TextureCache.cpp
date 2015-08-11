@@ -156,7 +156,7 @@ namespace GRAPH
                 _asyncMutex.unlock();
             }
 
-            IMAGE::Image *image = nullptr;
+            IMAGE::SmartImage *image = nullptr;
             bool generateImage = false;
 
             auto it = _textures.find(asyncStruct->filename);
@@ -181,7 +181,7 @@ namespace GRAPH
             {
                 const std::string& filename = asyncStruct->filename;
                 // generate image
-                image = new (std::nothrow) IMAGE::Image();
+                image = new (std::nothrow) IMAGE::SmartImage();
                 if (image && !image->initWithImageFileThreadSafe(filename))
                 {
                     SAFE_RELEASE(image);
@@ -230,7 +230,7 @@ namespace GRAPH
             _asyncMutex.unlock();
 
             AsyncStruct *asyncStruct = imageInfo->asyncStruct;
-            IMAGE::Image *image = imageInfo->image;
+            IMAGE::SmartImage *image = imageInfo->image;
 
             const std::string& filename = asyncStruct->filename;
 
@@ -278,7 +278,7 @@ namespace GRAPH
     Texture2D * TextureCache::addImage(const std::string &path)
     {
         Texture2D * texture = nullptr;
-        IMAGE::Image* image = nullptr;
+        IMAGE::SmartImage* image = nullptr;
         // Split up directory and filename
         // MUTEX:
         // Needed since addImageAsync calls this method from a different thread
@@ -297,7 +297,7 @@ namespace GRAPH
             // all images are handled by UIImage except PVR extension that is handled by our own handler
             do
             {
-                image = new (std::nothrow) IMAGE::Image();
+                image = new (std::nothrow) IMAGE::SmartImage();
                 if (nullptr == image) break;
 
                 bool bRet = image->initWithImageFile(fullpath);
@@ -318,7 +318,7 @@ namespace GRAPH
         return texture;
     }
 
-    Texture2D* TextureCache::addImage(IMAGE::Image *image, const std::string &key)
+    Texture2D* TextureCache::addImage(IMAGE::SmartImage *image, const std::string &key)
     {
         Texture2D * texture = nullptr;
 
@@ -349,7 +349,7 @@ namespace GRAPH
     bool TextureCache::reloadTexture(const std::string& fileName)
     {
         Texture2D * texture = nullptr;
-        IMAGE::Image * image = nullptr;
+        IMAGE::SmartImage * image = nullptr;
 
         std::string fullpath = IO::FileUtils::getInstance().fullPathForFilename(fileName);
         if (fullpath.size() == 0)
@@ -370,7 +370,7 @@ namespace GRAPH
         else
         {
             do {
-                image = new (std::nothrow) IMAGE::Image();
+                image = new (std::nothrow) IMAGE::SmartImage();
                 if (nullptr == image) break;
 
                 bool bRet = image->initWithImageFile(fullpath);

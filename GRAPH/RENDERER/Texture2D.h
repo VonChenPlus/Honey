@@ -12,7 +12,7 @@
 #include "MATH/Size.h"
 #include "GRAPH/BASE/Types.h"
 #include "GRAPH/BASE/Fonts.h"
-#include "IMAGE/HImage.h"
+#include "IMAGE/SmartImage.h"
 
 namespace GRAPH
 {
@@ -138,7 +138,7 @@ namespace GRAPH
         NOTE: It will not convert the pvr image file.
         @param image An UIImage object.
         */
-        bool initWithImage(IMAGE::Image * image);
+        bool initWithImage(IMAGE::SmartImage * image);
 
         /**
         Initializes a texture from a UIImage object.
@@ -148,7 +148,7 @@ namespace GRAPH
         @param image An UIImage object.
         @param format Texture pixel formats.
         **/
-        bool initWithImage(IMAGE::Image * image, IMAGE::PixelFormat format);
+        bool initWithImage(IMAGE::SmartImage * image, IMAGE::PixelFormat format);
 
         /** Initializes a texture from a string with dimensions, alignment, font name and font size.
 
@@ -271,53 +271,6 @@ namespace GRAPH
          * @return True is Texture contains a 9-patch info, false otherwise.
          */
         bool isContain9PatchInfo()const;
-
-        /**convert functions*/
-
-        /**
-        Convert the format to the format param you specified, if the format is PixelFormat::Automatic, it will detect it automatically and convert to the closest format for you.
-        It will return the converted format to you. if the outData != data, you must delete it manually.
-        */
-        static IMAGE::PixelFormat convertDataToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat originFormat, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
-
-        static IMAGE::PixelFormat convertI8ToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
-        static IMAGE::PixelFormat convertAI88ToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
-        static IMAGE::PixelFormat convertRGB888ToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
-        static IMAGE::PixelFormat convertRGBA8888ToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen);
-
-        //I8 to XXX
-        static void convertI8ToRGB888(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertI8ToRGBA8888(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertI8ToRGB565(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertI8ToRGBA4444(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertI8ToRGB5A1(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertI8ToAI88(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-
-        //AI88 to XXX
-        static void convertAI88ToRGB888(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertAI88ToRGBA8888(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertAI88ToRGB565(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertAI88ToRGBA4444(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertAI88ToRGB5A1(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertAI88ToA8(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertAI88ToI8(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-
-        //RGB888 to XXX
-        static void convertRGB888ToRGBA8888(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertRGB888ToRGB565(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertRGB888ToI8(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertRGB888ToAI88(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertRGB888ToRGBA4444(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertRGB888ToRGB5A1(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-
-        //RGBA8888 to XXX
-        static void convertRGBA8888ToRGB888(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertRGBA8888ToRGB565(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertRGBA8888ToI8(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertRGBA8888ToA8(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertRGBA8888ToAI88(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertRGBA8888ToRGBA4444(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
-        static void convertRGBA8888ToRGB5A1(const unsigned char* data, ssize_t dataLen, unsigned char* outData);
 
     protected:
         /** pixel format of the texture */
