@@ -67,16 +67,12 @@ namespace GRAPH
     , _inverseDirty(true)
     , _useAdditionalTransform(false)
     , _transformUpdated(true)
-    // children (lazy allocs)
-    // lazy alloc
     , _localZOrder(0)
     , _globalZOrder(0)
     , _parent(nullptr)
-    // "whole screen" objects. like Scenes and Layers, should set _ignoreAnchorPointForPosition to true
     , _tag(Node::INVALID_TAG)
     , _name("")
     , _hashOfName(0)
-    // userData is always inited as nil
     , _userData(nullptr)
     , _userObject(nullptr)
     , _glProgramState(nullptr)
@@ -94,7 +90,6 @@ namespace GRAPH
     , _cascadeOpacityEnabled(false)
     , _cameraMask(1)
     {
-        // set default scheduler and actionManager
         _director = Director::getInstance();
         _actionManager = _director->getActionManager();
         _actionManager->retain();
@@ -121,11 +116,7 @@ namespace GRAPH
 
     Node::~Node()
     {
-        // User object has to be released before others, since userObject may have a weak reference of this node
-        // It may invoke `node->stopAllAction();` while `_actionManager` is null if the next line is after `SAFE_RELEASE_NULL(_actionManager)`.
         SAFE_RELEASE_NULL(_userObject);
-
-        // attributes
         SAFE_RELEASE_NULL(_glProgramState);
 
         for (auto& child : _children)
@@ -150,21 +141,12 @@ namespace GRAPH
 
     void Node::cleanup()
     {
-        // actions
         this->stopAllActions();
         this->unscheduleAllCallbacks();
 
-        // timers
         for( const auto &child: _children)
             child->cleanup();
     }
-
-    std::string Node::getDescription() const
-    {
-        return UTILS::STRING::StringFromFormat("<Node | Tag = %d", _tag);
-    }
-
-    // MARK: getters / setters
 
     float Node::getSkewX() const
     {
@@ -217,13 +199,11 @@ namespace GRAPH
         }
     }
 
-    /// rotation getter
     float Node::getRotation() const
     {
         return _rotationZ_X;
     }
 
-    /// rotation setter
     void Node::setRotation(float rotation)
     {
         if (_rotationZ_X == rotation)
@@ -251,7 +231,6 @@ namespace GRAPH
         _rotationX = rotation.x;
         _rotationY = rotation.y;
 
-        // rotation Z is decomposed in 2 to simulate Skew for Flash animations
         _rotationZ_Y = _rotationZ_X = rotation.z;
 
         updateRotationQuat();
@@ -264,9 +243,6 @@ namespace GRAPH
 
     void Node::updateRotationQuat()
     {
-        // convert Euler angle to quaternion
-        // when _rotationZ_X == _rotationZ_Y, _rotationQuat = RotationZ_X * RotationY * RotationX
-        // when _rotationZ_X != _rotationZ_Y, _rotationQuat = RotationY * RotationX
         float halfRadx = MATH_DEGREES_TO_RADIANS(_rotationX / 2.f), halfRady = MATH_DEGREES_TO_RADIANS(_rotationY / 2.f), halfRadz = _rotationZ_X == _rotationZ_Y ? -MATH_DEGREES_TO_RADIANS(_rotationZ_X / 2.f) : 0;
         float coshalfRadx = cosf(halfRadx), sinhalfRadx = sinf(halfRadx), coshalfRady = cosf(halfRady), sinhalfRady = sinf(halfRady), coshalfRadz = cosf(halfRadz), sinhalfRadz = sinf(halfRadz);
         _rotationQuat.x = sinhalfRadx * coshalfRady * coshalfRadz - coshalfRadx * sinhalfRady * sinhalfRadz;
@@ -277,7 +253,6 @@ namespace GRAPH
 
     void Node::updateRotation3D()
     {
-        //convert quaternion to Euler angle
         float x = _rotationQuat.x, y = _rotationQuat.y, z = _rotationQuat.z, w = _rotationQuat.w;
         _rotationX = atan2f(2.f * (w * x + y * z), 1.f - 2.f * (x * x + y * y));
         _rotationY = asinf(2.f * (w * y - z * x));
@@ -327,13 +302,11 @@ namespace GRAPH
         updateRotationQuat();
     }
 
-    /// scale getter
     float Node::getScale(void) const
     {
         return _scaleX;
     }
 
-    /// scale setter
     void Node::setScale(float scale)
     {
         if (_scaleX == scale && _scaleY == scale && _scaleZ == scale)
@@ -343,13 +316,11 @@ namespace GRAPH
         _transformUpdated = _transformDirty = _inverseDirty = true;
     }
 
-    /// scaleX getter
     float Node::getScaleX() const
     {
         return _scaleX;
     }
 
-    /// scale setter
     void Node::setScale(float scaleX,float scaleY)
     {
         if (_scaleX == scaleX && _scaleY == scaleY)
@@ -360,7 +331,6 @@ namespace GRAPH
         _transformUpdated = _transformDirty = _inverseDirty = true;
     }
 
-    /// scaleX setter
     void Node::setScaleX(float scaleX)
     {
         if (_scaleX == scaleX)
@@ -370,13 +340,11 @@ namespace GRAPH
         _transformUpdated = _transformDirty = _inverseDirty = true;
     }
 
-    /// scaleY getter
     float Node::getScaleY() const
     {
         return _scaleY;
     }
 
-    /// scaleY setter
     void Node::setScaleZ(float scaleZ)
     {
         if (_scaleZ == scaleZ)
@@ -386,13 +354,11 @@ namespace GRAPH
         _transformUpdated = _transformDirty = _inverseDirty = true;
     }
 
-    /// scaleY getter
     float Node::getScaleZ() const
     {
         return _scaleZ;
     }
 
-    /// scaleY setter
     void Node::setScaleY(float scaleY)
     {
         if (_scaleY == scaleY)
@@ -402,14 +368,11 @@ namespace GRAPH
         _transformUpdated = _transformDirty = _inverseDirty = true;
     }
 
-
-    /// position getter
     const MATH::Vector2f& Node::getPosition() const
     {
         return _position;
     }
 
-    /// position setter
     void Node::setPosition(const MATH::Vector2f& position)
     {
         setPosition(position.x, position.y);
@@ -479,13 +442,11 @@ namespace GRAPH
         _positionZ = positionZ;
     }
 
-    /// position getter
     const MATH::Vector2f& Node::getNormalizedPosition() const
     {
         return _normalizedPosition;
     }
 
-    /// position setter
     void Node::setNormalizedPosition(const MATH::Vector2f& position)
     {
         if (_normalizedPosition.equals(position))
@@ -502,13 +463,11 @@ namespace GRAPH
         return _children.size();
     }
 
-    /// isVisible getter
     bool Node::isVisible() const
     {
         return _visible;
     }
 
-    /// isVisible setter
     void Node::setVisible(bool visible)
     {
         if(visible != _visible)
@@ -524,7 +483,6 @@ namespace GRAPH
         return _anchorPointInPoints;
     }
 
-    /// anchorPoint getter
     const MATH::Vector2f& Node::getAnchorPoint() const
     {
         return _anchorPoint;
@@ -540,7 +498,6 @@ namespace GRAPH
         }
     }
 
-    /// contentSize getter
     const MATH::Sizef& Node::getContentSize() const
     {
         return _contentSize;
@@ -557,25 +514,22 @@ namespace GRAPH
         }
     }
 
-    // isRunning getter
     bool Node::isRunning() const
     {
         return _running;
     }
 
-    /// parent setter
     void Node::setParent(Node * parent)
     {
         _parent = parent;
         _transformUpdated = _transformDirty = _inverseDirty = true;
     }
 
-    /// isRelativeAnchorPoint getter
     bool Node::isIgnoreAnchorPointForPosition() const
     {
         return _ignoreAnchorPointForPosition;
     }
-    /// isRelativeAnchorPoint setter
+
     void Node::ignoreAnchorPointForPosition(bool newValue)
     {
         if (newValue != _ignoreAnchorPointForPosition)
@@ -585,13 +539,11 @@ namespace GRAPH
         }
     }
 
-    /// tag getter
     int Node::getTag() const
     {
         return _tag;
     }
 
-    /// tag setter
     void Node::setTag(int tag)
     {
         _tag = tag ;
@@ -609,7 +561,6 @@ namespace GRAPH
         _hashOfName = h(name);
     }
 
-    /// userData setter
     void Node::setUserData(void *userData)
     {
         _userData = userData;
@@ -650,7 +601,6 @@ namespace GRAPH
         }
     }
 
-
     void Node::setGLProgram(GLProgram* glProgram)
     {
         if (_glProgramState == nullptr || (_glProgramState && _glProgramState->getGLProgram() != glProgram))
@@ -688,9 +638,6 @@ namespace GRAPH
         return RectApplyAffineTransform(rect, getNodeToParentAffineTransform());
     }
 
-    // MARK: Children logic
-
-    // lazy allocs
     void Node::childrenAlloc()
     {
         _children.reserve(4);
@@ -713,7 +660,6 @@ namespace GRAPH
 
         for (const auto& child : _children)
         {
-            // Different strings may have the same hash code, but can use it to compare first for speed
             if(child->_hashOfName == hash && child->_name.compare(name) == 0)
                 return child;
         }
@@ -727,7 +673,6 @@ namespace GRAPH
         size_t subStrStartPos = 0;  // sub string start index
         size_t subStrlength = length; // sub string length
 
-        // Starts with '//'?
         bool searchRecursively = false;
         if (length > 2 && name[0] == '/' && name[1] == '/')
         {
@@ -736,7 +681,6 @@ namespace GRAPH
             subStrlength -= 2;
         }
 
-        // End with '/..'?
         bool searchFromParent = false;
         if (length > 3 &&
             name[length-3] == '/' &&
@@ -747,7 +691,6 @@ namespace GRAPH
             subStrlength -= 3;
         }
 
-        // Remove '//', '/..' if exist
         std::string newName = name.substr(subStrStartPos, subStrlength);
 
         if (searchFromParent)
@@ -758,12 +701,10 @@ namespace GRAPH
 
         if (searchRecursively)
         {
-            // name is '//xxx'
             doEnumerateRecursive(this, newName, callback);
         }
         else
         {
-            // name is xxx
             doEnumerate(newName, callback);
         }
     }
@@ -774,12 +715,10 @@ namespace GRAPH
 
         if (node->doEnumerate(name, callback))
         {
-            // search itself
             ret = true;
         }
         else
         {
-            // search its children
             for (const auto& child : node->getChildren())
             {
                 if (doEnumerateRecursive(child, name, callback))
@@ -795,7 +734,6 @@ namespace GRAPH
 
     bool Node::doEnumerate(std::string name, std::function<bool (Node *)> callback) const
     {
-        // name may be xxx/yyy, should find its parent
         size_t pos = name.find('/');
         std::string searchName = name;
         bool needRecursive = false;
@@ -813,7 +751,6 @@ namespace GRAPH
             {
                 if (!needRecursive)
                 {
-                    // terminate enumeration if callback return true
                     if (callback(child))
                     {
                         ret = true;
@@ -832,10 +769,6 @@ namespace GRAPH
         return ret;
     }
 
-    /* "add" logic MUST only be on this method
-    * If a class want's to extend the 'addChild' behavior it only needs
-    * to override this method
-    */
     void Node::addChild(Node *child, int localZOrder, int tag)
     {
         addChildHelper(child, localZOrder, tag, "", true);
@@ -866,7 +799,6 @@ namespace GRAPH
         if( _running )
         {
             child->onEnter();
-            // prevent onEnterTransitionDidFinish to be called twice when a node is added in onEnter
             if (_isTransitionFinished)
             {
                 child->onEnterTransitionDidFinish();
@@ -907,13 +839,8 @@ namespace GRAPH
         }
     }
 
-    /* "remove" logic MUST only be on this method
-    * If a class want's to extend the 'removeChild' behavior it only needs
-    * to override this method
-    */
     void Node::removeChild(Node* child, bool cleanup /* = true */)
     {
-        // explicit nil handling
         if (_children.empty())
         {
             return;
@@ -951,12 +878,8 @@ namespace GRAPH
 
     void Node::removeAllChildrenWithCleanup(bool cleanup)
     {
-        // not using detachChild improves speed here
         for (const auto& child : _children)
         {
-            // IMPORTANT:
-            //  -1st do onExit
-            //  -2nd cleanup
             if(_running)
             {
                 child->onExitTransitionDidStart();
@@ -967,7 +890,7 @@ namespace GRAPH
             {
                 child->cleanup();
             }
-            // set parent nil at the end
+
             child->setParent(nullptr);
         }
 
@@ -976,30 +899,22 @@ namespace GRAPH
 
     void Node::detachChild(Node *child, ssize_t childIndex, bool doCleanup)
     {
-        // IMPORTANT:
-        //  -1st do onExit
-        //  -2nd cleanup
         if (_running)
         {
             child->onExitTransitionDidStart();
             child->onExit();
         }
 
-        // If you don't do cleanup, the child's actions will not get removed and the
-        // its scheduledSelectors_ dict will not get released!
         if (doCleanup)
         {
             child->cleanup();
         }
 
-        // set parent nil at the end
         child->setParent(nullptr);
 
         _children.erase(childIndex);
     }
 
-
-    // helper used by reorderChild & add
     void Node::insertChild(Node* child, int z)
     {
         _transformUpdated = true;
@@ -1023,8 +938,6 @@ namespace GRAPH
             _reorderChildDirty = false;
         }
     }
-
-    // MARK: draw / visit
 
     void Node::draw()
     {
@@ -1057,12 +970,6 @@ namespace GRAPH
             }
         }
 
-        //remove this two line given that isVisitableByVisitingCamera should not affect the calculation of transform given that we are visiting scene
-        //without involving view and projection matrix.
-
-    //    if (!isVisitableByVisitingCamera())
-    //        return parentFlags;
-
         uint32_t flags = parentFlags;
         flags |= (_transformUpdated ? FLAGS_TRANSFORM_DIRTY : 0);
         flags |= (_contentSizeDirty ? FLAGS_CONTENT_SIZE_DIRTY : 0);
@@ -1086,7 +993,6 @@ namespace GRAPH
 
     void Node::visit(Renderer* renderer, const MATH::Matrix4 &parentTransform, uint32_t parentFlags)
     {
-        // quick return if not visible. children won't be drawn.
         if (!_visible)
         {
             return;
@@ -1094,9 +1000,6 @@ namespace GRAPH
 
         uint32_t flags = processParentFlags(parentTransform, parentFlags);
 
-        // IMPORTANT:
-        // To ease the migration to v3.0, we still support the MATH::Matrix4 stack,
-        // but it is deprecated and your code should not rely on it
         _director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
         _director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, _modelViewTransform);
 
@@ -1107,7 +1010,6 @@ namespace GRAPH
         if(!_children.empty())
         {
             sortAllChildren();
-            // draw children zOrder < 0
             for( ; i < _children.size(); i++ )
             {
                 auto node = _children.at(i);
@@ -1117,7 +1019,7 @@ namespace GRAPH
                 else
                     break;
             }
-            // self draw
+
             if (visibleByCamera)
                 this->draw(renderer, _modelViewTransform, flags);
 
@@ -1130,19 +1032,12 @@ namespace GRAPH
         }
 
         _director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-
-        // FIX ME: Why need to set _orderOfArrival to 0??
-        // Please refer to https://github.com/cocos2d/cocos2d-x/pull/6920
-        // reset for next frame
-        // _orderOfArrival = 0;
     }
 
     MATH::Matrix4 Node::transform(const MATH::Matrix4& parentTransform)
     {
         return parentTransform * this->getNodeToParentTransform();
     }
-
-    // MARK: events
 
     void Node::onEnter()
     {
@@ -1213,8 +1108,6 @@ namespace GRAPH
         }
     }
 
-    // MARK: actions
-
     Action * Node::runAction(Action* action)
     {
         _actionManager->addAction(action, this, !_running);
@@ -1250,8 +1143,6 @@ namespace GRAPH
     {
         return _actionManager->getNumberOfRunningActionsInTarget(this);
     }
-
-    // MARK: Callbacks
 
     void Node::setScheduler(Scheduler* scheduler)
     {
@@ -1338,7 +1229,6 @@ namespace GRAPH
 
     void Node::unschedule(SEL_SCHEDULE selector)
     {
-        // explicit null handling
         if (selector == nullptr)
             return;
 
@@ -1369,12 +1259,9 @@ namespace GRAPH
         _eventDispatcher->pauseEventListenersForTarget(this);
     }
 
-    // override me
     void Node::update(float)
     {
     }
-
-    // MARK: coordinates
 
     MATH::AffineTransform Node::getNodeToParentAffineTransform() const
     {
@@ -1388,7 +1275,6 @@ namespace GRAPH
     {
         if (_transformDirty)
         {
-            // Translate values
             float x = _position.x;
             float y = _position.y;
             float z = _positionZ;
@@ -1404,25 +1290,19 @@ namespace GRAPH
 
             MATH::Vector2f anchorPoint(_anchorPointInPoints.x * _scaleX, _anchorPointInPoints.y * _scaleY);
 
-            // caculate real position
             if (! needsSkewMatrix && !_anchorPointInPoints.isZero())
             {
                 x += -anchorPoint.x;
                 y += -anchorPoint.y;
             }
 
-            // Build Transform Matrix = translation * rotation * scale
             MATH::Matrix4 translation;
-            //move to anchor point first, then rotate
             MATH::Matrix4::createTranslation(x + anchorPoint.x, y + anchorPoint.y, z, &translation);
 
             MATH::Matrix4::createRotation(_rotationQuat, &_transform);
 
             if (_rotationZ_X != _rotationZ_Y)
             {
-                // Rotation values
-                // Change rotation code to handle X and Y
-                // If we skew with the exact same value for both x and y then we're simply just rotating
                 float radiansX = -MATH_DEGREES_TO_RADIANS(_rotationZ_X);
                 float radiansY = -MATH_DEGREES_TO_RADIANS(_rotationZ_Y);
                 float cx = cosf(radiansX);
@@ -1435,7 +1315,6 @@ namespace GRAPH
                 _transform.m[1] = sy * m0 + cx * m1, _transform.m[5] = sy * m4 + cx * m5, _transform.m[9] = sy * m8 + cx * m9;
             }
             _transform = translation * _transform;
-            //move by (-anchorPoint.x, -anchorPoint.y, 0) after rotation
             _transform.translate(-anchorPoint.x, -anchorPoint.y, 0);
 
 
@@ -1452,8 +1331,6 @@ namespace GRAPH
                 _transform.m[8] *= _scaleZ, _transform.m[9] *= _scaleZ, _transform.m[10] *= _scaleZ;
             }
 
-            // FIXME:: Try to inline skew
-            // If skew is needed, apply skew and then anchor point
             if (needsSkewMatrix)
             {
                 float skewMatArray[16] =
@@ -1467,11 +1344,8 @@ namespace GRAPH
 
                 _transform = _transform * skewMatrix;
 
-                // adjust anchor point
                 if (!_anchorPointInPoints.isZero())
                 {
-                    // FIXME:: Argh, MATH::Matrix4 needs a "translate" method.
-                    // FIXME:: Although this is faster than multiplying a vec4 * MATH::Matrix4
                     _transform.m[12] += _transform.m[0] * -_anchorPointInPoints.x + _transform.m[4] * -_anchorPointInPoints.y;
                     _transform.m[13] += _transform.m[1] * -_anchorPointInPoints.x + _transform.m[5] * -_anchorPointInPoints.y;
                 }
@@ -1606,7 +1480,6 @@ namespace GRAPH
         return _director->convertToUI(worldPoint);
     }
 
-    // convenience methods which take a Touch instead of MATH::Vector2f
     MATH::Vector2f Node::convertTouchToNodeSpace(Touch *touch) const
     {
         return this->convertToNodeSpace(touch->getLocation());
@@ -1620,12 +1493,9 @@ namespace GRAPH
 
     void Node::updateTransform()
     {
-        // Recursively iterate over children
         for( const auto &child: _children)
             child->updateTransform();
     }
-
-    // MARK: Opacity and Color
 
     GLubyte Node::getOpacity(void) const
     {
@@ -1780,6 +1650,335 @@ namespace GRAPH
         }
     }
 
+    void Node::setCameraMask(unsigned short mask, bool applyChildren)
+    {
+        _cameraMask = mask;
+        if (applyChildren)
+        {
+            for (const auto& child : _children)
+            {
+                child->setCameraMask(mask, applyChildren);
+            }
+        }
+    }
+
+    ProtectedNode::ProtectedNode() : _reorderProtectedChildDirty(false)
+    {
+    }
+
+    ProtectedNode::~ProtectedNode()
+    {
+    }
+
+    ProtectedNode * ProtectedNode::create(void)
+    {
+        ProtectedNode * ret = new (std::nothrow) ProtectedNode();
+        if (ret && ret->init())
+        {
+            ret->autorelease();
+        }
+        else
+        {
+            SAFE_DELETE(ret);
+        }
+        return ret;
+    }
+
+    void ProtectedNode::cleanup()
+    {
+        Node::cleanup();
+        for( const auto &child: _protectedChildren)
+            child->cleanup();
+    }
+
+    void ProtectedNode::addProtectedChild(Node *child)
+    {
+        addProtectedChild(child, child->getLocalZOrder(), child->getTag());
+    }
+
+    void ProtectedNode::addProtectedChild(Node *child, int localZOrder)
+    {
+        addProtectedChild(child, localZOrder, child->getTag());
+    }
+
+    void ProtectedNode::addProtectedChild(Node *child, int zOrder, int tag)
+    {
+        if (_protectedChildren.empty())
+        {
+            _protectedChildren.reserve(4);
+        }
+
+        this->insertProtectedChild(child, zOrder);
+
+        child->setTag(tag);
+
+        child->setParent(this);
+        child->setOrderOfArrival(s_globalOrderOfArrival++);
+
+        if( _running )
+        {
+            child->onEnter();
+            if (_isTransitionFinished) {
+                child->onEnterTransitionDidFinish();
+            }
+        }
+
+        if (_cascadeColorEnabled)
+        {
+            updateCascadeColor();
+        }
+
+        if (_cascadeOpacityEnabled)
+        {
+            updateCascadeOpacity();
+        }
+    }
+
+    Node* ProtectedNode::getProtectedChildByTag(int tag)
+    {
+        for (auto& child : _protectedChildren)
+        {
+            if(child && child->getTag() == tag)
+                return child;
+        }
+        return nullptr;
+    }
+
+    void ProtectedNode::removeProtectedChild(Node *child, bool cleanup)
+    {
+        if (_protectedChildren.empty())
+        {
+            return;
+        }
+
+        ssize_t index = _protectedChildren.getIndex(child);
+        if( index != -1 )
+        {
+            if (_running)
+            {
+                child->onExitTransitionDidStart();
+                child->onExit();
+            }
+
+            if (cleanup)
+            {
+                child->cleanup();
+            }
+
+            child->setParent(nullptr);
+
+            _protectedChildren.erase(index);
+        }
+    }
+
+    void ProtectedNode::removeAllProtectedChildren()
+    {
+        removeAllProtectedChildrenWithCleanup(true);
+    }
+
+    void ProtectedNode::removeAllProtectedChildrenWithCleanup(bool cleanup)
+    {
+        for (auto& child : _protectedChildren)
+        {
+            if(_running)
+            {
+                child->onExitTransitionDidStart();
+                child->onExit();
+            }
+
+            if (cleanup)
+            {
+                child->cleanup();
+            }
+
+            child->setParent(nullptr);
+        }
+
+        _protectedChildren.clear();
+    }
+
+    void ProtectedNode::removeProtectedChildByTag(int tag, bool cleanup)
+    {
+        Node *child = this->getProtectedChildByTag(tag);
+
+        if (child != nullptr)
+        {
+            this->removeProtectedChild(child, cleanup);
+        }
+    }
+
+    void ProtectedNode::insertProtectedChild(Node *child, int z)
+    {
+        _reorderProtectedChildDirty = true;
+        _protectedChildren.pushBack(child);
+        child->setLocalZOrder(z);
+    }
+
+    void ProtectedNode::sortAllProtectedChildren()
+    {
+        if( _reorderProtectedChildDirty ) {
+            std::sort( std::begin(_protectedChildren), std::end(_protectedChildren), nodeComparisonLess );
+            _reorderProtectedChildDirty = false;
+        }
+    }
+
+    void ProtectedNode::reorderProtectedChild(Node *child, int localZOrder)
+    {
+        _reorderProtectedChildDirty = true;
+        child->setOrderOfArrival(s_globalOrderOfArrival++);
+        child->setLocalZOrder(localZOrder);
+    }
+
+    void ProtectedNode::visit(Renderer* renderer, const MATH::Matrix4 &parentTransform, uint32_t parentFlags)
+    {
+        if (!_visible)
+        {
+            return;
+        }
+
+        uint32_t flags = processParentFlags(parentTransform, parentFlags);
+
+        Director* director = Director::getInstance();
+        director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+        director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, _modelViewTransform);
+
+        int i = 0;      // used by _children
+        int j = 0;      // used by _protectedChildren
+
+        sortAllChildren();
+        sortAllProtectedChildren();
+
+        for( ; i < _children.size(); i++ )
+        {
+            auto node = _children.at(i);
+
+            if ( node && node->getLocalZOrder() < 0 )
+                node->visit(renderer, _modelViewTransform, flags);
+            else
+                break;
+        }
+
+        for( ; j < _protectedChildren.size(); j++ )
+        {
+            auto node = _protectedChildren.at(j);
+
+            if ( node && node->getLocalZOrder() < 0 )
+                node->visit(renderer, _modelViewTransform, flags);
+            else
+                break;
+        }
+
+        if (isVisitableByVisitingCamera())
+            this->draw(renderer, _modelViewTransform, flags);
+
+        for(auto it=_protectedChildren.cbegin()+j; it != _protectedChildren.cend(); ++it)
+            (*it)->visit(renderer, _modelViewTransform, flags);
+
+        for(auto it=_children.cbegin()+i; it != _children.cend(); ++it)
+            (*it)->visit(renderer, _modelViewTransform, flags);
+
+        director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    }
+
+    void ProtectedNode::onEnter()
+    {
+        Node::onEnter();
+        for( const auto &child: _protectedChildren)
+            child->onEnter();
+    }
+
+    void ProtectedNode::onEnterTransitionDidFinish()
+    {
+        Node::onEnterTransitionDidFinish();
+        for( const auto &child: _protectedChildren)
+            child->onEnterTransitionDidFinish();
+    }
+
+    void ProtectedNode::onExitTransitionDidStart()
+    {
+        Node::onExitTransitionDidStart();
+        for( const auto &child: _protectedChildren)
+            child->onExitTransitionDidStart();
+    }
+
+    void ProtectedNode::onExit()
+    {
+        Node::onExit();
+        for( const auto &child: _protectedChildren)
+            child->onExit();
+    }
+
+    void ProtectedNode::updateDisplayedOpacity(GLubyte parentOpacity)
+    {
+        _displayedOpacity = _realOpacity * parentOpacity/255.0;
+        updateColor();
+
+        if (_cascadeOpacityEnabled)
+        {
+            for(auto child : _children){
+                child->updateDisplayedOpacity(_displayedOpacity);
+            }
+        }
+
+        for(auto child : _protectedChildren){
+            child->updateDisplayedOpacity(_displayedOpacity);
+        }
+    }
+
+    void ProtectedNode::updateDisplayedColor(const Color3B& parentColor)
+    {
+        _displayedColor.red = _realColor.red * parentColor.red/255.0;
+        _displayedColor.green = _realColor.green * parentColor.green/255.0;
+        _displayedColor.blue = _realColor.blue * parentColor.blue/255.0;
+        updateColor();
+
+        if (_cascadeColorEnabled)
+        {
+            for(const auto &child : _children){
+                child->updateDisplayedColor(_displayedColor);
+            }
+        }
+        for(const auto &child : _protectedChildren){
+            child->updateDisplayedColor(_displayedColor);
+        }
+    }
+
+    void ProtectedNode::disableCascadeColor()
+    {
+        for(auto child : _children){
+            child->updateDisplayedColor(Color3B::WHITE);
+        }
+        for(auto child : _protectedChildren){
+            child->updateDisplayedColor(Color3B::WHITE);
+        }
+    }
+
+    void ProtectedNode::disableCascadeOpacity()
+    {
+        _displayedOpacity = _realOpacity;
+
+        for(auto child : _children){
+            child->updateDisplayedOpacity(255);
+        }
+
+        for(auto child : _protectedChildren){
+            child->updateDisplayedOpacity(255);
+        }
+    }
+
+    void ProtectedNode::setCameraMask(unsigned short mask, bool applyChildren)
+    {
+        Node::setCameraMask(mask, applyChildren);
+        if (applyChildren)
+        {
+            for (auto& iter: _protectedChildren)
+            {
+                iter->setCameraMask(mask);
+            }
+        }
+
+    }
+
     bool isScreenPointInRect(const MATH::Vector2f &pt, const Camera* camera, const MATH::Matrix4& w2l, const MATH::Rectf& rect, MATH::Vector3f *p)
     {
         if (nullptr == camera || rect.size.width <= 0 || rect.size.height <= 0)
@@ -1787,31 +1986,21 @@ namespace GRAPH
             return false;
         }
 
-        // first, convert pt to near/far plane, get Pn and Pf
         MATH::Vector3f Pn(pt.x, pt.y, -1), Pf(pt.x, pt.y, 1);
         Pn = camera->unprojectGL(Pn);
         Pf = camera->unprojectGL(Pf);
 
-        //  then convert Pn and Pf to node space
         w2l.transformPoint(&Pn);
         w2l.transformPoint(&Pf);
 
-        // Pn and Pf define a line Q(t) = D + t * E which D = Pn
         auto E = Pf - Pn;
 
-        // second, get three points which define content plane
-        //  these points define a plane P(u, w) = A + uB + wC
         MATH::Vector3f A = MATH::Vector3f(rect.origin.x, rect.origin.y, 0);
         MATH::Vector3f B(rect.size.width, 0, 0);
         MATH::Vector3f C(0, rect.size.height, 0);
         B = B - A;
         C = C - A;
 
-        //  the line Q(t) intercept with plane P(u, w)
-        //  calculate the intercept point P = Q(t)
-        //      (BxC).A - (BxC).D
-        //  t = -----------------
-        //          (BxC).E
         MATH::Vector3f BxC;
         MATH::Vector3f::cross(B, C, &BxC);
         auto BxCdotE = BxC.dot(E);
@@ -1824,18 +2013,5 @@ namespace GRAPH
             *p = P;
         }
         return rect.contains(MATH::Vector2f(P.x, P.y));
-    }
-
-    // MARK: Camera
-    void Node::setCameraMask(unsigned short mask, bool applyChildren)
-    {
-        _cameraMask = mask;
-        if (applyChildren)
-        {
-            for (const auto& child : _children)
-            {
-                child->setCameraMask(mask, applyChildren);
-            }
-        }
     }
 }
