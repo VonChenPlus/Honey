@@ -336,10 +336,10 @@ namespace UI
             float amount;
             if (orientation_ == ORIENT_HORIZONTAL) {
                 amount = views_[i]->getMeasuredWidth() + margins.left + margins.right;
-                maxOther = std::max(maxOther, views_[i]->getMeasuredHeight() + margins.top + margins.bottom);
+                maxOther = MATH::MATH_MAX(maxOther, views_[i]->getMeasuredHeight() + margins.top + margins.bottom);
             } else {
                 amount = views_[i]->getMeasuredHeight() + margins.top + margins.bottom;
-                maxOther = std::max(maxOther, views_[i]->getMeasuredWidth() + margins.left + margins.right);
+                maxOther = MATH::MATH_MAX(maxOther, views_[i]->getMeasuredWidth() + margins.left + margins.right);
             }
 
             sum += amount;

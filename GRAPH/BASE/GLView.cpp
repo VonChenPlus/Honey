@@ -7,8 +7,6 @@
 #include "GRAPH/RENDERER/FrameBuffer.h"
 #include "GRAPH/BASE/Camera.h"
 #include "GRAPH/BASE/EventDispatcher.h"
-#undef max
-#undef min
 
 namespace GRAPH
 {
@@ -101,12 +99,12 @@ namespace GRAPH
 
             if (_resolutionPolicy == ResolutionPolicy::NO_BORDER)
             {
-                _scaleX = _scaleY = std::max(_scaleX, _scaleY);
+                _scaleX = _scaleY = MATH::MATH_MAX(_scaleX, _scaleY);
             }
 
             else if (_resolutionPolicy == ResolutionPolicy::SHOW_ALL)
             {
-                _scaleX = _scaleY = std::min(_scaleX, _scaleY);
+                _scaleX = _scaleY = MATH::MATH_MIN(_scaleX, _scaleY);
             }
 
             else if ( _resolutionPolicy == ResolutionPolicy::FIXED_HEIGHT) {

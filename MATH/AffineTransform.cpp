@@ -57,10 +57,10 @@ namespace MATH
         Vector2f bottomLeft = PointApplyAffineTransform(Vector2f(left, bottom), anAffineTransform);
         Vector2f bottomRight = PointApplyAffineTransform(Vector2f(right, bottom), anAffineTransform);
 
-        float minX = std::min(std::min(topLeft.x, topRight.x), std::min(bottomLeft.x, bottomRight.x));
-        float maxX = std::max(std::max(topLeft.x, topRight.x), std::max(bottomLeft.x, bottomRight.x));
-        float minY = std::min(std::min(topLeft.y, topRight.y), std::min(bottomLeft.y, bottomRight.y));
-        float maxY = std::max(std::max(topLeft.y, topRight.y), std::max(bottomLeft.y, bottomRight.y));
+        float minX = MATH::MATH_MIN(MATH::MATH_MIN(topLeft.x, topRight.x), MATH::MATH_MIN(bottomLeft.x, bottomRight.x));
+        float maxX = MATH::MATH_MAX(MATH::MATH_MAX(topLeft.x, topRight.x), MATH::MATH_MAX(bottomLeft.x, bottomRight.x));
+        float minY = MATH::MATH_MIN(MATH::MATH_MIN(topLeft.y, topRight.y), MATH::MATH_MIN(bottomLeft.y, bottomRight.y));
+        float maxY = MATH::MATH_MAX(MATH::MATH_MAX(topLeft.y, topRight.y), MATH::MATH_MAX(bottomLeft.y, bottomRight.y));
 
         return Rectf(minX, minY, (maxX - minX), (maxY - minY));
     }
@@ -81,10 +81,10 @@ namespace MATH
         transform.transformPoint(&bottomLeft);
         transform.transformPoint(&bottomRight);
 
-        float minX = std::min(std::min(topLeft.x, topRight.x), std::min(bottomLeft.x, bottomRight.x));
-        float maxX = std::max(std::max(topLeft.x, topRight.x), std::max(bottomLeft.x, bottomRight.x));
-        float minY = std::min(std::min(topLeft.y, topRight.y), std::min(bottomLeft.y, bottomRight.y));
-        float maxY = std::max(std::max(topLeft.y, topRight.y), std::max(bottomLeft.y, bottomRight.y));
+        float minX = MATH::MATH_MIN(MATH::MATH_MIN(topLeft.x, topRight.x), MATH::MATH_MIN(bottomLeft.x, bottomRight.x));
+        float maxX = MATH::MATH_MAX(MATH::MATH_MAX(topLeft.x, topRight.x), MATH::MATH_MAX(bottomLeft.x, bottomRight.x));
+        float minY = MATH::MATH_MIN(MATH::MATH_MIN(topLeft.y, topRight.y), MATH::MATH_MIN(bottomLeft.y, bottomRight.y));
+        float maxY = MATH::MATH_MAX(MATH::MATH_MAX(topLeft.y, topRight.y), MATH::MATH_MAX(bottomLeft.y, bottomRight.y));
 
         return Rectf(minX, minY, (maxX - minX), (maxY - minY));
     }

@@ -22,6 +22,7 @@
 
 #include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
+#include "MATH/MathDef.h"
 
 namespace IO
 {
@@ -68,7 +69,7 @@ namespace IO
 
         size_t total = 0;
         do {
-            size_t bufSize = std::min(buf.size(), buffer.size());
+            size_t bufSize = MATH::MATH_MIN(buf.size(), buffer.size());
             buffer.read(bufSize, &buf[0]);
             int retval = send(fd, (char *)&buf[0], (int)bufSize, 0);
             if (retval == 0) {

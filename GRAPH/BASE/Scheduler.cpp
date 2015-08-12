@@ -246,7 +246,7 @@ namespace GRAPH
     // implementation of Scheduler
 
     // Priority level reserved for system services.
-    const int Scheduler::PRIORITY_SYSTEM = MATH_INT32_MIN;
+    const int Scheduler::PRIORITY_SYSTEM = MATH::MATH_INT32_MIN();
 
     // Minimum priority level for user scheduling.
     const int Scheduler::PRIORITY_NON_SYSTEM_MIN = PRIORITY_SYSTEM + 1;

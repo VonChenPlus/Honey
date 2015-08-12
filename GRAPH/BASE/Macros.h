@@ -3,7 +3,10 @@
 
 #include "MATH/MathDef.h"
 
-#define REPEAT_FOREVER (MATH_UINT32_MAX -1)
+namespace GRAPH
+{
+    #define REPEAT_FOREVER (MATH::MATH_UINT32_MAX() - 1)
+}
 
 #endif // MACROS_H
 

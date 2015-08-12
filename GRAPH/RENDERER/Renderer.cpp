@@ -8,8 +8,6 @@
 #include "MATH/Rectangle.h"
 #include "GRAPH/BASE/Camera.h"
 #include "GRAPH/BASE/Director.h"
-#undef max
-#undef min
 
 namespace GRAPH
 {
@@ -920,8 +918,8 @@ namespace GRAPH
         MATH::Vector2f v2p = Camera::getVisitingCamera()->projectGL(v3p);
 
         // convert content size to world coordinates
-        float wshw = std::max(abs(hSizeX * transform.m[0] + hSizeY * transform.m[4]), abs(hSizeX * transform.m[0] - hSizeY * transform.m[4]));
-        float wshh = std::max(abs(hSizeX * transform.m[1] + hSizeY * transform.m[5]), abs(hSizeX * transform.m[1] - hSizeY * transform.m[5]));
+        float wshw = MATH::MATH_MAX(abs(hSizeX * transform.m[0] + hSizeY * transform.m[4]), abs(hSizeX * transform.m[0] - hSizeY * transform.m[4]));
+        float wshh = MATH::MATH_MAX(abs(hSizeX * transform.m[1] + hSizeY * transform.m[5]), abs(hSizeX * transform.m[1] - hSizeY * transform.m[5]));
 
         // enlarge visable rect half size in screen coord
         visiableRect.origin.x -= wshw;

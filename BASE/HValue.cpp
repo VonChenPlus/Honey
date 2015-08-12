@@ -296,8 +296,8 @@ bool HValue::operator== (const HValue& v) const {
     case Type::INTEGER: return v._field.intVal    == this->_field.intVal;
     case Type::BOOLEAN: return v._field.boolVal   == this->_field.boolVal;
     case Type::STRING:  return *v._field.strVal   == *this->_field.strVal;
-    case Type::FLOAT:   return fabs(v._field.floatVal  - this->_field.floatVal)  <= MATH_FLOAT_EPSILON;
-    case Type::DOUBLE:  return fabs(v._field.doubleVal - this->_field.doubleVal) <= MATH_FLOAT_EPSILON;
+    case Type::FLOAT:   return fabs(v._field.floatVal  - this->_field.floatVal)  <= MATH::MATH_FLOAT_EPSILON();
+    case Type::DOUBLE:  return fabs(v._field.doubleVal - this->_field.doubleVal) <= MATH::MATH_FLOAT_EPSILON();
     case Type::VECTOR: {
         const auto &v1 = *(this->_field.vectorVal);
         const auto &v2 = *(v._field.vectorVal);

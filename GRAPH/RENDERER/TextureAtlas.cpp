@@ -7,8 +7,6 @@
 #include "GRAPH/RENDERER/GLStateCache.h"
 #include "GRAPH/RENDERER/TextureCache.h"
 #include "GRAPH/RENDERER/Renderer.h"
-#undef max
-#undef min
 
 namespace GRAPH
 {
@@ -240,7 +238,7 @@ namespace GRAPH
 
     void TextureAtlas::updateQuad(V3F_C4B_T2F_Quad *quad, ssize_t index)
     {
-        _totalQuads = std::max( index+1, _totalQuads);
+        _totalQuads = MATH::MATH_MAX( index+1, _totalQuads);
 
         _quads[index] = *quad;
 
@@ -368,7 +366,7 @@ namespace GRAPH
         }
         auto oldCapactiy = _capacity;
         // update capacity and totolQuads
-        _totalQuads = std::min(_totalQuads, newCapacity);
+        _totalQuads = MATH::MATH_MIN(_totalQuads, newCapacity);
         _capacity = newCapacity;
 
         V3F_C4B_T2F_Quad* tmpQuads = nullptr;

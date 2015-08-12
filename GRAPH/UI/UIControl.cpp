@@ -308,13 +308,13 @@ namespace UI
         if (a.right() < b.left || b.right() < a.left)
             return 0.0f;
         // okay they do overlap. Let's clip.
-        float maxMin = std::max(a.left, b.left);
-        float minMax = std::min(a.right(), b.right());
+        float maxMin = MATH::MATH_MAX(a.left, b.left);
+        float minMax = MATH::MATH_MIN(a.right(), b.right());
         float overlap = minMax - maxMin;
         if (overlap < 0.0f)
             return 0.0f;
         else
-            return std::min(1.0f, overlap / std::min(a.width, b.width));
+            return MATH::MATH_MIN(1.0f, overlap / MATH::MATH_MIN(a.width, b.width));
     }
 
     // Returns the percentage the smaller one overlaps the bigger one.
@@ -322,13 +322,13 @@ namespace UI
         if (a.bottom() < b.top || b.bottom() < a.top)
             return 0.0f;
         // okay they do overlap. Let's clip.
-        float maxMin = std::max(a.top, b.top);
-        float minMax = std::min(a.bottom(), b.bottom());
+        float maxMin = MATH::MATH_MAX(a.top, b.top);
+        float minMax = MATH::MATH_MIN(a.bottom(), b.bottom());
         float overlap = minMax - maxMin;
         if (overlap < 0.0f)
             return 0.0f;
         else
-            return std::min(1.0f, overlap / std::min(a.height, b.height));
+            return MATH::MATH_MIN(1.0f, overlap / MATH::MATH_MIN(a.height, b.height));
     }
 
     float GetDirectionScore(View *origin, View *destination, FocusDirection direction) {
@@ -418,7 +418,7 @@ namespace UI
         if (wrongDirection)
             return 0.0f;
         else
-            return 10.0f / std::max(1.0f, distance - distanceBonus) + overlap;
+            return 10.0f / MATH::MATH_MAX(1.0f, distance - distanceBonus) + overlap;
     }
 
     bool IsEscapeKeyCode(int keyCode) {

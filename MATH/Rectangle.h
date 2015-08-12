@@ -50,10 +50,10 @@ namespace MATH
         }
 
         inline void intersect(const Rectangle &rhs) {
-            origin.x = std::max(minX(), rhs.minX());
-            origin.y = std::max(minY(), rhs.minY());
-            size.width = std::max(std::min(maxX(), rhs.maxX()), minX()) - minX();
-            size.height = std::max(std::min(maxY(), rhs.maxY()), minY()) - minY();
+            origin.x = MATH::MATH_MAX(minX(), rhs.minX());
+            origin.y = MATH::MATH_MAX(minY(), rhs.minY());
+            size.width = MATH::MATH_MAX(MATH::MATH_MIN(maxX(), rhs.maxX()), minX()) - minX();
+            size.height = MATH::MATH_MAX(MATH::MATH_MIN(maxY(), rhs.maxY()), minY()) - minY();
         }
 
         inline void merge(const Rectangle &rhs) {
@@ -63,10 +63,10 @@ namespace MATH
                 return;
             }
 
-            origin.x = std::min(minX(), rhs.minX());
-            origin.y = std::min(minY(), rhs.minY());
-            size.width = std::max(maxX(), rhs.maxX()) - minX();
-            size.height = std::max(maxY(), rhs.maxY()) - minY();
+            origin.x = MATH::MATH_MIN(minX(), rhs.minX());
+            origin.y = MATH::MATH_MIN(minY(), rhs.minY());
+            size.width = MATH::MATH_MAX(maxX(), rhs.maxX()) - minX();
+            size.height = MATH::MATH_MAX(maxY(), rhs.maxY()) - minY();
         }
 
         inline void translate(const Vector2<T> &p) {

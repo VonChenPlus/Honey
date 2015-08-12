@@ -82,7 +82,7 @@ namespace MATH
                                          float zNearPlane, float zFarPlane, Matrix4* dst) {
         float f_n = 1.0f / (zFarPlane - zNearPlane);
         float theta = MATH_DEG_TO_RAD(fieldOfView) * 0.5f;
-        if (fabs(fmod(theta, MATH_PIOVER2)) < MATH_FLOAT_EPSILON) {
+        if (fabs(fmod(theta, MATH_PIOVER2)) < MATH::MATH_FLOAT_EPSILON()) {
             return;
         }
         float divisor = tan(theta);
@@ -131,7 +131,7 @@ namespace MATH
                                        const Vector3f& cameraUpVector, const Vector3f* cameraForwardVector,
                                        Matrix4* dst) {
         Vector3f delta(objectPosition, cameraPosition);
-        bool isSufficientDelta = delta.lengthSquared() > MATH_FLOAT_EPSILON;
+        bool isSufficientDelta = delta.lengthSquared() > MATH::MATH_FLOAT_EPSILON();
 
         dst->setIdentity();
         dst->m[3] = objectPosition.x;
@@ -435,7 +435,7 @@ namespace MATH
         // Now calculate the rotation from the resulting matrix (axes).
         float trace = xaxis.x + yaxis.y + zaxis.z + 1.0f;
 
-        if (trace > MATH_FLOAT_EPSILON) {
+        if (trace > MATH::MATH_FLOAT_EPSILON()) {
             float s = 0.5f / sqrt(trace);
             rotation->w = 0.25f / s;
             rotation->x = (yaxis.z - zaxis.y) * s;

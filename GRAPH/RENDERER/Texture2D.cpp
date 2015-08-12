@@ -5,8 +5,6 @@
 #include "BASE/HData.h"
 #include "GRAPH/RENDERER/GLStateCache.h"
 #include "GRAPH/BASE/Director.h"
-#undef max
-#undef min
 
 namespace GRAPH
 {
@@ -215,8 +213,8 @@ namespace GRAPH
                 glTexImage2D(GL_TEXTURE_2D, i, info.internalFormat, (GLsizei)width, (GLsizei)height, 0, info.format, info.type, data);
             }
 
-            width = std::max(width >> 1, 1);
-            height = std::max(height >> 1, 1);
+            width = MATH::MATH_MAX(width >> 1, 1);
+            height = MATH::MATH_MAX(height >> 1, 1);
         }
 
         _contentSize = MATH::Sizef((float)pixelsWide, (float)pixelsHigh);

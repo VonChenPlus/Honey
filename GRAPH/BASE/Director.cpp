@@ -17,7 +17,6 @@
 #include "GRAPH/RENDERER/GLProgramState.h"
 #include "BASE/AutoreleasePool.h"
 #include "IO/FileUtils.h"
-#undef max
 
 namespace GRAPH
 {
@@ -262,7 +261,7 @@ namespace GRAPH
         else
         {
             _deltaTime = (now.tv_sec - _lastUpdate->tv_sec) + (now.tv_usec - _lastUpdate->tv_usec) / 1000000.0f;
-            _deltaTime = std::max(0.0f, _deltaTime);
+            _deltaTime = MATH::MATH_MAX(0.0f, _deltaTime);
         }
 
         *_lastUpdate = now;

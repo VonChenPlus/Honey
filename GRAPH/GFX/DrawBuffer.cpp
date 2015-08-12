@@ -368,7 +368,7 @@ namespace GFX
                 cval = ' ';
             }
             if (cval == '\n') {
-                maxX = std::max(maxX, wacc);
+                maxX = MATH::MATH_MAX(maxX, wacc);
                 wacc = 0;
                 lines++;
                 continue;
@@ -383,7 +383,7 @@ namespace GFX
             }
         }
         
-        if (width) *width = std::max(wacc, maxX);
+        if (width) *width = MATH::MATH_MAX(wacc, maxX);
         if (height) *height = atlasfont.height * fontscaley * lines;
     }
 

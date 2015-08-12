@@ -4,8 +4,11 @@
 #include <limits>
 #include <cstdlib>
 #include <cmath>
+#include <algorithm>
 
 #include "BASE/Honey.h"
+#undef min
+#undef max
 
 namespace MATH
 {
@@ -25,33 +28,33 @@ namespace MATH
     #define MATH_RANDOM_MINUS1_1()  ((2.0f*((float)rand()/RAND_MAX))-1.0f)  // Returns a random float between -1 and 1.
     #define MATH_RANDOM_0_1()       ((float)rand()/RAND_MAX)                // Returns a random float between 0 and 1.
 
-    #define MATH_INT8_MAX       std::numeric_limits<int8>::max()
-    #define MATH_INT8_MIN       std::numeric_limits<int8>::min()
-    #define MATH_UINT8_MAX      std::numeric_limits<uint8>::max()
-    #define MATH_UINT8_MIN      std::numeric_limits<uint8>::min()
+    inline int8 MATH_INT8_MAX()       { return std::numeric_limits<int8>::max(); }
+    inline int8 MATH_INT8_MIN()       { return std::numeric_limits<int8>::min(); }
+    inline int8 MATH_UINT8_MAX()      { return std::numeric_limits<uint8>::max(); }
+    inline int8 MATH_UINT8_MIN()      { return std::numeric_limits<uint8>::min(); }
 
-    #define MATH_INT16_MAX      std::numeric_limits<int16>::max()
-    #define MATH_INT16_MIN      std::numeric_limits<int16>::min()
-    #define MATH_UINT16_MAX     std::numeric_limits<uint16>::max()
-    #define MATH_UINT16_MIN     std::numeric_limits<uint16>::min()
+    inline int16 MATH_INT16_MAX()      { return std::numeric_limits<int16>::max(); }
+    inline int16 MATH_INT16_MIN()      { return std::numeric_limits<int16>::min(); }
+    inline int16 MATH_UINT16_MAX()     { return std::numeric_limits<uint16>::max(); }
+    inline int16 MATH_UINT16_MIN()     { return std::numeric_limits<uint16>::min(); }
 
-    #define MATH_INT32_MAX      std::numeric_limits<int32>::max()
-    #define MATH_INT32_MIN      std::numeric_limits<int32>::min()
-    #define MATH_UINT32_MAX     std::numeric_limits<uint32>::max()
-    #define MATH_UINT32_MIN     std::numeric_limits<uint32>::min()
+    inline int32 MATH_INT32_MAX()      { return std::numeric_limits<int32>::max(); }
+    inline int32 MATH_INT32_MIN()      { return std::numeric_limits<int32>::min(); }
+    inline int32 MATH_UINT32_MAX()     { return std::numeric_limits<uint32>::max(); }
+    inline int32 MATH_UINT32_MIN()     { return std::numeric_limits<uint32>::min(); }
 
-    #define MATH_INT64_MAX      std::numeric_limits<int64>::max()
-    #define MATH_INT64_MIN      std::numeric_limits<int64>::min()
-    #define MATH_UINT64_MAX     std::numeric_limits<uint64>::max()
-    #define MATH_UINT64_MIN     std::numeric_limits<uint64>::min()
+    inline int64 MATH_INT64_MAX()      { return std::numeric_limits<int64>::max(); }
+    inline int64 MATH_INT64_MIN()      { return std::numeric_limits<int64>::min(); }
+    inline int64 MATH_UINT64_MAX()     { return std::numeric_limits<uint64>::max(); }
+    inline int64 MATH_UINT64_MIN()     { return std::numeric_limits<uint64>::min(); }
 
-    #define MATH_FLOAT_MAX      std::numeric_limits<float>::max()
-    #define MATH_FLOAT_MIN      std::numeric_limits<float>::min()
-    #define MATH_FLOAT_EPSILON  std::numeric_limits<float>::epsilon()
+    inline float MATH_FLOAT_MAX()      { return std::numeric_limits<float>::max(); }
+    inline float MATH_FLOAT_MIN()      { return std::numeric_limits<float>::min(); }
+    inline float MATH_FLOAT_EPSILON()  { return std::numeric_limits<float>::epsilon(); }
 
-    #define MATH_DOUBLE_MAX      std::numeric_limits<double>::max()
-    #define MATH_DOUBLE_MIN      std::numeric_limits<double>::min()
-    #define MATH_DOUBLE_EPSILON  std::numeric_limits<double>::epsilon()
+    inline double MATH_DOUBLE_MAX()      { return std::numeric_limits<double>::max(); }
+    inline double MATH_DOUBLE_MIN()      { return std::numeric_limits<double>::min(); }
+    inline double MATH_DOUBLE_EPSILON()  { return std::numeric_limits<double>::epsilon(); }
 
     #define MATH_CLAMP(x, lo, hi) ((x < lo) ? lo : ((x > hi) ? hi : x))
     #define MATH_CLAMP16(x) MATH_CLAMP(x, 0, 16)
@@ -79,17 +82,14 @@ namespace MATH
     template <>
     inline bool MATHEQUALS(const double &v1, const double &v2) { return std::abs(v1 - v2) < std::numeric_limits<double>::epsilon(); }
 
-    inline bool IsPowerOf2(int n) {
-        return n == 1 || (n & (n - 1)) == 0;
-    }
+    template <typename T>
+    T MATH_MAX(T v1, T v2) { return std::max(v1, v2); }
+    template <typename T>
+    T MATH_MIN(T v1, T v2) { return std::min(v1, v2); }
 
-    inline uint32 Log2I(uint32 value) {
-        uint32 ret = -1;
-        while (value != 0) {
-            value >>= 1; ret++;
-        }
-        return ret;
-    }
+    inline bool IsPowerOf2(int n) { return n == 1 || (n & (n - 1)) == 0; }
+
+    inline uint32 Log2I(uint32 value) { uint32 ret = -1; while (value != 0) { value >>= 1; ret++; } return ret; }
 }
 
 #endif // MATHDEF_H
