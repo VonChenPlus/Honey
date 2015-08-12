@@ -83,9 +83,9 @@ namespace MATH
     inline bool MATHEQUALS(const double &v1, const double &v2) { return std::abs(v1 - v2) < std::numeric_limits<double>::epsilon(); }
 
     template <typename T>
-    T MATH_MAX(T v1, T v2) { return std::max(v1, v2); }
+    inline T MATH_MAX(T v1, T v2) { return std::max(v1, v2); }
     template <typename T>
-    T MATH_MIN(T v1, T v2) { return std::min(v1, v2); }
+    inline T MATH_MIN(T v1, T v2) { return std::min(v1, v2); }
 
     inline bool IsPowerOf2(int n) { return n == 1 || (n & (n - 1)) == 0; }
 
