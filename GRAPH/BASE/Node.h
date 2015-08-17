@@ -17,7 +17,6 @@ namespace GRAPH
     class Action;
     class Scheduler;
     class ActionManager;
-    class Component;
     class EventDispatcher;
     class Scene;
     class Renderer;

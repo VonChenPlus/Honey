@@ -3,6 +3,11 @@
 #include "GRAPH/BASE/EventDispatcher.h"
 #include "GRAPH/BASE/Macros.h"
 #include "GRAPH/BASE/Director.h"
+#include "GRAPH/BASE/Camera.h"
+#include "GRAPH/RENDERER/GLProgram.h"
+#include "GRAPH/RENDERER/GLProgramState.h"
+#include "GRAPH/UI/LAYOUTS/UILayout.h"
+#include "GRAPH/BASE/EventDispatcher.h"
 
 namespace GRAPH
 {
@@ -108,7 +113,6 @@ namespace GRAPH
         Widget::FocusNavigationController* Widget::_focusNavigationController = nullptr;
 
         Widget::Widget():
-        _usingLayoutComponent(false),
         _unifySize(false),
         _enabled(true),
         _bright(true),
@@ -118,8 +122,8 @@ namespace GRAPH
         _ignoreSize(false),
         _propagateTouchEvents(true),
         _brightStyle(BrightStyle::NONE),
-        _sizeType(ABSOLUTE),
-        _positionType(ABSOLUTE),
+        _sizeType(SizeType::ST_ABSOLUTE),
+        _positionType(PositionType::PT_ABSOLUTE),
         _actionTag(0),
         _customSize(MATH::SizefZERO),
         _hitted(false),
@@ -191,8 +195,7 @@ namespace GRAPH
 
         void Widget::onEnter()
         {
-            if (!_usingLayoutComponent)
-                updateSizeAndPosition();
+            updateSizeAndPosition();
             ProtectedNode::onEnter();
         }
 
@@ -225,19 +228,6 @@ namespace GRAPH
         {
         }
 
-        LayoutComponent* Widget::getOrCreateLayoutComponent()
-        {
-            auto layoutComponent = this->getComponent(__LAYOUT_COMPONENT_NAME);
-            if (nullptr == layoutComponent)
-            {
-                LayoutComponent *component = LayoutComponent::create();
-                this->addComponent(component);
-                layoutComponent = component;
-            }
-
-            return (LayoutComponent*)layoutComponent;
-        }
-
         void Widget::setContentSize(const MATH::Sizef &contentSize)
         {
             ProtectedNode::setContentSize(contentSize);
@@ -251,7 +241,7 @@ namespace GRAPH
             {
                 _contentSize = getVirtualRendererSize();
             }
-            if (!_usingLayoutComponent && _running)
+            if (_running)
             {
                 Widget* widgetParent = getWidgetParent();
                 MATH::Sizef pSize;
@@ -278,46 +268,31 @@ namespace GRAPH
             onSizeChanged();
         }
 
-        void Widget::setSize(const MATH::Sizef &size)
-        {
-            this->setContentSize(size);
-        }
-
         void Widget::setSizePercent(const MATH::Vector2f &percent)
         {
-            if (_usingLayoutComponent)
+            _sizePercent = percent;
+            MATH::Sizef cSize = _customSize;
+            if (_running)
             {
-                auto component = this->getOrCreateLayoutComponent();
-                component->setUsingPercentContentSize(true);
-                component->setPercentContentSize(percent);
-                component->refreshLayout();
-            }
-            else
-            {
-                _sizePercent = percent;
-                MATH::Sizef cSize = _customSize;
-                if (_running)
+                Widget* widgetParent = getWidgetParent();
+                if (widgetParent)
                 {
-                    Widget* widgetParent = getWidgetParent();
-                    if (widgetParent)
-                    {
-                        cSize = Size(widgetParent->getContentSize().width * percent.x, widgetParent->getContentSize().height * percent.y);
-                    }
-                    else
-                    {
-                        cSize = Size(_parent->getContentSize().width * percent.x, _parent->getContentSize().height * percent.y);
-                    }
-                }
-                if (_ignoreSize)
-                {
-                    this->setContentSize(getVirtualRendererSize());
+                    cSize = MATH::Sizef(widgetParent->getContentSize().width * percent.x, widgetParent->getContentSize().height * percent.y);
                 }
                 else
                 {
-                    this->setContentSize(cSize);
+                    cSize = MATH::Sizef(_parent->getContentSize().width * percent.x, _parent->getContentSize().height * percent.y);
                 }
-                _customSize = cSize;
             }
+            if (_ignoreSize)
+            {
+                this->setContentSize(getVirtualRendererSize());
+            }
+            else
+            {
+                this->setContentSize(cSize);
+            }
+            _customSize = cSize;
         }
 
         void Widget::updateSizeAndPosition()
@@ -331,7 +306,7 @@ namespace GRAPH
         {
             switch (_sizeType)
             {
-                case ABSOLUTE:
+                case SizeType::ST_ABSOLUTE:
                 {
                     if (_ignoreSize)
                     {
@@ -354,9 +329,9 @@ namespace GRAPH
                     _sizePercent.set(spx, spy);
                     break;
                 }
-                case SizeType::PERCENT:
+                case SizeType::ST_PERCENT:
                 {
-                    MATH::Sizef cSize = Size(parentSize.width * _sizePercent.x , parentSize.height * _sizePercent.y);
+                    MATH::Sizef cSize = MATH::Sizef(parentSize.width * _sizePercent.x , parentSize.height * _sizePercent.y);
                     if (_ignoreSize)
                     {
                         this->setContentSize(getVirtualRendererSize());
@@ -376,7 +351,7 @@ namespace GRAPH
             MATH::Vector2f absPos = getPosition();
             switch (_positionType)
             {
-                case PositionType::ABSOLUTE:
+                case PositionType::PT_ABSOLUTE:
                 {
                     if (parentSize.width <= 0.0f || parentSize.height <= 0.0f)
                     {
@@ -388,7 +363,7 @@ namespace GRAPH
                     }
                     break;
                 }
-                case PositionType::PERCENT:
+                case PositionType::PT_PERCENT:
                 {
                     absPos.set(parentSize.width * _positionPercent.x, parentSize.height * _positionPercent.y);
                     break;
@@ -399,24 +374,6 @@ namespace GRAPH
             setPosition(absPos);
         }
 
-        void Widget::setSizeType(SizeType type)
-        {
-            _sizeType = type;
-
-            if (_usingLayoutComponent)
-            {
-                auto component = this->getOrCreateLayoutComponent();
-
-                if (_sizeType == Widget::SizeType::PERCENT)
-                {
-                    component->setUsingPercentContentSize(true);
-                }
-                else
-                {
-                    component->setUsingPercentContentSize(false);
-                }
-            }
-        }
         Widget::SizeType Widget::getSizeType() const
         {
             return _sizeType;
@@ -436,7 +393,7 @@ namespace GRAPH
             _ignoreSize = ignore;
             if (_ignoreSize)
             {
-                Size s = getVirtualRendererSize();
+                MATH::Sizef s = getVirtualRendererSize();
                 this->setContentSize(s);
             }
             else
@@ -450,24 +407,13 @@ namespace GRAPH
             return _ignoreSize;
         }
 
-        const Size& Widget::getSize() const
-        {
-            return this->getContentSize();
-        }
-
-        const Size& Widget::getCustomSize() const
+        const MATH::Sizef& Widget::getCustomSize() const
         {
             return _customSize;
         }
 
         const MATH::Vector2f& Widget::getSizePercent()
         {
-            if (_usingLayoutComponent)
-            {
-                auto component = this->getOrCreateLayoutComponent();
-                _sizePercent = component->getPercentContentSize();
-            }
-
             return _sizePercent;
         }
 
@@ -483,25 +429,22 @@ namespace GRAPH
 
         void Widget::onSizeChanged()
         {
-            if (!_usingLayoutComponent)
+            for (auto& child : getChildren())
             {
-                for (auto& child : getChildren())
+                Widget* widgetChild = dynamic_cast<Widget*>(child);
+                if (widgetChild)
                 {
-                    Widget* widgetChild = dynamic_cast<Widget*>(child);
-                    if (widgetChild)
-                    {
-                        widgetChild->updateSizeAndPosition();
-                    }
+                    widgetChild->updateSizeAndPosition();
                 }
             }
         }
 
-        Size Widget::getVirtualRendererSize() const
+        MATH::Sizef Widget::getVirtualRendererSize() const
         {
             return _contentSize;
         }
 
-        void Widget::updateContentSizeWithTextureSize(const cocos2d::Size &size)
+        void Widget::updateContentSizeWithTextureSize(const MATH::Sizef &size)
         {
             if (_unifySize)
             {
@@ -539,7 +482,7 @@ namespace GRAPH
             else
             {
                 _eventDispatcher->removeEventListener(_touchListener);
-                CC_SAFE_RELEASE_NULL(_touchListener);
+                SAFE_RELEASE_NULL(_touchListener);
             }
         }
 
@@ -746,7 +689,7 @@ namespace GRAPH
             return true;
         }
 
-        void Widget::propagateTouchEvent(cocos2d::ui::Widget::TouchEventType event, cocos2d::ui::Widget *sender, cocos2d::Touch *touch)
+        void Widget::propagateTouchEvent(Widget::TouchEventType event, Widget *sender, Touch *touch)
         {
             Widget* widgetParent = getWidgetParent();
             if (widgetParent)
@@ -867,12 +810,6 @@ namespace GRAPH
             this->release();
         }
 
-        void Widget::addTouchEventListener(Ref *target, SEL_TouchEvent selector)
-        {
-            _touchEventListener = target;
-            _touchEventSelector = selector;
-        }
-
         void Widget::addTouchEventListener(const ccWidgetTouchCallback& callback)
         {
             this->_touchEventCallback = callback;
@@ -888,9 +825,9 @@ namespace GRAPH
             this->_ccEventCallback = callback;
         }
 
-        bool Widget::hitTest(const MATH::Vector2f &pt, const Camera* camera, Vec3 *p) const
+        bool Widget::hitTest(const MATH::Vector2f &pt, const Camera* camera, MATH::Vector3f *p) const
         {
-            Rect rect;
+            MATH::Rectf rect;
             rect.size = getContentSize();
             return isScreenPointInRect(pt, camera, getWorldToNodeTransform(), rect, p);
         }
@@ -937,7 +874,7 @@ namespace GRAPH
             return true;
         }
 
-        void Widget::interceptTouchEvent(cocos2d::ui::Widget::TouchEventType event, cocos2d::ui::Widget *sender, Touch *touch)
+        void Widget::interceptTouchEvent(Widget::TouchEventType event, Widget *sender, Touch *touch)
         {
             Widget* widgetParent = getWidgetParent();
             if (widgetParent)
@@ -949,12 +886,12 @@ namespace GRAPH
 
         void Widget::setPosition(const MATH::Vector2f &pos)
         {
-            if (!_usingLayoutComponent && _running)
+            if (_running)
             {
                 Widget* widgetParent = getWidgetParent();
                 if (widgetParent)
                 {
-                    Size pSize = widgetParent->getContentSize();
+                    MATH::Sizef pSize = widgetParent->getContentSize();
                     if (pSize.width <= 0.0f || pSize.height <= 0.0f)
                     {
                         _positionPercent.setZero();
@@ -970,60 +907,26 @@ namespace GRAPH
 
         void Widget::setPositionPercent(const MATH::Vector2f &percent)
         {
-            if (_usingLayoutComponent)
+            _positionPercent = percent;
+            if (_running)
             {
-                auto component = this->getOrCreateLayoutComponent();
-                component->setPositionPercentX(percent.x);
-                component->setPositionPercentY(percent.y);
-                component->refreshLayout();
-            }
-            else
-            {
-                _positionPercent = percent;
-                if (_running)
+                Widget* widgetParent = getWidgetParent();
+                if (widgetParent)
                 {
-                    Widget* widgetParent = getWidgetParent();
-                    if (widgetParent)
-                    {
-                        Size parentSize = widgetParent->getContentSize();
-                        MATH::Vector2f absPos(parentSize.width * _positionPercent.x, parentSize.height * _positionPercent.y);
-                        setPosition(absPos);
-                    }
+                    MATH::Sizef parentSize = widgetParent->getContentSize();
+                    MATH::Vector2f absPos(parentSize.width * _positionPercent.x, parentSize.height * _positionPercent.y);
+                    setPosition(absPos);
                 }
             }
         }
 
         const MATH::Vector2f& Widget::getPositionPercent(){
-
-            if (_usingLayoutComponent)
-            {
-                auto component = this->getOrCreateLayoutComponent();
-                float percentX = component->getPositionPercentX();
-                float percentY = component->getPositionPercentY();
-
-                _positionPercent.set(percentX, percentY);
-            }
             return _positionPercent;
         }
 
         void Widget::setPositionType(PositionType type)
         {
             _positionType = type;
-
-            if (_usingLayoutComponent)
-            {
-                auto component = this->getOrCreateLayoutComponent();
-                if (type == Widget::PositionType::ABSOLUTE)
-                {
-                    component->setPositionPercentXEnabled(false);
-                    component->setPositionPercentYEnabled(false);
-                }
-                else
-                {
-                    component->setPositionPercentXEnabled(true);
-                    component->setPositionPercentYEnabled(true);
-                }
-            }
         }
 
         Widget::PositionType Widget::getPositionType() const
@@ -1089,11 +992,6 @@ namespace GRAPH
         LayoutParameter* Widget::getLayoutParameter()const
         {
             return dynamic_cast<LayoutParameter*>(_layoutParameterDictionary.at((int)_layoutParameterType));
-        }
-
-        LayoutParameter* Widget::getLayoutParameter(LayoutParameter::Type type)
-        {
-            return dynamic_cast<LayoutParameter*>(_layoutParameterDictionary.at((int)type));
         }
 
         std::string Widget::getDescription() const
@@ -1185,7 +1083,7 @@ namespace GRAPH
 
             copySpecialProperties(widget);
 
-            Map<int, LayoutParameter*>& layoutParameterDic = widget->_layoutParameterDictionary;
+            HObjectMap<int, LayoutParameter*>& layoutParameterDic = widget->_layoutParameterDictionary;
             for (auto iter = layoutParameterDic.begin(); iter != layoutParameterDic.end(); ++iter)
             {
                 setLayoutParameter(iter->second->clone());
@@ -1260,7 +1158,6 @@ namespace GRAPH
 
             float Widget::getScale()const
             {
-                CCASSERT(this->getScaleX() == this->getScaleY(), "");
                 return this->getScaleX();
             }
 
@@ -1363,7 +1260,7 @@ namespace GRAPH
                 }
 
                 EventFocus event(widgetLoseFocus, widgetGetFocus);
-                auto dispatcher = cocos2d::Director::getInstance()->getEventDispatcher();
+                auto dispatcher = Director::getInstance()->getEventDispatcher();
                 dispatcher->dispatchEvent(&event);
             }
 
@@ -1431,17 +1328,6 @@ namespace GRAPH
         void Widget::setUnifySizeEnabled(bool enable)
         {
             _unifySize = enable;
-        }
-
-
-        void Widget::setLayoutComponentEnabled(bool enable)
-        {
-            _usingLayoutComponent = enable;
-        }
-
-        bool Widget::isLayoutComponentEnabled()const
-        {
-            return _usingLayoutComponent;
         }
     }
 }

@@ -6,13 +6,62 @@
 #include "GRAPH/UI/LAYOUTS/UILayoutParameter.h"
 #include "GRAPH/BASE/Event.h"
 
-class EventListenerTouchOneByOne;
-class Camera;
-
 namespace GRAPH
 {
+    class EventListenerTouchOneByOne;
+    class Camera;
+
     namespace UI
     {
+        class ObjectFactory
+        {
+        public:
+            typedef HObject* (*Instance)(void);
+            typedef std::function<HObject* (void)> InstanceFunc;
+            struct TInfo
+            {
+                TInfo(void);
+                TInfo(const std::string& type, Instance ins = nullptr);
+                TInfo(const std::string& type, InstanceFunc ins = nullptr);
+                TInfo(const TInfo &t);
+                ~TInfo(void);
+                TInfo& operator= (const TInfo &t);
+                std::string _class;
+                Instance _fun;
+                InstanceFunc _func;
+            };
+            typedef std::unordered_map<std::string, TInfo>  FactoryMap;
+
+            static ObjectFactory* getInstance();
+            static void destroyInstance();
+            HObject* createObject(const std::string &name);
+
+            void registerType(const TInfo &t);
+            void removeAll();
+
+        protected:
+            ObjectFactory(void);
+            virtual ~ObjectFactory(void);
+        private:
+            static ObjectFactory *_sharedFactory;
+            FactoryMap _typeMap;
+        };
+
+        #define DECLARE_CLASS_GUI_INFO \
+            public: \
+            static ObjectFactory::TInfo __Type; \
+            static HObject* createInstance(void); \
+
+        #define IMPLEMENT_CLASS_GUI_INFO(className) \
+            HObject* className::createInstance(void) \
+            { \
+                return className::create(); \
+            } \
+            ObjectFactory::TInfo className::__Type(#className, &className::createInstance); \
+
+        #define CREATE_CLASS_GUI_INFO(className) \
+            ObjectFactory::TInfo(#className, &className::createInstance) \
+
         class LayoutComponent;
 
         typedef enum
@@ -42,8 +91,8 @@ namespace GRAPH
              */
             enum class PositionType
             {
-                ABSOLUTE,
-                PERCENT
+                PT_ABSOLUTE,
+                PT_PERCENT
             };
 
             /**
@@ -51,8 +100,8 @@ namespace GRAPH
              */
             enum class SizeType
             {
-                ABSOLUTE,
-                PERCENT
+                ST_ABSOLUTE,
+                ST_PERCENT
             };
 
             /**
@@ -584,9 +633,6 @@ namespace GRAPH
             void setCallbackType(const std::string& callbackType) { _callbackType = callbackType; }
             const std::string& getCallbackType() const{ return _callbackType; }
 
-            void setLayoutComponentEnabled(bool enable);
-            bool isLayoutComponentEnabled()const;
-
         public:
             virtual bool init() override;
             virtual void interceptTouchEvent(TouchEventType event, Widget* sender, Touch *touch);
@@ -638,10 +684,8 @@ namespace GRAPH
             bool isAncestorsVisible(Node* node);
 
             void cleanupWidget();
-            LayoutComponent* getOrCreateLayoutComponent();
 
         protected:
-            bool _usingLayoutComponent;
             bool _unifySize;
             bool _enabled;
             bool _bright;
@@ -687,6 +731,7 @@ namespace GRAPH
             static Widget *_focusedWidget;  //both layout & widget will be stored in this variable
 
             HObject*       _touchEventListener;
+            SEL_TouchEvent    _touchEventSelector;
             ccWidgetTouchCallback _touchEventCallback;
             ccWidgetClickCallback _clickEventListener;
             ccWidgetEventCallback _ccEventCallback;
