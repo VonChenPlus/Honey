@@ -68,6 +68,7 @@ namespace GRAPH
         static Color4B WhiteColor(Color4B);
         static Color4B WhiteAlpha(float alpha);
         static Color4B BlackAlpha(float alpha);
+        static Color4B ColorAlpha(Color4B, float alpha);
 
         static const Color4B WHITE;
         static const Color4B YELLOW;

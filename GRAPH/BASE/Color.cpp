@@ -72,9 +72,9 @@ namespace GRAPH
 
     Color4B::Color4B(uint32 color)
         : red(color & 0xFF)
-        , green(color & 0xFF00)
-        , blue(color & 0xFF0000)
-        , alpha(color & 0xFF000000) {
+        , green((color & 0xFF00) >> 8)
+        , blue((color & 0xFF0000) >> 16)
+        , alpha((color & 0xFF000000) >> 24) {
 
     }
 
@@ -138,6 +138,13 @@ namespace GRAPH
         if (alpha < 0.0f) alpha = 0.0f;
         if (alpha > 1.0f) alpha = 1.0f;
         return Color4B(0, 0, 0, alpha*255);
+    }
+
+    Color4B ColorAlpha(Color4B color, float alpha) {
+        if (alpha < 0.0f) alpha = 0.0f;
+        if (alpha > 1.0f) alpha = 1.0f;
+        color.alpha = alpha * 255;
+        return color;
     }
 
     Color4F::Color4F()
