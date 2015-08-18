@@ -412,39 +412,39 @@ const char* XMLUtil::GetCharacterRef( const char* p, char* value, int* length )
 
 void XMLUtil::ToStr( int v, char* buffer, int bufferSize )
 {
-    //TIXML_SNPRINTF( buffer, bufferSize, "%d", v );
+    TIXML_SNPRINTF( buffer, bufferSize, "%d", v );
 }
 
 
 void XMLUtil::ToStr( unsigned v, char* buffer, int bufferSize )
 {
-    //TIXML_SNPRINTF( buffer, bufferSize, "%u", v );
+    TIXML_SNPRINTF( buffer, bufferSize, "%u", v );
 }
 
 
 void XMLUtil::ToStr( bool v, char* buffer, int bufferSize )
 {
-    //TIXML_SNPRINTF( buffer, bufferSize, "%d", v ? 1 : 0 );
+    TIXML_SNPRINTF( buffer, bufferSize, "%d", v ? 1 : 0 );
 }
 
 
 void XMLUtil::ToStr( float v, char* buffer, int bufferSize )
 {
-    //TIXML_SNPRINTF( buffer, bufferSize, "%g", v );
+    TIXML_SNPRINTF( buffer, bufferSize, "%g", v );
 }
 
 
 void XMLUtil::ToStr( double v, char* buffer, int bufferSize )
 {
-    //TIXML_SNPRINTF( buffer, bufferSize, "%g", v );
+    TIXML_SNPRINTF( buffer, bufferSize, "%g", v );
 }
 
 
 bool XMLUtil::ToInt( const char* str, int* value )
 {
-    //if ( TIXML_SSCANF( str, "%d", value ) == 1 ) {
-    //    return true;
-    //}
+    if ( TIXML_SSCANF( str, "%d", value ) == 1 ) {
+        return true;
+    }
     return false;
 }
 
@@ -1719,10 +1719,10 @@ void XMLDocument::PrintError() const
         char buf2[LEN] = { 0 };
 
         if ( _errorStr1 ) {
-            //TIXML_SNPRINTF( buf1, LEN, "%s", _errorStr1 );
+            TIXML_SNPRINTF( buf1, LEN, "%s", _errorStr1 );
         }
         if ( _errorStr2 ) {
-            //TIXML_SNPRINTF( buf2, LEN, "%s", _errorStr2 );
+            TIXML_SNPRINTF( buf2, LEN, "%s", _errorStr2 );
         }
 
         printf( "XMLDocument error id=%d str1=%s str2=%s\n",
