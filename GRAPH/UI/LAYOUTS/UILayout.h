@@ -7,14 +7,13 @@
 namespace GRAPH
 {
     class DrawNode;
+    class LayerColor;
+    class LayerGradient;
 
     namespace UI
     {
-        class LayerColor;
-        class LayerGradient;
-
-        class LayoutManager;
         class Scale9Sprite;
+        class LayoutManager;
 
         class LayoutProtocol
         {
@@ -583,6 +582,72 @@ namespace GRAPH
             bool _passFocusToChild;
              //when finding the next focused widget, use this variable to pass focus between layout & widget
             bool _isFocusPassing;
+        };
+
+        class LayoutManager : public HObject
+        {
+        public:
+            virtual ~LayoutManager(){}
+            LayoutManager(){}
+
+            /**
+             * The interface does the actual layouting work.
+             */
+            virtual void doLayout(LayoutProtocol *layout) = 0;
+
+            friend class Layout;
+        };
+
+        class LinearVerticalLayoutManager : public LayoutManager
+        {
+        private:
+            LinearVerticalLayoutManager(){}
+            virtual ~LinearVerticalLayoutManager(){}
+            static LinearVerticalLayoutManager* create();
+            virtual void doLayout(LayoutProtocol *layout) override;
+
+            friend class Layout;
+        };
+
+        class LinearHorizontalLayoutManager : public LayoutManager
+        {
+        private:
+            LinearHorizontalLayoutManager(){}
+            virtual ~LinearHorizontalLayoutManager(){}
+            static LinearHorizontalLayoutManager* create();
+            virtual void doLayout(LayoutProtocol *layout) override;
+
+            friend class Layout;
+        };
+
+        class RelativeLayoutManager : public LayoutManager
+        {
+        private:
+            RelativeLayoutManager()
+            :_unlayoutChildCount(0),
+            _widget(nullptr),
+            _finalPositionX(0.0f),
+            _finalPositionY(0.0f),
+            _relativeWidgetLP(nullptr)
+            {}
+            virtual ~RelativeLayoutManager(){}
+            static RelativeLayoutManager* create();
+            virtual void doLayout(LayoutProtocol *layout) override;
+
+            HObjectVector<Widget*> getAllWidgets(LayoutProtocol *layout);
+            Widget* getRelativeWidget(Widget* widget);
+            bool caculateFinalPositionWithRelativeWidget(LayoutProtocol *layout);
+            void caculateFinalPositionWithRelativeAlign();
+
+            ssize_t _unlayoutChildCount;
+            HObjectVector<Widget*> _widgetChildren;
+            Widget* _widget;
+            float _finalPositionX;
+            float _finalPositionY;
+
+            RelativeLayoutParameter* _relativeWidgetLP;
+
+            friend class Layout;
         };
     }
 }

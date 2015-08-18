@@ -212,6 +212,24 @@ namespace IO
         return newFileName;
     }
 
+    std::string FileUtils::getNewFilename(const std::string &filename) const
+    {
+        std::string newFileName;
+
+        // in Lookup Filename dictionary ?
+        auto iter = filenameLookupDict_.find(filename);
+
+        if (iter == filenameLookupDict_.end())
+        {
+            newFileName = filename;
+        }
+        else
+        {
+            newFileName = iter->second.asString();
+        }
+        return newFileName;
+    }
+
     std::string FileUtils::fullPathForFilename(const std::string &filename) const {
         if (filename.empty()){
             throw _HException_Normal("filename is Empty!");
@@ -277,6 +295,11 @@ namespace IO
             ret = "";
         }
         return ret;
+    }
+
+    std::string FileUtils::fullPathFromRelativeFile(const std::string &filename, const std::string &relativeFile)
+    {
+        return relativeFile.substr(0, relativeFile.rfind('/')+1) + getNewFilename(filename);
     }
 
     bool FileUtils::isAbsolutePath(const std::string& path) const {

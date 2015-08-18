@@ -78,6 +78,11 @@ namespace MATH
             return (x * v.x + y * v.y);
         }
 
+        static inline T dot(const Vector2 &v1, const Vector2 &v2) {
+            Vector2 ret = v1;
+            return ret.dot(v2);;
+        }
+
         T length() const {
             return (T)sqrt(x * x + y * y);
         }
@@ -89,6 +94,17 @@ namespace MATH
         inline void negate() {
             x = -x;
             y = -y;
+        }
+
+        static inline Vector2 negate(const Vector2 &value) {
+            Vector2 ret = value;
+            ret.negate();
+            return ret;
+        }
+
+        static inline Vector2 perp(const Vector2 &value) {
+            Vector2 ret(-value.y, value.x);
+            return ret;
         }
 
         void normalize() {
@@ -106,6 +122,12 @@ namespace MATH
             y *= n;
         }
 
+        static inline Vector2 normalize(const Vector2 &value) {
+            Vector2 ret = value;
+            ret.normalize();
+            return ret;
+        }
+
         Vector2 getNormalized() const {
             Vector2 v(*this);
             v.normalize();
@@ -117,6 +139,12 @@ namespace MATH
             y *= scalar;
         }
 
+        static inline Vector2 scale(const Vector2 &value, const T &scalar) {
+            Vector2 ret = value;
+            ret.scale(scalar);
+            return ret;
+        }
+
         inline void scale(const Vector2& scale) {
             x *= scale.x;
             y *= scale.y;
@@ -124,31 +152,18 @@ namespace MATH
 
         /**
          * Rotates this vector by angle (specified in radians) around the given point.
-         *
-         * @param point The point to rotate around.
-         * @param angle The angle to rotate by (in radians).
          */
         Vector2 rotate(const Vector2& pivot, double angle) {
             return pivot + (*this - pivot).rotate(Vector2::forAngle(angle));
         }
 
         /** Complex multiplication of two points ("rotates" two points).
-         @return Vec2 vector with an angle of this.getAngle() + other.getAngle(),
-         and a length of this.getLength() * other.getLength().
-         @since v2.1.4
-         * @js NA
-         * @lua NA
          */
         inline Vector2 rotate(const Vector2& other) const {
             return Vector2(x*other.x - y*other.y, x*other.y + y*other.x);
         }
 
         /** Unrotates two points.
-         @return Vec2 vector with an angle of this.getAngle() - other.getAngle(),
-         and a length of this.getLength() * other.getLength().
-         @since v2.1.4
-         * @js NA
-         * @lua NA
          */
         inline Vector2 unrotate(const Vector2& other) const {
             return Vector2(x*other.x + y*other.y, y*other.x - x*other.y);
@@ -183,16 +198,18 @@ namespace MATH
             y -= v.y;
         }
 
+        static inline Vector2 subtract(const Vector2 &v1, const Vector2 &v2) {
+            Vector2 ret = v1;
+            ret.subtract(v2);
+            return ret;
+        }
+
         /**
          * Updates this vector towards the given target using a smoothing function.
          * The given response time determines the amount of smoothing (lag). A longer
          * response time yields a smoother result and more lag. To force this vector to
          * follow the target closely, provide a response time that is very small relative
          * to the given elapsed time.
-         *
-         * @param target target value.
-         * @param elapsedTime elapsed time between calls.
-         * @param responseTime response time (in the same units as elapsedTime).
          */
         inline void smooth(const Vector2& target, const T &elapsedTime, const T &responseTime) {
             if (elapsedTime > 0) {
@@ -284,23 +301,12 @@ namespace MATH
         }
 
         /** Calculates the projection of this over other.
-         @return Vec2
-         @since v2.1.4
-         * @js NA
-         * @lua NA
          */
         inline Vector2 project(const Vector2& other) const {
             return other * (dot(other)/other.dot(other));
         }
 
         /** Linear Interpolation between two points a and b
-         @returns
-            alpha == 0 ? a
-            alpha == 1 ? b
-            otherwise a value between a..b
-         @since v2.1.4
-         * @js NA
-         * @lua NA
          */
         inline Vector2 lerp(const Vector2& other, double alpha) const {
             return *this * (1.0 - alpha) + other * alpha;

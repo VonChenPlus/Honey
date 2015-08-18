@@ -679,6 +679,87 @@ namespace GRAPH
         drawLine(MATH::Vector2f(p4.x, p4.y), MATH::Vector2f(p1.x, p1.y), color);
     }
 
+    void DrawNode::drawPolygon(const MATH::Vector2f *verts, int count, const Color4F &fillColor, float borderWidth, const Color4F &borderColor)
+    {
+        bool outline = (borderColor.alpha > 0.0 && borderWidth > 0.0);
+
+        auto  triangle_count = outline ? (3*count - 2) : (count - 2);
+        auto vertex_count = 3*triangle_count;
+        ensureCapacity(vertex_count);
+
+        V2F_C4B_T2F_Triangle *triangles = (V2F_C4B_T2F_Triangle *)(_buffer + _bufferCount);
+        V2F_C4B_T2F_Triangle *cursor = triangles;
+
+        for (int i = 0; i < count-2; i++)
+        {
+            V2F_C4B_T2F_Triangle tmp = {
+                {verts[0], Color4B(fillColor), MATH::Vec2fZERO},
+                {verts[i+1], Color4B(fillColor), MATH::Vec2fZERO},
+                {verts[i+2], Color4B(fillColor), MATH::Vec2fZERO},
+            };
+
+            *cursor++ = tmp;
+        }
+
+        if(outline)
+        {
+            struct ExtrudeVerts {MATH::Vector2f offset, n;};
+            struct ExtrudeVerts* extrude = (struct ExtrudeVerts*)malloc(sizeof(struct ExtrudeVerts)*count);
+            memset(extrude, 0, sizeof(struct ExtrudeVerts)*count);
+
+            for (int i = 0; i < count; i++)
+            {
+                MATH::Vector2f v0 = verts[(i-1+count)%count];
+                MATH::Vector2f v1 = verts[i];
+                MATH::Vector2f v2 = verts[(i+1)%count];
+
+                MATH::Vector2f n1 = MATH::Vector2f::normalize(MATH::Vector2f::perp(MATH::Vector2f::subtract(v1, v0)));
+                MATH::Vector2f n2 = MATH::Vector2f::normalize(MATH::Vector2f::perp(MATH::Vector2f::subtract(v2, v1)));
+
+                MATH::Vector2f offset = MATH::Vector2f::scale(MATH::Vector2f::add(n1, n2), 1.0/(MATH::Vector2f::dot(n1, n2) + 1.0));
+                struct ExtrudeVerts tmp = {offset, n2};
+                extrude[i] = tmp;
+            }
+
+            for(int i = 0; i < count; i++)
+            {
+                int j = (i+1)%count;
+                MATH::Vector2f v0 = verts[i];
+                MATH::Vector2f v1 = verts[j];
+
+                MATH::Vector2f n0 = extrude[i].n;
+
+                MATH::Vector2f offset0 = extrude[i].offset;
+                MATH::Vector2f offset1 = extrude[j].offset;
+
+                MATH::Vector2f inner0 = MATH::Vector2f::subtract(v0, MATH::Vector2f::scale(offset0, borderWidth));
+                MATH::Vector2f inner1 = MATH::Vector2f::subtract(v1, MATH::Vector2f::scale(offset1, borderWidth));
+                MATH::Vector2f outer0 = MATH::Vector2f::subtract(v0, MATH::Vector2f::scale(offset0, borderWidth));
+                MATH::Vector2f outer1 = MATH::Vector2f::subtract(v1, MATH::Vector2f::scale(offset1, borderWidth));
+
+                V2F_C4B_T2F_Triangle tmp1 = {
+                    {inner0, Color4B(borderColor), MATH::Vector2f::negate(n0)},
+                    {inner1, Color4B(borderColor), MATH::Vector2f::negate(n0)},
+                    {outer1, Color4B(borderColor), n0}
+                };
+                *cursor++ = tmp1;
+
+                V2F_C4B_T2F_Triangle tmp2 = {
+                    {inner0, Color4B(borderColor), MATH::Vector2f::negate(n0)},
+                    {outer0, Color4B(borderColor), n0},
+                    {outer1, Color4B(borderColor), n0}
+                };
+                *cursor++ = tmp2;
+            }
+
+            free(extrude);
+        }
+
+        _bufferCount += vertex_count;
+
+        _dirty = true;
+    }
+
     void DrawNode::drawTriangle(const MATH::Vector2f &p1, const MATH::Vector2f &p2, const MATH::Vector2f &p3, const Color4F &color)
     {
         unsigned int vertex_count = 3;

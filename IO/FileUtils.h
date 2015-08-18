@@ -29,9 +29,11 @@ namespace IO
         void writeDataToFile(HData retData, const std::string& fullPath);
 
         std::string getFilenameForNick(const std::string &filename) const;
+        std::string getNewFilename(const std::string &filename) const;
         std::string fullPathForFilename(const std::string &filename) const;
         std::string getPathForFilename(const std::string& filename, const std::string& resolutionDirectory, const std::string& searchPath) const;
         std::string getFullPathForDirectoryAndFilename(const std::string& directory, const std::string& filename) const;
+        std::string fullPathFromRelativeFile(const std::string &filename, const std::string &relativeFile);
 
         virtual bool isAbsolutePath(const std::string& path) const;
         bool isFileExist(const std::string& filename) const;

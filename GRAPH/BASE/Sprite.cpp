@@ -1334,7 +1334,7 @@ namespace GRAPH
         removeSpriteFramesFromDictionary(dict);
 
         // remove it from the cache
-        std::set<string>::iterator ret = _loadedFileNames->find(plist);
+        std::set<std::string>::iterator ret = _loadedFileNames->find(plist);
         if (ret != _loadedFileNames->end())
         {
             _loadedFileNames->erase(ret);
@@ -1343,7 +1343,7 @@ namespace GRAPH
 
     void SpriteFrameCache::removeSpriteFramesFromFileContent(const std::string& plist_content)
     {
-        ValueMap dict = FileUtils::getInstance()->getValueMapFromData(plist_content.data(), static_cast<int>(plist_content.size()));
+        ValueMap dict = IO::FileUtils::getInstance().getValueMapFromData((const HBYTE *)plist_content.data(), static_cast<int>(plist_content.size()));
         if (dict.empty())
         {
             return;

@@ -34,6 +34,11 @@ namespace GRAPH
             virtual bool initWithFile(const MATH::Rectf& capInsets, const std::string& file);
             virtual bool initWithFile(const std::string& file);
 
+            virtual bool initWithSpriteFrame(SpriteFrame* spriteFrame, const MATH::Rectf& capInsets);
+            virtual bool initWithSpriteFrame(SpriteFrame* spriteFrame);
+            virtual bool initWithSpriteFrameName(const std::string& spriteFrameName, const MATH::Rectf& capInsets);
+            virtual bool initWithSpriteFrameName(const std::string& spriteFrameName);
+
             //override function
             virtual bool init() override;
             virtual bool init(Sprite* sprite, const MATH::Rectf& rect, bool rotated, const MATH::Rectf& capInsets);
@@ -123,6 +128,7 @@ namespace GRAPH
             virtual float getScale() const override;
             using Node::getScaleZ;
             virtual void setCameraMask(unsigned short mask, bool applyChildren = true) override;
+
         protected:
             void updateCapInset();
             void updatePositions();

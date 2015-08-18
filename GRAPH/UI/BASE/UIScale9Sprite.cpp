@@ -52,6 +52,40 @@ namespace GRAPH
             return pReturn;
         }
 
+        bool Scale9Sprite::initWithSpriteFrame(SpriteFrame* spriteFrame,
+                                                   const MATH::Rectf& capInsets)
+        {
+            Sprite *sprite = Sprite::createWithSpriteFrame(spriteFrame);
+            bool pReturn = this->init(sprite,
+                                      spriteFrame->getRect(),
+                                      spriteFrame->isRotated(),
+                                      spriteFrame->getOffset(),
+                                      spriteFrame->getOriginalSize(),
+                                      capInsets);
+            return pReturn;
+        }
+
+        bool Scale9Sprite::initWithSpriteFrame(SpriteFrame* spriteFrame)
+        {
+            bool pReturn = this->initWithSpriteFrame(spriteFrame, MATH::RectfZERO);
+            return pReturn;
+        }
+
+        bool Scale9Sprite::initWithSpriteFrameName(const std::string& spriteFrameName,
+                                                   const MATH::Rectf& capInsets)
+        {
+            SpriteFrame *frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(spriteFrameName);
+            if (nullptr == frame) return false;
+            bool pReturn = this->initWithSpriteFrame(frame, capInsets);
+            return pReturn;
+        }
+
+        bool Scale9Sprite::initWithSpriteFrameName(const std::string& spriteFrameName)
+        {
+            bool pReturn = this->initWithSpriteFrameName(spriteFrameName, MATH::RectfZERO);
+            return pReturn;
+        }
+
         bool Scale9Sprite::init()
         {
             return this->init(NULL, MATH::RectfZERO, MATH::RectfZERO);

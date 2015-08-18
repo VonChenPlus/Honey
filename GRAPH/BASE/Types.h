@@ -42,7 +42,7 @@ namespace GRAPH
     struct Tex2F
     {
         Tex2F(float _u, float _v): u(_u), v(_v) {}
-
+        Tex2F(const MATH::Vector2f value) :u(value.x), v(value.y){}
         Tex2F(): u(0.f), v(0.f) {}
 
         GLfloat u;
