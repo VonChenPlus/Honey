@@ -8,6 +8,7 @@
 #include "MATH/AffineTransform.h"
 #include "GRAPH/RENDERER/GLProgram.h"
 #include "GRAPH/RENDERER/GLStateCache.h"
+#include "GRAPH/UI/BASE/UIScale9Sprite.h"
 
 namespace GRAPH
 {

@@ -29,6 +29,7 @@ namespace GRAPH
     }
 
     class GLProgram;
+    class SpriteFrame;
 
     class Texture2D : public HObject
     {
@@ -263,6 +264,8 @@ namespace GRAPH
 
         /** Get a shader program from the texture.*/
         GLProgram* getGLProgram() const;
+
+        void removeSpriteFrameCapInset(SpriteFrame* spriteFrame);
 
     private:
         /**

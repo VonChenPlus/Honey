@@ -7,6 +7,8 @@
 #include "GRAPH/BASE/DrawNode.h"
 #include "GRAPH/BASE/Macros.h"
 #include "GRAPH/RENDERER/Renderer.h"
+#include "IO/FileUtils.h"
+#include "GRAPH/BASE/Macros.h"
 
 namespace GRAPH
 {
@@ -33,6 +35,24 @@ namespace GRAPH
         }
         SAFE_DELETE(sprite);
         return nullptr;
+    }
+
+    Sprite* Sprite::createWithSpriteFrame(SpriteFrame *spriteFrame)
+    {
+        Sprite *sprite = new (std::nothrow) Sprite();
+        if (sprite && spriteFrame && sprite->initWithSpriteFrame(spriteFrame))
+        {
+            sprite->autorelease();
+            return sprite;
+        }
+        SAFE_DELETE(sprite);
+        return nullptr;
+    }
+
+    Sprite* Sprite::createWithSpriteFrameName(const std::string& spriteFrameName)
+    {
+        SpriteFrame *frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(spriteFrameName);
+        return createWithSpriteFrame(frame);
     }
 
     Sprite* Sprite::create(const std::string& filename)
@@ -99,6 +119,20 @@ namespace GRAPH
     bool Sprite::initWithTexture(Texture2D *texture, const MATH::Rectf& rect)
     {
         return initWithTexture(texture, rect, false);
+    }
+
+    bool Sprite::initWithSpriteFrameName(const std::string& spriteFrameName)
+    {
+        SpriteFrame *frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(spriteFrameName);
+        return initWithSpriteFrame(frame);
+    }
+
+    bool Sprite::initWithSpriteFrame(SpriteFrame *spriteFrame)
+    {
+        bool bRet = initWithTexture(spriteFrame->getTexture(), spriteFrame->getRect());
+        setSpriteFrame(spriteFrame);
+
+        return bRet;
     }
 
     bool Sprite::initWithFile(const std::string& filename)
@@ -201,12 +235,14 @@ namespace GRAPH
     Sprite::Sprite(void)
     : _shouldBeHidden(false)
     , _texture(nullptr)
+    , _spriteFrame(nullptr)
     , _insideBounds(true)
     {
     }
 
     Sprite::~Sprite(void)
     {
+        SAFE_RELEASE(_spriteFrame);
         SAFE_RELEASE(_texture);
     }
 
@@ -374,6 +410,60 @@ namespace GRAPH
     void Sprite::setVertexRect(const MATH::Rectf& rect)
     {
         _rect = rect;
+    }
+
+    void Sprite::setSpriteFrame(const std::string &spriteFrameName)
+    {
+        SpriteFrameCache *cache = SpriteFrameCache::getInstance();
+        SpriteFrame *spriteFrame = cache->getSpriteFrameByName(spriteFrameName);
+
+        setSpriteFrame(spriteFrame);
+    }
+
+    void Sprite::setSpriteFrame(SpriteFrame *spriteFrame)
+    {
+        // retain the sprite frame
+        // do not removed by SpriteFrameCache::removeUnusedSpriteFrames
+        if (_spriteFrame != spriteFrame)
+        {
+            SAFE_RELEASE(_spriteFrame);
+            _spriteFrame = spriteFrame;
+            spriteFrame->retain();
+        }
+        _unflippedOffsetPositionFromCenter = spriteFrame->getOffset();
+
+        Texture2D *texture = spriteFrame->getTexture();
+        // update texture before updating texture rect
+        if (texture != _texture)
+        {
+            setTexture(texture);
+        }
+
+        // update rect
+        _rectRotated = spriteFrame->isRotated();
+        setTextureRect(spriteFrame->getRect(), _rectRotated, spriteFrame->getOriginalSize());
+    }
+
+    bool Sprite::isFrameDisplayed(SpriteFrame *frame) const
+    {
+        MATH::Rectf r = frame->getRect();
+
+        return (r.equals(_rect) &&
+                frame->getTexture()->getName() == _texture->getName() &&
+                frame->getOffset().equals(_unflippedOffsetPositionFromCenter));
+    }
+
+    SpriteFrame* Sprite::getSpriteFrame() const
+    {
+        if(nullptr != this->_spriteFrame)
+        {
+            return this->_spriteFrame;
+        }
+        return SpriteFrame::createWithTexture(_texture,
+                                               CC_RECT_POINTS_TO_PIXELS(_rect),
+                                               _rectRotated,
+                                               CC_POINT_POINTS_TO_PIXELS(_unflippedOffsetPositionFromCenter),
+                                               CC_SIZE_POINTS_TO_PIXELS(_contentSize));
     }
 
     void Sprite::setTextureCoords(MATH::Rectf rect)
@@ -896,5 +986,416 @@ namespace GRAPH
     void Sprite::setPolygonInfo(const PolygonInfo& info)
     {
         _polyInfo = info;
+    }
+
+    SpriteFrame* SpriteFrame::create(const std::string& filename, const MATH::Rectf& rect)
+    {
+        SpriteFrame *spriteFrame = new (std::nothrow) SpriteFrame();
+        spriteFrame->initWithTextureFilename(filename, rect);
+        spriteFrame->autorelease();
+
+        return spriteFrame;
+    }
+
+    SpriteFrame* SpriteFrame::createWithTexture(Texture2D *texture, const MATH::Rectf& rect)
+    {
+        SpriteFrame *spriteFrame = new (std::nothrow) SpriteFrame();
+        spriteFrame->initWithTexture(texture, rect);
+        spriteFrame->autorelease();
+
+        return spriteFrame;
+    }
+
+    SpriteFrame* SpriteFrame::createWithTexture(Texture2D* texture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize)
+    {
+        SpriteFrame *spriteFrame = new (std::nothrow) SpriteFrame();
+        spriteFrame->initWithTexture(texture, rect, rotated, offset, originalSize);
+        spriteFrame->autorelease();
+
+        return spriteFrame;
+    }
+
+    SpriteFrame* SpriteFrame::create(const std::string& filename, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize)
+    {
+        SpriteFrame *spriteFrame = new (std::nothrow) SpriteFrame();
+        spriteFrame->initWithTextureFilename(filename, rect, rotated, offset, originalSize);
+        spriteFrame->autorelease();
+
+        return spriteFrame;
+    }
+
+    SpriteFrame::SpriteFrame()
+    : _rotated(false)
+    , _texture(nullptr)
+    {
+
+    }
+
+    bool SpriteFrame::initWithTexture(Texture2D* texture, const MATH::Rectf& rect)
+    {
+        MATH::Rectf rectInPixels = CC_RECT_POINTS_TO_PIXELS(rect);
+        return initWithTexture(texture, rectInPixels, false, MATH::Vec2fZERO, rectInPixels.size);
+    }
+
+    bool SpriteFrame::initWithTextureFilename(const std::string& filename, const MATH::Rectf& rect)
+    {
+        MATH::Rectf rectInPixels = CC_RECT_POINTS_TO_PIXELS( rect );
+        return initWithTextureFilename(filename, rectInPixels, false, MATH::Vec2fZERO, rectInPixels.size);
+    }
+
+    bool SpriteFrame::initWithTexture(Texture2D* texture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize)
+    {
+        _texture = texture;
+
+        if (texture)
+        {
+            texture->retain();
+        }
+
+        _rectInPixels = rect;
+        _rect = CC_RECT_PIXELS_TO_POINTS(rect);
+        _offsetInPixels = offset;
+        _offset = CC_POINT_PIXELS_TO_POINTS( _offsetInPixels );
+        _originalSizeInPixels = originalSize;
+        _originalSize = CC_SIZE_PIXELS_TO_POINTS( _originalSizeInPixels );
+        _rotated = rotated;
+
+        return true;
+    }
+
+    bool SpriteFrame::initWithTextureFilename(const std::string& filename, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize)
+    {
+        _texture = nullptr;
+        _textureFilename = filename;
+        _rectInPixels = rect;
+        _rect = CC_RECT_PIXELS_TO_POINTS( rect );
+        _offsetInPixels = offset;
+        _offset = CC_POINT_PIXELS_TO_POINTS( _offsetInPixels );
+        _originalSizeInPixels = originalSize;
+        _originalSize = CC_SIZE_PIXELS_TO_POINTS( _originalSizeInPixels );
+        _rotated = rotated;
+
+        return true;
+    }
+
+    SpriteFrame::~SpriteFrame()
+    {
+        SAFE_RELEASE(_texture);
+    }
+
+    void SpriteFrame::setRect(const MATH::Rectf& rect)
+    {
+        _rect = rect;
+        _rectInPixels = CC_RECT_POINTS_TO_PIXELS(_rect);
+    }
+
+    void SpriteFrame::setRectInPixels(const MATH::Rectf& rectInPixels)
+    {
+        _rectInPixels = rectInPixels;
+        _rect = CC_RECT_PIXELS_TO_POINTS(rectInPixels);
+    }
+
+    const MATH::Vector2f& SpriteFrame::getOffset() const
+    {
+        return _offset;
+    }
+
+    void SpriteFrame::setOffset(const MATH::Vector2f& offsets)
+    {
+        _offset = offsets;
+        _offsetInPixels = CC_POINT_POINTS_TO_PIXELS( _offset );
+    }
+
+    const MATH::Vector2f& SpriteFrame::getOffsetInPixels() const
+    {
+        return _offsetInPixels;
+    }
+
+    void SpriteFrame::setOffsetInPixels(const MATH::Vector2f& offsetInPixels)
+    {
+        _offsetInPixels = offsetInPixels;
+        _offset = CC_POINT_PIXELS_TO_POINTS( _offsetInPixels );
+    }
+
+    void SpriteFrame::setTexture(Texture2D * texture)
+    {
+        if( _texture != texture ) {
+            SAFE_RELEASE(_texture);
+            SAFE_RETAIN(texture);
+            _texture = texture;
+        }
+    }
+
+    Texture2D* SpriteFrame::getTexture()
+    {
+        if( _texture ) {
+            return _texture;
+        }
+
+        if( _textureFilename.length() > 0 ) {
+            return Director::getInstance()->getTextureCache()->addImage(_textureFilename.c_str());
+        }
+        // no texture or texture filename
+        return nullptr;
+    }
+
+    static SpriteFrameCache *_sharedSpriteFrameCache = nullptr;
+
+    SpriteFrameCache* SpriteFrameCache::getInstance()
+    {
+        if (! _sharedSpriteFrameCache)
+        {
+            _sharedSpriteFrameCache = new (std::nothrow) SpriteFrameCache();
+            _sharedSpriteFrameCache->init();
+        }
+
+        return _sharedSpriteFrameCache;
+    }
+
+    void SpriteFrameCache::destroyInstance()
+    {
+        SAFE_RELEASE_NULL(_sharedSpriteFrameCache);
+    }
+
+    bool SpriteFrameCache::init()
+    {
+        _spriteFrames.reserve(20);
+        _spriteFramesAliases.reserve(20);
+        _loadedFileNames = new std::set<std::string>();
+        return true;
+    }
+
+    SpriteFrameCache::~SpriteFrameCache()
+    {
+        SAFE_DELETE(_loadedFileNames);
+    }
+
+    void SpriteFrameCache::addSpriteFramesWithFile(const std::string& plist, Texture2D *texture)
+    {
+        if (_loadedFileNames->find(plist) != _loadedFileNames->end())
+        {
+            return; // We already added it
+        }
+
+        std::string fullPath = IO::FileUtils::getInstance().fullPathForFilename(plist);
+        ValueMap dict = IO::FileUtils::getInstance().getValueMapFromFile(fullPath);
+
+        addSpriteFramesWithDictionary(dict, texture);
+        _loadedFileNames->insert(plist);
+    }
+
+    void SpriteFrameCache::addSpriteFramesWithFileContent(const std::string& plist_content, Texture2D *texture)
+    {
+        ValueMap dict = IO::FileUtils::getInstance().getValueMapFromData((const HBYTE *)plist_content.c_str(), static_cast<int>(plist_content.size()));
+        addSpriteFramesWithDictionary(dict, texture);
+    }
+
+    void SpriteFrameCache::addSpriteFramesWithFile(const std::string& plist, const std::string& textureFileName)
+    {
+        Texture2D *texture = Director::getInstance()->getTextureCache()->addImage(textureFileName);
+
+        if (texture)
+        {
+            addSpriteFramesWithFile(plist, texture);
+        }
+    }
+
+    void SpriteFrameCache::addSpriteFramesWithFile(const std::string& plist)
+    {
+        std::string fullPath = IO::FileUtils::getInstance().fullPathForFilename(plist);
+        if (fullPath.size() == 0)
+        {
+            return;
+        }
+
+        if (_loadedFileNames->find(plist) == _loadedFileNames->end())
+        {
+
+            ValueMap dict = IO::FileUtils::getInstance().getValueMapFromFile(fullPath);
+
+            std::string texturePath("");
+
+            if (dict.find("metadata") != dict.end())
+            {
+                ValueMap& metadataDict = dict["metadata"].asValueMap();
+                // try to read  texture file name from meta data
+                texturePath = metadataDict["textureFileName"].asString();
+            }
+
+            if (!texturePath.empty())
+            {
+                // build texture path relative to plist file
+                texturePath = IO::FileUtils::getInstance().fullPathFromRelativeFile(texturePath.c_str(), plist);
+            }
+            else
+            {
+                // build texture path by replacing file extension
+                texturePath = plist;
+
+                // remove .xxx
+                size_t startPos = texturePath.find_last_of(".");
+                texturePath = texturePath.erase(startPos);
+
+                // append .png
+                texturePath = texturePath.append(".png");
+            }
+
+            Texture2D *texture = Director::getInstance()->getTextureCache()->addImage(texturePath.c_str());
+
+            if (texture)
+            {
+                addSpriteFramesWithDictionary(dict, texture);
+                _loadedFileNames->insert(plist);
+            }
+        }
+    }
+
+    bool SpriteFrameCache::isSpriteFramesWithFileLoaded(const std::string& plist) const
+    {
+        bool result = false;
+
+        if (_loadedFileNames->find(plist) != _loadedFileNames->end())
+        {
+            result = true;
+        }
+
+        return result;
+    }
+
+    void SpriteFrameCache::addSpriteFrame(SpriteFrame* frame, const std::string& frameName)
+    {
+        _spriteFrames.insert(frameName, frame);
+    }
+
+    void SpriteFrameCache::removeSpriteFrames()
+    {
+        _spriteFrames.clear();
+        _spriteFramesAliases.clear();
+        _loadedFileNames->clear();
+    }
+
+    void SpriteFrameCache::removeUnusedSpriteFrames()
+    {
+        bool removed = false;
+        std::vector<std::string> toRemoveFrames;
+
+        for (auto iter = _spriteFrames.begin(); iter != _spriteFrames.end(); ++iter)
+        {
+            SpriteFrame* spriteFrame = iter->second;
+            if( spriteFrame->getReferenceCount() == 1 )
+            {
+                toRemoveFrames.push_back(iter->first);
+                spriteFrame->getTexture()->removeSpriteFrameCapInset(spriteFrame);
+                removed = true;
+            }
+        }
+
+        _spriteFrames.erase(toRemoveFrames);
+
+        // FIXME:. Since we don't know the .plist file that originated the frame, we must remove all .plist from the cache
+        if( removed )
+        {
+            _loadedFileNames->clear();
+        }
+    }
+
+
+    void SpriteFrameCache::removeSpriteFrameByName(const std::string& name)
+    {
+        // explicit nil handling
+        if( !(name.size()>0) )
+            return;
+
+        // Is this an alias ?
+        std::string key = _spriteFramesAliases[name].asString();
+
+        if (!key.empty())
+        {
+            _spriteFrames.erase(key);
+            _spriteFramesAliases.erase(key);
+        }
+        else
+        {
+            _spriteFrames.erase(name);
+        }
+
+        // FIXME:. Since we don't know the .plist file that originated the frame, we must remove all .plist from the cache
+        _loadedFileNames->clear();
+    }
+
+    void SpriteFrameCache::removeSpriteFramesFromFile(const std::string& plist)
+    {
+        std::string fullPath = IO::FileUtils::getInstance().fullPathForFilename(plist);
+        ValueMap dict = IO::FileUtils::getInstance().getValueMapFromFile(fullPath);
+        if (dict.empty())
+        {
+            return;
+        }
+        removeSpriteFramesFromDictionary(dict);
+
+        // remove it from the cache
+        std::set<string>::iterator ret = _loadedFileNames->find(plist);
+        if (ret != _loadedFileNames->end())
+        {
+            _loadedFileNames->erase(ret);
+        }
+    }
+
+    void SpriteFrameCache::removeSpriteFramesFromFileContent(const std::string& plist_content)
+    {
+        ValueMap dict = FileUtils::getInstance()->getValueMapFromData(plist_content.data(), static_cast<int>(plist_content.size()));
+        if (dict.empty())
+        {
+            return;
+        }
+        removeSpriteFramesFromDictionary(dict);
+    }
+
+    void SpriteFrameCache::removeSpriteFramesFromDictionary(ValueMap& dictionary)
+    {
+        ValueMap framesDict = dictionary["frames"].asValueMap();
+        std::vector<std::string> keysToRemove;
+
+        for (auto iter = framesDict.cbegin(); iter != framesDict.cend(); ++iter)
+        {
+            if (_spriteFrames.at(iter->first))
+            {
+                keysToRemove.push_back(iter->first);
+            }
+        }
+
+        _spriteFrames.erase(keysToRemove);
+    }
+
+    void SpriteFrameCache::removeSpriteFramesFromTexture(Texture2D* texture)
+    {
+        std::vector<std::string> keysToRemove;
+
+        for (auto iter = _spriteFrames.cbegin(); iter != _spriteFrames.cend(); ++iter)
+        {
+            std::string key = iter->first;
+            SpriteFrame* frame = _spriteFrames.at(key);
+            if (frame && (frame->getTexture() == texture))
+            {
+                keysToRemove.push_back(key);
+            }
+        }
+
+        _spriteFrames.erase(keysToRemove);
+    }
+
+    SpriteFrame* SpriteFrameCache::getSpriteFrameByName(const std::string& name)
+    {
+        SpriteFrame* frame = _spriteFrames.at(name);
+        if (!frame)
+        {
+            // try alias dictionary
+            std::string key = _spriteFramesAliases[name].asString();
+            if (!key.empty())
+            {
+                frame = _spriteFrames.at(key);
+            }
+        }
+        return frame;
     }
 }

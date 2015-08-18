@@ -19,6 +19,8 @@ SOURCES += \
     $$P/GRAPH/GFX/*.cpp \
     $$P/GRAPH/THIN3D/*.cpp \
     $$P/GRAPH/UI/*.cpp \
+    $$P/GRAPH/UI/BASE/*.cpp \
+    $$P/GRAPH/UI/LAYOUTS/*.cpp \
     $$P/GRAPH/UI/CONTROLS/*.cpp \
     $$P/IMAGE/*.cpp \
     $$P/MATH/*.cpp \
@@ -26,7 +28,8 @@ SOURCES += \
     $$P/THREAD/*.cpp \
     $$P/UTILS/HASH/*.cpp \
     $$P/UTILS/STRING/*.cpp \
-    $$P/UTILS/TIME/*.cpp
+    $$P/UTILS/TIME/*.cpp \
+    GRAPH/UI/BASE/UIScale9Sprite.cpp
 
 HEADERS += \
     $$P/BASE/*.h \
@@ -35,6 +38,8 @@ HEADERS += \
     $$P/GRAPH/GFX/*.h \
     $$P/GRAPH/THIN3D/*.h \
     $$P/GRAPH/UI/*.h \
+    $$P/GRAPH/UI/BASE/*.h \
+    $$P/GRAPH/UI/LAYOUTS/*.h \
     $$P/GRAPH/UI/CONTROLS/*.h \
     $$P/IMAGE/*.h \
     $$P/MATH/*.h \
@@ -43,7 +48,8 @@ HEADERS += \
     $$P/UTILS/HASH/*.h \
     $$P/UTILS/STRING/*.h \
     $$P/UTILS/TIME/*.h \
-    $$P/UTILS/RANDOM/*.h
+    $$P/UTILS/RANDOM/*.h \
+    GRAPH/UI/BASE/UIScale9Sprite.h
     
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)

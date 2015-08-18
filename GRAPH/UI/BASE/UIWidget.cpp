@@ -1238,7 +1238,7 @@ namespace GRAPH
             }
         }
 
-        void Widget::dispatchFocusEvent(cocos2d::ui::Widget *widgetLoseFocus, cocos2d::ui::Widget *widgetGetFocus)
+        void Widget::dispatchFocusEvent(Widget *widgetLoseFocus, Widget *widgetGetFocus)
         {
             //if the widgetLoseFocus doesn't get focus, it will use the previous focused widget instead
             if (widgetLoseFocus && !widgetLoseFocus->isFocused())
