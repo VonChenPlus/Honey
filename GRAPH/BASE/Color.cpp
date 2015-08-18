@@ -140,7 +140,7 @@ namespace GRAPH
         return Color4B(0, 0, 0, alpha*255);
     }
 
-    Color4B ColorAlpha(Color4B color, float alpha) {
+    Color4B Color4B::ColorAlpha(Color4B color, float alpha) {
         if (alpha < 0.0f) alpha = 0.0f;
         if (alpha > 1.0f) alpha = 1.0f;
         color.alpha = alpha * 255;
