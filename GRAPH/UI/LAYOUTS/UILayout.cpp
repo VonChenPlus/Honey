@@ -1101,7 +1101,7 @@ namespace GRAPH
 
         float Layout::calculateNearestDistance(Widget* baseWidget)
         {
-            float distance = FLT_MAX;
+            float distance = MATH::MATH_FLOAT_MAX();
 
             MATH::Vector2f widgetPosition =  this->getWorldCenterPoint(baseWidget);
 
@@ -1139,7 +1139,7 @@ namespace GRAPH
 
         float Layout::calculateFarthestDistance(Widget *baseWidget)
         {
-            float distance = -FLT_MAX;
+            float distance = -MATH::MATH_FLOAT_MAX();
 
             MATH::Vector2f widgetPosition =  this->getWorldCenterPoint(baseWidget);
 
@@ -1198,7 +1198,7 @@ namespace GRAPH
             int index = 0;
             ssize_t count = this->getChildren().size();
 
-            float distance = FLT_MAX;
+            float distance = MATH::MATH_FLOAT_MAX();
             int found = 0;
             if (direction == FocusDirection::LEFT || direction == FocusDirection::RIGHT ||
                 direction == FocusDirection::DOWN || direction == FocusDirection::UP)
@@ -1244,7 +1244,7 @@ namespace GRAPH
             int index = 0;
             ssize_t count = this->getChildren().size();
 
-            float distance = -FLT_MAX;
+            float distance = -MATH::MATH_FLOAT_MAX();
             int found = 0;
             if (direction == FocusDirection::LEFT || direction == FocusDirection::RIGHT
                 || direction == FocusDirection::DOWN || direction == FocusDirection::UP)
