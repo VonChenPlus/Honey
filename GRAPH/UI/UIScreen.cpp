@@ -166,8 +166,7 @@ namespace UI
             float y = ybase[i] + dc.getBounds().top + 40 * cosf(i * 7.2f + t * 1.3f);
             float angle = sinf(i + t);
             int n = i & 3;
-            GRAPH::Color4B color = colors[n];
-            color.alpha = alpha * 0.1f;
+            GRAPH::Color4B color = GRAPH::Color4B::ColorAlpha(colors[n], alpha * 0.1f);
             dc.draw()->drawImageRotated(symbols[n], x, y, 1.0f, angle, color);
         }
 
