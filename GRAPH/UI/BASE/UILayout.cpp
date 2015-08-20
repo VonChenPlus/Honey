@@ -1,4 +1,4 @@
-#include "GRAPH/UI/LAYOUTS/UILayout.h"
+#include "GRAPH/UI/BASE/UILayout.h"
 #include "GRAPH/BASE/DrawNode.h"
 #include "GRAPH/BASE/Macros.h"
 #include "GRAPH/BASE/Director.h"
@@ -1898,6 +1898,162 @@ namespace GRAPH
             if (_clippingStencil){
                 _clippingStencil->setCameraMask(mask, applyChildren);
             }
+        }
+
+        HBox::HBox()
+        {
+        }
+
+        HBox::~HBox()
+        {
+        }
+
+        HBox* HBox::create()
+        {
+            HBox* widget = new (std::nothrow) HBox();
+            if (widget && widget->init())
+            {
+                widget->autorelease();
+                return widget;
+            }
+            SAFE_DELETE(widget);
+            return nullptr;
+        }
+
+        HBox* HBox::create(const MATH::Sizef &size)
+        {
+            HBox* widget = new (std::nothrow) HBox();
+            if (widget && widget->initWithSize(size))
+            {
+                widget->autorelease();
+                return widget;
+            }
+            SAFE_DELETE(widget);
+            return nullptr;
+        }
+
+        bool HBox::init()
+        {
+            if (Layout::init())
+            {
+                setLayoutType(Layout::Type::THORIZONTAL);
+                return true;
+            }
+            return false;
+        }
+
+        bool HBox::initWithSize(const MATH::Sizef& size)
+        {
+            if (init())
+            {
+                setContentSize(size);
+                return true;
+            }
+            return false;
+        }
+
+        VBox::VBox()
+        {
+        }
+
+        VBox::~VBox()
+        {
+        }
+
+        VBox* VBox::create()
+        {
+            VBox* widget = new (std::nothrow) VBox();
+            if (widget && widget->init())
+            {
+                widget->autorelease();
+                return widget;
+            }
+            SAFE_DELETE(widget);
+            return nullptr;
+        }
+
+        VBox* VBox::create(const MATH::Sizef &size)
+        {
+            VBox* widget = new (std::nothrow) VBox();
+            if (widget && widget->initWithSize(size))
+            {
+                widget->autorelease();
+                return widget;
+            }
+            SAFE_DELETE(widget);
+            return nullptr;
+        }
+
+        bool VBox::init()
+        {
+            if (Layout::init())
+            {
+                setLayoutType(Layout::Type::TVERTICAL);
+                return true;
+            }
+            return false;
+        }
+
+        bool VBox::initWithSize(const MATH::Sizef& size)
+        {
+            if (init())
+            {
+                setContentSize(size);
+                return true;
+            }
+            return false;
+        }
+
+        RelativeBox::RelativeBox()
+        {
+        }
+
+        RelativeBox::~RelativeBox()
+        {
+        }
+
+        RelativeBox* RelativeBox::create()
+        {
+            RelativeBox* widget = new (std::nothrow) RelativeBox();
+            if (widget && widget->init())
+            {
+                widget->autorelease();
+                return widget;
+            }
+            SAFE_DELETE(widget);
+            return nullptr;
+        }
+
+        RelativeBox* RelativeBox::create(const MATH::Sizef &size)
+        {
+            RelativeBox* widget = new (std::nothrow) RelativeBox();
+            if (widget && widget->initWithSize(size))
+            {
+                widget->autorelease();
+                return widget;
+            }
+            SAFE_DELETE(widget);
+            return nullptr;
+        }
+
+        bool RelativeBox::init()
+        {
+            if (Layout::init())
+            {
+                setLayoutType(Layout::Type::TRELATIVE);
+                return true;
+            }
+            return false;
+        }
+
+        bool RelativeBox::initWithSize(const MATH::Sizef& size)
+        {
+            if (init())
+            {
+                setContentSize(size);
+                return true;
+            }
+            return false;
         }
 
         LinearHorizontalLayoutManager* LinearHorizontalLayoutManager::create()

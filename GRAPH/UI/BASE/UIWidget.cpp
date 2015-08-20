@@ -6,7 +6,7 @@
 #include "GRAPH/BASE/Camera.h"
 #include "GRAPH/RENDERER/GLProgram.h"
 #include "GRAPH/RENDERER/GLProgramState.h"
-#include "GRAPH/UI/LAYOUTS/UILayout.h"
+#include "GRAPH/UI/BASE/UILayout.h"
 #include "GRAPH/BASE/EventDispatcher.h"
 
 namespace GRAPH

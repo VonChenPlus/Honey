@@ -584,6 +584,51 @@ namespace GRAPH
             bool _isFocusPassing;
         };
 
+        class HBox : public Layout
+        {
+        public:
+            HBox();
+            virtual ~HBox();
+
+            static HBox* create();
+            static HBox* create(const MATH::Sizef& size);
+
+        public:
+            //initializes state of widget.
+            virtual bool init() override;
+            virtual bool initWithSize(const MATH::Sizef& size);
+        };
+
+        class VBox : public Layout
+        {
+        public:
+            VBox();
+            virtual ~VBox();
+
+            static VBox* create();
+            static VBox* create(const MATH::Sizef& size);
+
+        public:
+            //initializes state of widget.
+            virtual bool init() override;
+            virtual bool initWithSize(const MATH::Sizef& size);
+        };
+
+        class RelativeBox : public Layout
+        {
+        public:
+            RelativeBox();
+            virtual ~RelativeBox();
+
+            static RelativeBox* create();
+            static RelativeBox* create(const MATH::Sizef& size);
+
+        public:
+            //initializes state of widget.
+            virtual bool init() override;
+            virtual bool initWithSize(const MATH::Sizef& size);
+        };
+
         class LayoutManager : public HObject
         {
         public:
