@@ -15,6 +15,7 @@ win32-msvc* {
 	DEFINES += _MBCS GLEW_STATIC _CRT_SECURE_NO_WARNINGS "_VARIADIC_MAX=10"
 	contains(DEFINES, UNICODE): DEFINES += _UNICODE
 	QMAKE_ALLFLAGS_RELEASE += /O2 /fp:fast
+        LIBS += $$P/EXTERNALS/freetype2/library/windows/freetype26MT.lib
 } else {
 	DEFINES += __STDC_CONSTANT_MACROS
 	QMAKE_CXXFLAGS += -Wno-unused-function -Wno-unused-variable -Wno-strict-aliasing -fno-strict-aliasing -Wno-unused-parameter -Wno-multichar -Wno-uninitialized -Wno-ignored-qualifiers -Wno-missing-field-initializers

@@ -334,6 +334,9 @@ namespace MATH
     static const Vector2f Vec2fONE(1.0f, 1.0f);
     static const Vector2f Vec2fUNITX(1.0f, 0.0f);
     static const Vector2f Vec2fUNITY(0.0f, 1.0f);
+    static const Vector2f Vec2fMIDDLE(0.5f, 0.5f);
+    static const Vector2f Vec2fTOPLEFT(0.0f, 1.0f);
+    static const Vector2f Vec2fBOTTOMLEFT(0.0f, 0.0f);
 
     typedef Vector2<int> Vector2i;
     static const Vector2i Vec2iZERO(0, 0);

@@ -684,6 +684,39 @@ namespace UTILS
             return getUTF8StringLength((const UTF8*)utf8.c_str());
         }
 
+        static void TrimUTF16VectorFromIndex(std::vector<char16_t>& str, int index)
+        {
+            int size = static_cast<int>(str.size());
+            if (index >= size || index < 0)
+                return;
+
+            str.erase(str.begin() + index, str.begin() + size);
+        }
+
+        void TrimUTF16Vector(std::vector<char16_t>& str) {
+            int len = static_cast<int>(str.size());
+
+            if ( len <= 0 )
+                return;
+
+            int last_index = len - 1;
+
+            // Only start trimming if the last character is whitespace..
+            if (IsUnicodeSpace(str[last_index]))
+            {
+                for (int i = last_index - 1; i >= 0; --i)
+                {
+                    if (IsUnicodeSpace(str[i]))
+                        last_index = i;
+                    else
+                        break;
+                }
+
+                TrimUTF16VectorFromIndex(str, last_index);
+            }
+        }
+
+
         bool IsUnicodeSpace(char16_t ch) {
             return  (ch >= 0x0009 && ch <= 0x000D) || ch == 0x0020 || ch == 0x0085 || ch == 0x00A0 || ch == 0x1680
                || (ch >= 0x2000 && ch <= 0x200A) || ch == 0x2028 || ch == 0x2029 || ch == 0x202F

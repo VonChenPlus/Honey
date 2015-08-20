@@ -2,6 +2,7 @@
 #define UTFUTILS_H
 
 #include <string>
+#include <vector>
 
 namespace UTILS
 {
@@ -22,6 +23,8 @@ namespace UTILS
         #endif
 
         long UTF8StringLength(const std::string& utf8);
+
+        void TrimUTF16Vector(std::vector<char16_t>& str);
 
         bool IsUnicodeSpace(char16_t ch);
         bool IsCJKUnicode(char16_t ch);
