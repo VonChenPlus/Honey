@@ -6,6 +6,8 @@
 #include "GRAPH/RENDERER/GLProgram.h"
 #include "UTILS/STRING/UTFUtils.h"
 #include "GRAPH/BASE/Director.h"
+#include "GRAPH/RENDERER/GLStateCache.h"
+#include "GRAPH/RENDERER/Renderer.h"
 
 namespace GRAPH
 {
@@ -1228,8 +1230,6 @@ namespace GRAPH
 
     void Label::enableOutline(const Color4B& outlineColor,int outlineSize /* = -1 */)
     {
-        CCASSERT(_currentLabelType == LabelType::STRING_TEXTURE || _currentLabelType == LabelType::TTF, "Only supported system font and TTF!");
-
         if (outlineSize > 0 || _currLabelEffect == LabelEffect::OUTLINE)
         {
             if (_currentLabelType == LabelType::TTF)
@@ -1382,10 +1382,10 @@ namespace GRAPH
             {
                 _fontDefinition._stroke._strokeEnabled = true;
                 _fontDefinition._stroke._strokeSize = _outlineSize;
-                _fontDefinition._stroke._strokeColor.r = _effectColor.r;
-                _fontDefinition._stroke._strokeColor.g = _effectColor.g;
-                _fontDefinition._stroke._strokeColor.b = _effectColor.b;
-                _fontDefinition._stroke._strokeAlpha = _effectColor.a;
+                _fontDefinition._stroke._strokeColor.red = _effectColor.red;
+                _fontDefinition._stroke._strokeColor.green = _effectColor.green;
+                _fontDefinition._stroke._strokeColor.blue = _effectColor.blue;
+                _fontDefinition._stroke._strokeAlpha = _effectColor.alpha;
             }
             else
             {
@@ -1468,18 +1468,6 @@ namespace GRAPH
         }
     }
 
-    void Label::setFontDefinition(const FontDefinition& textDefinition)
-    {
-        _fontDefinition = textDefinition;
-        _fontDefinition._stroke._strokeEnabled = false;
-        if (_fontDefinition._shadow._shadowEnabled)
-        {
-            _fontDefinition._shadow._shadowEnabled = false;
-            enableShadow(Color4B(0,0,0,255 * _fontDefinition._shadow._shadowOpacity),_fontDefinition._shadow._shadowOffset,_fontDefinition._shadow._shadowBlur);
-        }
-        _compatibleMode = true;
-    }
-
     void Label::updateContent()
     {
         if (_systemFontDirty)
@@ -1501,10 +1489,8 @@ namespace GRAPH
         if (_fontAtlas)
         {
             std::u16string utf16String;
-            if (StringUtils::UTF8ToUTF16(_originalUTF8String, utf16String))
-            {
-                _currentUTF16String = utf16String;
-            }
+            UTILS::STRING::UTF8ToUTF16(_originalUTF8String, utf16String);
+            _currentUTF16String = utf16String;
 
             computeStringNumLines();
             computeHorizontalKernings(_currentUTF16String);
@@ -1526,11 +1512,11 @@ namespace GRAPH
         if (_currentLabelType == LabelType::TTF)
         {
             glProgram->setUniformLocationWith4f(_uniformTextColor,
-                _shadowColor4F.r, _shadowColor4F.g, _shadowColor4F.b, _shadowColor4F.a);
+                _shadowColor4F.red, _shadowColor4F.green, _shadowColor4F.blue, _shadowColor4F.alpha);
             if (_currLabelEffect == LabelEffect::OUTLINE || _currLabelEffect == LabelEffect::GLOW)
             {
                 glProgram->setUniformLocationWith4f(_uniformEffectColor,
-                    _shadowColor4F.r, _shadowColor4F.g, _shadowColor4F.b, _shadowColor4F.a);
+                    _shadowColor4F.red, _shadowColor4F.green, _shadowColor4F.blue, _shadowColor4F.alpha);
             }
 
             glProgram->setUniformsForBuiltins(_shadowTransform);
@@ -1565,11 +1551,11 @@ namespace GRAPH
         }
     }
 
-    void Label::onDraw(const Mat4& transform, bool transformUpdated)
+    void Label::onDraw(const MATH::Matrix4& transform, bool transformUpdated)
     {
         auto glprogram = getGLProgram();
         glprogram->use();
-        GL::blendFunc(_blendFunc.src, _blendFunc.dst);
+        blendFunc(_blendFunc.src, _blendFunc.dst);
 
         if (_shadowEnabled)
         {
@@ -1588,9 +1574,9 @@ namespace GRAPH
             case LabelEffect::OUTLINE:
                 //draw text with outline
                 glprogram->setUniformLocationWith4f(_uniformTextColor,
-                    _textColorF.r, _textColorF.g, _textColorF.b, _textColorF.a);
+                    _textColorF.red, _textColorF.green, _textColorF.blue, _textColorF.alpha);
                 glprogram->setUniformLocationWith4f(_uniformEffectColor,
-                    _effectColorF.r, _effectColorF.g, _effectColorF.b, _effectColorF.a);
+                    _effectColorF.red, _effectColorF.green, _effectColorF.blue, _effectColorF.alpha);
                 for (const auto& batchNode : _batchNodes)
                 {
                     batchNode->getTextureAtlas()->drawQuads();
@@ -1598,14 +1584,14 @@ namespace GRAPH
 
                 //draw text without outline
                 glprogram->setUniformLocationWith4f(_uniformEffectColor,
-                    _effectColorF.r, _effectColorF.g, _effectColorF.b, 0.f);
+                    _effectColorF.red, _effectColorF.green, _effectColorF.blue, 0.f);
                 break;
             case LabelEffect::GLOW:
                 glprogram->setUniformLocationWith4f(_uniformEffectColor,
-                    _effectColorF.r, _effectColorF.g, _effectColorF.b, _effectColorF.a);
+                    _effectColorF.red, _effectColorF.green, _effectColorF.blue, _effectColorF.alpha);
             case LabelEffect::NORMAL:
                 glprogram->setUniformLocationWith4f(_uniformTextColor,
-                    _textColorF.r, _textColorF.g, _textColorF.b, _textColorF.a);
+                    _textColorF.red, _textColorF.green, _textColorF.blue, _textColorF.alpha);
                 break;
             default:
                 break;
@@ -1618,7 +1604,7 @@ namespace GRAPH
         }
     }
 
-    void Label::draw(Renderer *renderer, const Mat4 &transform, uint32_t flags)
+    void Label::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags)
     {
         if (_batchNodes.empty() || _limitShowCount <= 0)
         {
@@ -1626,11 +1612,9 @@ namespace GRAPH
         }
         // Don't do calculate the culling if the transform was not updated
         bool transformUpdated = flags & FLAGS_TRANSFORM_DIRTY;
-    #if CC_USE_CULLING
         _insideBounds = transformUpdated ? renderer->checkVisibility(transform, _contentSize) : _insideBounds;
 
         if (_insideBounds)
-    #endif
         {
             _customCommand.init(_globalZOrder, transform, flags);
             _customCommand.func = CC_CALLBACK_0(Label::onDraw, this, transform, transformUpdated);
@@ -1639,7 +1623,7 @@ namespace GRAPH
         }
     }
 
-    void Label::visit(Renderer *renderer, const Mat4 &parentTransform, uint32_t parentFlags)
+    void Label::visit(Renderer *renderer, const MATH::Matrix4 &parentTransform, uint32_t parentFlags)
     {
         if (! _visible || (_originalUTF8String.empty() && _children.empty()) )
         {
@@ -1779,7 +1763,7 @@ namespace GRAPH
                 }
 
                 auto textureID = letterInfo.def.textureID;
-                Rect uvRect;
+                MATH::Rectf uvRect;
                 uvRect.size.height = letterInfo.def.height;
                 uvRect.size.width = letterInfo.def.width;
                 uvRect.origin.x = letterInfo.def.U;
@@ -1812,8 +1796,6 @@ namespace GRAPH
 
     void Label::setLineHeight(float height)
     {
-        CCASSERT(_currentLabelType != LabelType::STRING_TEXTURE, "Not supported system font!");
-
         if (_commonLineHeight != height)
         {
             _commonLineHeight = height;
@@ -1823,13 +1805,11 @@ namespace GRAPH
 
     float Label::getLineHeight() const
     {
-        CCASSERT(_currentLabelType != LabelType::STRING_TEXTURE, "Not supported system font!");
         return _textSprite ? 0.0f : _commonLineHeight;
     }
 
     void Label::setAdditionalKerning(float space)
     {
-        CCASSERT(_currentLabelType != LabelType::STRING_TEXTURE, "Not supported system font!");
         if (_additionalKerning != space)
         {
             _additionalKerning = space;
@@ -1839,8 +1819,6 @@ namespace GRAPH
 
     float Label::getAdditionalKerning() const
     {
-        CCASSERT(_currentLabelType != LabelType::STRING_TEXTURE, "Not supported system font!");
-
         return _additionalKerning;
     }
 
@@ -1926,18 +1904,16 @@ namespace GRAPH
 
     void Label::setTextColor(const Color4B &color)
     {
-        CCASSERT(_currentLabelType == LabelType::TTF || _currentLabelType == LabelType::STRING_TEXTURE, "Only supported system font and ttf!");
-
         _textColor = color;
-        _textColorF.r = _textColor.r / 255.0f;
-        _textColorF.g = _textColor.g / 255.0f;
-        _textColorF.b = _textColor.b / 255.0f;
-        _textColorF.a = _textColor.a / 255.0f;
+        _textColorF.red = _textColor.red / 255.0f;
+        _textColorF.green = _textColor.green / 255.0f;
+        _textColorF.blue = _textColor.blue / 255.0f;
+        _textColorF.alpha = _textColor.alpha / 255.0f;
 
         if (_currentLabelType == LabelType::STRING_TEXTURE)
         {
-            if (_fontDefinition._fontFillColor.r != _textColor.r || _fontDefinition._fontFillColor.g != _textColor.g
-                || _fontDefinition._fontFillColor.b != _textColor.b || _fontDefinition._fontAlpha != _textColor.a)
+            if (_fontDefinition._fontFillColor.red != _textColor.red || _fontDefinition._fontFillColor.green != _textColor.green
+                || _fontDefinition._fontFillColor.blue != _textColor.blue || _fontDefinition._fontAlpha != _textColor.alpha)
             {
                 _contentDirty = true;
             }
@@ -1951,17 +1927,17 @@ namespace GRAPH
             return;
         }
 
-        Color4B color4( _displayedColor.r, _displayedColor.g, _displayedColor.b, _displayedOpacity );
+        Color4B color4( _displayedColor.red, _displayedColor.green, _displayedColor.blue, _displayedOpacity );
 
         // special opacity for premultiplied textures
         if (_isOpacityModifyRGB)
         {
-            color4.r *= _displayedOpacity/255.0f;
-            color4.g *= _displayedOpacity/255.0f;
-            color4.b *= _displayedOpacity/255.0f;
+            color4.red *= _displayedOpacity/255.0f;
+            color4.green *= _displayedOpacity/255.0f;
+            color4.blue *= _displayedOpacity/255.0f;
         }
 
-        cocos2d::TextureAtlas* textureAtlas;
+        TextureAtlas* textureAtlas;
         V3F_C4B_T2F_Quad *quads;
         for (const auto& batchNode:_batchNodes)
         {
@@ -1980,14 +1956,7 @@ namespace GRAPH
         }
     }
 
-    std::string Label::getDescription() const
-    {
-        std::string utf8str;
-        StringUtils::UTF16ToUTF8(_currentUTF16String, utf8str);
-        return StringUtils::format("<Label | Tag = %d, Label = '%s'>", _tag, utf8str.c_str());
-    }
-
-    const Size& Label::getContentSize() const
+    const MATH::Sizef& Label::getContentSize() const
     {
         if (_systemFontDirty || _contentDirty)
         {
@@ -1996,7 +1965,7 @@ namespace GRAPH
         return _contentSize;
     }
 
-    Rect Label::getBoundingBox() const
+    MATH::Rectf Label::getBoundingBox() const
     {
         const_cast<Label*>(this)->getContentSize();
 

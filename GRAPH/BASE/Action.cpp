@@ -16,11 +16,6 @@ namespace GRAPH
     {
     }
 
-    std::string Action::description() const
-    {
-        return UTILS::STRING::StringFromFormat("<Action | Tag = %d", _tag);
-    }
-
     void Action::startWithTarget(Node *aTarget)
     {
         _originalTarget = _target = aTarget;

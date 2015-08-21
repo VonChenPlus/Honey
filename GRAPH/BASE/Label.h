@@ -142,8 +142,6 @@ namespace GRAPH
         virtual float getScaleX() const override;
         virtual float getScaleY() const override;
 
-        virtual std::string getDescription() const override;
-
         virtual const MATH::Sizef& getContentSize() const override;
 
         virtual MATH::Rectf getBoundingBox() const override;

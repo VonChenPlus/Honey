@@ -27,7 +27,8 @@ SOURCES += \
     $$P/THREAD/*.cpp \
     $$P/UTILS/HASH/*.cpp \
     $$P/UTILS/STRING/*.cpp \
-    $$P/UTILS/TIME/*.cpp
+    $$P/UTILS/TIME/*.cpp \
+    GRAPH/BASE/ActionInterval.cpp
 
 HEADERS += \
     $$P/BASE/*.h \
@@ -45,7 +46,8 @@ HEADERS += \
     $$P/UTILS/HASH/*.h \
     $$P/UTILS/STRING/*.h \
     $$P/UTILS/TIME/*.h \
-    $$P/UTILS/RANDOM/*.h
+    $$P/UTILS/RANDOM/*.h \
+    GRAPH/BASE/ActionInterval.h
     
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)

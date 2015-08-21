@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "GRAPH/UI/CONTROLS/UIButton.h"
 #include "GRAPH/UI/BASE/UIScale9Sprite.h"
+#include "GRAPH/BASE/Label.h"
 
 namespace GRAPH
 {
@@ -121,7 +122,7 @@ namespace GRAPH
         void Button::createTitleRenderer()
         {
             _titleRenderer = Label::create();
-            _titleRenderer->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+            _titleRenderer->setAnchorPoint(MATH::Vec2fMIDDLE);
             addProtectedChild(_titleRenderer, TITLE_RENDERER_Z, -1);
         }
 
@@ -314,7 +315,7 @@ namespace GRAPH
             this->setupDisabledTexture();
         }
 
-        void Button::setCapInsets(const Rect &capInsets)
+        void Button::setCapInsets(const MATH::Rectf &capInsets)
         {
             setCapInsetsNormalRenderer(capInsets);
             setCapInsetsPressedRenderer(capInsets);
@@ -322,7 +323,7 @@ namespace GRAPH
         }
 
 
-        void Button::setCapInsetsNormalRenderer(const Rect &capInsets)
+        void Button::setCapInsetsNormalRenderer(const MATH::Rectf &capInsets)
         {
             _capInsetsNormal = Helper::restrictCapInsetRect(capInsets, this->_normalTextureSize);
 
@@ -334,7 +335,7 @@ namespace GRAPH
             _buttonNormalRenderer->setCapInsets(_capInsetsNormal);
         }
 
-        void Button::setCapInsetsPressedRenderer(const Rect &capInsets)
+        void Button::setCapInsetsPressedRenderer(const MATH::Rectf &capInsets)
         {
             _capInsetsPressed = Helper::restrictCapInsetRect(capInsets, this->_pressedTextureSize);
 
@@ -346,7 +347,7 @@ namespace GRAPH
             _buttonClickedRenderer->setCapInsets(_capInsetsPressed);
         }
 
-        void Button::setCapInsetsDisabledRenderer(const Rect &capInsets)
+        void Button::setCapInsetsDisabledRenderer(const MATH::Rectf &capInsets)
         {
             _capInsetsDisabled = Helper::restrictCapInsetRect(capInsets, this->_disabledTextureSize);
 
@@ -358,17 +359,17 @@ namespace GRAPH
             _buttonDisableRenderer->setCapInsets(_capInsetsDisabled);
         }
 
-        const Rect& Button::getCapInsetsNormalRenderer()const
+        const MATH::Rectf& Button::getCapInsetsNormalRenderer()const
         {
             return _capInsetsNormal;
         }
 
-        const Rect& Button::getCapInsetsPressedRenderer()const
+        const MATH::Rectf& Button::getCapInsetsPressedRenderer()const
         {
             return _capInsetsPressed;
         }
 
-        const Rect& Button::getCapInsetsDisabledRenderer()const
+        const MATH::Rectf& Button::getCapInsetsDisabledRenderer()const
         {
             return _capInsetsDisabled;
         }
