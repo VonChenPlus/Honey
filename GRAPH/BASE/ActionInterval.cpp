@@ -1,9 +1,10 @@
+#include <stdarg.h>
 #include "GRAPH/BASE/ActionInterval.h"
 #include "GRAPH/BASE/Sprite.h"
 #include "GRAPH/BASE/Director.h"
 #include "GRAPH/BASE/Event.h"
 #include "GRAPH/BASE/EventDispatcher.h"
-#include <stdarg.h>
+#include "GRAPH/BASE/ActionInstant.h"
 
 namespace GRAPH
 {

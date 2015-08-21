@@ -8,6 +8,23 @@ namespace GRAPH
 {
     #define REPEAT_FOREVER (MATH::MATH_UINT32_MAX() - 1)
 
+    #define CREATE_FUNC(__TYPE__) \
+    static __TYPE__* create() \
+    { \
+        __TYPE__ *pRet = new(std::nothrow) __TYPE__(); \
+        if (pRet && pRet->init()) \
+        { \
+            pRet->autorelease(); \
+            return pRet; \
+        } \
+        else \
+        { \
+            delete pRet; \
+            pRet = NULL; \
+            return NULL; \
+        } \
+    }
+
     #define CC_CONTENT_SCALE_FACTOR() Director::getInstance()->getContentScaleFactor()
 
     #define CC_RECT_POINTS_TO_PIXELS(__rect_in_points_points__)                                                                        \

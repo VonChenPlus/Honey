@@ -113,6 +113,7 @@ namespace GRAPH
         Widget::FocusNavigationController* Widget::_focusNavigationController = nullptr;
 
         Widget::Widget():
+        _usingLayoutComponent(false),
         _unifySize(false),
         _enabled(true),
         _bright(true),
@@ -195,7 +196,8 @@ namespace GRAPH
 
         void Widget::onEnter()
         {
-            updateSizeAndPosition();
+            if (!_usingLayoutComponent)
+                updateSizeAndPosition();
             ProtectedNode::onEnter();
         }
 
@@ -241,7 +243,7 @@ namespace GRAPH
             {
                 _contentSize = getVirtualRendererSize();
             }
-            if (_running)
+            if (!_usingLayoutComponent && _running)
             {
                 Widget* widgetParent = getWidgetParent();
                 MATH::Sizef pSize;
@@ -268,31 +270,77 @@ namespace GRAPH
             onSizeChanged();
         }
 
+        LayoutComponent* Widget::getOrCreateLayoutComponent()
+        {
+            auto layoutComponent = this->getComponent(__LAYOUT_COMPONENT_NAME);
+            if (nullptr == layoutComponent)
+            {
+                LayoutComponent *component = LayoutComponent::create();
+                this->addComponent(component);
+                layoutComponent = component;
+            }
+
+            return (LayoutComponent*)layoutComponent;
+        }
+
         void Widget::setSizePercent(const MATH::Vector2f &percent)
         {
-            _sizePercent = percent;
-            MATH::Sizef cSize = _customSize;
-            if (_running)
+            if (_usingLayoutComponent)
             {
-                Widget* widgetParent = getWidgetParent();
-                if (widgetParent)
-                {
-                    cSize = MATH::Sizef(widgetParent->getContentSize().width * percent.x, widgetParent->getContentSize().height * percent.y);
-                }
-                else
-                {
-                    cSize = MATH::Sizef(_parent->getContentSize().width * percent.x, _parent->getContentSize().height * percent.y);
-                }
-            }
-            if (_ignoreSize)
-            {
-                this->setContentSize(getVirtualRendererSize());
+                auto component = this->getOrCreateLayoutComponent();
+                component->setUsingPercentContentSize(true);
+                component->setPercentContentSize(percent);
+                component->refreshLayout();
             }
             else
             {
-                this->setContentSize(cSize);
+                _sizePercent = percent;
+                MATH::Sizef cSize = _customSize;
+                if (_running)
+                {
+                    Widget* widgetParent = getWidgetParent();
+                    if (widgetParent)
+                    {
+                        cSize = MATH::Sizef(widgetParent->getContentSize().width * percent.x, widgetParent->getContentSize().height * percent.y);
+                    }
+                    else
+                    {
+                        cSize = MATH::Sizef(_parent->getContentSize().width * percent.x, _parent->getContentSize().height * percent.y);
+                    }
+                }
+                if (_ignoreSize)
+                {
+                    this->setContentSize(getVirtualRendererSize());
+                }
+                else
+                {
+                    this->setContentSize(cSize);
+                }
+                _customSize = cSize;
             }
-            _customSize = cSize;
+        }
+
+        void Widget::setSizeType(SizeType type)
+        {
+            _sizeType = type;
+
+            if (_usingLayoutComponent)
+            {
+                auto component = this->getOrCreateLayoutComponent();
+
+                if (_sizeType == Widget::SizeType::ST_PERCENT)
+                {
+                    component->setUsingPercentContentSize(true);
+                }
+                else
+                {
+                    component->setUsingPercentContentSize(false);
+                }
+            }
+        }
+        Widget::SizeType Widget::getSizeType() const
+        {
+            return _sizeType;
         }
 
         void Widget::updateSizeAndPosition()
@@ -374,11 +422,6 @@ namespace GRAPH
             setPosition(absPos);
         }
 
-        Widget::SizeType Widget::getSizeType() const
-        {
-            return _sizeType;
-        }
-
         void Widget::ignoreContentAdaptWithSize(bool ignore)
         {
             if (_unifySize)
@@ -414,6 +457,12 @@ namespace GRAPH
 
         const MATH::Vector2f& Widget::getSizePercent()
         {
+            if (_usingLayoutComponent)
+            {
+                auto component = this->getOrCreateLayoutComponent();
+                _sizePercent = component->getPercentContentSize();
+            }
+
             return _sizePercent;
         }
 
@@ -429,12 +478,15 @@ namespace GRAPH
 
         void Widget::onSizeChanged()
         {
-            for (auto& child : getChildren())
+            if (!_usingLayoutComponent)
             {
-                Widget* widgetChild = dynamic_cast<Widget*>(child);
-                if (widgetChild)
+                for (auto& child : getChildren())
                 {
-                    widgetChild->updateSizeAndPosition();
+                    Widget* widgetChild = dynamic_cast<Widget*>(child);
+                    if (widgetChild)
+                    {
+                        widgetChild->updateSizeAndPosition();
+                    }
                 }
             }
         }
@@ -886,7 +938,7 @@ namespace GRAPH
 
         void Widget::setPosition(const MATH::Vector2f &pos)
         {
-            if (_running)
+            if (!_usingLayoutComponent && _running)
             {
                 Widget* widgetParent = getWidgetParent();
                 if (widgetParent)
@@ -907,26 +959,58 @@ namespace GRAPH
 
         void Widget::setPositionPercent(const MATH::Vector2f &percent)
         {
-            _positionPercent = percent;
-            if (_running)
+            if (_usingLayoutComponent)
             {
-                Widget* widgetParent = getWidgetParent();
-                if (widgetParent)
+                auto component = this->getOrCreateLayoutComponent();
+                component->setPositionPercentX(percent.x);
+                component->setPositionPercentY(percent.y);
+                component->refreshLayout();
+            }
+            else
+            {
+                _positionPercent = percent;
+                if (_running)
                 {
-                    MATH::Sizef parentSize = widgetParent->getContentSize();
-                    MATH::Vector2f absPos(parentSize.width * _positionPercent.x, parentSize.height * _positionPercent.y);
-                    setPosition(absPos);
+                    Widget* widgetParent = getWidgetParent();
+                    if (widgetParent)
+                    {
+                        MATH::Sizef parentSize = widgetParent->getContentSize();
+                        MATH::Vector2f absPos(parentSize.width * _positionPercent.x, parentSize.height * _positionPercent.y);
+                        setPosition(absPos);
+                    }
                 }
             }
         }
 
         const MATH::Vector2f& Widget::getPositionPercent(){
+            if (_usingLayoutComponent)
+            {
+                auto component = this->getOrCreateLayoutComponent();
+                float percentX = component->getPositionPercentX();
+                float percentY = component->getPositionPercentY();
+
+                _positionPercent.set(percentX, percentY);
+            }
             return _positionPercent;
         }
 
         void Widget::setPositionType(PositionType type)
         {
             _positionType = type;
+            if (_usingLayoutComponent)
+            {
+                auto component = this->getOrCreateLayoutComponent();
+                if (type == Widget::PositionType::PT_ABSOLUTE)
+                {
+                    component->setPositionPercentXEnabled(false);
+                    component->setPositionPercentYEnabled(false);
+                }
+                else
+                {
+                    component->setPositionPercentXEnabled(true);
+                    component->setPositionPercentYEnabled(true);
+                }
+            }
         }
 
         Widget::PositionType Widget::getPositionType() const
@@ -1328,6 +1412,16 @@ namespace GRAPH
         void Widget::setUnifySizeEnabled(bool enable)
         {
             _unifySize = enable;
+        }
+
+        void Widget::setLayoutComponentEnabled(bool enable)
+        {
+            _usingLayoutComponent = enable;
+        }
+
+        bool Widget::isLayoutComponentEnabled()const
+        {
+            return _usingLayoutComponent;
         }
     }
 }

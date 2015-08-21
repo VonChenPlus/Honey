@@ -633,6 +633,9 @@ namespace GRAPH
             void setCallbackType(const std::string& callbackType) { _callbackType = callbackType; }
             const std::string& getCallbackType() const{ return _callbackType; }
 
+            void setLayoutComponentEnabled(bool enable);
+            bool isLayoutComponentEnabled()const;
+
         public:
             virtual bool init() override;
             virtual void interceptTouchEvent(TouchEventType event, Widget* sender, Touch *touch);
@@ -684,8 +687,10 @@ namespace GRAPH
             bool isAncestorsVisible(Node* node);
 
             void cleanupWidget();
+            LayoutComponent* getOrCreateLayoutComponent();
 
         protected:
+            bool _usingLayoutComponent;
             bool _unifySize;
             bool _enabled;
             bool _bright;

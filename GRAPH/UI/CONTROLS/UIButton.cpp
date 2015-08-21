@@ -2,6 +2,9 @@
 #include "GRAPH/UI/CONTROLS/UIButton.h"
 #include "GRAPH/UI/BASE/UIScale9Sprite.h"
 #include "GRAPH/BASE/Label.h"
+#include "GRAPH/UI/BASE/UIHelper.h"
+#include "GRAPH/BASE/ActionInterval.h"
+#include "IO/FileUtils.h"
 
 namespace GRAPH
 {
@@ -510,7 +513,7 @@ namespace GRAPH
                 }
                 else
                 {
-                    Size s = getNormalSize();
+                    MATH::Sizef s = getNormalSize();
                     ProtectedNode::setContentSize(s);
                 }
                 onSizeChanged();
@@ -556,7 +559,7 @@ namespace GRAPH
             }
         }
 
-        Size Button::getVirtualRendererSize() const
+        MATH::Sizef Button::getVirtualRendererSize() const
         {
             if (_unifySize)
             {
@@ -565,7 +568,7 @@ namespace GRAPH
 
             if (nullptr != _titleRenderer)
             {
-                Size titleSize = _titleRenderer->getContentSize();
+                MATH::Sizef titleSize = _titleRenderer->getContentSize();
                 if (!_normalTextureLoaded && _titleRenderer->getString().size() > 0)
                 {
                     return titleSize;
@@ -615,7 +618,7 @@ namespace GRAPH
                 }
                 else
                 {
-                    Size textureSize = _normalTextureSize;
+                    MATH::Sizef textureSize = _normalTextureSize;
                     if (textureSize.width <= 0.0f || textureSize.height <= 0.0f)
                     {
                         _buttonNormalRenderer->setScale(1.0f);
@@ -654,7 +657,7 @@ namespace GRAPH
                 }
                 else
                 {
-                    Size textureSize = _pressedTextureSize;
+                    MATH::Sizef textureSize = _pressedTextureSize;
                     if (textureSize.width <= 0.0f || textureSize.height <= 0.0f)
                     {
                         _buttonClickedRenderer->setScale(1.0f);
@@ -690,7 +693,7 @@ namespace GRAPH
                 }
                 else
                 {
-                    Size textureSize = _disabledTextureSize;
+                    MATH::Sizef textureSize = _disabledTextureSize;
                     if (textureSize.width <= 0.0f || textureSize.height <= 0.0f)
                     {
                         _buttonDisableRenderer->setScale(1.0f);
@@ -815,7 +818,7 @@ namespace GRAPH
             {
                 this->createTitleRenderer();
             }
-            if(FileUtils::getInstance()->isFileExist(fontName))
+            if(IO::FileUtils::getInstance().isFileExist(fontName))
             {
                 std::string lowerCasedFontName = fontName;
                 std::transform(lowerCasedFontName.begin(), lowerCasedFontName.end(), lowerCasedFontName.begin(), ::tolower);
@@ -921,14 +924,15 @@ namespace GRAPH
             }
 
         }
-        Size Button::getNormalSize() const
+
+        MATH::Sizef Button::getNormalSize() const
         {
-            Size titleSize;
+            MATH::Sizef titleSize;
             if (_titleRenderer != nullptr)
             {
                 titleSize = _titleRenderer->getContentSize();
             }
-            Size imageSize;
+            MATH::Sizef imageSize;
             if (_buttonNormalRenderer != nullptr)
             {
                 imageSize = _buttonNormalRenderer->getContentSize();
@@ -936,10 +940,10 @@ namespace GRAPH
             float width = titleSize.width > imageSize.width ? titleSize.width : imageSize.width;
             float height = titleSize.height > imageSize.height ? titleSize.height : imageSize.height;
 
-            return Size(width,height);
+            return MATH::Sizef(width,height);
         }
 
-        Size Button::getNormalTextureSize() const
+        MATH::Sizef Button::getNormalTextureSize() const
         {
             return _normalTextureSize;
         }

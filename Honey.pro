@@ -27,8 +27,7 @@ SOURCES += \
     $$P/THREAD/*.cpp \
     $$P/UTILS/HASH/*.cpp \
     $$P/UTILS/STRING/*.cpp \
-    $$P/UTILS/TIME/*.cpp \
-    GRAPH/BASE/ActionInterval.cpp
+    $$P/UTILS/TIME/*.cpp
 
 HEADERS += \
     $$P/BASE/*.h \
@@ -46,8 +45,7 @@ HEADERS += \
     $$P/UTILS/HASH/*.h \
     $$P/UTILS/STRING/*.h \
     $$P/UTILS/TIME/*.h \
-    $$P/UTILS/RANDOM/*.h \
-    GRAPH/BASE/ActionInterval.h
+    $$P/UTILS/RANDOM/*.h
     
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)
@@ -83,7 +81,7 @@ SOURCES += $$P/EXTERNALS/tinyxml2/*.cpp
 HEADERS += $$P/EXTERNALS/tinyxml2/*.h
 
 #freetype2
-HEADERS += $$P/EXTERNALS/freetype2/include/*.*
+HEADERS += $$P/EXTERNALS/freetype2/include/*.h
 INCLUDEPATH += $$P/EXTERNALS/freetype2/include
 
 #edtaa3func

@@ -25,6 +25,8 @@ namespace GRAPH
     class GLProgramState;
     class Camera;
     class Node;
+    class Component;
+    class ComponentContainer;
 
     enum {
         kNodeOnEnter,
@@ -266,6 +268,12 @@ namespace GRAPH
         void setAdditionalTransform(MATH::Matrix4* additionalTransform);
         void setAdditionalTransform(const MATH::AffineTransform& additionalTransform);
 
+        Component* getComponent(const std::string& name);
+        virtual bool addComponent(Component *component);
+        virtual bool removeComponent(const std::string& name);
+        virtual bool removeComponent(Component *component);
+        virtual void removeAllComponents();
+
         // overrides
         virtual GLubyte getOpacity() const;
         virtual GLubyte getDisplayedOpacity() const;
@@ -400,6 +408,8 @@ namespace GRAPH
 
         bool _reorderChildDirty;
         bool _isTransitionFinished;
+
+        ComponentContainer *_componentContainer;
 
         GLubyte		_displayedOpacity;
         GLubyte     _realOpacity;
