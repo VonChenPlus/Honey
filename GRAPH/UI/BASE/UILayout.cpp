@@ -1773,10 +1773,7 @@ namespace GRAPH
                     }
                 }
             }
-            else
-            {
-                return isWidgetAncestorSupportLoopFocus(parent, direction);
-            }
+            return isWidgetAncestorSupportLoopFocus(parent, direction);
         }
 
         Widget* Layout::findNextFocusedWidget(FocusDirection direction, Widget* current)
