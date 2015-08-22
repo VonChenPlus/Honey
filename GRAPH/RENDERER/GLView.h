@@ -1,11 +1,28 @@
 #ifndef GLVIEW_H
 #define GLVIEW_H
 
+#include <vector>
 #include "GRAPH/BASE/Event.h"
 #include "MATH/Size.h"
 #include "MATH/Rectangle.h"
-
-#include <vector>
+#include "EXTERNALS/glew/GL/glew.h"
+#include "EXTERNALS/glfw/include/glfw3.h"
+#ifdef _WIN32
+#ifndef GLFW_EXPOSE_NATIVE_WIN32
+#define GLFW_EXPOSE_NATIVE_WIN32
+#endif
+#ifndef GLFW_EXPOSE_NATIVE_WGL
+#define GLFW_EXPOSE_NATIVE_WGL
+#endif
+#else
+#ifndef GLFW_EXPOSE_NATIVE_NSGL
+#define GLFW_EXPOSE_NATIVE_NSGL
+#endif
+#ifndef GLFW_EXPOSE_NATIVE_COCOA
+#define GLFW_EXPOSE_NATIVE_COCOA
+#endif
+#endif
+#include "EXTERNALS/glfw/include/glfw3native.h"
 
 namespace GRAPH
 {
@@ -40,10 +57,7 @@ namespace GRAPH
         UNKNOWN,
     };
 
-    /** @struct GLContextAttrs
-     *
-     * There are six opengl Context Attrs.
-     */
+
     struct GLContextAttrs
     {
         int redBits;
@@ -54,274 +68,70 @@ namespace GRAPH
         int stencilBits;
     };
 
-    /**
-     * @addtogroup platform
-     * @{
-     */
-    /**
-     * @brief By GLView you can operate the frame information of EGL view through some function.
-     */
     class GLView : public HObject
     {
     public:
-        /**
-         * @js ctor
-         */
         GLView();
-        /**
-         * @js NA
-         * @lua NA
-         */
         virtual ~GLView();
 
-        /** Force destroying EGL view, subclass must implement this method. */
         virtual void end() = 0;
 
-        /** Get whether opengl render system is ready, subclass must implement this method. */
         virtual bool isOpenGLReady() = 0;
 
-        /** Exchanges the front and back buffers, subclass must implement this method. */
         virtual void swapBuffers() = 0;
 
-        /** Open or close IME keyboard , subclass must implement this method.
-         *
-         * @param open Open or close IME keyboard.
-         */
-        virtual void setIMEKeyboardState(bool open) = 0;
-
-        /** When the window is closed, it will return false if the platforms is Ios or Android.
-         * If the platforms is windows or Mac,it will return true.
-         *
-         * @return In ios and android it will return false,if in windows or Mac it will return true.
-         */
         virtual bool windowShouldClose() { return false; }
 
-        /** Static method and member so that we can modify it on all platforms before create OpenGL context.
-         *
-         * @param glContextAttrs The OpenGL context attrs.
-         */
         static void setGLContextAttrs(GLContextAttrs& glContextAttrs);
-
-        /** Return the OpenGL context attrs.
-         *
-         * @return Return the OpenGL context attrs.
-         */
         static GLContextAttrs getGLContextAttrs();
 
-        /** The OpenGL context attrs. */
         static GLContextAttrs _glContextAttrs;
 
-        /** Polls the events. */
         virtual void pollEvents();
 
-        /**
-         * Get the frame size of EGL view.
-         * In general, it returns the screen size since the EGL view is a fullscreen view.
-         *
-         * @return The frame size of EGL view.
-         */
         virtual const MATH::Sizef& getFrameSize() const;
-
-        /**
-         * Set the frame size of EGL view.
-         *
-         * @param width The width of the fram size.
-         * @param height The height of the fram size.
-         */
         virtual void setFrameSize(float width, float height);
 
-        /** Set zoom factor for frame. This methods are for
-         * debugging big resolution (e.g.new ipad) app on desktop.
-         *
-         * @param zoomFactor The zoom factor for frame.
-         */
         virtual void setFrameZoomFactor(float) {}
-
-        /** Get zoom factor for frame. This methods are for
-         * debugging big resolution (e.g.new ipad) app on desktop.
-         *
-         * @return The zoom factor for frame.
-         */
         virtual float getFrameZoomFactor() const { return 1.0; }
 
-        /**
-         * Hide or Show the mouse cursor if there is one.
-         *
-         * @param isVisible Hide or Show the mouse cursor if there is one.
-         */
         virtual void setCursorVisible(bool) {}
 
-        /** Get retina factor.
-         *
-         * @return The retina factor.
-         */
         virtual int getRetinaFactor() const { return 1; }
 
-        /** Only works on ios platform. Set Content Scale of the Factor. */
         virtual bool setContentScaleFactor(float) { return false; }
-
-        /** Only works on ios platform. Get Content Scale of the Factor. */
         virtual float getContentScaleFactor() const { return 1.0; }
 
-        /** Returns whether or not the view is in Retina Display mode.
-         *
-         * @return Returns whether or not the view is in Retina Display mode.
-         */
         virtual bool isRetinaDisplay() const { return false; }
 
-        /**
-         * Get the visible area size of opengl viewport.
-         *
-         * @return The visible area size of opengl viewport.
-         */
         virtual MATH::Sizef getVisibleSize() const;
-
-        /**
-         * Get the visible origin point of opengl viewport.
-         *
-         * @return The visible origin point of opengl viewport.
-         */
         virtual MATH::Vector2f getVisibleOrigin() const;
-
-        /**
-         * Get the visible rectangle of opengl viewport.
-         *
-         * @return The visible rectangle of opengl viewport.
-         */
         virtual MATH::Rectf getVisibleRect() const;
 
-        /**
-         * Set the design resolution size.
-         * @param width Design resolution width.
-         * @param height Design resolution height.
-         * @param resolutionPolicy The resolution policy desired, you may choose:
-         *                         [1] EXACT_FIT Fill screen by stretch-to-fit: if the design resolution ratio of width to height is different from the screen resolution ratio, your game view will be stretched.
-         *                         [2] NO_BORDER Full screen without black border: if the design resolution ratio of width to height is different from the screen resolution ratio, two areas of your game view will be cut.
-         *                         [3] SHOW_ALL  Full screen with black border: if the design resolution ratio of width to height is different from the screen resolution ratio, two black borders will be shown.
-         */
         virtual void setDesignResolutionSize(float width, float height, ResolutionPolicy resolutionPolicy);
-
-        /** Get design resolution size.
-         *  Default resolution size is the same as 'getFrameSize'.
-         *
-         * @return The design resolution size.
-         */
         virtual const MATH::Sizef&  getDesignResolutionSize() const;
 
-        /**
-         * Set opengl view port rectangle with points.
-         *
-         * @param x Set the points of x.
-         * @param y Set the points of y.
-         * @param w Set the width of  the view port
-         * @param h Set the Height of the view port.
-         */
         virtual void setViewPortInPoints(float x , float y , float w , float h);
-
-        /**
-         * Set Scissor rectangle with points.
-         *
-         * @param x Set the points of x.
-         * @param y Set the points of y.
-         * @param w Set the width of  the view port
-         * @param h Set the Height of the view port.
-         */
         virtual void setScissorInPoints(float x , float y , float w , float h);
 
-        /**
-         * Get whether GL_SCISSOR_TEST is enable.
-         *
-         * @return Whether GL_SCISSOR_TEST is enable.
-         */
         virtual bool isScissorEnabled();
-
-        /**
-         * Get the current scissor rectangle.
-         *
-         * @return The current scissor rectangle.
-         */
         virtual MATH::Rectf getScissorRect() const;
 
-        /** Set the view name.
-         *
-         * @param viewname A string will be set to the view as name.
-         */
         virtual void setViewName(const std::string& viewname);
-
-        /** Get the view name.
-         *
-         * @return The view name.
-         */
         const std::string& getViewName() const;
 
-        /** Touch events are handled by default; if you want to customize your handlers, please override this function.
-         *
-         * @param num The number of touch.
-         * @param ids The identity of the touch.
-         * @param xs The points of x.
-         * @param ys The points of y.
-         */
         virtual void handleTouchesBegin(int num, intptr_t ids[], float xs[], float ys[]);
-
-        /** Touch events are handled by default; if you want to customize your handlers, please override this function.
-         *
-         * @param num The number of touch.
-         * @param ids The identity of the touch.
-         * @param xs The points of x.
-         * @param ys The points of y.
-         */
         virtual void handleTouchesMove(int num, intptr_t ids[], float xs[], float ys[]);
-
-        /** Touch events are handled by default; if you want to customize your handlers, please override this function.
-         *
-         * @param num The number of touch.
-         * @param ids The identity of the touch.
-         * @param xs The points of x.
-         * @param ys The points of y.
-         */
         virtual void handleTouchesEnd(int num, intptr_t ids[], float xs[], float ys[]);
-
-        /** Touch events are handled by default; if you want to customize your handlers, please override this function.
-         *
-         * @param num The number of touch.
-         * @param ids The identity of the touch.
-         * @param xs The points of x.
-         * @param ys The points of y.
-         */
         virtual void handleTouchesCancel(int num, intptr_t ids[], float xs[], float ys[]);
 
-        /**
-         * Get the opengl view port rectangle.
-         *
-         * @return Return the opengl view port rectangle.
-         */
-        const MATH::Recti& getViewPortRect() const;
+        const MATH::Rectf& getViewPortRect() const;
 
-        /**
-         * Get list of all active touches.
-         *
-         * @return A list of all active touches.
-         */
         std::vector<Touch*> getAllTouches() const;
 
-        /**
-         * Get scale factor of the horizontal direction.
-         *
-         * @return Scale factor of the horizontal direction.
-         */
         float getScaleX() const;
-
-        /**
-         * Get scale factor of the vertical direction.
-         *
-         * @return Scale factor of the vertical direction.
-         */
         float getScaleY() const;
 
-        /** Returns the current Resolution policy.
-         *
-         * @return The current Resolution policy.
-         */
         ResolutionPolicy getResolutionPolicy() const { return _resolutionPolicy; }
 
     protected:
@@ -334,13 +144,91 @@ namespace GRAPH
         // resolution size, it is the size appropriate for the app resources.
         MATH::Sizef _designResolutionSize;
         // the view port size
-        MATH::Recti _viewPortRect;
+        MATH::Rectf _viewPortRect;
         // the view name
         std::string _viewName;
 
         float _scaleX;
         float _scaleY;
         ResolutionPolicy _resolutionPolicy;
+    };
+
+    class GLViewImpl : public GLView
+    {
+    public:
+        static GLViewImpl* create(const std::string& viewName);
+        static GLViewImpl* createWithRect(const std::string& viewName, MATH::Rectf size, float frameZoomFactor = 1.0f);
+        static GLViewImpl* createWithFullScreen(const std::string& viewName);
+        static GLViewImpl* createWithFullScreen(const std::string& viewName, const GLFWvidmode &videoMode, GLFWmonitor *monitor);
+
+        float getFrameZoomFactor() const override;
+
+        virtual void setViewPortInPoints(float x , float y , float w , float h) override;
+        virtual void setScissorInPoints(float x , float y , float w , float h) override;
+
+
+        bool windowShouldClose() override;
+        void pollEvents() override;
+        GLFWwindow* getWindow() const { return _mainWindow; }
+
+        virtual bool isOpenGLReady() override;
+        virtual void end() override;
+        virtual void swapBuffers() override;
+        virtual void setFrameSize(float width, float height) override;
+
+        void setFrameZoomFactor(float zoomFactor) override;
+
+        virtual void setCursorVisible(bool isVisible) override;
+
+        int getRetinaFactor() const override { return _retinaFactor; }
+
+    #ifdef _WIN32
+        HWND getWin32Window() { return glfwGetWin32Window(_mainWindow); }
+    #else
+        id getCocoaWindow() { return glfwGetCocoaWindow(_mainWindow); }
+    #endif
+
+    protected:
+        GLViewImpl();
+        virtual ~GLViewImpl();
+
+        bool initWithRect(const std::string& viewName, MATH::Rectf rect, float frameZoomFactor);
+        bool initWithFullScreen(const std::string& viewName);
+        bool initWithFullscreen(const std::string& viewname, const GLFWvidmode &videoMode, GLFWmonitor *monitor);
+
+        void initGlew();
+
+        void updateFrameSize();
+
+        // GLFW callbacks
+        void onGLFWError(int errorID, const char* errorDesc);
+        void onGLFWMouseCallBack(GLFWwindow* window, int button, int action, int modify);
+        void onGLFWMouseMoveCallBack(GLFWwindow* window, double x, double y);
+        void onGLFWMouseScrollCallback(GLFWwindow* window, double x, double y);
+        void onGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        void onGLFWCharCallback(GLFWwindow* window, unsigned int character);
+        void onGLFWWindowPosCallback(GLFWwindow* windows, int x, int y);
+        void onGLFWframebuffersize(GLFWwindow* window, int w, int h);
+        void onGLFWWindowSizeFunCallback(GLFWwindow *window, int width, int height);
+
+        bool _captured;
+        bool _supportTouch;
+        bool _isInRetinaMonitor;
+        bool _isRetinaEnabled;
+        int  _retinaFactor;  // Should be 1 or 2
+
+        float _frameZoomFactor;
+
+        GLFWwindow* _mainWindow;
+        GLFWmonitor* _monitor;
+
+        float _mouseX;
+        float _mouseY;
+
+        friend class GLFWEventHandler;
+
+    private:
+        DISALLOW_COPY_AND_ASSIGN(GLViewImpl)
     };
 }
 

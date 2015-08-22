@@ -4,6 +4,7 @@
 #include "GRAPH/BASE/Node.h"
 #include "GRAPH/RENDERER/RenderCommand.h"
 #include "GRAPH/BASE/Protocols.h"
+#include "GRAPH/BASE/Fonts.h"
 
 namespace GRAPH
 {

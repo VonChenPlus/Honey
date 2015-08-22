@@ -8,6 +8,7 @@
 #include "GRAPH/BASE/Director.h"
 #include "GRAPH/RENDERER/GLStateCache.h"
 #include "GRAPH/RENDERER/Renderer.h"
+#include "GRAPH/RENDERER/Texture2D.h"
 
 namespace GRAPH
 {

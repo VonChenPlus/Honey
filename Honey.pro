@@ -87,3 +87,7 @@ INCLUDEPATH += $$P/EXTERNALS/freetype2/include
 #edtaa3func
 SOURCES += $$P/EXTERNALS/edtaa3func/*.cpp
 HEADERS += $$P/EXTERNALS/edtaa3func/*.h
+
+#glfw
+HEADERS += $$P/EXTERNALS/glfw/include/*.h
+INCLUDEPATH += $$P/EXTERNALS/glfw/include

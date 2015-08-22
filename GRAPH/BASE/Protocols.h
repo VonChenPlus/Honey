@@ -2,10 +2,14 @@
 #define PROTOCOLS_H
 
 #include <string>
-#include "GRAPH/RENDERER/Texture2D.h"
+#include "GRAPH/RENDERER/GLCommon.h"
+#include "GRAPH/BASE/Color.h"
+#include "GRAPH/BASE/Types.h"
 
 namespace GRAPH
 {
+    class Texture2D;
+
     class ApplicationProtocol
     {
     public:

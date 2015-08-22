@@ -13,7 +13,7 @@
 typedef char GLchar;
 #define GL_BGRA_EXT 0x80E1
 #else // OpenGL
-#include "GL/glew.h"
+#include "EXTERNALS/glew/GL/glew.h"
 #if defined(__APPLE__)
 #include <OpenGL/gl.h>
 #else
