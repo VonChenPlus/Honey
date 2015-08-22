@@ -27,8 +27,7 @@ SOURCES += \
     $$P/THREAD/*.cpp \
     $$P/UTILS/HASH/*.cpp \
     $$P/UTILS/STRING/*.cpp \
-    $$P/UTILS/TIME/*.cpp \
-    GRAPH/UI/CONTROLS/UICheckBox.cpp
+    $$P/UTILS/TIME/*.cpp
 
 HEADERS += \
     $$P/BASE/*.h \
@@ -46,8 +45,7 @@ HEADERS += \
     $$P/UTILS/HASH/*.h \
     $$P/UTILS/STRING/*.h \
     $$P/UTILS/TIME/*.h \
-    $$P/UTILS/RANDOM/*.h \
-    GRAPH/UI/CONTROLS/UICheckBox.h
+    $$P/UTILS/RANDOM/*.h
     
 # Zlib
 win32|contains(QT_CONFIG, no-zlib)

@@ -2,11 +2,23 @@
 #define PROTOCOLS_H
 
 #include <string>
-
 #include "GRAPH/RENDERER/Texture2D.h"
 
 namespace GRAPH
 {
+    class ApplicationProtocol
+    {
+    public:
+        virtual ~ApplicationProtocol(){
+        }
+
+        virtual bool applicationDidFinishLaunching() = 0;
+        virtual void applicationDidEnterBackground() = 0;
+        virtual void applicationWillEnterForeground() = 0;
+
+        virtual void initGLContextAttrs() {}
+    };
+
     class RGBAProtocol
     {
     public:
