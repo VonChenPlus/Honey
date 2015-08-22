@@ -3,7 +3,7 @@
 
 #include <stack>
 #include "BASE/HObject.h"
-#include "GRAPH/BASE/GLView.h"
+#include "GRAPH/RENDERER/GLView.h"
 #include "MATH/Matrix.h"
 #include "GRAPH/BASE/Scene.h"
 #include "UTILS/TIME/TimeUtils.h"

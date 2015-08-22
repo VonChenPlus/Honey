@@ -33,24 +33,16 @@ namespace GRAPH
     class Application : public ApplicationProtocol
     {
     public:
+        static Application* getInstance();
+
         Application();
         virtual ~Application();
 
         int run();
 
-        static Application* getInstance();
-
-        void setStartupScriptFilename(const std::string& startupScriptFile);
-
-        const std::string& getStartupScriptFilename(void)
-        {
-            return _startupScriptFilename;
-        }
+        void initGLContextAttrs() override;
 
     protected:
-        std::string         _resourceRootPath;
-        std::string         _startupScriptFilename;
-
         static Application * sm_pSharedApplication;
     };
 }

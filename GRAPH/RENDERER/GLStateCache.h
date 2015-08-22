@@ -2,7 +2,7 @@
 #define GLSTATE_H
 
 #include <cstdint>
-#include "GRAPH/BASE/GLCommon.h"
+#include "GRAPH/RENDERER/GLCommon.h"
 
 namespace GRAPH
 {

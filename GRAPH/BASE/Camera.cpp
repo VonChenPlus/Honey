@@ -1,6 +1,6 @@
 #include "GRAPH/BASE/Camera.h"
 #include "GRAPH/BASE/Director.h"
-#include "GRAPH/BASE/GLView.h"
+#include "GRAPH/RENDERER/GLView.h"
 #include "GRAPH/BASE/Scene.h"
 #include "GRAPH/RENDERER/Renderer.h"
 #include "GRAPH/RENDERER/GLProgramState.h"

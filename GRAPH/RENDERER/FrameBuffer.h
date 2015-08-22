@@ -2,7 +2,7 @@
 #define FRAMEBUFFER_H
 
 #include "BASE/HObject.h"
-#include "GRAPH/BASE/GLCommon.h"
+#include "GRAPH/RENDERER/GLCommon.h"
 #include "GRAPH/BASE/Color.h"
 #include "GRAPH/RENDERER/Texture2D.h"
 #include <set>

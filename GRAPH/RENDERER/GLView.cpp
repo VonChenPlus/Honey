@@ -1,8 +1,8 @@
-#include "GRAPH/BASE/GLView.h"
 #include <map>
 #include "GRAPH/BASE/Event.h"
 #include "GRAPH/BASE/Director.h"
-#include "GRAPH/BASE/GLCommon.h"
+#include "GRAPH/RENDERER/GLCommon.h"
+#include "GRAPH/RENDERER/GLView.h"
 #include "MATH/MathDef.h"
 #include "GRAPH/RENDERER/FrameBuffer.h"
 #include "GRAPH/BASE/Camera.h"

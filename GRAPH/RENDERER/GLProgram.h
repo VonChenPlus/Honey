@@ -6,7 +6,7 @@
 
 #include "BASE/HObject.h"
 #include "GRAPH/BASE/Types.h"
-#include "GRAPH/BASE/GLCommon.h"
+#include "GRAPH/RENDERER/GLCommon.h"
 #include "MATH/Matrix.h"
 
 namespace GRAPH

@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "BASE/HObject.h"
-#include "GRAPH/BASE/GLCommon.h"
+#include "GRAPH/RENDERER/GLCommon.h"
 #include "MATH/Vector.h"
 #include "MATH/Rectangle.h"
 #include "MATH/Size.h"

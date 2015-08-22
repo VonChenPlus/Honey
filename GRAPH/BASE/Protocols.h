@@ -12,11 +12,10 @@ namespace GRAPH
         virtual ~ApplicationProtocol(){
         }
 
+        virtual void initGLContextAttrs() = 0;
         virtual bool applicationDidFinishLaunching() = 0;
         virtual void applicationDidEnterBackground() = 0;
         virtual void applicationWillEnterForeground() = 0;
-
-        virtual void initGLContextAttrs() {}
     };
 
     class RGBAProtocol

@@ -7,7 +7,7 @@
 #include "MATH/Quaternion.h"
 #include "MATH/Matrix.h"
 #include "MATH/Rectangle.h"
-#include "GRAPH/BASE/GLCommon.h"
+#include "GRAPH/RENDERER/GLCommon.h"
 #include "GRAPH/BASE/Color.h"
 #include "MATH/AffineTransform.h"
 

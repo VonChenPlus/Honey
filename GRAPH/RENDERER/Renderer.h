@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <stack>
-#include "GRAPH/BASE/GLCommon.h"
+#include "GRAPH/RENDERER/GLCommon.h"
 #include "BASE/Honey.h"
 #include "GRAPH/BASE/Types.h"
 #include "GRAPH/RENDERER/RenderCommand.h"
