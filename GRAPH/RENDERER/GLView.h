@@ -7,22 +7,6 @@
 #include "MATH/Rectangle.h"
 #include "EXTERNALS/glew/GL/glew.h"
 #include "EXTERNALS/glfw/include/glfw3.h"
-#ifdef _WIN32
-#ifndef GLFW_EXPOSE_NATIVE_WIN32
-#define GLFW_EXPOSE_NATIVE_WIN32
-#endif
-#ifndef GLFW_EXPOSE_NATIVE_WGL
-#define GLFW_EXPOSE_NATIVE_WGL
-#endif
-#else
-#ifndef GLFW_EXPOSE_NATIVE_NSGL
-#define GLFW_EXPOSE_NATIVE_NSGL
-#endif
-#ifndef GLFW_EXPOSE_NATIVE_COCOA
-#define GLFW_EXPOSE_NATIVE_COCOA
-#endif
-#endif
-#include "EXTERNALS/glfw/include/glfw3native.h"
 
 namespace GRAPH
 {
@@ -181,12 +165,6 @@ namespace GRAPH
         virtual void setCursorVisible(bool isVisible) override;
 
         int getRetinaFactor() const override { return _retinaFactor; }
-
-    #ifdef _WIN32
-        HWND getWin32Window() { return glfwGetWin32Window(_mainWindow); }
-    #else
-        id getCocoaWindow() { return glfwGetCocoaWindow(_mainWindow); }
-    #endif
 
     protected:
         GLViewImpl();

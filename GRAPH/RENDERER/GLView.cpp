@@ -827,7 +827,7 @@ namespace GRAPH
 
     void GLViewImpl::setFrameZoomFactor(float zoomFactor)
     {
-        if (fabs(_frameZoomFactor - zoomFactor) < FLT_EPSILON)
+        if (fabs(_frameZoomFactor - zoomFactor) < MATH::MATH_FLOAT_EPSILON())
         {
             return;
         }
@@ -1042,7 +1042,7 @@ namespace GRAPH
         float factorX = frameSizeW / w * _retinaFactor * _frameZoomFactor;
         float factorY = frameSizeH / h * _retinaFactor * _frameZoomFactor;
 
-        if (fabs(factorX - 0.5f) < FLT_EPSILON && fabs(factorY - 0.5f) < FLT_EPSILON )
+        if (fabs(factorX - 0.5f) < MATH::MATH_FLOAT_EPSILON() && fabs(factorY - 0.5f) < MATH::MATH_FLOAT_EPSILON() )
         {
             _isInRetinaMonitor = true;
             if (_isRetinaEnabled)
@@ -1056,7 +1056,7 @@ namespace GRAPH
 
             glfwSetWindowSize(window, static_cast<int>(frameSizeW * 0.5f * _retinaFactor * _frameZoomFactor) , static_cast<int>(frameSizeH * 0.5f * _retinaFactor * _frameZoomFactor));
         }
-        else if(fabs(factorX - 2.0f) < FLT_EPSILON && fabs(factorY - 2.0f) < FLT_EPSILON)
+        else if(fabs(factorX - 2.0f) < MATH::MATH_FLOAT_EPSILON() && fabs(factorY - 2.0f) < MATH::MATH_FLOAT_EPSILON())
         {
             _isInRetinaMonitor = false;
             _retinaFactor = 1;
