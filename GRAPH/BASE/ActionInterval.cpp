@@ -62,7 +62,7 @@ namespace GRAPH
         // by 3% in heavy based action games.
         if (_duration == 0)
         {
-            _duration = FLT_EPSILON;
+            _duration = MATH::MATH_FLOAT_EPSILON();
         }
 
         _elapsed = 0;
