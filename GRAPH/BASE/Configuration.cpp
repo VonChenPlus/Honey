@@ -4,8 +4,6 @@
 
 namespace GRAPH
 {
-    extern const char* cocos2dVersion();
-
     Configuration* Configuration::s_sharedConfiguration = nullptr;
 
     Configuration::Configuration()
@@ -30,9 +28,6 @@ namespace GRAPH
 
     bool Configuration::init()
     {
-        _valueDict["cocos2d.x.version"] = HValue(cocos2dVersion());
-
-
     #if CC_ENABLE_PROFILERS
         _valueDict["cocos2d.x.compiled_with_profiler"] = HValue(true);
     #else

@@ -141,8 +141,6 @@ namespace GRAPH
 
             void addEventListener(const ccCheckBoxCallback& callback);
 
-            virtual std::string getDescription() const override;
-
         protected:
             virtual void releaseUpEvent() override;
 

@@ -48,33 +48,6 @@ namespace UTILS
             DataToHexString((uint8 *)(&data[0]), data.size(), output);
         }
 
-        void StringTrimEndNonAlphaNum(char *str) {
-            size_t n = strlen(str);
-            while (!isalnum(str[n]) && n > 0) {
-                str[n--] = '\0';
-            }
-        }
-
-        void SkipSpace(const char **ptr) {
-            while (**ptr && isspace(**ptr)) {
-                (*ptr)++;
-            }
-        }
-
-        void StringUpper(char *str) {
-            while (*str) {
-                *str = toupper(*str);
-                str++;
-            }
-        }
-
-        void StringUpper(char *str, int len) {
-            while (len--) {
-                *str = toupper(*str);
-                str++;
-            }
-        }
-
         unsigned int ParseHexString(const char *_szValue) {
             int Value = 0;
             size_t Finish = strlen(_szValue);
@@ -124,6 +97,85 @@ namespace UTILS
             buffer.read(buffer.size(), (HBYTE *)&(*output)[0]);
         }
 
+        MATH::Rectf RectFromString(const std::string& str)
+        {
+            MATH::Rectf result = MATH::RectfZERO;
+
+            if (str.empty()) return result;
+            std::string content = str;
+
+            // find the first '{' and the third '}'
+            size_t nPosLeft = content.find('{');
+            size_t nPosRight = content.find('}');
+            for (int i = 1; i < 3; ++i)
+            {
+                if (nPosRight == std::string::npos)
+                {
+                    break;
+                }
+                nPosRight = content.find('}', nPosRight + 1);
+            }
+            if (nPosLeft == std::string::npos || nPosRight == std::string::npos)
+                throw _HException_Normal("Unknow rect string format!");
+
+            content = content.substr(nPosLeft + 1, nPosRight - nPosLeft - 1);
+            size_t nPointEnd = content.find('}');
+            if (nPointEnd == std::string::npos)
+                throw _HException_Normal("Unknow rect string format!");
+            nPointEnd = content.find(',', nPointEnd);
+            if (nPointEnd == std::string::npos)
+                throw _HException_Normal("Unknow rect string format!");
+
+            // get the point string and size string
+            const std::string pointStr = content.substr(0, nPointEnd);
+            const std::string sizeStr = content.substr(nPointEnd + 1, content.length() - nPointEnd);
+
+            // split the string with ','
+            std::vector<std::string> pointInfo;
+            SplitWithForm(pointStr, pointInfo);
+            std::vector<std::string> sizeInfo;
+            SplitWithForm(sizeStr.c_str(), sizeInfo);
+
+            float x = (float) atof(pointInfo[0].c_str());
+            float y = (float) atof(pointInfo[1].c_str());
+            float width = (float) atof(sizeInfo[0].c_str());
+            float height = (float) atof(sizeInfo[1].c_str());
+
+            result = MATH::Rectf(x, y, width, height);
+            return result;
+        }
+
+        MATH::Vector2f PointFromString(const std::string& str)
+        {
+            MATH::Vector2f ret = MATH::Vec2fZERO;
+
+            if (str.empty()) return ret;
+
+            std::vector<std::string> strs;
+            SplitWithForm(str, strs);
+
+            float x = (float) atof(strs[0].c_str());
+            float y = (float) atof(strs[1].c_str());
+
+            ret.set(x, y);
+            return ret;
+        }
+
+        MATH::Sizef SizeFromString(const std::string& pszContent)
+        {
+            MATH::Sizef ret = MATH::SizefZERO;
+            if (pszContent.empty()) return ret;
+
+            std::vector<std::string> strs;
+            SplitWithForm(pszContent, strs);
+
+            float width = (float) atof(strs[0].c_str());
+            float height = (float) atof(strs[1].c_str());
+
+            ret = MATH::Sizef(width, height);
+            return ret;
+        }
+
         std::string StringFromFormat(const char* format, ...) {
             va_list args;
             char *buf = NULLPTR;
@@ -165,74 +217,48 @@ namespace UTILS
             return value ? "True" : "False";
         }
 
-        // Turns "  hej " into "hej". Also handles tabs.
-        std::string StripSpaces(const std::string &str) {
-            const size_t s = str.find_first_not_of(" \t\r\n");
-
-            if (str.npos != s)
-                return str.substr(s, str.find_last_not_of(" \t\r\n") - s + 1);
-            else
-                return "";
-        }
-
-        // "\"hello\"" is turned to "hello"
-        // This one assumes that the string has already been space stripped in both
-        // ends, as done by StripSpaces above, for example.
-        std::string StripQuotes(const std::string& s) {
-            if (s.size() && '\"' == s[0] && '\"' == *s.rbegin())
-                return s.substr(1, s.size() - 2);
-            else
-                return s;
-        }
-
-        // For Debugging. Read out an u8 array.
-        std::string ArrayToString(const uint8 *data, uint32 size, int line_len, bool spaces) {
-            std::ostringstream oss;
-            oss << std::setfill('0') << std::hex;
-
-            for (int line = 0; size; ++data, --size) {
-                oss << std::setw(2) << (int)*data;
-                if (line_len == ++line) {
-                    oss << '\n';
-                    line = 0;
-                }
-                else if (spaces)
-                    oss << ' ';
+        void SplitString(const std::string& src, const std::string& token, std::vector<std::string>& output) {
+            size_t nend = 0;
+            size_t nbegin = 0;
+            size_t tokenSize = token.size();
+            while (nend != std::string::npos)
+            {
+                nend = src.find(token, nbegin);
+                if (nend == std::string::npos)
+                    output.push_back(src.substr(nbegin, src.length() - nbegin));
+                else
+                    output.push_back(src.substr(nbegin, nend - nbegin));
+                nbegin = nend + tokenSize;
             }
-
-            return oss.str();
         }
 
-        void SplitString(const std::string& str, const char delim, std::vector<std::string>& output) {
-            std::istringstream iss(str);
-            output.resize(1);
+        void SplitWithForm(const std::string& content, std::vector<std::string>& output) {
+            if (content.empty()) return;
 
-            while (std::getline(iss, *output.rbegin(), delim))
-                output.push_back("");
+            size_t nPosLeft = content.find('{');
+            size_t nPosRight = content.find('}');
 
-            output.pop_back();
-        }
+            // don't have '{' and '}'
+            if (nPosLeft == std::string::npos || nPosRight == std::string::npos)
+                throw _HException_Normal("Unknow string format!");
+            // '}' is before '{'
+            if (nPosLeft > nPosRight) 
+                throw _HException_Normal("Unknow string format!");
 
-        std::string ReplaceAll(std::string result, const std::string& src, const std::string& dest) {
-            size_t pos = 0;
+            const std::string pointStr = content.substr(nPosLeft + 1, nPosRight - nPosLeft - 1);
+            // nothing between '{' and '}'
+            if (pointStr.length() == 0) return;
 
-            if (src == dest)
-                return result;
+            size_t nPos1 = pointStr.find('{');
+            size_t nPos2 = pointStr.find('}');
+            // contain '{' or '}' 
+            if (nPos1 != std::string::npos || nPos2 != std::string::npos)
+                throw _HException_Normal("Unknow string format!");
 
-            while(1) {
-                pos = result.find(src, pos);
-                if (pos == result.npos)
-                    break;
-                result.replace(pos, src.size(), dest);
-                pos += dest.size();
+            SplitString(pointStr, ",", output);
+            if (output.size() != 2 || output[0].length() == 0 || output[1].length() == 0) {
+                throw _HException_Normal("Unknow string format!");
             }
-            return result;
-        }
-
-        int StrcmpIgnore(std::string str1, std::string str2, std::string ignorestr1, std::string ignorestr2) {
-            str1 = ReplaceAll(str1, ignorestr1, ignorestr2);
-            str2 = ReplaceAll(str2, ignorestr1, ignorestr2);
-            return strcmp(str1.c_str(),str2.c_str());
         }
     }
 }

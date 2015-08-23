@@ -260,11 +260,6 @@ namespace GRAPH
             virtual bool isClippingEnabled()const;
 
             /**
-             * Returns the "class name" of widget.
-             */
-            virtual std::string getDescription() const override;
-
-            /**
              * Change the layout type.
              *@param type Layout type.
              */

@@ -877,11 +877,6 @@ namespace GRAPH
             }
         }
 
-        std::string Button::getDescription() const
-        {
-            return "Button";
-        }
-
         Widget* Button::createCloneInstance()
         {
             return Button::create();

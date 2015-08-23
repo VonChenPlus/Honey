@@ -663,11 +663,6 @@ namespace GRAPH
             _checkBoxEventCallback = callback;
         }
 
-        std::string CheckBox::getDescription() const
-        {
-            return "CheckBox";
-        }
-
         Widget* CheckBox::createCloneInstance()
         {
             return CheckBox::create();

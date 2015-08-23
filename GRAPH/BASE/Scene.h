@@ -45,7 +45,6 @@ namespace GRAPH
         static Scene *createWithSize(const MATH::Sizef& size);
 
         using Node::addChild;
-        virtual std::string getDescription() const override;
 
         /** Get all cameras.
          *

@@ -52,7 +52,6 @@ namespace GRAPH
             virtual void ignoreContentAdaptWithSize(bool ignore) override;
             virtual MATH::Sizef getVirtualRendererSize() const override;
             virtual Node* getVirtualRenderer() override;
-            virtual std::string getDescription() const override;
 
             Label* getTitleRenderer()const;
             void setTitleText(const std::string& text);

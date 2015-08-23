@@ -72,11 +72,6 @@ namespace GRAPH
         }
     }
 
-    std::string Scene::getDescription() const
-    {
-        return UTILS::STRING::StringFromFormat("<Scene | tag = %d>", _tag);
-    }
-
     void Scene::onProjectionChanged(EventCustom*)
     {
         if (_defaultCamera)

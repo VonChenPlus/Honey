@@ -1,5 +1,6 @@
-#include "HObject.h"
 #include <string.h>
+#include "HObject.h"
+#include "AutoreleasePool.h"
 
 HObject::HObject()
     : referenceCount_(1) {
@@ -20,6 +21,15 @@ void HObject::release() {
     if (referenceCount_ == 0) {
         delete this;
     }
+}
+
+HObject *HObject::autorelease() {
+    PoolManager::getInstance().getCurrentPool()->addObject(this);
+    return this;
+}
+
+uint32 HObject::getReferenceCount() const {
+    return referenceCount_;
 }
 
 HObjectArray::HObjectArray(int64 capacity) {

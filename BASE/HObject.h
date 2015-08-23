@@ -23,9 +23,9 @@ public:
 
     void retain();
     void release();
-    void autorelease();
+    HObject *autorelease();
 
-    uint32 getReferenceCount();
+    uint32 getReferenceCount() const;
 
 protected:
     HObject();

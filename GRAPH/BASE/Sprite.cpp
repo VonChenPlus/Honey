@@ -9,6 +9,7 @@
 #include "GRAPH/RENDERER/Renderer.h"
 #include "IO/FileUtils.h"
 #include "GRAPH/BASE/Macros.h"
+#include "UTILS/STRING/StringUtils.h"
 
 namespace GRAPH
 {
@@ -1248,6 +1249,107 @@ namespace GRAPH
                 _loadedFileNames->insert(plist);
             }
         }
+    }
+
+    void SpriteFrameCache::addSpriteFramesWithDictionary(ValueMap& dictionary, Texture2D* texture)
+    {
+        ValueMap& framesDict = dictionary["frames"].asValueMap();
+        int format = 0;
+
+        // get the format
+        if (dictionary.find("metadata") != dictionary.end())
+        {
+            ValueMap& metadataDict = dictionary["metadata"].asValueMap();
+            format = metadataDict["format"].asInt();
+        }
+
+        auto textureFileName = Director::getInstance()->getTextureCache()->getTextureFilePath(texture);
+        auto image = new IMAGE::SmartImage();
+        image->initWithImageFile(textureFileName);
+
+        for (auto iter = framesDict.begin(); iter != framesDict.end(); ++iter)
+        {
+            ValueMap& frameDict = iter->second.asValueMap();
+            std::string spriteFrameName = iter->first;
+            SpriteFrame* spriteFrame = _spriteFrames.at(spriteFrameName);
+            if (spriteFrame)
+            {
+                continue;
+            }
+
+            if (format == 0)
+            {
+                float x = frameDict["x"].asFloat();
+                float y = frameDict["y"].asFloat();
+                float w = frameDict["width"].asFloat();
+                float h = frameDict["height"].asFloat();
+                float ox = frameDict["offsetX"].asFloat();
+                float oy = frameDict["offsetY"].asFloat();
+                int ow = frameDict["originalWidth"].asInt();
+                int oh = frameDict["originalHeight"].asInt();
+
+                // abs ow/oh
+                ow = abs(ow);
+                oh = abs(oh);
+                // create frame
+                spriteFrame = SpriteFrame::createWithTexture(texture,
+                    MATH::Rectf(x, y, w, h),
+                    false,
+                    MATH::Vector2f(ox, oy),
+                    MATH::Sizef((float) ow, (float) oh)
+                    );
+            }
+            else if (format == 1 || format == 2)
+            {
+                MATH::Rectf frame = UTILS::STRING::RectFromString(frameDict["frame"].asString());
+                bool rotated = false;
+
+                // rotation
+                if (format == 2)
+                {
+                    rotated = frameDict["rotated"].asBool();
+                }
+
+                MATH::Vector2f offset = UTILS::STRING::PointFromString(frameDict["offset"].asString());
+                MATH::Sizef sourceSize = UTILS::STRING::SizeFromString(frameDict["sourceSize"].asString());
+
+                // create frame
+                spriteFrame = SpriteFrame::createWithTexture(texture,
+                    frame,
+                    rotated,
+                    offset,
+                    sourceSize
+                    );
+            }
+            else if (format == 3)
+            {
+                // get values
+                MATH::Sizef spriteSize = UTILS::STRING::SizeFromString(frameDict["spriteSize"].asString());
+                MATH::Vector2f spriteOffset = UTILS::STRING::PointFromString(frameDict["spriteOffset"].asString());
+                MATH::Sizef spriteSourceSize = UTILS::STRING::SizeFromString(frameDict["spriteSourceSize"].asString());
+                MATH::Rectf textureRect = UTILS::STRING::RectFromString(frameDict["textureRect"].asString());
+                bool textureRotated = frameDict["textureRotated"].asBool();
+
+                // get aliases
+                ValueVector& aliases = frameDict["aliases"].asValueVector();
+
+                for (const auto &value : aliases) {
+                    std::string oneAlias = value.asString();
+                    _spriteFramesAliases[oneAlias] = HValue(spriteFrameName);
+                }
+
+                // create frame
+                spriteFrame = SpriteFrame::createWithTexture(texture,
+                    MATH::Rectf(textureRect.origin.x, textureRect.origin.y, spriteSize.width, spriteSize.height),
+                    textureRotated,
+                    spriteOffset,
+                    spriteSourceSize);
+            }
+
+            // add sprite frame
+            _spriteFrames.insert(spriteFrameName, spriteFrame);
+        }
+        SAFE_DELETE(image);
     }
 
     bool SpriteFrameCache::isSpriteFramesWithFileLoaded(const std::string& plist) const

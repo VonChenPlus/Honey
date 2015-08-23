@@ -997,11 +997,6 @@ namespace GRAPH
             _doLayoutDirty = false;
         }
 
-        std::string Layout::getDescription() const
-        {
-            return "Layout";
-        }
-
         Widget* Layout::createCloneInstance()
         {
             return Layout::create();

@@ -552,12 +552,6 @@ namespace GRAPH
 
 
             /**
-             * Returns the string representation of widget class name
-             * @return get the class description.
-             */
-            virtual std::string getDescription() const override;
-
-            /**
              * Create a new widget copy of the original one.
              * @return A cloned widget copy of original.
              */

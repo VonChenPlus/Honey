@@ -1078,11 +1078,6 @@ namespace GRAPH
             return dynamic_cast<LayoutParameter*>(_layoutParameterDictionary.at((int)_layoutParameterType));
         }
 
-        std::string Widget::getDescription() const
-        {
-            return "Widget";
-        }
-
         Widget* Widget::clone()
         {
             Widget* clonedWidget = createCloneInstance();

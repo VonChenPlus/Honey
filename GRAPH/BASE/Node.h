@@ -71,8 +71,6 @@ namespace GRAPH
 
         static Node * create();
 
-        virtual std::string getDescription() const;
-
         virtual void setLocalZOrder(int localZOrder);
         virtual int getLocalZOrder() const { return _localZOrder; }
 
