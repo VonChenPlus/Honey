@@ -132,7 +132,7 @@ namespace GRAPH
         _touchListener(nullptr),
         _flippedX(false),
         _flippedY(false),
-        _layoutParameterType(LayoutParameter::Type::NONE),
+        _layoutParameterType(LayoutParameter::Type::TNONE),
         _focused(false),
         _focusEnabled(true),
         _touchEventListener(nullptr),

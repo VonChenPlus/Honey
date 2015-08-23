@@ -34,13 +34,13 @@ namespace GRAPH
         public:
             enum class Type
             {
-                NONE = 0,
-                LINEAR,
-                RELATIVE
+                TNONE = 0,
+                TLINEAR,
+                TRELATIVE
             };
             LayoutParameter() : _margin(Margin())
             {
-                _layoutParameterType = Type::NONE;
+                _layoutParameterType = Type::TNONE;
             }
 
             virtual ~LayoutParameter(){}
@@ -87,7 +87,7 @@ namespace GRAPH
             LinearLayoutParameter()
             : _linearGravity(LinearGravity::NONE)
             {
-                _layoutParameterType = Type::LINEAR;
+                _layoutParameterType = Type::TLINEAR;
             }
 
             virtual ~LinearLayoutParameter(){}
@@ -143,7 +143,7 @@ namespace GRAPH
             _relativeLayoutName(""),
             _put(false)
             {
-                _layoutParameterType = Type::RELATIVE;
+                _layoutParameterType = Type::TRELATIVE;
             }
 
             virtual ~RelativeLayoutParameter(){}
