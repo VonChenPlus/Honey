@@ -49,6 +49,7 @@ PoolManager &PoolManager::getInstance() {
 
 PoolManager::PoolManager() {
     releasePoolStack_.reserve(DEFAULTPOOLCOUNT);
+    new AutoreleasePool("default autorelease pool");
 }
 
 PoolManager::~PoolManager() {

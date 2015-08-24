@@ -64,6 +64,15 @@ namespace IO
             return true;
         }
 
+        bool isAbsolutePath(const std::string& path) const {
+            if ((path.length() > 2
+                && ((path[0] >= 'a' && path[0] <= 'z') || (path[0] >= 'A' && path[0] <= 'Z'))
+                && path[1] == ':') || (path[0] == '/' && path[1] == '/')) {
+                return true;
+            }
+            return false;
+        }
+
         bool isDirectoryExistInternal(const std::string& dirPath) const override {
             unsigned long fAttrib = GetFileAttributesW(UTF8ToWString(dirPath).c_str());
             if (fAttrib != INVALID_FILE_ATTRIBUTES &&

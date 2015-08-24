@@ -387,6 +387,7 @@ namespace GRAPH
             if (texture == nullptr)
             {
                 IMAGE::SmartImage* image = new (std::nothrow) IMAGE::SmartImage();
+                bool isOK = image->initWithRawData(cc_2x2_white_image, sizeof(cc_2x2_white_image), 2, 2, 8);
                 texture = Director::getInstance()->getTextureCache()->addImage(image, CC_2x2_WHITE_IMAGE_KEY);
                 SAFE_RELEASE(image);
             }
