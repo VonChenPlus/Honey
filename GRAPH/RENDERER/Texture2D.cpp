@@ -133,12 +133,12 @@ namespace GRAPH
             return false;
         }
 
-        if(_pixelFormatInfoTables.find(pixelFormat) == _pixelFormatInfoTables.end())
+        if (IMAGE::SmartImage::getPixelFormatInfoMap().find(pixelFormat) == IMAGE::SmartImage::getPixelFormatInfoMap().end())
         {
             return false;
         }
 
-        const IMAGE::PixelFormatInfo& info = _pixelFormatInfoTables.at(pixelFormat);
+        const IMAGE::PixelFormatInfo& info = IMAGE::SmartImage::getPixelFormatInfoMap().at(pixelFormat);
 
         if (info.compressed && !Configuration::getInstance()->supportsPVRTC()
                             && !Configuration::getInstance()->supportsETC()
@@ -237,7 +237,7 @@ namespace GRAPH
         if (_name)
         {
             bindTexture2D(_name);
-            const IMAGE::PixelFormatInfo& info = _pixelFormatInfoTables.at(_pixelFormat);
+            const IMAGE::PixelFormatInfo& info = IMAGE::SmartImage::getPixelFormatInfoMap().at(_pixelFormat);
             glTexSubImage2D(GL_TEXTURE_2D,0,offsetX,offsetY,width,height,info.format, info.type,data);
 
             return true;

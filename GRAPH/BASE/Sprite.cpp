@@ -13,6 +13,99 @@
 
 namespace GRAPH
 {
+    static unsigned short quadIndices [] = { 0, 1, 2, 3, 2, 1 };
+    const static float PRECISION = 10.0f;
+
+    PolygonInfo::PolygonInfo(const PolygonInfo& other) :
+        triangles(),
+        isVertsOwner(true),
+        rect()
+    {
+        filename = other.filename;
+        isVertsOwner = other.isVertsOwner;
+        rect = other.rect;
+        triangles.verts = new V3F_C4B_T2F[other.triangles.vertCount];
+        triangles.indices = new unsigned short[other.triangles.indexCount];
+        triangles.vertCount = other.triangles.vertCount;
+        triangles.indexCount = other.triangles.indexCount;
+        memcpy(triangles.verts, other.triangles.verts, other.triangles.vertCount*sizeof(V3F_C4B_T2F));
+        memcpy(triangles.indices, other.triangles.indices, other.triangles.indexCount*sizeof(unsigned short));
+    };
+
+    PolygonInfo& PolygonInfo::operator= (const PolygonInfo& other)
+    {
+        if (this != &other)
+        {
+            releaseVertsAndIndices();
+            filename = other.filename;
+            isVertsOwner = other.isVertsOwner;
+            rect = other.rect;
+            triangles.verts = new V3F_C4B_T2F[other.triangles.vertCount];
+            triangles.indices = new unsigned short[other.triangles.indexCount];
+            triangles.vertCount = other.triangles.vertCount;
+            triangles.indexCount = other.triangles.indexCount;
+            memcpy(triangles.verts, other.triangles.verts, other.triangles.vertCount*sizeof(V3F_C4B_T2F));
+            memcpy(triangles.indices, other.triangles.indices, other.triangles.indexCount*sizeof(unsigned short));
+        }
+        return *this;
+    }
+
+    PolygonInfo::~PolygonInfo()
+    {
+        releaseVertsAndIndices();
+    }
+
+    void PolygonInfo::setQuad(V3F_C4B_T2F_Quad *quad)
+    {
+        releaseVertsAndIndices();
+        isVertsOwner = false;
+        triangles.indices = quadIndices;
+        triangles.vertCount = 4;
+        triangles.indexCount = 6;
+        triangles.verts = (V3F_C4B_T2F*) quad;
+    }
+
+    void PolygonInfo::releaseVertsAndIndices()
+    {
+        if (isVertsOwner)
+        {
+            if (nullptr != triangles.verts)
+            {
+                SAFE_DELETE_ARRAY(triangles.verts);
+            }
+
+            if (nullptr != triangles.indices)
+            {
+                SAFE_DELETE_ARRAY(triangles.indices);
+            }
+        }
+    }
+
+    const unsigned int PolygonInfo::getVertCount() const
+    {
+        return (unsigned int) triangles.vertCount;
+    }
+
+    const unsigned int PolygonInfo::getTriaglesCount() const
+    {
+        return (unsigned int) triangles.indexCount / 3;
+    }
+
+    const float PolygonInfo::getArea() const
+    {
+        float area = 0;
+        V3F_C4B_T2F *verts = triangles.verts;
+        unsigned short *indices = triangles.indices;
+        for (int i = 0; i < triangles.indexCount; i += 3)
+        {
+            auto A = verts[indices[i]].vertices;
+            auto B = verts[indices[i + 1]].vertices;
+            auto C = verts[indices[i + 2]].vertices;
+            area += (A.x*(B.y - C.y) + B.x*(C.y - A.y) + C.x*(A.y - B.y)) / 2;
+        }
+        return area;
+    }
+
     // MARK: create, init, dealloc
     Sprite* Sprite::createWithTexture(Texture2D *texture)
     {
@@ -989,6 +1082,610 @@ namespace GRAPH
         _polyInfo = info;
     }
 
+    SpriteBatchNode* SpriteBatchNode::createWithTexture(Texture2D* tex, ssize_t capacity/* = DEFAULT_CAPACITY*/)
+    {
+        SpriteBatchNode *batchNode = new (std::nothrow) SpriteBatchNode();
+        batchNode->initWithTexture(tex, capacity);
+        batchNode->autorelease();
+
+        return batchNode;
+    }
+
+    /*
+    * creation with File Image
+    */
+
+    SpriteBatchNode* SpriteBatchNode::create(const std::string& fileImage, ssize_t capacity/* = DEFAULT_CAPACITY*/)
+    {
+        SpriteBatchNode *batchNode = new (std::nothrow) SpriteBatchNode();
+        batchNode->initWithFile(fileImage, capacity);
+        batchNode->autorelease();
+
+        return batchNode;
+    }
+
+    /*
+    * init with Texture2D
+    */
+    bool SpriteBatchNode::initWithTexture(Texture2D *tex, ssize_t capacity/* = DEFAULT_CAPACITY*/)
+    {
+        _blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
+        if (!tex->hasPremultipliedAlpha())
+        {
+            _blendFunc = BlendFunc::ALPHA_NON_PREMULTIPLIED;
+        }
+        _textureAtlas = new (std::nothrow) TextureAtlas();
+
+        if (capacity == 0)
+        {
+            capacity = DEFAULT_CAPACITY;
+        }
+
+        _textureAtlas->initWithTexture(tex, capacity);
+
+        updateBlendFunc();
+
+        _children.reserve(capacity);
+
+        _descendants.reserve(capacity);
+
+        setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR));
+        return true;
+    }
+
+    bool SpriteBatchNode::init()
+    {
+        Texture2D * texture = new (std::nothrow) Texture2D();
+        texture->autorelease();
+        return this->initWithTexture(texture, 0);
+    }
+
+    /*
+    * init with FileImage
+    */
+    bool SpriteBatchNode::initWithFile(const std::string& fileImage, ssize_t capacity/* = DEFAULT_CAPACITY*/)
+    {
+        Texture2D *texture2D = Director::getInstance()->getTextureCache()->addImage(fileImage);
+        return initWithTexture(texture2D, capacity);
+    }
+
+    SpriteBatchNode::SpriteBatchNode()
+        : _textureAtlas(nullptr)
+    {
+    }
+
+    SpriteBatchNode::~SpriteBatchNode()
+    {
+        SAFE_RELEASE(_textureAtlas);
+    }
+
+    // override visit
+    // don't call visit on it's children
+    void SpriteBatchNode::visit(Renderer *renderer, const MATH::Matrix4 &parentTransform, uint32_t parentFlags)
+    {
+        // CAREFUL:
+        // This visit is almost identical to CocosNode#visit
+        // with the exception that it doesn't call visit on it's children
+        //
+        // The alternative is to have a void Sprite#visit, but
+        // although this is less maintainable, is faster
+        //
+        if (!_visible)
+        {
+            return;
+        }
+
+        sortAllChildren();
+
+        uint32_t flags = processParentFlags(parentTransform, parentFlags);
+
+        if (isVisitableByVisitingCamera())
+        {
+            // IMPORTANT:
+            // To ease the migration to v3.0, we still support the Mat4 stack,
+            // but it is deprecated and your code should not rely on it
+            Director* director = Director::getInstance();
+            director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+            director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, _modelViewTransform);
+
+            draw(renderer, _modelViewTransform, flags);
+
+            director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+        }
+    }
+
+    void SpriteBatchNode::addChild(Node *child, int zOrder, int tag)
+    {
+        Sprite *sprite = static_cast<Sprite*>(child);
+
+        Node::addChild(child, zOrder, tag);
+
+        appendChild(sprite);
+    }
+
+    void SpriteBatchNode::addChild(Node * child, int zOrder, const std::string &name)
+    {
+        Sprite *sprite = static_cast<Sprite*>(child);
+
+        Node::addChild(child, zOrder, name);
+
+        appendChild(sprite);
+    }
+
+    // override reorderChild
+    void SpriteBatchNode::reorderChild(Node *child, int zOrder)
+    {
+        if (zOrder == child->getLocalZOrder())
+        {
+            return;
+        }
+
+        //set the z-order and sort later
+        Node::reorderChild(child, zOrder);
+    }
+
+    // override remove child
+    void SpriteBatchNode::removeChild(Node *child, bool cleanup)
+    {
+        Sprite *sprite = static_cast<Sprite*>(child);
+
+        // explicit null handling
+        if (sprite == nullptr)
+        {
+            return;
+        }
+
+        // cleanup before removing
+        removeSpriteFromAtlas(sprite);
+
+        Node::removeChild(sprite, cleanup);
+    }
+
+    void SpriteBatchNode::removeChildAtIndex(ssize_t index, bool doCleanup)
+    {
+        removeChild(_children.at(index), doCleanup);
+    }
+
+    void SpriteBatchNode::removeAllChildrenWithCleanup(bool doCleanup)
+    {
+        // Invalidate atlas index. issue #569
+        // useSelfRender should be performed on all descendants. issue #1216
+        for (const auto &sprite : _descendants) {
+            sprite->setBatchNode(nullptr);
+        }
+
+        Node::removeAllChildrenWithCleanup(doCleanup);
+
+        _descendants.clear();
+        _textureAtlas->removeAllQuads();
+    }
+
+    //override sortAllChildren
+    void SpriteBatchNode::sortAllChildren()
+    {
+        if (_reorderChildDirty)
+        {
+            std::sort(std::begin(_children), std::end(_children), nodeComparisonLess);
+
+            //sorted now check all children
+            if (!_children.empty())
+            {
+                //first sort all children recursively based on zOrder
+                for (const auto &child : _children) {
+                    child->sortAllChildren();
+                }
+
+                ssize_t index = 0;
+
+                //fast dispatch, give every child a new atlasIndex based on their relative zOrder (keep parent -> child relations intact)
+                // and at the same time reorder descendants and the quads to the right index
+                for (const auto &child : _children) {
+                    Sprite* sp = static_cast<Sprite*>(child);
+                    updateAtlasIndex(sp, &index);
+                }
+            }
+
+            _reorderChildDirty = false;
+        }
+    }
+
+    void SpriteBatchNode::updateAtlasIndex(Sprite* sprite, ssize_t* curIndex)
+    {
+        auto& array = sprite->getChildren();
+        auto count = array.size();
+
+        ssize_t oldIndex = 0;
+
+        if (count == 0)
+        {
+            oldIndex = sprite->getAtlasIndex();
+            sprite->setAtlasIndex(*curIndex);
+            if (oldIndex != *curIndex){
+                swap(oldIndex, *curIndex);
+            }
+            (*curIndex)++;
+        }
+        else
+        {
+            bool needNewIndex = true;
+
+            if (array.at(0)->getLocalZOrder() >= 0)
+            {
+                //all children are in front of the parent
+                oldIndex = sprite->getAtlasIndex();
+                sprite->setAtlasIndex(*curIndex);
+                if (oldIndex != *curIndex)
+                {
+                    swap(oldIndex, *curIndex);
+                }
+                (*curIndex)++;
+
+                needNewIndex = false;
+            }
+
+            for (const auto &child : array) {
+                Sprite* sp = static_cast<Sprite*>(child);
+                if (needNewIndex && sp->getLocalZOrder() >= 0)
+                {
+                    oldIndex = sprite->getAtlasIndex();
+                    sprite->setAtlasIndex(*curIndex);
+                    if (oldIndex != *curIndex) {
+                        this->swap(oldIndex, *curIndex);
+                    }
+                    (*curIndex)++;
+                    needNewIndex = false;
+                }
+
+                updateAtlasIndex(sp, curIndex);
+            }
+
+            if (needNewIndex)
+            {//all children have a zOrder < 0)
+                oldIndex = sprite->getAtlasIndex();
+                sprite->setAtlasIndex(*curIndex);
+                if (oldIndex != *curIndex) {
+                    swap(oldIndex, *curIndex);
+                }
+                (*curIndex)++;
+            }
+        }
+    }
+
+    void SpriteBatchNode::swap(ssize_t oldIndex, ssize_t newIndex)
+    {
+        V3F_C4B_T2F_Quad* quads = _textureAtlas->getQuads();
+        std::swap(quads[oldIndex], quads[newIndex]);
+
+        //update the index of other swapped item
+
+        auto oldIt = std::next(_descendants.begin(), oldIndex);
+        auto newIt = std::next(_descendants.begin(), newIndex);
+
+        (*newIt)->setAtlasIndex(oldIndex);
+        //    (*oldIt)->setAtlasIndex(newIndex);
+
+        std::swap(*oldIt, *newIt);
+    }
+
+    void SpriteBatchNode::reorderBatch(bool reorder)
+    {
+        _reorderChildDirty = reorder;
+    }
+
+    void SpriteBatchNode::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags)
+    {
+        // Optimization: Fast Dispatch
+        if (_textureAtlas->getTotalQuads() == 0)
+        {
+            return;
+        }
+
+        for (const auto &child : _children)
+        {
+#if CC_USE_PHYSICS
+            auto physicsBody = child->getPhysicsBody();
+            if (physicsBody)
+            {
+                child->updateTransformFromPhysics(transform, flags);
+            }
+#endif
+            child->updateTransform();
+        }
+
+        _batchCommand.init(_globalZOrder, getGLProgram(), _blendFunc, _textureAtlas, transform, flags);
+        renderer->addCommand(&_batchCommand);
+    }
+
+    void SpriteBatchNode::increaseAtlasCapacity()
+    {
+        // if we're going beyond the current TextureAtlas's capacity,
+        // all the previously initialized sprites will need to redo their texture coords
+        // this is likely computationally expensive
+        ssize_t quantity = (_textureAtlas->getCapacity() + 1) * 4 / 3;
+
+        if (!_textureAtlas->resizeCapacity(quantity))
+        {
+        }
+    }
+
+    ssize_t SpriteBatchNode::rebuildIndexInOrder(Sprite *parent, ssize_t index)
+    {
+        auto& children = parent->getChildren();
+        for (const auto &child : children) {
+            Sprite* sp = static_cast<Sprite*>(child);
+            if (sp && (sp->getLocalZOrder() < 0))
+            {
+                index = rebuildIndexInOrder(sp, index);
+            }
+        }
+
+        // ignore self (batch node)
+        if (parent != static_cast<HObject*>(this))
+        {
+            parent->setAtlasIndex(index);
+            index++;
+        }
+
+        for (const auto &child : children) {
+            Sprite* sp = static_cast<Sprite*>(child);
+            if (sp && (sp->getLocalZOrder() >= 0))
+            {
+                index = rebuildIndexInOrder(sp, index);
+            }
+        }
+
+        return index;
+    }
+
+    ssize_t SpriteBatchNode::highestAtlasIndexInChild(Sprite *sprite)
+    {
+        auto& children = sprite->getChildren();
+
+        if (children.size() == 0)
+        {
+            return sprite->getAtlasIndex();
+        }
+        else
+        {
+            return highestAtlasIndexInChild(static_cast<Sprite*>(children.back()));
+        }
+    }
+
+    ssize_t SpriteBatchNode::lowestAtlasIndexInChild(Sprite *sprite)
+    {
+        auto& children = sprite->getChildren();
+
+        if (children.size() == 0)
+        {
+            return sprite->getAtlasIndex();
+        }
+        else
+        {
+            return lowestAtlasIndexInChild(static_cast<Sprite*>(children.at(0)));
+        }
+    }
+
+    ssize_t SpriteBatchNode::atlasIndexForChild(Sprite *sprite, int nZ)
+    {
+        auto& siblings = sprite->getParent()->getChildren();
+        auto childIndex = siblings.getIndex(sprite);
+
+        // ignore parent Z if parent is spriteSheet
+        bool ignoreParent = (SpriteBatchNode*) (sprite->getParent()) == this;
+        Sprite *prev = nullptr;
+        if (childIndex > 0 && childIndex != -1)
+        {
+            prev = static_cast<Sprite*>(siblings.at(childIndex - 1));
+        }
+
+        // first child of the sprite sheet
+        if (ignoreParent)
+        {
+            if (childIndex == 0)
+            {
+                return 0;
+            }
+
+            return highestAtlasIndexInChild(prev) + 1;
+        }
+
+        // parent is a Sprite, so, it must be taken into account
+
+        // first child of an Sprite ?
+        if (childIndex == 0)
+        {
+            Sprite *p = static_cast<Sprite*>(sprite->getParent());
+
+            // less than parent and brothers
+            if (nZ < 0)
+            {
+                return p->getAtlasIndex();
+            }
+            else
+            {
+                return p->getAtlasIndex() + 1;
+            }
+        }
+        else
+        {
+            // previous & sprite belong to the same branch
+            if ((prev->getLocalZOrder() < 0 && nZ < 0) || (prev->getLocalZOrder() >= 0 && nZ >= 0))
+            {
+                return highestAtlasIndexInChild(prev) + 1;
+            }
+
+            // else (previous < 0 and sprite >= 0 )
+            Sprite *p = static_cast<Sprite*>(sprite->getParent());
+            return p->getAtlasIndex() + 1;
+        }
+
+        return 0;
+    }
+
+    // addChild helper, faster than insertChild
+    void SpriteBatchNode::appendChild(Sprite* sprite)
+    {
+        _reorderChildDirty = true;
+        sprite->setBatchNode(this);
+        sprite->setDirty(true);
+
+        if (_textureAtlas->getTotalQuads() == _textureAtlas->getCapacity()) {
+            increaseAtlasCapacity();
+        }
+
+        _descendants.push_back(sprite);
+        int index = static_cast<int>(_descendants.size() - 1);
+
+        sprite->setAtlasIndex(index);
+
+        V3F_C4B_T2F_Quad quad = sprite->getQuad();
+        _textureAtlas->insertQuad(&quad, index);
+
+        // add children recursively
+        auto& children = sprite->getChildren();
+        for (const auto &child : children) {
+            appendChild(static_cast<Sprite*>(child));
+        }
+    }
+
+    void SpriteBatchNode::removeSpriteFromAtlas(Sprite *sprite)
+    {
+        // remove from TextureAtlas
+        _textureAtlas->removeQuadAtIndex(sprite->getAtlasIndex());
+
+        // Cleanup sprite. It might be reused (issue #569)
+        sprite->setBatchNode(nullptr);
+
+        auto it = std::find(_descendants.begin(), _descendants.end(), sprite);
+        if (it != _descendants.end())
+        {
+            auto next = std::next(it);
+
+            Sprite *spr = nullptr;
+            for (; next != _descendants.end(); ++next) {
+                spr = *next;
+                spr->setAtlasIndex(spr->getAtlasIndex() - 1);
+            }
+
+            _descendants.erase(it);
+        }
+
+        // remove children recursively
+        auto& children = sprite->getChildren();
+        for (const auto &obj : children) {
+            Sprite* child = static_cast<Sprite*>(obj);
+            if (child)
+            {
+                removeSpriteFromAtlas(child);
+            }
+        }
+    }
+
+    void SpriteBatchNode::updateBlendFunc()
+    {
+        if (!_textureAtlas->getTexture()->hasPremultipliedAlpha())
+        {
+            _blendFunc = BlendFunc::ALPHA_NON_PREMULTIPLIED;
+            setOpacityModifyRGB(false);
+        }
+        else
+        {
+            _blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
+            setOpacityModifyRGB(true);
+        }
+    }
+
+    // CocosNodeTexture protocol
+    void SpriteBatchNode::setBlendFunc(const BlendFunc &blendFunc)
+    {
+        _blendFunc = blendFunc;
+    }
+
+    const BlendFunc& SpriteBatchNode::getBlendFunc() const
+    {
+        return _blendFunc;
+    }
+
+    Texture2D* SpriteBatchNode::getTexture() const
+    {
+        return _textureAtlas->getTexture();
+    }
+
+    void SpriteBatchNode::setTexture(Texture2D *texture)
+    {
+        _textureAtlas->setTexture(texture);
+        updateBlendFunc();
+    }
+
+    // SpriteSheet Extension
+    //implementation SpriteSheet (TMXTiledMapExtension)
+
+    void SpriteBatchNode::insertQuadFromSprite(Sprite *sprite, ssize_t index)
+    {
+        // make needed room
+        while (index >= _textureAtlas->getCapacity() || _textureAtlas->getCapacity() == _textureAtlas->getTotalQuads())
+        {
+            this->increaseAtlasCapacity();
+        }
+        //
+        // update the quad directly. Don't add the sprite to the scene graph
+        //
+        sprite->setBatchNode(this);
+        sprite->setAtlasIndex(index);
+
+        V3F_C4B_T2F_Quad quad = sprite->getQuad();
+        _textureAtlas->insertQuad(&quad, index);
+
+        // FIXME:: updateTransform will update the textureAtlas too, using updateQuad.
+        // FIXME:: so, it should be AFTER the insertQuad
+        sprite->setDirty(true);
+        sprite->updateTransform();
+    }
+
+    void SpriteBatchNode::updateQuadFromSprite(Sprite *sprite, ssize_t index)
+    {
+        // make needed room
+        while (index >= _textureAtlas->getCapacity() || _textureAtlas->getCapacity() == _textureAtlas->getTotalQuads())
+        {
+            this->increaseAtlasCapacity();
+        }
+
+        //
+        // update the quad directly. Don't add the sprite to the scene graph
+        //
+        sprite->setBatchNode(this);
+        sprite->setAtlasIndex(index);
+
+        sprite->setDirty(true);
+
+        // UpdateTransform updates the textureAtlas quad
+        sprite->updateTransform();
+    }
+
+    SpriteBatchNode * SpriteBatchNode::addSpriteWithoutQuad(Sprite*child, int z, int aTag)
+    {
+        // quad index is Z
+        child->setAtlasIndex(z);
+
+        // FIXME:: optimize with a binary search
+        auto it = _descendants.begin();
+        for (; it != _descendants.end(); ++it)
+        {
+            if ((*it)->getAtlasIndex() >= z)
+                break;
+        }
+
+        _descendants.insert(it, child);
+
+        // IMPORTANT: Call super, and not self. Avoid adding it to the texture atlas array
+        Node::addChild(child, z, aTag);
+
+        //#issue 1262 don't use lazy sorting, tiles are added as quads not as sprites, so sprites need to be added in order
+        reorderBatch(false);
+
+        return this;
+    }
+
     SpriteFrame* SpriteFrame::create(const std::string& filename, const MATH::Rectf& rect)
     {
         SpriteFrame *spriteFrame = new (std::nothrow) SpriteFrame();
@@ -1387,7 +2084,6 @@ namespace GRAPH
             if( spriteFrame->getReferenceCount() == 1 )
             {
                 toRemoveFrames.push_back(iter->first);
-                spriteFrame->getTexture()->removeSpriteFrameCapInset(spriteFrame);
                 removed = true;
             }
         }

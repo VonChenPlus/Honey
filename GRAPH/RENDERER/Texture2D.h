@@ -265,8 +265,6 @@ namespace GRAPH
         /** Get a shader program from the texture.*/
         GLProgram* getGLProgram() const;
 
-        void removeSpriteFrameCapInset(SpriteFrame* spriteFrame);
-
     private:
         /**
          * Whether the texture contains a 9-patch capInset info or not.

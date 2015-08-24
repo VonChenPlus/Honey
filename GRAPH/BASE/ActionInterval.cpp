@@ -206,6 +206,12 @@ namespace GRAPH
         return true;
     }
 
+    Sequence::~Sequence(void)
+    {
+        SAFE_RELEASE(_actions[0]);
+        SAFE_RELEASE(_actions[1]);
+    }
+
     void Sequence::startWithTarget(Node *target)
     {
         ActionInterval::startWithTarget(target);
