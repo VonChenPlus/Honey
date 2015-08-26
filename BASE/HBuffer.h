@@ -6,6 +6,17 @@
 
 #include "BASE/Honey.h"
 
+template <typename T>
+inline T swap(T *value) {
+    switch (sizeof(T)) {
+    case 2: return (T)swap16((uint8 *)value);
+    case 4: return (T)swap32((uint8 *)value);
+    case 8: return (T)swap64((uint8 *)value);
+    default:
+        throw _HException_Normal("Unhander data bits!");
+    }
+}
+
 // Acts as a queue. Intended to be as fast as possible for most uses.
 // Does not do synchronization, must use external mutexes.
 class HBuffer
