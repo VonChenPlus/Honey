@@ -14,17 +14,6 @@ namespace UTILS
 {
     namespace STRING
     {
-        #ifdef _MSC_VER
-            #pragma warning (disable:4996)
-            #ifndef strncasecmp
-                #define strncasecmp _strnicmp
-            #endif
-
-            #ifndef strcasecmp
-                #define strcasecmp _strcmpi
-            #endif
-        #endif
-
         // Other simple string utilities.
         bool StartsWith(const std::string &str, const std::string &what);
         bool EndsWith(const std::string &str, const std::string &what);
