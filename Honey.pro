@@ -13,13 +13,10 @@ INCLUDEPATH += $$P
 
 SOURCES += \
     $$P/BASE/*.cpp \
-    $$P/GRAPH/BASE/*.cpp \
-    $$P/GRAPH/RENDERER/*.cpp \
-    $$P/GRAPH/RENDERER/SHADER/*.* \
+    $$P/GRAPH/BASE/Color.cpp \
     $$P/GRAPH/GFX/*.cpp \
     $$P/GRAPH/THIN3D/*.cpp \
     $$P/GRAPH/UI/*.cpp \
-    $$P/GRAPH/UI/BASE/*.cpp \
     $$P/GRAPH/UI/CONTROLS/*.cpp \
     $$P/IMAGE/*.cpp \
     $$P/MATH/*.cpp \
@@ -31,12 +28,10 @@ SOURCES += \
 
 HEADERS += \
     $$P/BASE/*.h \
-    $$P/GRAPH/BASE/*.h \
-    $$P/GRAPH/RENDERER/*.h \
+    $$P/GRAPH/BASE/Color.h \
     $$P/GRAPH/GFX/*.h \
     $$P/GRAPH/THIN3D/*.h \
     $$P/GRAPH/UI/*.h \
-    $$P/GRAPH/UI/BASE/*.h \
     $$P/GRAPH/UI/CONTROLS/*.h \
     $$P/IMAGE/*.h \
     $$P/MATH/*.h \
@@ -79,15 +74,3 @@ HEADERS += $$P/EXTERNALS/d3des/*.h
 #tinyxml2
 SOURCES += $$P/EXTERNALS/tinyxml2/*.cpp
 HEADERS += $$P/EXTERNALS/tinyxml2/*.h
-
-#freetype2
-HEADERS += $$P/EXTERNALS/freetype2/include/*.h
-INCLUDEPATH += $$P/EXTERNALS/freetype2/include
-
-#edtaa3func
-SOURCES += $$P/EXTERNALS/edtaa3func/*.cpp
-HEADERS += $$P/EXTERNALS/edtaa3func/*.h
-
-#glfw
-HEADERS += $$P/EXTERNALS/glfw/include/*.h
-INCLUDEPATH += $$P/EXTERNALS/glfw/include

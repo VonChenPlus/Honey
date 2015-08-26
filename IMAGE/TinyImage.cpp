@@ -1,4 +1,4 @@
-#include "IMAGE/SmartImage.h"
+#include "IMAGE/TinyImage.h"
 
 #include <string.h>
 
@@ -535,7 +535,7 @@ namespace IMAGE
     const PixelFormatInfoMap _pixelFormatInfoTables(TexturePixelFormatInfoTablesValue,
                                                                          TexturePixelFormatInfoTablesValue + sizeof(TexturePixelFormatInfoTablesValue) / sizeof(TexturePixelFormatInfoTablesValue[0]));
 
-    SmartImage::SmartImage()
+    TinyImage::TinyImage()
         : data_(nullptr)
         , dataLen_(0)
         , width_(0)
@@ -546,11 +546,11 @@ namespace IMAGE
 
     }
 
-    SmartImage::~SmartImage() {
+    TinyImage::~TinyImage() {
         SAFE_FREE(data_);
     }
 
-    bool SmartImage::initWithImageFile(const std::string& path) {
+    bool TinyImage::initWithImageFile(const std::string& path) {
         bool ret = false;
         filePath_ = IO::FileUtils::getInstance().fullPathForFilename(path);
 
@@ -563,7 +563,7 @@ namespace IMAGE
         return ret;
     }
 
-    bool SmartImage::initWithImageFileThreadSafe(const std::string& fullpath) {
+    bool TinyImage::initWithImageFileThreadSafe(const std::string& fullpath) {
         bool ret = false;
         filePath_ = fullpath;
 
@@ -576,7 +576,7 @@ namespace IMAGE
         return ret;
     }
 
-    bool SmartImage::initWithImageData(const unsigned char *data, ssize_t dataLen) {
+    bool TinyImage::initWithImageData(const unsigned char *data, ssize_t dataLen) {
         bool ret = false;
 
         do {
@@ -613,7 +613,7 @@ namespace IMAGE
         return ret;
     }
 
-    bool SmartImage::isPng(const unsigned char *data, ssize_t dataLen) {
+    bool TinyImage::isPng(const unsigned char *data, ssize_t dataLen) {
         if (dataLen <= 8) {
             return false;
         }
@@ -623,11 +623,11 @@ namespace IMAGE
         return memcmp(PNG_SIGNATURE, data, sizeof(PNG_SIGNATURE)) == 0;
     }
 
-    bool SmartImage::isEtc(const unsigned char * data, ssize_t) {
+    bool TinyImage::isEtc(const unsigned char * data, ssize_t) {
         return etc1_pkm_is_valid((etc1_byte*)data) ? true : false;
     }
 
-    bool SmartImage::isJpg(const unsigned char * data, ssize_t dataLen) {
+    bool TinyImage::isJpg(const unsigned char * data, ssize_t dataLen) {
         if (dataLen <= 4) {
             return false;
         }
@@ -637,7 +637,7 @@ namespace IMAGE
         return memcmp(data, JPG_SOI, 2) == 0;
     }
 
-    SmartImage::Format SmartImage::detectFormat(const unsigned char * data, ssize_t dataLen) {
+    TinyImage::Format TinyImage::detectFormat(const unsigned char * data, ssize_t dataLen) {
         if (isPng(data, dataLen)) {
             return Format::PNG;
         }
@@ -652,19 +652,19 @@ namespace IMAGE
         }
     }
 
-    int SmartImage::getBitPerPixel() {
+    int TinyImage::getBitPerPixel() {
         return getPixelFormatInfoMap().at(renderFormat_).bpp;
     }
 
-    bool SmartImage::hasAlpha() {
+    bool TinyImage::hasAlpha() {
         return getPixelFormatInfoMap().at(renderFormat_).alpha;
     }
 
-    bool SmartImage::isCompressed() {
+    bool TinyImage::isCompressed() {
         return getPixelFormatInfoMap().at(renderFormat_).compressed;
     }
 
-    bool SmartImage::initWithJpgData(const unsigned char * data, ssize_t dataLen) {
+    bool TinyImage::initWithJpgData(const unsigned char * data, ssize_t dataLen) {
         int actual_components = 0;
         data_ = (unsigned char*)jpgd::decompress_jpeg_image_from_memory((const unsigned char*)data, (int)dataLen, &width_, &height_, &actual_components, 4);
         renderFormat_ = PixelFormat::RGB888;
@@ -672,7 +672,7 @@ namespace IMAGE
         return true;
     }
 
-    bool SmartImage::initWithPngData(const unsigned char *data, ssize_t dataLen) {
+    bool TinyImage::initWithPngData(const unsigned char *data, ssize_t dataLen) {
         int color_type;
         PNGLoadPtr((const unsigned char*)data, dataLen, &width_, &height_, &color_type, (unsigned char**)&data_, (int *)&dataLen_);
 
@@ -705,7 +705,7 @@ namespace IMAGE
         return true;
     }
 
-    bool SmartImage::initWithETCData(const unsigned char * data, ssize_t) {
+    bool TinyImage::initWithETCData(const unsigned char * data, ssize_t) {
         const etc1_byte* header = static_cast<const etc1_byte*>(data);
 
         //check the data
@@ -739,7 +739,7 @@ namespace IMAGE
         return true;
     }
 
-    bool SmartImage::initWithRawData(const unsigned char * data, ssize_t, int width, int height, int, bool preMulti) {
+    bool TinyImage::initWithRawData(const unsigned char * data, ssize_t, int width, int height, int, bool preMulti) {
         bool ret = false;
         do
         {
@@ -763,7 +763,7 @@ namespace IMAGE
         return ret;
     }
 
-    void SmartImage::premultipliedAlpha() {
+    void TinyImage::premultipliedAlpha() {
         unsigned int* fourBytes = (unsigned int*)data_;
         for(int i = 0; i < width_ * height_; i++) {
             unsigned char* p = data_ + i * 4;
@@ -773,11 +773,11 @@ namespace IMAGE
         hasPremultipliedAlpha_ = true;
     }
 
-    void SmartImage::setPVRImagesHavePremultipliedAlpha(bool haveAlphaPremultiplied) {
+    void TinyImage::setPVRImagesHavePremultipliedAlpha(bool haveAlphaPremultiplied) {
         _PVRHaveAlphaPremultiplied = haveAlphaPremultiplied;
     }
 
-    const PixelFormatInfoMap& SmartImage::getPixelFormatInfoMap() {
+    const PixelFormatInfoMap& TinyImage::getPixelFormatInfoMap() {
         return _pixelFormatInfoTables;
     }
 }

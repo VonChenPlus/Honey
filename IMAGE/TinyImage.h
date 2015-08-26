@@ -1,5 +1,5 @@
-#ifndef SMARTIMAGE_H
-#define SMARTIMAGE_H
+#ifndef TinyImage_H
+#define TinyImage_H
 
 #include <map>
 #include "BASE/HObject.h"
@@ -131,11 +131,11 @@ namespace IMAGE
         PixelFormatInfoMapValue(PixelFormat::AI88, PixelFormatInfo(GL_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, 16, false, true)),
     };
 
-    class SmartImage : public HObject
+    class TinyImage : public HObject
     {
     public:
-        SmartImage();
-        virtual ~SmartImage();
+        TinyImage();
+        virtual ~TinyImage();
 
         enum class Format
         {
@@ -187,8 +187,8 @@ namespace IMAGE
 
     protected:
         // noncopyable
-        SmartImage(const SmartImage&    rImg);
-        SmartImage & operator=(const SmartImage&);
+        TinyImage(const TinyImage&    rImg);
+        TinyImage & operator=(const TinyImage&);
 
         Format detectFormat(const unsigned char * data, ssize_t dataLen);
         bool isPng(const unsigned char * data, ssize_t dataLen);
@@ -197,4 +197,4 @@ namespace IMAGE
     };
 }
 
-#endif // SMARTIMAGE_H
+#endif // TinyImage_H
