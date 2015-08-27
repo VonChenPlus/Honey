@@ -9,11 +9,11 @@
 
 namespace GFX
 {
-    class Texture : public GfxResourceHolder
+    class Texture2D : public GfxResourceHolder
     {
     public:
-        Texture();
-        ~Texture();
+        Texture2D();
+        ~Texture2D();
 
         // Deduces format from the filename.
         // If loading fails, will load a 256x256 XOR texture.

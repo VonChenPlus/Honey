@@ -1,5 +1,5 @@
-#ifndef TinyImage_H
-#define TinyImage_H
+#ifndef TINYIMAGE_H
+#define TINYIMAGE_H
 
 #include <map>
 #include "BASE/HObject.h"
@@ -197,4 +197,4 @@ namespace IMAGE
     };
 }
 
-#endif // TinyImage_H
+#endif // TINYIMAGE_H
