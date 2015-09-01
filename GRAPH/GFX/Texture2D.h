@@ -48,8 +48,6 @@ namespace GFX
         unsigned int id_;
         int width_, height_;
     };
-
-    typedef int ImageID;
 }
 
 #endif // TEXTURE_H

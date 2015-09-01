@@ -4,7 +4,6 @@
 #include "MATH/Matrix.h"
 #include "MATH/Bounds.h"
 #include "GRAPH/THIN3D/Thin3D.h"
-#include "GRAPH/GFX/Texture2D.h"
 #include "GRAPH/GFX/Atlas.h"
 #include "GRAPH/Color.h"
 

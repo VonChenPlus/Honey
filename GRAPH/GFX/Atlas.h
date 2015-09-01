@@ -3,6 +3,8 @@
 
 namespace GFX
 {
+    typedef int ImageID;
+
     struct AtlasChar
     {
         // texcoords
