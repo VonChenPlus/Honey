@@ -2,7 +2,7 @@
 #define BUTTON_H
 
 #include "GRAPH/UI/CONTROLS/Clickable.h"
-#include "GRAPH/GFX/Texture.h"
+#include "GRAPH/GFX/Texture2D.h"
 
 namespace UI
 {

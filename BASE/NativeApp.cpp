@@ -109,7 +109,7 @@ void NativeInitGraphics()
     GLOBAL::_UIState = make_shared<UIState>();
     GLOBAL::_UIStatesaved = make_shared<UIState>();
     GLOBAL::_Thin3D = shared_ptr<Thin3DContext>(T3DCreateGLContext());
-    GLOBAL::screenManager().setThin3DContext(&GLOBAL::thin3DContext());
+    //GLOBAL::screenManager().setThin3DContext(&GLOBAL::thin3DContext());
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

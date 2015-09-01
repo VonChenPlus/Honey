@@ -1,4 +1,4 @@
-#include "Texture.h"
+#include "Texture2D.h"
 
 #include <cmath>
 
@@ -32,24 +32,24 @@ namespace GLOBAL
 
 namespace GFX
 {
-    Texture::Texture() : id_(0) {
+    Texture2D::Texture2D() : id_(0) {
         CheckGLExtensions();
         register_gl_resource_holder(this);
     }
 
-    Texture::~Texture() {
+    Texture2D::~Texture2D() {
         unregister_gl_resource_holder(this);
         destroy();
     }
 
-    void Texture::destroy() {
+    void Texture2D::destroy() {
         if (id_) {
             glDeleteTextures(1, &id_);
             id_ = 0;
         }
     }
 
-    void Texture::glLost() {
+    void Texture2D::glLost() {
         if (!filename_.empty())
         {
             load(filename_.c_str());
@@ -126,7 +126,7 @@ namespace GFX
         return data;
     }
 
-    void Texture::load(const char *filename) {
+    void Texture2D::load(const char *filename) {
         // hook for generated textures
         if (!memcmp(filename, "gen:", 4)) {
             int bpp, w, h;
@@ -194,7 +194,7 @@ namespace GFX
         }
     }
 
-    void Texture::loadPNG(const char *filename, bool genMips) {
+    void Texture2D::loadPNG(const char *filename, bool genMips) {
         unsigned char *image_data;
         int color, datalen;
         PNGLoad(filename, &width_, &height_, &color, &image_data, &datalen);
@@ -216,7 +216,7 @@ namespace GFX
         free(image_data);
     }
 
-    void Texture::loadJPEG(const char *filename, bool genMips) {
+    void Texture2D::loadJPEG(const char *filename, bool genMips) {
         //ILOG("Loading jpeg %s", filename);
         unsigned char *image_data;
         int actual_comps;
@@ -242,7 +242,7 @@ namespace GFX
         free(image_data);
     }
 
-    void Texture::loadPNG(const uint8 *data, size_t size, bool genMips) {
+    void Texture2D::loadPNG(const uint8 *data, size_t size, bool genMips) {
         unsigned char *image_data;
         int color, datalen;
         PNGLoadPtr(data, size, &width_, &height_, &color, &image_data, &datalen);
@@ -264,7 +264,7 @@ namespace GFX
         free(image_data);
     }
 
-    void Texture::loadXOR() {
+    void Texture2D::loadXOR() {
         width_ = height_ = 256;
         unsigned char *buf = new unsigned char[width_*height_*4];
         for (int y = 0; y < 256; y++) {
@@ -304,7 +304,7 @@ namespace GFX
         return rgba;
     }
 
-    void Texture::loadZIM(const char *filename) {
+    void Texture2D::loadZIM(const char *filename) {
         uint8 *image_data[ZIM_MAX_MIP_LEVELS];
         int width[ZIM_MAX_MIP_LEVELS];
         int height[ZIM_MAX_MIP_LEVELS];
@@ -381,7 +381,7 @@ namespace GFX
         free(image_data[0]);
     }
 
-    void Texture::bind(int stage) {
+    void Texture2D::bind(int stage) {
         GL_CHECK();
         if (stage != -1)
             glActiveTexture(GL_TEXTURE0 + stage);
@@ -389,7 +389,7 @@ namespace GFX
         GL_CHECK();
     }
 
-    void Texture::unBind(int stage) {
+    void Texture2D::unBind(int stage) {
         GL_CHECK();
         if (stage != -1)
             glActiveTexture(GL_TEXTURE0 + stage);
