@@ -2,7 +2,7 @@
 #define TYPES_H
 
 #include "MATH/Vector.h"
-#include "GRAPH/BASE/Color.h"
+#include "GRAPH/Color.h"
 #include "GRAPH/RENDERER/GLCommon.h"
 
 namespace GRAPH
