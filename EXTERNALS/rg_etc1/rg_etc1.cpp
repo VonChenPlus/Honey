@@ -1940,7 +1940,7 @@ done:
 
    // Packs solid color blocks efficiently using a set of small precomputed tables.
    // For random 888 inputs, MSE results are better than Erricson's ETC1 packer in "slow" mode ~9.5% of the time, is slightly worse only ~.01% of the time, and is equal the rest of the time.
-   static uint64 pack_etc1_block_solid_color(etc1_block& block, const uint8* pColor, etc1_pack_params& pack_params)
+   static uint64 pack_etc1_block_solid_color(etc1_block& block, const uint8* pColor, etc1_pack_params&)
    {
       // pack_params;
       RG_ETC1_ASSERT(g_etc1_inverse_lookup[0][255]);
@@ -2028,7 +2028,7 @@ found_perfect_match:
    static uint pack_etc1_block_solid_color_constrained(
       etc1_optimizer::results& results, 
       uint num_colors, const uint8* pColor, 
-      etc1_pack_params& pack_params, 
+      etc1_pack_params& ,
       bool use_diff,
       const color_quad_u8* pBase_color5_unscaled)
    {

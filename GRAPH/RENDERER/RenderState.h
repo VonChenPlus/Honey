@@ -159,7 +159,7 @@ namespace GRAPH
     public:
         StateBlock* getStateBlock() const;
 
-        inline static StateBlock& DefaultState();
+        static StateBlock& DefaultState();
 
     private:
         mutable StateBlock* stateBlock_;
