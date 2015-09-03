@@ -12,6 +12,10 @@ namespace GRAPH
 {
     class RenderState : public HObject
     {
+    protected:
+        RenderState();
+        ~RenderState();
+
     public:
         enum Blend
         {
@@ -126,42 +130,39 @@ namespace GRAPH
             void invalidate(long stateBits);
             void restore(long stateOverrideBits);
 
-            static StateBlock* _defaultState;
-
         protected:
             void bindNoRestore();
             void enableDepthWrite();
 
             void cloneInto(StateBlock* renderState) const;
 
-            bool _cullFaceEnabled;
-            bool _depthTestEnabled;
-            bool _depthWriteEnabled;
-            DepthFunction _depthFunction;
-            bool _blendEnabled;
-            Blend _blendSrc;
-            Blend _blendDst;
-            CullFaceSide _cullFaceSide;
-            FrontFace _frontFace;
-            bool _stencilTestEnabled;
-            unsigned int _stencilWrite;
-            StencilFunction _stencilFunction;
-            int _stencilFunctionRef;
-            unsigned int _stencilFunctionMask;
-            StencilOperation _stencilOpSfail;
-            StencilOperation _stencilOpDpfail;
-            StencilOperation _stencilOpDppass;
-            long _bits;
+            bool cullFaceEnabled_;
+            bool depthTestEnabled_;
+            bool depthWriteEnabled_;
+            DepthFunction depthFunction_;
+            bool blendEnabled_;
+            Blend blendSrc_;
+            Blend blendDst_;
+            CullFaceSide cullFaceSide_;
+            FrontFace frontFace_;
+            bool stencilTestEnabled_;
+            unsigned int stencilWrite_;
+            StencilFunction stencilFunction_;
+            int stencilFunctionRef_;
+            unsigned int stencilFunctionMask_;
+            StencilOperation stencilOpSfail_;
+            StencilOperation stencilOpDpfail_;
+            StencilOperation stencilOpDppass_;
+            long stateBits_;
         };
 
-        void setStateBlock(StateBlock* state);
+    public:
         StateBlock* getStateBlock() const;
 
-    protected:
-        RenderState();
-        ~RenderState();
+        inline static StateBlock& DefaultState();
 
-        mutable StateBlock* _state;
+    private:
+        mutable StateBlock* stateBlock_;
     };
 }
 

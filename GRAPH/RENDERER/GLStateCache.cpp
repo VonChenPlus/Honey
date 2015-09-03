@@ -50,15 +50,15 @@ namespace GRAPH
     {
         if (sfactor == GL_ONE && dfactor == GL_ZERO) {
             glDisable(GL_BLEND);
-            RenderState::StateBlock::_defaultState->setBlend(false);
+            RenderState::DefaultState().setBlend(false);
         }
         else {
             glEnable(GL_BLEND);
             glBlendFunc(sfactor, dfactor);
 
-            RenderState::StateBlock::_defaultState->setBlend(true);
-            RenderState::StateBlock::_defaultState->setBlendSrc((RenderState::Blend)sfactor);
-            RenderState::StateBlock::_defaultState->setBlendSrc((RenderState::Blend)dfactor);
+            RenderState::DefaultState().setBlend(true);
+            RenderState::DefaultState().setBlendSrc((RenderState::Blend)sfactor);
+            RenderState::DefaultState().setBlendSrc((RenderState::Blend)dfactor);
         }
     }
 

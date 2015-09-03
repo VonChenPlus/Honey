@@ -5,15 +5,22 @@
 
 namespace GRAPH
 {
-    RenderState::StateBlock* RenderState::StateBlock::_defaultState = nullptr;
-
     RenderState::RenderState() {
-        _state = StateBlock::create();
-        SAFE_RETAIN(_state);
+        stateBlock_ = StateBlock::create();
+        SAFE_RETAIN(stateBlock_);
     }
 
     RenderState::~RenderState() {
-        SAFE_RELEASE(_state);
+        SAFE_RELEASE(stateBlock_);
+    }
+
+    RenderState::StateBlock* RenderState::getStateBlock() const {
+        return stateBlock_;
+    }
+
+    RenderState::StateBlock &RenderState::DefaultState() {
+        static RenderState::StateBlock instance;
+        return instance;
     }
 
     RenderState::StateBlock* RenderState::StateBlock::create()
@@ -27,14 +34,14 @@ namespace GRAPH
     }
 
     RenderState::StateBlock::StateBlock()
-        : _cullFaceEnabled(false)
-        , _depthTestEnabled(true), _depthWriteEnabled(false), _depthFunction(RenderState::DEPTH_LESS)
-        , _blendEnabled(true), _blendSrc(RenderState::BLEND_ONE), _blendDst(RenderState::BLEND_ZERO)
-        , _cullFaceSide(CULL_FACE_SIDE_BACK), _frontFace(FRONT_FACE_CCW)
-        , _stencilTestEnabled(false), _stencilWrite(RS_ALL_ONES)
-        , _stencilFunction(RenderState::STENCIL_ALWAYS), _stencilFunctionRef(0), _stencilFunctionMask(RS_ALL_ONES)
-        , _stencilOpSfail(RenderState::STENCIL_OP_KEEP), _stencilOpDpfail(RenderState::STENCIL_OP_KEEP), _stencilOpDppass(RenderState::STENCIL_OP_KEEP)
-        , _bits(0L) {
+        : cullFaceEnabled_(false)
+        , depthTestEnabled_(true), depthWriteEnabled_(false), depthFunction_(RenderState::DEPTH_LESS)
+        , blendEnabled_(true), blendSrc_(RenderState::BLEND_ONE), blendDst_(RenderState::BLEND_ZERO)
+        , cullFaceSide_(CULL_FACE_SIDE_BACK), frontFace_(FRONT_FACE_CCW)
+        , stencilTestEnabled_(false), stencilWrite_(RS_ALL_ONES)
+        , stencilFunction_(RenderState::STENCIL_ALWAYS), stencilFunctionRef_(0), stencilFunctionMask_(RS_ALL_ONES)
+        , stencilOpSfail_(RenderState::STENCIL_OP_KEEP), stencilOpDpfail_(RenderState::STENCIL_OP_KEEP), stencilOpDppass_(RenderState::STENCIL_OP_KEEP)
+        , stateBits_(0L) {
     }
 
     RenderState::StateBlock::~StateBlock() {
@@ -46,106 +53,106 @@ namespace GRAPH
         // irrespective of whether it belongs to a hierarchy of RenderStates.
         // Therefore, we call restore() here with only this StateBlock's override
         // bits to restore state before applying the new state.
-        StateBlock::restore(_bits);
+        StateBlock::restore(stateBits_);
 
         bindNoRestore();
     }
 
     void RenderState::StateBlock::bindNoRestore() {
         // Update any state that differs from _defaultState and flip _defaultState bits
-        if ((_bits & RS_BLEND) && (_blendEnabled != _blendEnabled)) {
-            if (_blendEnabled)
+        if ((stateBits_ & RS_BLEND) && (blendEnabled_ != blendEnabled_)) {
+            if (blendEnabled_)
                 glEnable(GL_BLEND);
             else
                 glDisable(GL_BLEND);
-            _blendEnabled = _blendEnabled;
+            blendEnabled_ = blendEnabled_;
         }
-        if ((_bits & RS_BLEND_FUNC) && (_blendSrc != _blendSrc || _blendDst != _blendDst)) {
-            GLStateCache::BlendFunc((GLenum)_blendSrc, (GLenum)_blendDst);
-            _blendSrc = _blendSrc;
-            _blendDst = _blendDst;
+        if ((stateBits_ & RS_BLEND_FUNC) && (blendSrc_ != blendSrc_ || blendDst_ != blendDst_)) {
+            GLStateCache::BlendFunc((GLenum)blendSrc_, (GLenum)blendDst_);
+            blendSrc_ = blendSrc_;
+            blendDst_ = blendDst_;
         }
-        if ((_bits & RS_CULL_FACE) && (_cullFaceEnabled != _cullFaceEnabled)) {
-            if (_cullFaceEnabled)
+        if ((stateBits_ & RS_CULL_FACE) && (cullFaceEnabled_ != cullFaceEnabled_)) {
+            if (cullFaceEnabled_)
                 glEnable(GL_CULL_FACE);
             else
                 glDisable(GL_CULL_FACE);
-            _cullFaceEnabled = _cullFaceEnabled;
+            cullFaceEnabled_ = cullFaceEnabled_;
         }
-        if ((_bits & RS_CULL_FACE_SIDE) && (_cullFaceSide != _cullFaceSide)) {
-            glCullFace((GLenum)_cullFaceSide);
-            _cullFaceSide = _cullFaceSide;
+        if ((stateBits_ & RS_CULL_FACE_SIDE) && (cullFaceSide_ != cullFaceSide_)) {
+            glCullFace((GLenum)cullFaceSide_);
+            cullFaceSide_ = cullFaceSide_;
         }
-        if ((_bits & RS_FRONT_FACE) && (_frontFace != _frontFace)) {
-            glFrontFace((GLenum)_frontFace);
-            _frontFace = _frontFace;
+        if ((stateBits_ & RS_FRONT_FACE) && (frontFace_ != frontFace_)) {
+            glFrontFace((GLenum)frontFace_);
+            frontFace_ = frontFace_;
         }
-        if ((_bits & RS_DEPTH_TEST) && (_depthTestEnabled != _depthTestEnabled)) {
-            if (_depthTestEnabled)
+        if ((stateBits_ & RS_DEPTH_TEST) && (depthTestEnabled_ != depthTestEnabled_)) {
+            if (depthTestEnabled_)
                 glEnable(GL_DEPTH_TEST);
             else
                 glDisable(GL_DEPTH_TEST);
-            _depthTestEnabled = _depthTestEnabled;
+            depthTestEnabled_ = depthTestEnabled_;
         }
-        if ((_bits & RS_DEPTH_WRITE) && (_depthWriteEnabled != _depthWriteEnabled)) {
-            glDepthMask(_depthWriteEnabled ? GL_TRUE : GL_FALSE);
-            _depthWriteEnabled = _depthWriteEnabled;
+        if ((stateBits_ & RS_DEPTH_WRITE) && (depthWriteEnabled_ != depthWriteEnabled_)) {
+            glDepthMask(depthWriteEnabled_ ? GL_TRUE : GL_FALSE);
+            depthWriteEnabled_ = depthWriteEnabled_;
         }
-        if ((_bits & RS_DEPTH_FUNC) && (_depthFunction != _depthFunction)) {
-            glDepthFunc((GLenum)_depthFunction);
-            _depthFunction = _depthFunction;
+        if ((stateBits_ & RS_DEPTH_FUNC) && (depthFunction_ != depthFunction_)) {
+            glDepthFunc((GLenum)depthFunction_);
+            depthFunction_ = depthFunction_;
         }
 
-        _bits |= _bits;
+        stateBits_ |= stateBits_;
     }
 
     void RenderState::StateBlock::restore(long stateOverrideBits) {
         // If there is no state to restore (i.e. no non-default state), do nothing.
-        if ( (stateOverrideBits | _bits) == stateOverrideBits) {
+        if ( (stateOverrideBits | stateBits_) == stateOverrideBits) {
             return;
         }
 
         // Restore any state that is not overridden and is not default
-        if (!(stateOverrideBits & RS_BLEND) && (_bits & RS_BLEND)) {
+        if (!(stateOverrideBits & RS_BLEND) && (stateBits_ & RS_BLEND)) {
             glEnable(GL_BLEND);
-            _bits &= ~RS_BLEND;
-            _blendEnabled = true;
+            stateBits_ &= ~RS_BLEND;
+            blendEnabled_ = true;
         }
-        if (!(stateOverrideBits & RS_BLEND_FUNC) && (_bits & RS_BLEND_FUNC)) {
+        if (!(stateOverrideBits & RS_BLEND_FUNC) && (stateBits_ & RS_BLEND_FUNC)) {
             GLStateCache::BlendFunc(GL_ONE, GL_ZERO);
-            _bits &= ~RS_BLEND_FUNC;
-            _blendSrc = RenderState::BLEND_ONE;
-            _blendDst = RenderState::BLEND_ZERO;
+            stateBits_ &= ~RS_BLEND_FUNC;
+            blendSrc_ = RenderState::BLEND_ONE;
+            blendDst_ = RenderState::BLEND_ZERO;
         }
-        if (!(stateOverrideBits & RS_CULL_FACE) && (_bits & RS_CULL_FACE)) {
+        if (!(stateOverrideBits & RS_CULL_FACE) && (stateBits_ & RS_CULL_FACE)) {
             glDisable(GL_CULL_FACE);
-            _bits &= ~RS_CULL_FACE;
-            _cullFaceEnabled = false;
+            stateBits_ &= ~RS_CULL_FACE;
+            cullFaceEnabled_ = false;
         }
-        if (!(stateOverrideBits & RS_CULL_FACE_SIDE) && (_bits & RS_CULL_FACE_SIDE)) {
+        if (!(stateOverrideBits & RS_CULL_FACE_SIDE) && (stateBits_ & RS_CULL_FACE_SIDE)) {
             glCullFace((GLenum)GL_BACK);
-            _bits &= ~RS_CULL_FACE_SIDE;
-            _cullFaceSide = RenderState::CULL_FACE_SIDE_BACK;
+            stateBits_ &= ~RS_CULL_FACE_SIDE;
+            cullFaceSide_ = RenderState::CULL_FACE_SIDE_BACK;
         }
-        if (!(stateOverrideBits & RS_FRONT_FACE) && (_bits & RS_FRONT_FACE)) {
+        if (!(stateOverrideBits & RS_FRONT_FACE) && (stateBits_ & RS_FRONT_FACE)) {
             glFrontFace((GLenum)GL_CCW);
-            _bits &= ~RS_FRONT_FACE;
-            _frontFace = RenderState::FRONT_FACE_CCW;
+            stateBits_ &= ~RS_FRONT_FACE;
+            frontFace_ = RenderState::FRONT_FACE_CCW;
         }
-        if (!(stateOverrideBits & RS_DEPTH_TEST) && (_bits & RS_DEPTH_TEST)) {
+        if (!(stateOverrideBits & RS_DEPTH_TEST) && (stateBits_ & RS_DEPTH_TEST)) {
             glEnable(GL_DEPTH_TEST);
-            _bits &= ~RS_DEPTH_TEST;
-            _depthTestEnabled = true;
+            stateBits_ &= ~RS_DEPTH_TEST;
+            depthTestEnabled_ = true;
         }
-        if (!(stateOverrideBits & RS_DEPTH_WRITE) && (_bits & RS_DEPTH_WRITE)) {
+        if (!(stateOverrideBits & RS_DEPTH_WRITE) && (stateBits_ & RS_DEPTH_WRITE)) {
             glDepthMask(GL_FALSE);
-            _bits &= ~RS_DEPTH_WRITE;
-            _depthWriteEnabled = false;
+            stateBits_ &= ~RS_DEPTH_WRITE;
+            depthWriteEnabled_ = false;
         }
-        if (!(stateOverrideBits & RS_DEPTH_FUNC) && (_bits & RS_DEPTH_FUNC)) {
+        if (!(stateOverrideBits & RS_DEPTH_FUNC) && (stateBits_ & RS_DEPTH_FUNC)) {
             glDepthFunc((GLenum)GL_LESS);
-            _bits &= ~RS_DEPTH_FUNC;
-            _depthFunction = RenderState::DEPTH_LESS;
+            stateBits_ &= ~RS_DEPTH_FUNC;
+            depthFunction_ = RenderState::DEPTH_LESS;
         }
     }
 
@@ -153,32 +160,32 @@ namespace GRAPH
         // Internal method used to restore depth writing before a
         // clear operation. This is necessary if the last code to draw before the
         // next frame leaves depth writing disabled.
-        if (!_depthWriteEnabled) {
+        if (!depthWriteEnabled_) {
             glDepthMask(GL_TRUE);
-            _bits &= ~RS_DEPTH_WRITE;
-            _depthWriteEnabled = true;
+            stateBits_ &= ~RS_DEPTH_WRITE;
+            depthWriteEnabled_ = true;
         }
     }
 
     void RenderState::StateBlock::cloneInto(StateBlock* state) const {
-        state->_cullFaceEnabled = _cullFaceEnabled;
-        state->_depthTestEnabled = _depthTestEnabled;
-        state->_depthWriteEnabled = _depthWriteEnabled;
-        state->_depthFunction = _depthFunction;
-        state->_blendEnabled = _blendEnabled;
-        state->_blendSrc = _blendSrc;
-        state->_blendDst = _blendDst;
-        state->_cullFaceSide = _cullFaceSide;
-        state->_frontFace = _frontFace;
-        state->_stencilTestEnabled = _stencilTestEnabled;
-        state->_stencilWrite = _stencilWrite;
-        state->_stencilFunction = _stencilFunction;
-        state->_stencilFunctionRef = _stencilFunctionRef;
-        state->_stencilFunctionMask = _stencilFunctionMask;
-        state->_stencilOpSfail = _stencilOpSfail;
-        state->_stencilOpDpfail = _stencilOpDpfail;
-        state->_stencilOpDppass = _stencilOpDppass;
-        state->_bits = _bits;
+        state->cullFaceEnabled_ = cullFaceEnabled_;
+        state->depthTestEnabled_ = depthTestEnabled_;
+        state->depthWriteEnabled_ = depthWriteEnabled_;
+        state->depthFunction_ = depthFunction_;
+        state->blendEnabled_ = blendEnabled_;
+        state->blendSrc_ = blendSrc_;
+        state->blendDst_ = blendDst_;
+        state->cullFaceSide_ = cullFaceSide_;
+        state->frontFace_ = frontFace_;
+        state->stencilTestEnabled_ = stencilTestEnabled_;
+        state->stencilWrite_ = stencilWrite_;
+        state->stencilFunction_ = stencilFunction_;
+        state->stencilFunctionRef_ = stencilFunctionRef_;
+        state->stencilFunctionMask_ = stencilFunctionMask_;
+        state->stencilOpSfail_ = stencilOpSfail_;
+        state->stencilOpDpfail_ = stencilOpDpfail_;
+        state->stencilOpDppass_ = stencilOpDppass_;
+        state->stateBits_ = stateBits_;
     }
 
     static RenderState::Blend parseBlend(const std::string& value) {
@@ -350,19 +357,19 @@ namespace GRAPH
     }
 
     void RenderState::StateBlock::invalidate(long stateBits) {
-        _bits = stateBits;
+        stateBits_ = stateBits;
         restore(0);
     }
 
     void RenderState::StateBlock::setBlend(bool enabled) {
-        _blendEnabled = enabled;
+        blendEnabled_ = enabled;
         if (enabled)
         {
-            _bits &= ~RS_BLEND;
+            stateBits_ &= ~RS_BLEND;
         }
         else
         {
-            _bits |= RS_BLEND;
+            stateBits_ |= RS_BLEND;
         }
     }
 
@@ -372,87 +379,87 @@ namespace GRAPH
     }
 
     void RenderState::StateBlock::setBlendSrc(Blend blend) {
-        _blendSrc = blend;
-        if (_blendSrc == BLEND_ONE && _blendDst == BLEND_ZERO) {
+        blendSrc_ = blend;
+        if (blendSrc_ == BLEND_ONE && blendDst_ == BLEND_ZERO) {
             // Default blend func
-            _bits &= ~RS_BLEND_FUNC;
+            stateBits_ &= ~RS_BLEND_FUNC;
         }
         else {
-            _bits |= RS_BLEND_FUNC;
+            stateBits_ |= RS_BLEND_FUNC;
         }
     }
 
     void RenderState::StateBlock::setBlendDst(Blend blend) {
-        _blendDst = blend;
-        if (_blendSrc == BLEND_ONE && _blendDst == BLEND_ZERO) {
+        blendDst_ = blend;
+        if (blendSrc_ == BLEND_ONE && blendDst_ == BLEND_ZERO) {
             // Default blend func
-            _bits &= ~RS_BLEND_FUNC;
+            stateBits_ &= ~RS_BLEND_FUNC;
         }
         else {
-            _bits |= RS_BLEND_FUNC;
+            stateBits_ |= RS_BLEND_FUNC;
         }
     }
 
     void RenderState::StateBlock::setCullFace(bool enabled) {
-        _cullFaceEnabled = enabled;
+        cullFaceEnabled_ = enabled;
         if (!enabled) {
-            _bits &= ~RS_CULL_FACE;
+            stateBits_ &= ~RS_CULL_FACE;
         }
         else {
-            _bits |= RS_CULL_FACE;
+            stateBits_ |= RS_CULL_FACE;
         }
     }
 
     void RenderState::StateBlock::setCullFaceSide(CullFaceSide side) {
-        _cullFaceSide = side;
-        if (_cullFaceSide == CULL_FACE_SIDE_BACK) {
+        cullFaceSide_ = side;
+        if (cullFaceSide_ == CULL_FACE_SIDE_BACK) {
             // Default cull side
-            _bits &= ~RS_CULL_FACE_SIDE;
+            stateBits_ &= ~RS_CULL_FACE_SIDE;
         }
         else {
-            _bits |= RS_CULL_FACE_SIDE;
+            stateBits_ |= RS_CULL_FACE_SIDE;
         }
     }
 
     void RenderState::StateBlock::setFrontFace(FrontFace winding) {
-        _frontFace = winding;
-        if (_frontFace == FRONT_FACE_CCW) {
+        frontFace_ = winding;
+        if (frontFace_ == FRONT_FACE_CCW) {
             // Default front face
-            _bits &= ~RS_FRONT_FACE;
+            stateBits_ &= ~RS_FRONT_FACE;
         }
         else {
-            _bits |= RS_FRONT_FACE;
+            stateBits_ |= RS_FRONT_FACE;
         }
     }
 
     void RenderState::StateBlock::setDepthTest(bool enabled) {
-        _depthTestEnabled = enabled;
+        depthTestEnabled_ = enabled;
         if (enabled) {
-            _bits &= ~RS_DEPTH_TEST;
+            stateBits_ &= ~RS_DEPTH_TEST;
         }
         else {
-            _bits |= RS_DEPTH_TEST;
+            stateBits_ |= RS_DEPTH_TEST;
         }
     }
 
     void RenderState::StateBlock::setDepthWrite(bool enabled) {
-        _depthWriteEnabled = enabled;
+        depthWriteEnabled_ = enabled;
         if (!enabled) {
-            _bits &= ~RS_DEPTH_WRITE;
+            stateBits_ &= ~RS_DEPTH_WRITE;
         }
         else {
-            _bits |= RS_DEPTH_WRITE;
+            stateBits_ |= RS_DEPTH_WRITE;
         }
     }
 
     void RenderState::StateBlock::setDepthFunction(DepthFunction func) {
-        _depthFunction = func;
-        if (_depthFunction == DEPTH_LESS) {
+        depthFunction_ = func;
+        if (depthFunction_ == DEPTH_LESS) {
             // Default depth function
-            _bits &= ~RS_DEPTH_FUNC;
+            stateBits_ &= ~RS_DEPTH_FUNC;
         }
         else {
-            _bits |= RS_DEPTH_FUNC;
+            stateBits_ |= RS_DEPTH_FUNC;
         }
     }
 }
