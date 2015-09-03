@@ -86,6 +86,11 @@ namespace UTILS
             return Value;
         }
 
+        bool ParseBoolean(const std::string& value)
+        {
+            return (value.compare("true")==0);
+        }
+
         void DataToHexString(const uint8 *data, size_t size, std::string *output) {
             HBuffer buffer;
             for (size_t i = 0; i < size; i++) {

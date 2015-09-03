@@ -23,8 +23,8 @@ namespace UTILS
 
         void DataToHexString(const uint8 *data, size_t size, std::string *output);
         void StringToHexString(const std::string &data, std::string *output);
-        // highly unsafe and not recommended.
         unsigned int ParseHexString(const char* _szValue);
+        bool ParseBoolean(const std::string& value);
 
         MATH::Rectf RectFromString(const std::string& str);
         MATH::Vector2f PointFromString(const std::string& str);

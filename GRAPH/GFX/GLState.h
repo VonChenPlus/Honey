@@ -4,7 +4,7 @@
 #include <string>
 #include <string.h>
 
-#include "GLCommon.h"
+#include "../RENDERER/GLCommon.h"
 
 namespace GFX
 {

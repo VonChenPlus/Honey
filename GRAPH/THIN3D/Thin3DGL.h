@@ -4,7 +4,7 @@
 #include <map>
 
 #include "GRAPH/THIN3D/Thin3D.h"
-#include "GRAPH/GFX/GLCommon.h"
+#include "GRAPH/RENDERER/GLCommon.h"
 #include "GRAPH/GFX/GLState.h"
 #include "GRAPH/GFX/GfxResourceHolder.h"
 #include "MATH/Matrix.h"

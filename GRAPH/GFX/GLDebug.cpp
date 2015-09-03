@@ -1,5 +1,5 @@
 #include "GLDebug.h"
-#include "GRAPH/GFX/GLCommon.h"
+#include "GRAPH/RENDERER/GLCommon.h"
 #include "BASE/Honey.h"
 #include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;

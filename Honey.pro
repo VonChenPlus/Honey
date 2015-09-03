@@ -16,6 +16,7 @@ SOURCES += \
     $$P/GRAPH/*.cpp \
     $$P/GRAPH/GFX/*.cpp \
     $$P/GRAPH/THIN3D/*.cpp \
+    $$P/GRAPH/RENDERER/*.cpp \
     $$P/GRAPH/UI/*.cpp \
     $$P/GRAPH/UI/CONTROLS/*.cpp \
     $$P/IMAGE/*.cpp \
@@ -31,6 +32,7 @@ HEADERS += \
     $$P/GRAPH/*.h \
     $$P/GRAPH/GFX/*.h \
     $$P/GRAPH/THIN3D/*.h \
+    $$P/GRAPH/RENDERER/*.h \
     $$P/GRAPH/UI/*.h \
     $$P/GRAPH/UI/CONTROLS/*.h \
     $$P/IMAGE/*.h \

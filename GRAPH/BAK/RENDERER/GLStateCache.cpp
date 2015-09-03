@@ -1,5 +1,7 @@
 #include "GRAPH/RENDERER/GLStateCache.h"
+#include "GRAPH/BASE/Director.h"
 #include "GRAPH/RENDERER/RenderState.h"
+#include "GRAPH/BASE/Configuration.h"
 
 namespace GRAPH
 {
@@ -8,6 +10,7 @@ namespace GRAPH
 
     namespace
     {
+        static GLuint s_currentProjectionMatrix = -1;
         static uint32_t s_attributeFlags = 0;  // 32 attributes max
 
         static GLuint    s_currentShaderProgram = -1;
@@ -15,31 +18,40 @@ namespace GRAPH
         static GLenum    s_blendingSource = -1;
         static GLenum    s_blendingDest = -1;
         static int       s_GLServerState = 0;
+        static GLuint    s_VAO = 0;
         static GLenum    s_activeTexture = -1;
     }
 
-    void GLStateCache::Invalidate(void) {
+    void invalidateStateCache( void )
+    {
+        Director::getInstance()->resetMatrixStack();
+        s_currentProjectionMatrix = -1;
         s_attributeFlags = 0;
 
         s_currentShaderProgram = -1;
-        for( int i=0; i < MAX_ACTIVE_TEXTURE; i++ ) {
+        for( int i=0; i < MAX_ACTIVE_TEXTURE; i++ )
+        {
             s_currentBoundTexture[i] = -1;
         }
 
         s_blendingSource = -1;
         s_blendingDest = -1;
         s_GLServerState = 0;
+        s_VAO = 0;
     }
 
-    void GLStateCache::DeleteProgram(GLuint program) {
-        if(program == s_currentShaderProgram) {
+    void deleteProgram( GLuint program )
+    {
+        if(program == s_currentShaderProgram)
+        {
             s_currentShaderProgram = -1;
         }
 
         glDeleteProgram( program );
     }
 
-    void GLStateCache::UseProgram(GLuint program) {
+    void useProgram( GLuint program )
+    {
         if( program != s_currentShaderProgram ) {
             s_currentShaderProgram = program;
             glUseProgram(program);
@@ -48,11 +60,13 @@ namespace GRAPH
 
     static void SetBlending(GLenum sfactor, GLenum dfactor)
     {
-        if (sfactor == GL_ONE && dfactor == GL_ZERO) {
+        if (sfactor == GL_ONE && dfactor == GL_ZERO)
+        {
             glDisable(GL_BLEND);
             RenderState::StateBlock::_defaultState->setBlend(false);
         }
-        else {
+        else
+        {
             glEnable(GL_BLEND);
             glBlendFunc(sfactor, dfactor);
 
@@ -62,42 +76,52 @@ namespace GRAPH
         }
     }
 
-    void GLStateCache::BlendFunc(GLenum sfactor, GLenum dfactor) {
-        if (sfactor != s_blendingSource || dfactor != s_blendingDest) {
+    void blendFunc(GLenum sfactor, GLenum dfactor)
+    {
+        if (sfactor != s_blendingSource || dfactor != s_blendingDest)
+        {
             s_blendingSource = sfactor;
             s_blendingDest = dfactor;
             SetBlending(sfactor, dfactor);
         }
     }
 
-    void GLStateCache::BlendResetToCache(void) {
+    void blendResetToCache(void)
+    {
         glBlendEquation(GL_FUNC_ADD);
         SetBlending(s_blendingSource, s_blendingDest);
     }
 
-    void GLStateCache::BindTexture2D(GLuint textureId) {
-        BindTexture2DN(0, textureId);
+    void bindTexture2D(GLuint textureId)
+    {
+        bindTexture2DN(0, textureId);
     }
 
-    void GLStateCache::BindTexture2DN(GLuint textureUnit, GLuint textureId) {
-        if (s_currentBoundTexture[textureUnit] != textureId) {
+    void bindTexture2DN(GLuint textureUnit, GLuint textureId)
+    {
+        if (s_currentBoundTexture[textureUnit] != textureId)
+        {
             s_currentBoundTexture[textureUnit] = textureId;
-            ActiveTexture(GL_TEXTURE0 + textureUnit);
+            activeTexture(GL_TEXTURE0 + textureUnit);
             glBindTexture(GL_TEXTURE_2D, textureId);
         }
     }
 
-    void GLStateCache::BindTextureN(GLuint textureUnit, GLuint textureId, GLuint textureType/* = GL_TEXTURE_2D*/) {
-        if (s_currentBoundTexture[textureUnit] != textureId) {
+    void bindTextureN(GLuint textureUnit, GLuint textureId, GLuint textureType/* = GL_TEXTURE_2D*/)
+    {
+        if (s_currentBoundTexture[textureUnit] != textureId)
+        {
             s_currentBoundTexture[textureUnit] = textureId;
-            ActiveTexture(GL_TEXTURE0 + textureUnit);
+            activeTexture(GL_TEXTURE0 + textureUnit);
             glBindTexture(textureType, textureId);
         }
     }
 
 
-    void GLStateCache::DeleteTexture(GLuint textureId) {
-        for (size_t i = 0; i < MAX_ACTIVE_TEXTURE; ++i) {
+    void deleteTexture(GLuint textureId)
+    {
+        for (size_t i = 0; i < MAX_ACTIVE_TEXTURE; ++i)
+        {
             if (s_currentBoundTexture[i] == textureId)
             {
                 s_currentBoundTexture[i] = -1;
@@ -106,20 +130,46 @@ namespace GRAPH
         glDeleteTextures(1, &textureId);
     }
 
-    void GLStateCache::ActiveTexture(GLenum texture) {
+    void deleteTextureN(GLuint, GLuint textureId)
+    {
+        deleteTexture(textureId);
+    }
+
+    void activeTexture(GLenum texture)
+    {
         if(s_activeTexture != texture) {
             s_activeTexture = texture;
             glActiveTexture(s_activeTexture);
         }
     }
 
-    void GLStateCache::EnableVertexAttribs(uint32_t flags) {
+    void bindVAO(GLuint vaoId)
+    {
+        if (Configuration::getInstance()->supportsShareableVAO())
+        {
+            if (s_VAO != vaoId)
+            {
+                s_VAO = vaoId;
+                glBindVertexArray(vaoId);
+            }
+
+        }
+    }
+
+    // GL Vertex Attrib functions
+
+    void enableVertexAttribs(uint32_t flags)
+    {
+        bindVAO(0);
+
+        // hardcoded!
         for(int i=0; i < MAX_ATTRIBUTES; i++) {
             unsigned int bit = 1 << i;
             //FIXME:Cache is disabled, try to enable cache as before
             bool enabled = (flags & bit) != 0;
             bool enabledBefore = (s_attributeFlags & bit) != 0;
-            if(enabled != enabledBefore) {
+            if(enabled != enabledBefore)
+            {
                 if( enabled )
                     glEnableVertexAttribArray(i);
                 else
@@ -127,5 +177,12 @@ namespace GRAPH
             }
         }
         s_attributeFlags = flags;
+    }
+
+    // GL Uniforms functions
+
+    void setProjectionMatrixDirty( void )
+    {
+        s_currentProjectionMatrix = -1;
     }
 }
