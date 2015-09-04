@@ -30,27 +30,8 @@ namespace IMAGE
         //! 16-bit textures: RGB5A1
         RGB5A1,
         //! 4-bit PVRTC-compressed texture: PVRTC4
-        PVRTC4,
-        //! 4-bit PVRTC-compressed texture: PVRTC4 (has alpha channel)
-        PVRTC4A,
-        //! 2-bit PVRTC-compressed texture: PVRTC2
-        PVRTC2,
-        //! 2-bit PVRTC-compressed texture: PVRTC2 (has alpha channel)
-        PVRTC2A,
         //! ETC-compressed texture: ETC
         ETC,
-        //! S3TC-compressed texture: S3TC_Dxt1
-        S3TC_DXT1,
-        //! S3TC-compressed texture: S3TC_Dxt3
-        S3TC_DXT3,
-        //! S3TC-compressed texture: S3TC_Dxt5
-        S3TC_DXT5,
-        //! ATITC-compressed texture: ATC_RGB
-        ATC_RGB,
-        //! ATITC-compressed texture: ATC_EXPLICIT_ALPHA
-        ATC_EXPLICIT_ALPHA,
-        //! ATITC-compresed texture: ATC_INTERPOLATED_ALPHA
-        ATC_INTERPOLATED_ALPHA,
         //! Default texture format: AUTO
         DEFAULT = AUTO,
 

@@ -2,11 +2,92 @@
 #define TYPES_H
 
 #include "MATH/Vector.h"
+#include "MATH/Size.h"
 #include "GRAPH/Color.h"
 #include "GRAPH/RENDERER/GLCommon.h"
 
 namespace GRAPH
 {
+    enum class TextVAlignment
+    {
+        TOP,
+        CENTER,
+        BOTTOM
+    };
+
+    enum class TextHAlignment
+    {
+        LEFT,
+        CENTER,
+        RIGHT
+    };
+
+    enum class TextAlign
+    {
+        CENTER        = 0x33, /** Horizontal center and vertical center. */
+        TOP           = 0x13, /** Horizontal center and vertical top. */
+        TOP_RIGHT     = 0x12, /** Horizontal right and vertical top. */
+        RIGHT         = 0x32, /** Horizontal right and vertical center. */
+        BOTTOM_RIGHT  = 0x22, /** Horizontal right and vertical bottom. */
+        BOTTOM        = 0x23, /** Horizontal center and vertical bottom. */
+        BOTTOM_LEFT   = 0x21, /** Horizontal left and vertical bottom. */
+        LEFT          = 0x31, /** Horizontal left and vertical center. */
+        TOP_LEFT      = 0x11, /** Horizontal left and vertical top. */
+    };
+
+    struct FontShadow
+    {
+    public:
+        FontShadow()
+            : shadowEnabled(false)
+            , shadowBlur(0)
+            , shadowOpacity(0)
+        {}
+
+        bool   shadowEnabled;
+        MATH::Sizef  shadowOffset;
+        float  shadowBlur;
+        float  shadowOpacity;
+    };
+
+    struct FontStroke
+    {
+    public:
+        FontStroke()
+            : strokeEnabled(false)
+            , strokeColor(Color3B::BLACK)
+            , strokeAlpha(255)
+            , strokeSize(0)
+        {}
+
+        bool      strokeEnabled;
+        Color3B   strokeColor;
+        GLubyte   strokeAlpha;
+        float     strokeSize;
+    };
+
+    struct FontDefinition
+    {
+    public:
+        FontDefinition()
+            : fontSize(0)
+            , alignment(TextHAlignment::CENTER)
+            , vertAlignment(TextVAlignment::TOP)
+            , dimensions(MATH::SizefZERO)
+            , fontFillColor(Color3B::WHITE)
+            , fontAlpha(255)
+        {}
+        std::string           fontName;
+        int                   fontSize;
+        TextHAlignment        alignment;
+        TextVAlignment vertAlignment;
+        MATH::Sizef           dimensions;
+        Color3B               fontFillColor;
+        GLubyte               fontAlpha;
+        FontShadow            shadow;
+        FontStroke            stroke;
+    };
+
     struct Tex2F
     {
         Tex2F(float _u, float _v): u(_u), v(_v) {}
@@ -17,74 +98,40 @@ namespace GRAPH
         GLfloat v;
     };
 
-    /** @struct V2F_C4B_T2F
-     * A Vec2 with a vertex point, a tex coord point and a color 4B.
-     */
     struct V2F_C4B_T2F
     {
-        /// vertices (2F)
         MATH::Vector2f  vertices;
-        /// colors (4B)
         Color4B        colors;
-        /// tex coords (2F)
         Tex2F          texCoords;
     };
 
-    /** @struct V2F_C4B_PF
-     *
-     */
     struct V2F_C4B_PF
     {
-        /// vertices (2F)
         MATH::Vector2f  vertices;
-        /// colors (4B)
         Color4B        colors;
-        /// pointsize
         float      pointSize;
     };
 
-    /** @struct V2F_C4F_T2F
-     * A Vec2 with a vertex point, a tex coord point and a color 4F.
-     */
     struct V2F_C4F_T2F
     {
-        /// vertices (2F)
         MATH::Vector2f       vertices;
-        /// colors (4F)
         Color4F        colors;
-        /// tex coords (2F)
         Tex2F          texCoords;
     };
 
-    /** @struct V3F_C4B_T2F
-     * A Vec2 with a vertex point, a tex coord point and a color 4B.
-     */
     struct V3F_C4B_T2F
     {
-        /// vertices (3F)
-        MATH::Vector3f     vertices;            // 12 bytes
-
-        /// colors (4B)
-        Color4B      colors;              // 4 bytes
-
-        // tex coords (2F)
-        Tex2F        texCoords;           // 8 bytes
+        MATH::Vector3f     vertices;
+        Color4B      colors;
+        Tex2F        texCoords;
     };
 
-    /** @struct V3F_T2F
-     * A Vec2 with a vertex point, a tex coord point.
-     */
     struct V3F_T2F
     {
-        /// vertices (2F)
         MATH::Vector3f       vertices;
-        /// tex coords (2F)
         Tex2F          texCoords;
     };
 
-    /** @struct V2F_C4B_T2F_Triangle
-     * A Triangle of V2F_C4B_T2F.
-     */
     struct V2F_C4B_T2F_Triangle
     {
         V2F_C4B_T2F a;
@@ -92,94 +139,57 @@ namespace GRAPH
         V2F_C4B_T2F c;
     };
 
-    /** @struct V2F_C4B_T2F_Quad
-     * A Quad of V2F_C4B_T2F.
-     */
     struct V2F_C4B_T2F_Quad
     {
-        /// bottom left
         V2F_C4B_T2F    bl;
-        /// bottom right
         V2F_C4B_T2F    br;
-        /// top left
         V2F_C4B_T2F    tl;
-        /// top right
         V2F_C4B_T2F    tr;
     };
 
-    /** @struct V3F_C4B_T2F_Quad
-     * 4 Vertex3FTex2FColor4B.
-     */
     struct V3F_C4B_T2F_Quad
     {
-        /// top left
         V3F_C4B_T2F    tl;
-        /// bottom left
         V3F_C4B_T2F    bl;
-        /// top right
         V3F_C4B_T2F    tr;
-        /// bottom right
         V3F_C4B_T2F    br;
     };
 
-    /** @struct V2F_C4F_T2F_Quad
-     * 4 Vertex2FTex2FColor4F Quad.
-     */
     struct V2F_C4F_T2F_Quad
     {
-        /// bottom left
         V2F_C4F_T2F    bl;
-        /// bottom right
         V2F_C4F_T2F    br;
-        /// top left
         V2F_C4F_T2F    tl;
-        /// top right
         V2F_C4F_T2F    tr;
     };
 
-    /** @struct V3F_T2F_Quad
-     *
-     */
     struct V3F_T2F_Quad
     {
-        /// bottom left
         V3F_T2F    bl;
-        /// bottom right
         V3F_T2F    br;
-        /// top left
         V3F_T2F    tl;
-        /// top right
         V3F_T2F    tr;
     };
 
     struct BlendFunc
     {
-        /** source blend function */
         GLenum src;
-        /** destination blend function */
         GLenum dst;
 
-        /** Blending disabled. Uses {GL_ONE, GL_ZERO} */
         static const BlendFunc DISABLE;
-        /** Blending enabled for textures with Alpha premultiplied. Uses {GL_ONE, GL_ONE_MINUS_SRC_ALPHA} */
         static const BlendFunc ALPHA_PREMULTIPLIED;
-        /** Blending enabled for textures with Alpha NON premultiplied. Uses {GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA} */
         static const BlendFunc ALPHA_NON_PREMULTIPLIED;
-        /** Enables Additive blending. Uses {GL_SRC_ALPHA, GL_ONE} */
         static const BlendFunc ADDITIVE;
 
-        bool operator==(const BlendFunc &a) const
-        {
+        bool operator==(const BlendFunc &a) const {
             return src == a.src && dst == a.dst;
         }
 
-        bool operator!=(const BlendFunc &a) const
-        {
+        bool operator!=(const BlendFunc &a) const {
             return src != a.src || dst != a.dst;
         }
 
-        bool operator<(const BlendFunc &a) const
-        {
+        bool operator<(const BlendFunc &a) const {
             return src < a.src || (src == a.src && dst < a.dst);
         }
     };

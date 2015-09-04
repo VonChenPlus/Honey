@@ -206,14 +206,14 @@ namespace GRAPH
         GLint             builtInUniforms_[UNIFORM_MAX];
         bool              hasShaderCompiler_;
 
-        struct UniformsFlags {
+        struct BulidInUniformsFlags {
             unsigned int usesTime:1;
             unsigned int usesNormal:1;
             unsigned int usesMVP:1;
             unsigned int usesMV:1;
             unsigned int usesP:1;
             unsigned int usesRandom:1;
-            UniformsFlags() { memset(this, 0, sizeof(*this)); }
+            BulidInUniformsFlags() { memset(this, 0, sizeof(*this)); }
         } uniformsFlags_;
 
         std::unordered_map<std::string, Uniform> userUniforms_;

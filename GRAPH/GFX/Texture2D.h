@@ -1,53 +1,103 @@
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#ifndef TEXTURE2D_H
+#define TEXTURE2D_H
 
 #include <string>
+#include "BASE/HObject.h"
+#include "GRAPH/Types.h"
+#include "GRAPH/RENDERER/GLCommon.h"
+#include "MATH/Vector.h"
+#include "MATH/Rectangle.h"
+#include "MATH/Size.h"
+#include "IMAGE/TinyImage.h"
 
-#include "BASE/Honey.h"
-#include "GRAPH/GFX/GfxResourceHolder.h"
-#include "GRAPH/GFX/Atlas.h"
-
-namespace GFX
+namespace GRAPH
 {
-    class Texture2D : public GfxResourceHolder
+    class GLProgram;
+
+    typedef struct _MipmapInfo
+    {
+        unsigned char* address;
+        int len;
+        _MipmapInfo():address(NULL),len(0){}
+    } MipmapInfo;
+
+    class Texture2D : public HObject
     {
     public:
+        typedef struct _TexParams {
+            GLuint    minFilter;
+            GLuint    magFilter;
+            GLuint    wrapS;
+            GLuint    wrapT;
+        }TexParams;
+
+    public:
+        static void setDefaultAlphaPixelFormat(IMAGE::PixelFormat format);
+        static IMAGE::PixelFormat getDefaultAlphaPixelFormat();
+
+    public:
         Texture2D();
-        ~Texture2D();
+        virtual ~Texture2D();
 
-        // Deduces format from the filename.
-        // If loading fails, will load a 256x256 XOR texture.
-        // If filename begins with "gen:", will defer to texture_gen.cpp/h.
-        // When format is known, it's fine to use LoadZIM etc directly.
-        // Those will NOT auto-fall back to xor texture however!
-        void load(const char *filename);
-        void bind(int stage = -1);
-        void destroy();
+        void releaseGLTexture();
 
-        // PNG from memory buffer
-        void loadPNG(const uint8 *data, size_t size, bool genMips = true);
-        void loadZIM(const char *filename);
-        void loadPNG(const char *filename, bool genMips = true);
-        void loadJPEG(const char *filename, bool genMips = true);
-        void loadXOR();	// Loads a placeholder texture.
+        bool initWithData(const void *data, ssize_t dataLen, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef& contentSize);
+        bool initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh);
 
-        unsigned int handle() const {
-            return id_;
-        }
+        bool updateWithData(const void *data,int offsetX,int offsetY,int width,int height);
 
-        virtual void glLost();
-        std::string filename() const { return filename_; }
+        void drawAtPoint(const MATH::Vector2f& point);
+        void drawInRect(const MATH::Rectf& rect);
 
-        static void unBind(int stage = -1);
+        bool initWithImage(IMAGE::TinyImage * image);
+        bool initWithImage(IMAGE::TinyImage * image, IMAGE::PixelFormat format);
+        bool initWithString(const char *text,  const std::string &fontName, float fontSize, const MATH::Sizef& dimensions = MATH::Sizef(0, 0), TextHAlignment hAlignment = TextHAlignment::CENTER, TextVAlignment vAlignment = TextVAlignment::TOP);
+        bool initWithString(const char *text, const FontDefinition& textDefinition);
 
-        int width() const { return width_; }
-        int height() const { return height_; }
+        void setTexParameters(const TexParams& texParams);
+        void setAntiAliasTexParameters();
+        void setAliasTexParameters();
 
-    private:
-        std::string filename_;
-        unsigned int id_;
-        int width_, height_;
+        void generateMipmap();
+
+        const char* getStringForFormat() const;
+        unsigned int getBitsPerPixelForFormat() const;
+        unsigned int getBitsPerPixelForFormat(IMAGE::PixelFormat format) const;
+
+        const MATH::Sizef& getContentSizeInPixels();
+
+        bool hasPremultipliedAlpha() const;
+        bool hasMipmaps() const;
+
+        IMAGE::PixelFormat getPixelFormat() const;
+        int getPixelsWidth() const;
+        int getPixelsHight() const;
+        GLuint getName() const;
+
+        GLfloat getMaxS() const;
+        void setMaxS(GLfloat maxS);
+
+        GLfloat getMaxT() const;
+        void setMaxT(GLfloat maxT);
+
+        MATH::Sizef getContentSize() const;
+
+        void setGLProgram(GLProgram* program);
+        GLProgram* getGLProgram() const;
+
+    protected:
+        IMAGE::PixelFormat pixelFormat_;
+        int pixelsWidth_;
+        int pixelsHight_;
+        GLuint name_;
+        GLfloat maxS_;
+        GLfloat maxT_;
+        MATH::Sizef contentSize_;
+        bool hasPremultipliedAlpha_;
+        bool hasMipmaps_;
+        GLProgram* shaderProgram_;
+        bool antialiasEnabled_;
     };
 }
 
-#endif // TEXTURE_H
+#endif // TEXTURE2D_H

@@ -1,400 +1,435 @@
-#include "Texture2D.h"
+#include "BASE/HData.h"
+#include "GRAPH/GFX/Texture2D.h"
+#include "GRAPH/RENDERER/GLProgram.h"
+#include "GRAPH/RENDERER/GLStateCache.h"
 
-#include <cmath>
-
-#include "GRAPH/GFX/GLState.h"
-#include "IMAGE/TinyZim.h"
-using IMAGE::ZIM_CLAMP;
-using IMAGE::ZIM_HAS_MIPS;
-using IMAGE::ZIM_GEN_MIPS;
-using IMAGE::LoadZIM;
-using IMAGE::ZIM_MAX_MIP_LEVELS;
-using IMAGE::ZIM_FORMAT_MASK;
-using IMAGE::ZIM_RGBA8888;
-using IMAGE::ZIM_RGBA4444;
-using IMAGE::ZIM_RGB565;
-using IMAGE::ZIM_ETC1;
-#include "GRAPH/GFX/GLDebug.h"
-#include "BASE/Honey.h"
-#include "IMAGE/TinyPNG.h"
-using IMAGE::PNGLoad;
-using IMAGE::PNGLoadPtr;
-#include "EXTERNALS/jpge/jpgd.h"
-#include "EXTERNALS/rg_etc1/rg_etc1.h"
-#include "GRAPH/GFX/GLExtensions.h"
-#include "UTILS/STRING/StringUtils.h"
-using UTILS::STRING::StringFromFormat;
-
-namespace GLOBAL
+namespace GRAPH
 {
-    extern GFX::GLExtensions &glExtensions();
-}
+    static IMAGE::PixelFormat g_defaultAlphaPixelFormat = IMAGE::PixelFormat::DEFAULT;
 
-namespace GFX
-{
-    Texture2D::Texture2D() : id_(0) {
-        CheckGLExtensions();
-        register_gl_resource_holder(this);
+    Texture2D::Texture2D()
+        : pixelFormat_(IMAGE::PixelFormat::DEFAULT)
+        , pixelsWidth_(0)
+        , pixelsHight_(0)
+        , name_(0)
+        , maxS_(0.0)
+        , maxT_(0.0)
+        , hasPremultipliedAlpha_(false)
+        , hasMipmaps_(false)
+        , shaderProgram_(nullptr)
+        , antialiasEnabled_(true) {
     }
 
     Texture2D::~Texture2D() {
-        unregister_gl_resource_holder(this);
-        destroy();
+        SAFE_RELEASE(shaderProgram_);
+        releaseGLTexture();
     }
 
-    void Texture2D::destroy() {
-        if (id_) {
-            glDeleteTextures(1, &id_);
-            id_ = 0;
+    void Texture2D::releaseGLTexture() {
+        if(name_) {
+            GLStateCache::DeleteTexture(name_);
         }
+        name_ = 0;
     }
 
-    void Texture2D::glLost() {
-        if (!filename_.empty())
-        {
-            load(filename_.c_str());
-            //ILOG("Reloaded lost texture %s", filename_.c_str());
-        }
-        else
-        {
-            //WLOG("Texture %p cannot be restored - has no filename", this);
-            destroy();
-        }
+
+    IMAGE::PixelFormat Texture2D::getPixelFormat() const {
+        return pixelFormat_;
     }
 
-    static void SetTextureParameters(int zim_flags) {
-        GLenum wrap = GL_REPEAT;
-        if (zim_flags & ZIM_CLAMP)
-            wrap = GL_CLAMP_TO_EDGE;
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
-        GL_CHECK();
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        if ((zim_flags & (ZIM_HAS_MIPS | ZIM_GEN_MIPS)))
-        {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-        }
-        else
-        {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        }
-        GL_CHECK();
+    int Texture2D::getPixelsWidth() const {
+        return pixelsWidth_;
     }
 
-    static uint8 *GenerateTexture(const char *filename, int &bpp, int &w, int &h, bool &clamp) {
-        UNUSED(clamp);
-        char name_and_params[256];
-        // security check :)
-        if (strlen(filename) > 200)
-            return 0;
-        sscanf(filename, "gen:%i:%i:%s", &w, &h, name_and_params);
+    int Texture2D::getPixelsHight() const {
+        return pixelsHight_;
+    }
 
-        uint8 *data;
-        if (!strcmp(name_and_params, "vignette")) {
-            bpp = 1;
-            data = new uint8[w*h];
-            for (int y = 0; y < h; ++y) {
-                for (int x = 0; x < w; x++) {
-                    float dx = (float)(x - w/2) / (w/2);
-                    float dy = (float)(y - h/2) / (h/2);
-                    float dist = sqrtf(dx * dx + dy * dy);
-                    dist /= 1.414f;
-                    float val = 1.0 - powf(dist, 1.4f);
-                    data[y*w + x] = val * 255;
-                }
+    GLuint Texture2D::getName() const {
+        return name_;
+    }
+
+    MATH::Sizef Texture2D::getContentSize() const {
+        MATH::Sizef ret;
+        ret.width = contentSize_.width;
+        ret.height = contentSize_.height;
+        return ret;
+    }
+
+    const MATH::Sizef& Texture2D::getContentSizeInPixels() {
+        return contentSize_;
+    }
+
+    GLfloat Texture2D::getMaxS() const {
+        return maxS_;
+    }
+
+    void Texture2D::setMaxS(GLfloat maxS) {
+        maxS_ = maxS;
+    }
+
+    GLfloat Texture2D::getMaxT() const {
+        return maxT_;
+    }
+
+    void Texture2D::setMaxT(GLfloat maxT) {
+        maxT_ = maxT;
+    }
+
+    GLProgram* Texture2D::getGLProgram() const {
+        return shaderProgram_;
+    }
+
+    void Texture2D::setGLProgram(GLProgram* shaderProgram) {
+        SAFE_RETAIN(shaderProgram);
+        SAFE_RELEASE(shaderProgram_);
+        shaderProgram_ = shaderProgram;
+    }
+
+    bool Texture2D::hasPremultipliedAlpha() const {
+        return hasPremultipliedAlpha_;
+    }
+
+    bool Texture2D::initWithData(const void *data, ssize_t dataLen, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef&) {
+        MipmapInfo mipmap;
+        mipmap.address = (unsigned char*)data;
+        mipmap.len = static_cast<int>(dataLen);
+        return initWithMipmaps(&mipmap, 1, pixelFormat, pixelsWide, pixelsHigh);
+    }
+
+    bool Texture2D::initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh)
+    {
+        if (mipmapsNum <= 0) {
+            return false;
+        }
+
+        if (IMAGE::TinyImage::getPixelFormatInfoMap().find(pixelFormat) == IMAGE::TinyImage::getPixelFormatInfoMap().end()) {
+            return false;
+        }
+
+        const IMAGE::PixelFormatInfo& info = IMAGE::TinyImage::getPixelFormatInfoMap().at(pixelFormat);
+
+        //Set the row align only when mipmapsNum == 1 and the data is uncompressed
+        if (mipmapsNum == 1 && !info.compressed) {
+            unsigned int bytesPerRow = pixelsWide * info.bpp / 8;
+
+            if(bytesPerRow % 8 == 0)
+            {
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 8);
             }
-        }
-        else if (!strcmp(name_and_params, "circle")) {
-            bpp = 1;
-            // TODO
-            data = new uint8[w*h];
-            for (int y = 0; y < h; ++y) {
-                for (int x = 0; x < w; x++) {
-                    float dx = (float)(x - w/2) / (w/2);
-                    float dy = (float)(y - h/2) / (h/2);
-                    float dist = sqrtf(dx * dx + dy * dy);
-                    dist /= 1.414f;
-                    float val = 1.0 - powf(dist, 1.4f);
-                    data[y*w + x] = val * 255;
-                }
+            else if(bytesPerRow % 4 == 0)
+            {
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+            }
+            else if(bytesPerRow % 2 == 0)
+            {
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
+            }
+            else
+            {
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
             }
         }
         else {
-            data = NULLPTR;
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         }
 
-        return data;
-    }
-
-    void Texture2D::load(const char *filename) {
-        // hook for generated textures
-        if (!memcmp(filename, "gen:", 4)) {
-            int bpp, w, h;
-            bool clamp = false;
-            uint8 *data = GenerateTexture(filename, bpp, w, h, clamp);
-            if (!data)
-                throw _HException_("GenerateTexture failed", HException::GFX);
-            glGenTextures(1, &id_);
-            glBindTexture(GL_TEXTURE_2D, id_);
-            if (bpp == 1) {
-                glTexImage2D(GL_TEXTURE_2D, 0, 1, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
-            }
-            else {
-                throw _HException_Normal("unsupported image format!");
-            }
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            delete [] data;
+        if(name_ != 0) {
+            GLStateCache::DeleteTexture(name_);
+            name_ = 0;
         }
 
-        filename_ = filename;
+        glGenTextures(1, &name_);
+        GLStateCache::BindTexture2D(name_);
 
-        // Currently here are a bunch of project-specific workarounds.
-        // They shouldn't really hurt anything else very much though.
-
-        size_t len = strlen(filename);
-        char fn[1024];
-        strncpy(fn, filename, sizeof(fn));
-        fn[1023] = 0;
-        bool zim = false;
-        if (!strcmp("dds", &filename[len-3])) {
-            strcpy(&fn[len-3], "zim");
-            zim = true;
-        }
-        if (!strcmp("6TX", &filename[len-3]) || !strcmp("6tx", &filename[len-3])) {
-            //ILOG("Detected 6TX %s", filename);
-            strcpy(&fn[len-3], "zim");
-            zim = true;
-        }
-        for (int i = 0; i < (int)strlen(fn); i++) {
-            if (fn[i] == '\\') fn[i] = '/';
-        }
-
-        if (fn[0] == 'm') fn[0] = 'M';
-        const char *name = fn;
-        if (zim && 0==memcmp(name, "Media/textures/", strlen("Media/textures"))) name += strlen("Media/textures/");
-        len = strlen(name);
-        if (!strcmp("png", &name[len-3]) || !strcmp("PNG", &name[len-3])) {
-            loadPNG(fn);
-        }
-        else if (!strcmp("zim", &name[len-3])) {
-            loadZIM(name);
-        }
-        else if (!strcmp("jpg", &name[len-3]) || !strcmp("JPG", &name[len-3]) ||
-                !strcmp("jpeg", &name[len-4]) || !strcmp("JPEG", &name[len-4])) {
-            loadJPEG(fn);
-        }
-        else if (!name || !strlen(name)) {
-            throw _HException_(StringFromFormat("Failed to identify image file %s by extension", name), HException::GFX);
+        if (mipmapsNum == 1) {
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, antialiasEnabled_ ? GL_LINEAR : GL_NEAREST);
         }
         else {
-            throw _HException_("Cannot load a texture with an empty filename", HException::GFX);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, antialiasEnabled_ ? GL_LINEAR_MIPMAP_NEAREST : GL_NEAREST_MIPMAP_NEAREST);
         }
-    }
 
-    void Texture2D::loadPNG(const char *filename, bool genMips) {
-        unsigned char *image_data;
-        int color, datalen;
-        PNGLoad(filename, &width_, &height_, &color, &image_data, &datalen);
-        GL_CHECK();
-        glGenTextures(1, &id_);
-        glBindTexture(GL_TEXTURE_2D, id_);
-        SetTextureParameters(genMips ? ZIM_GEN_MIPS : ZIM_CLAMP);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0,
-            GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-        if (genMips) {
-            if (GLOBAL::glExtensions().FBO_ARB) {
-                glGenerateMipmap(GL_TEXTURE_2D);
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, antialiasEnabled_ ? GL_LINEAR : GL_NEAREST );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+
+        // Specify OpenGL texture image
+        int width = pixelsWide;
+        int height = pixelsHigh;
+
+        for (int i = 0; i < mipmapsNum; ++i) {
+            unsigned char *data = mipmaps[i].address;
+            GLsizei datalen = mipmaps[i].len;
+
+            if (info.compressed) {
+                glCompressedTexImage2D(GL_TEXTURE_2D, i, info.internalFormat, (GLsizei)width, (GLsizei)height, 0, datalen, data);
             }
             else {
-                glGenerateMipmapEXT(GL_TEXTURE_2D);
+                glTexImage2D(GL_TEXTURE_2D, i, info.internalFormat, (GLsizei)width, (GLsizei)height, 0, info.format, info.type, data);
             }
+
+            width = MATH::MATH_MAX(width >> 1, 1);
+            height = MATH::MATH_MAX(height >> 1, 1);
         }
-        GL_CHECK();
-        free(image_data);
+
+        contentSize_ = MATH::Sizef((float)pixelsWide, (float)pixelsHigh);
+        pixelsWidth_ = pixelsWide;
+        pixelsHight_ = pixelsHigh;
+        pixelFormat_ = pixelFormat;
+        maxS_ = 1;
+        maxT_ = 1;
+
+        hasPremultipliedAlpha_ = false;
+        hasMipmaps_ = mipmapsNum > 1;
+
+        // shader
+        setGLProgram(GLProgramCache::getInstance()->getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE));
+        return true;
     }
 
-    void Texture2D::loadJPEG(const char *filename, bool genMips) {
-        //ILOG("Loading jpeg %s", filename);
-        unsigned char *image_data;
-        int actual_comps;
-        image_data = jpgd::decompress_jpeg_image_from_file(filename, &width_, &height_, &actual_comps, 4);
-        if (!image_data) {
-            throw _HException_("jpeg: image data returned was 0", HException::IO);
+    bool Texture2D::updateWithData(const void *data,int offsetX,int offsetY,int width,int height) {
+        if (name_) {
+            GLStateCache::BindTexture2D(name_);
+            const IMAGE::PixelFormatInfo& info = IMAGE::TinyImage::getPixelFormatInfoMap().at(pixelFormat_);
+            glTexSubImage2D(GL_TEXTURE_2D,0,offsetX,offsetY,width,height,info.format, info.type,data);
+            return true;
         }
-
-        GL_CHECK();
-        glGenTextures(1, &id_);
-        glBindTexture(GL_TEXTURE_2D, id_);
-        SetTextureParameters(genMips ? ZIM_GEN_MIPS : ZIM_CLAMP);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-        if (genMips) {
-            if (GLOBAL::glExtensions().FBO_ARB) {
-                glGenerateMipmap(GL_TEXTURE_2D);
-            }
-            else {
-                glGenerateMipmapEXT(GL_TEXTURE_2D);
-            }
-        }
-        GL_CHECK();
-        free(image_data);
+        return false;
     }
 
-    void Texture2D::loadPNG(const uint8 *data, size_t size, bool genMips) {
-        unsigned char *image_data;
-        int color, datalen;
-        PNGLoadPtr(data, size, &width_, &height_, &color, &image_data, &datalen);
-        GL_CHECK();
-        // TODO: should check for power of 2 tex size and disallow genMips when not.
-        glGenTextures(1, &id_);
-        glBindTexture(GL_TEXTURE_2D, id_);
-        SetTextureParameters(genMips ? ZIM_GEN_MIPS : ZIM_CLAMP);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-        if (genMips) {
-            if (GLOBAL::glExtensions().FBO_ARB) {
-                glGenerateMipmap(GL_TEXTURE_2D);
-            }
-            else {
-                glGenerateMipmapEXT(GL_TEXTURE_2D);
-            }
-        }
-        GL_CHECK();
-        free(image_data);
+    bool Texture2D::initWithImage(IMAGE::TinyImage *image) {
+        return initWithImage(image, g_defaultAlphaPixelFormat);
     }
 
-    void Texture2D::loadXOR() {
-        width_ = height_ = 256;
-        unsigned char *buf = new unsigned char[width_*height_*4];
-        for (int y = 0; y < 256; y++) {
-            for (int x = 0; x < 256; x++) {
-                buf[(y*width_ + x)*4 + 0] = x^y;
-                buf[(y*width_ + x)*4 + 1] = x^y;
-                buf[(y*width_ + x)*4 + 2] = x^y;
-                buf[(y*width_ + x)*4 + 3] = 0xFF;
-            }
+    bool Texture2D::initWithImage(IMAGE::TinyImage *image, IMAGE::PixelFormat format) {
+        if (image == nullptr) {
+            return false;
         }
-        GL_CHECK();
-        glGenTextures(1, &id_);
-        glBindTexture(GL_TEXTURE_2D, id_);
-        SetTextureParameters(ZIM_GEN_MIPS);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0,
-            GL_RGBA, GL_UNSIGNED_BYTE, buf);
-        if(GLOBAL::glExtensions().FBO_ARB) {
-            glGenerateMipmap(GL_TEXTURE_2D);
+
+        int imageWidth = image->getWidth();
+        int imageHeight = image->getHeight();
+
+        unsigned char*   tempData = image->getData();
+        MATH::Sizef      imageSize = MATH::Sizef((float)imageWidth, (float)imageHeight);
+        IMAGE::PixelFormat      pixelFormat = ((IMAGE::PixelFormat::NONE == format) || (IMAGE::PixelFormat::AUTO == format)) ? image->getRenderFormat() : format;
+        IMAGE::PixelFormat      renderFormat = image->getRenderFormat();
+        size_t	         tempDataLen = image->getDataLen();
+
+
+        if (image->isCompressed()) {
+            initWithData(tempData, tempDataLen, image->getRenderFormat(), imageWidth, imageHeight, imageSize);
+            return true;
         }
         else {
-            glGenerateMipmapEXT(GL_TEXTURE_2D);
+            unsigned char* outTempData = nullptr;
+            ssize_t outTempDataLen = 0;
+
+            pixelFormat = IMAGE::convertDataToFormat(tempData, tempDataLen, renderFormat, pixelFormat, &outTempData, &outTempDataLen);
+
+            initWithData(outTempData, outTempDataLen, pixelFormat, imageWidth, imageHeight, imageSize);
+
+            if (outTempData != nullptr && outTempData != tempData) {
+                free(outTempData);
+            }
+
+            // set the premultiplied tag
+            hasPremultipliedAlpha_ = image->hasPremultipliedAlpha();
+
+            return true;
         }
-        GL_CHECK();
-        delete [] buf;
     }
 
-    // Allocates using new[], doesn't free.
-    static uint8 *ETC1ToRGBA(uint8 *etc1, int width, int height) {
-        uint8 *rgba = new uint8[width * height * 4];
-        memset(rgba, 0xFF, width * height * 4);
-        for (int y = 0; y < height; y += 4) {
-            for (int x = 0; x < width; x += 4) {
-                rg_etc1::unpack_etc1_block(etc1 + ((y / 4) * width/4 + (x / 4)) * 8,
-                    (uint32 *)rgba + (y * width + x), width, false);
-            }
-        }
-        return rgba;
+    // implementation Texture2D (Text)
+    bool Texture2D::initWithString(const char *text, const std::string& fontName, float fontSize, const MATH::Sizef& dimensions/* = Size(0, 0)*/, TextHAlignment hAlignment/* =  TextHAlignment::CENTER */, TextVAlignment vAlignment/* =  TextVAlignment::TOP */) {
+        FontDefinition tempDef;
+
+        tempDef.shadow.shadowEnabled = false;
+        tempDef.stroke.strokeEnabled = false;
+        tempDef.fontName      = fontName;
+        tempDef.fontSize      = fontSize;
+        tempDef.dimensions    = dimensions;
+        tempDef.alignment     = hAlignment;
+        tempDef.vertAlignment = vAlignment;
+        tempDef.fontFillColor = Color3B::WHITE;
+
+        return initWithString(text, tempDef);
     }
 
-    void Texture2D::loadZIM(const char *filename) {
-        uint8 *image_data[ZIM_MAX_MIP_LEVELS];
-        int width[ZIM_MAX_MIP_LEVELS];
-        int height[ZIM_MAX_MIP_LEVELS];
-
-        int flags;
-        int num_levels = LoadZIM(filename, &width[0], &height[0], &flags, &image_data[0]);
-        if (num_levels >= ZIM_MAX_MIP_LEVELS)
-            throw _HException_Normal("num_levels >= ZIM_MAX_MIP_LEVELS");
-        width_ = width[0];
-        height_ = height[0];
-        int data_type = GL_UNSIGNED_BYTE;
-        int colors = GL_RGBA;
-        int storage = GL_RGBA;
-        bool compressed = false;
-        switch (flags & ZIM_FORMAT_MASK) {
-        case ZIM_RGBA8888:
-            data_type = GL_UNSIGNED_BYTE;
-            break;
-        case ZIM_RGBA4444:
-            data_type = GL_UNSIGNED_SHORT_4_4_4_4;
-            break;
-        case ZIM_RGB565:
-            data_type = GL_UNSIGNED_SHORT_5_6_5;
-            colors = GL_RGB;
-            storage = GL_RGB;
-            break;
-        case ZIM_ETC1:
-            compressed = true;
-            break;
+    bool Texture2D::initWithString(const char *text, const FontDefinition& textDefinition) {
+        if(!text || 0 == strlen(text)) {
+            return false;
         }
 
-        GL_CHECK();
+        bool ret = false;
+        TextAlign align;
 
-        glGenTextures(1, &id_);
-        glBindTexture(GL_TEXTURE_2D, id_);
-        SetTextureParameters(flags);
-
-        if (compressed) {
-            for (int l = 0; l < num_levels; l++) {
-                int data_w = width[l];
-                int data_h = height[l];
-                if (data_w < 4) data_w = 4;
-                if (data_h < 4) data_h = 4;
-                // TODO: OpenGL 4.3+ accepts ETC1 so we should not have to do this anymore on those cards.
-                // Also, iOS does not have support for ETC1 compressed textures so we just decompress.
-                // TODO: Use PVR texture compression on iOS.
-                image_data[l] = ETC1ToRGBA(image_data[l], data_w, data_h);
-                glTexImage2D(GL_TEXTURE_2D, l, GL_RGBA, width[l], height[l], 0,
-                    GL_RGBA, GL_UNSIGNED_BYTE, image_data[l]);
-            }
-            GL_CHECK();
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, num_levels - 2);
+        if (TextVAlignment::TOP == textDefinition.vertAlignment) {
+            align = (TextHAlignment::CENTER == textDefinition.alignment) ? TextAlign::TOP
+            : (TextHAlignment::LEFT == textDefinition.alignment) ? TextAlign::TOP_LEFT : TextAlign::TOP_RIGHT;
+        }
+        else if (TextVAlignment::CENTER == textDefinition.vertAlignment) {
+            align = (TextHAlignment::CENTER == textDefinition.alignment) ? TextAlign::CENTER
+            : (TextHAlignment::LEFT == textDefinition.alignment) ? TextAlign::LEFT : TextAlign::RIGHT;
+        }
+        else if (TextVAlignment::BOTTOM == textDefinition.vertAlignment) {
+            align = (TextHAlignment::CENTER == textDefinition.alignment) ? TextAlign::BOTTOM
+            : (TextHAlignment::LEFT == textDefinition.alignment) ? TextAlign::BOTTOM_LEFT : TextAlign::BOTTOM_RIGHT;
         }
         else {
-            for (int l = 0; l < num_levels; l++) {
-                glTexImage2D(GL_TEXTURE_2D, l, storage, width[l], height[l], 0,
-                    colors, data_type, image_data[l]);
-            }
-            if (num_levels == 1 && (flags & ZIM_GEN_MIPS)) {
-                if(GLOBAL::glExtensions().FBO_ARB) {
-                    glGenerateMipmap(GL_TEXTURE_2D);
-                }
-                else {
-    #ifndef USING_GLES2
-                    glGenerateMipmapEXT(GL_TEXTURE_2D);
-    #endif
-                }
-            }
+            return false;
         }
-        SetTextureParameters(flags);
 
-        GL_CHECK();
-        // Only free the top level, since the allocation is used for all of them.
-        free(image_data[0]);
+        IMAGE::PixelFormat pixelFormat = g_defaultAlphaPixelFormat;
+        HBYTE* outTempData = nullptr;
+        ssize_t outTempDataLen = 0;
+
+        int imageWidth;
+        int imageHeight;
+        auto textDef = textDefinition;
+        textDef.shadow.shadowEnabled = false;
+
+        bool hasPremultipliedAlpha;
+        // TODO
+        throw _HException_Normal("UnImpl getTextureDataForText");
+        //HData outData = getTextureDataForText(text, textDef, align, imageWidth, imageHeight, hasPremultipliedAlpha);
+        HData outData = HData::Null;
+        if(outData.isNull()) {
+            return false;
+        }
+
+        MATH::Sizef  imageSize = MATH::Sizef((float)imageWidth, (float)imageHeight);
+        pixelFormat = IMAGE::convertDataToFormat(outData.getBytes(), imageWidth*imageHeight*4, IMAGE::PixelFormat::RGBA8888, pixelFormat, &outTempData, &outTempDataLen);
+
+        ret = initWithData(outTempData, outTempDataLen, pixelFormat, imageWidth, imageHeight, imageSize);
+
+        if (outTempData != nullptr && outTempData != outData.getBytes()) {
+            free(outTempData);
+        }
+        hasPremultipliedAlpha_ = hasPremultipliedAlpha;
+        return ret;
     }
 
-    void Texture2D::bind(int stage) {
-        GL_CHECK();
-        if (stage != -1)
-            glActiveTexture(GL_TEXTURE0 + stage);
-        glBindTexture(GL_TEXTURE_2D, id_);
-        GL_CHECK();
+    void Texture2D::drawAtPoint(const MATH::Vector2f& point)
+    {
+        GLfloat    coordinates[] = {
+            0.0f,    maxT_,
+            maxS_,maxT_,
+            0.0f,    0.0f,
+            maxS_,0.0f };
+
+        GLfloat    width = (GLfloat)pixelsWidth_ * maxS_,
+            height = (GLfloat)pixelsHight_ * maxT_;
+
+        GLfloat        vertices[] = {
+            point.x,            point.y,
+            width + point.x,    point.y,
+            point.x,            height  + point.y,
+            width + point.x,    height  + point.y };
+
+        GLStateCache::EnableVertexAttribs( VERTEX_ATTRIB_FLAG_POSITION | VERTEX_ATTRIB_FLAG_TEX_COORD );
+        shaderProgram_->use();
+        shaderProgram_->setUniformsForBuiltins();
+
+        GLStateCache::BindTexture2D( name_ );
+
+        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, vertices);
+        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, 0, coordinates);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
-    void Texture2D::unBind(int stage) {
-        GL_CHECK();
-        if (stage != -1)
-            glActiveTexture(GL_TEXTURE0 + stage);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        GL_CHECK();
+    void Texture2D::drawInRect(const MATH::Rectf& rect) {
+        GLfloat    coordinates[] = {
+            0.0f,    maxT_,
+            maxS_,maxT_,
+            0.0f,    0.0f,
+            maxS_,0.0f };
+
+        GLfloat    vertices[] = {    rect.origin.x,        rect.origin.y,                            /*0.0f,*/
+            rect.origin.x + rect.size.width,        rect.origin.y,                            /*0.0f,*/
+            rect.origin.x,                            rect.origin.y + rect.size.height,        /*0.0f,*/
+            rect.origin.x + rect.size.width,        rect.origin.y + rect.size.height,        /*0.0f*/ };
+
+        GLStateCache::EnableVertexAttribs( VERTEX_ATTRIB_FLAG_POSITION | VERTEX_ATTRIB_FLAG_TEX_COORD );
+        shaderProgram_->use();
+        shaderProgram_->setUniformsForBuiltins();
+
+        GLStateCache::BindTexture2D( name_ );
+
+        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, vertices);
+        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, 0, coordinates);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+
+    void Texture2D::generateMipmap() {
+        GLStateCache::BindTexture2D(name_);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        hasMipmaps_ = true;
+    }
+
+    bool Texture2D::hasMipmaps() const {
+        return hasMipmaps_;
+    }
+
+    void Texture2D::setTexParameters(const TexParams &texParams) {
+        GLStateCache::BindTexture2D( name_ );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texParams.minFilter );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texParams.magFilter );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texParams.wrapS );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texParams.wrapT );
+    }
+
+    void Texture2D::setAliasTexParameters() {
+        if (! antialiasEnabled_) {
+            return;
+        }
+
+        antialiasEnabled_ = false;
+
+        if (name_ == 0) {
+            return;
+        }
+
+        GLStateCache::BindTexture2D(name_);
+
+        if( ! hasMipmaps_ ) {
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+        }
+        else {
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST );
+        }
+
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    }
+
+    void Texture2D::setAntiAliasTexParameters() {
+        if ( antialiasEnabled_ ) {
+            return;
+        }
+
+        antialiasEnabled_ = true;
+
+        if (name_ == 0) {
+            return;
+        }
+
+        GLStateCache::BindTexture2D( name_ );
+
+        if( ! hasMipmaps_ ) {
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        }
+        else {
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+        }
+
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    }
+
+    void Texture2D::setDefaultAlphaPixelFormat(IMAGE::PixelFormat format) {
+        g_defaultAlphaPixelFormat = format;
+    }
+
+    IMAGE::PixelFormat Texture2D::getDefaultAlphaPixelFormat() {
+        return g_defaultAlphaPixelFormat;
     }
 }
-
