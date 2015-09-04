@@ -17,6 +17,7 @@ SOURCES += \
     $$P/GRAPH/GFX/*.cpp \
     $$P/GRAPH/THIN3D/*.cpp \
     $$P/GRAPH/RENDERER/*.cpp \
+    $$P/GRAPH/RENDERER/SHADER/*.* \
     $$P/GRAPH/UI/*.cpp \
     $$P/GRAPH/UI/CONTROLS/*.cpp \
     $$P/IMAGE/*.cpp \
