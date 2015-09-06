@@ -1,5 +1,6 @@
 ﻿#include <string>
 #include "GRAPH/Director.h"
+#include "GRAPH/RENDERER/Texture2D.h"
 
 namespace GRAPH
 {
@@ -13,12 +14,20 @@ namespace GRAPH
 
     bool Director::init(void) {
         initMatrixStack();
+        textureCache_ = new (std::nothrow) TextureCache();
 
         return true;
     }
 
     Director::~Director(void) {
+        if (textureCache_) {
+            textureCache_->waitForQuit();
+            SAFE_RELEASE_NULL(textureCache_);
+        }
+    }
 
+    TextureCache* Director::getTextureCache() const {
+        return textureCache_;
     }
 
     void Director::initMatrixStack() {

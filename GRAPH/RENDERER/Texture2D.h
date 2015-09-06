@@ -21,22 +21,25 @@ namespace GRAPH
 {
     class GLProgram;
 
-    typedef struct _MipmapInfo
+    struct MipmapInfo
     {
         unsigned char* address;
         int len;
-        _MipmapInfo():address(NULL),len(0){}
-    } MipmapInfo;
+        MipmapInfo()
+            : address(nullptr)
+            , len(0){}
+    };
 
     class Texture2D : public HObject
     {
     public:
-        typedef struct _TexParams {
+        struct TexParams
+        {
             GLuint    minFilter;
             GLuint    magFilter;
             GLuint    wrapS;
             GLuint    wrapT;
-        }TexParams;
+        };
 
     public:
         static void setDefaultAlphaPixelFormat(IMAGE::PixelFormat format);
@@ -159,6 +162,66 @@ namespace GRAPH
         bool needQuit_;
         int asyncRefCount_;
         std::unordered_map<std::string, Texture2D*> textures_;
+    };
+
+    class TextureAtlas : public HObject
+    {
+    public:
+        static TextureAtlas* create(const std::string& file , ssize_t capacity);
+        static TextureAtlas* createWithTexture(Texture2D *texture, ssize_t capacity);
+
+        TextureAtlas();
+        virtual ~TextureAtlas();
+
+        bool initWithFile(const std::string& file, ssize_t capacity);
+        bool initWithTexture(Texture2D *texture, ssize_t capacity);
+
+        void updateQuad(V3F_C4B_T2F_Quad* quad, ssize_t index);
+        void insertQuad(V3F_C4B_T2F_Quad* quad, ssize_t index);
+        void insertQuads(V3F_C4B_T2F_Quad* quads, ssize_t index, ssize_t amount);
+        void insertQuadFromIndex(ssize_t fromIndex, ssize_t newIndex);
+
+        void removeQuadAtIndex(ssize_t index);
+        void removeQuadsAtIndex(ssize_t index, ssize_t amount);
+        void removeAllQuads();
+
+        bool resizeCapacity(ssize_t capacity);
+
+        void increaseTotalQuadsWith(ssize_t amount);
+        void moveQuadsFromIndex(ssize_t oldIndex, ssize_t amount, ssize_t newIndex);
+        void moveQuadsFromIndex(ssize_t index, ssize_t newIndex);
+        void fillWithEmptyQuadsFromIndex(ssize_t index, ssize_t amount);
+
+        void drawNumberOfQuads(ssize_t n);
+        void drawNumberOfQuads(ssize_t numberOfQuads, ssize_t start);
+        void drawQuads();
+
+        inline bool isDirty(void) { return dirty_; }
+        inline void setDirty(bool bDirty) { dirty_ = bDirty; }
+
+        ssize_t getTotalQuads() const;
+        ssize_t getCapacity() const;
+        Texture2D* getTexture() const;
+        void setTexture(Texture2D* texture);
+        V3F_C4B_T2F_Quad* getQuads();
+
+        void setQuads(V3F_C4B_T2F_Quad* quads);
+
+    private:
+        void renderCommand();
+
+        void setupIndices();
+        void mapBuffers();
+        void setupVBO();
+
+    protected:
+        GLushort* indices_;
+        GLuint  buffersVBO_[2]; //0: vertex  1: indices
+        bool    dirty_; //indicates whether or not the array buffer of the VBO needs to be updated
+        ssize_t totalQuads_;
+        ssize_t capacity_;
+        Texture2D* texture_;
+        V3F_C4B_T2F_Quad* quads_;
     };
 }
 

@@ -7,6 +7,8 @@
 
 namespace GRAPH
 {
+    class TextureCache;
+
     enum class MATRIX_STACK_TYPE
     {
         /// Model view matrix stack
@@ -29,6 +31,8 @@ namespace GRAPH
         virtual ~Director();
         virtual bool init();
 
+        TextureCache* getTextureCache() const;
+
         void pushMatrix(MATRIX_STACK_TYPE type);
         void popMatrix(MATRIX_STACK_TYPE type);
         void loadIdentityMatrix(MATRIX_STACK_TYPE type);
@@ -44,6 +48,8 @@ namespace GRAPH
         std::stack<MATH::Matrix4> modelViewMatrixStack_;
         std::stack<MATH::Matrix4> projectionMatrixStack_;
         std::stack<MATH::Matrix4> textureMatrixStack_;
+        //texture cache belongs to this director
+        TextureCache *textureCache_;
     };
 }
 
