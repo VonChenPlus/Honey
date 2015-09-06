@@ -2,6 +2,13 @@
 #define TEXTURE2D_H
 
 #include <string>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
+#include <queue>
+#include <string>
+#include <unordered_map>
+#include <functional>
 #include "BASE/HObject.h"
 #include "GRAPH/Types.h"
 #include "GRAPH/RENDERER/GLCommon.h"
@@ -97,6 +104,61 @@ namespace GRAPH
         bool hasMipmaps_;
         GLProgram* shaderProgram_;
         bool antialiasEnabled_;
+    };
+
+    class TextureCache : public HObject
+    {
+    public:
+        TextureCache();
+        virtual ~TextureCache();
+
+        Texture2D* addImage(const std::string &filepath);
+        Texture2D* addImage(IMAGE::TinyImage *image, const std::string &key);
+        virtual void addImageAsync(const std::string &filepath, const std::function<void(Texture2D*)>& callback);
+
+        virtual void unbindImageAsync(const std::string &filename);
+        virtual void unbindAllImageAsync();
+
+        bool reloadTexture(const std::string& fileName);
+
+        void removeAllTextures();
+        void removeUnusedTextures();
+        void removeTexture(Texture2D* texture);
+        void removeTextureForKey(const std::string &key);
+
+        Texture2D* getTextureForKey(const std::string& key) const;
+        const std::string getTextureFilePath(Texture2D* texture)const;
+
+        void waitForQuit();
+    private:
+        void addImageAsyncCallBack(float dt);
+        void loadImageThread();
+
+    protected:
+        struct AsyncStruct
+        {
+        public:
+            AsyncStruct(const std::string& fn, std::function<void(Texture2D*)> f) : filename(fn), callback(f) {}
+
+            std::string filename;
+            std::function<void(Texture2D*)> callback;
+        };
+
+        struct ImageInfo
+        {
+            AsyncStruct *asyncStruct;
+            IMAGE::TinyImage *image;
+        };
+
+        std::thread* loadingThread_;
+        std::deque<AsyncStruct*>* asyncStructQueue_;
+        std::deque<ImageInfo*>* imageInfoQueue_;
+        std::mutex asyncMutex_;
+        std::mutex sleepMutex_;
+        std::condition_variable sleepCondition_;
+        bool needQuit_;
+        int asyncRefCount_;
+        std::unordered_map<std::string, Texture2D*> textures_;
     };
 }
 
