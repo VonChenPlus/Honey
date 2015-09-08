@@ -252,6 +252,7 @@ namespace GRAPH
     {
         friend class GLProgram;
         friend class GLProgramState;
+
     public:
         UniformValue();
         UniformValue(Uniform *uniform, GLProgram* glprogram);
@@ -280,9 +281,9 @@ namespace GRAPH
             CALLBACK_FN     // CALLBACK is already defined in windows, can't use it.
         };
 
-        Uniform* _uniform;
-        GLProgram* _glprogram;
-        Type _type;
+        Uniform* uniform_;
+        GLProgram* glProgram_;
+        Type type_;
 
         union U{
             float floatValue;
@@ -319,14 +320,13 @@ namespace GRAPH
                 memcpy(this, &other, sizeof(*this));
                 return *this;
             }
-        } _value;
+        } value_;
     };
 
     class VertexAttribValue
     {
         friend class GLProgram;
         friend class GLProgramState;
-        friend class VertexAttribBinding;
 
     public:
         VertexAttribValue(VertexAttrib *vertexAttrib);
@@ -338,9 +338,9 @@ namespace GRAPH
         void apply();
 
     protected:
-        VertexAttrib* _vertexAttrib;
-        bool _useCallback;
-        bool _enabled;
+        VertexAttrib* vertexAttrib_;
+        bool useCallback_;
+        bool enabled_;
 
         union U{
             struct {
@@ -358,7 +358,7 @@ namespace GRAPH
                 memcpy(this, &other, sizeof(*this));
                 return *this;
             }
-        } _value;
+        } value_;
     };
 
     class Texture2D;
@@ -378,12 +378,12 @@ namespace GRAPH
         void applyUniforms();
 
         void setGLProgram(GLProgram* glprogram);
-        GLProgram* getGLProgram() const { return _glprogram; }
+        GLProgram* getGLProgram() const { return glProgram_; }
         uint32_t getVertexAttribsFlags() const;
         ssize_t getVertexAttribCount() const;
         void setVertexAttribCallback(const std::string& name, const std::function<void(VertexAttrib*)> &callback);
         void setVertexAttribPointer(const std::string& name, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid *pointer);
-        ssize_t getUniformCount() const { return _uniforms.size(); }
+        ssize_t getUniformCount() const { return uniforms_.size(); }
 
         void setUniformInt(const std::string& uniformName, int value);
         void setUniformFloat(const std::string& uniformName, float value);
@@ -423,14 +423,15 @@ namespace GRAPH
         UniformValue* getUniformValue(const std::string& uniformName);
         UniformValue* getUniformValue(GLint uniformLocation);
 
-        bool _uniformAttributeValueDirty;
-        std::unordered_map<std::string, GLint> _uniformsByName;
-        std::unordered_map<GLint, UniformValue> _uniforms;
-        std::unordered_map<std::string, VertexAttribValue> _attributes;
-        std::unordered_map<std::string, int> _boundTextureUnits;
-        int _textureUnitIndex;
-        uint32_t _vertexAttribsFlags;
-        GLProgram* _glprogram;
+    private:
+        bool uniformAttributeValueDirty_;
+        std::unordered_map<std::string, GLint> uniformsByName_;
+        std::unordered_map<GLint, UniformValue> uniforms_;
+        std::unordered_map<std::string, VertexAttribValue> attributes_;
+        std::unordered_map<std::string, int> boundTextureUnits_;
+        int textureUnitIndex_;
+        uint32_t vertexAttribsFlags_;
+        GLProgram* glProgram_;
     };
 
     class GLProgramStateCache
@@ -445,7 +446,9 @@ namespace GRAPH
     protected:
         GLProgramStateCache();
         ~GLProgramStateCache();
-        HObjectMap<GLProgram*, GLProgramState*> _glProgramStates;
+
+    private:
+        HObjectMap<GLProgram*, GLProgramState*> glProgramStates_;
     };
 }
 

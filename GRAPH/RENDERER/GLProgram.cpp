@@ -944,42 +944,42 @@ namespace GRAPH
     }
 
     UniformValue::UniformValue()
-        : _uniform(nullptr)
-        , _glprogram(nullptr)
-        , _type(Type::VALUE) {
+        : uniform_(nullptr)
+        , glProgram_(nullptr)
+        , type_(Type::VALUE) {
     }
 
     UniformValue::UniformValue(Uniform *uniform, GLProgram* glprogram)
-        : _uniform(uniform)
-        , _glprogram(glprogram)
-        , _type(Type::VALUE) {
+        : uniform_(uniform)
+        , glProgram_(glprogram)
+        , type_(Type::VALUE) {
     }
 
     UniformValue::~UniformValue() {
-        if (_type == Type::CALLBACK_FN)
-            delete _value.callback;
+        if (type_ == Type::CALLBACK_FN)
+            delete value_.callback;
     }
 
     void UniformValue::apply() {
-        if (_type == Type::CALLBACK_FN) {
-            (*_value.callback)(_glprogram, _uniform);
+        if (type_ == Type::CALLBACK_FN) {
+            (*value_.callback)(glProgram_, uniform_);
         }
-        else if (_type == Type::POINTER) {
-            switch (_uniform->type) {
+        else if (type_ == Type::POINTER) {
+            switch (uniform_->type) {
                 case GL_FLOAT:
-                    _glprogram->setUniformLocationWith1fv(_uniform->location, _value.floatv.pointer, _value.floatv.size);
+                    glProgram_->setUniformLocationWith1fv(uniform_->location, value_.floatv.pointer, value_.floatv.size);
                     break;
 
                 case GL_FLOAT_VEC2:
-                    _glprogram->setUniformLocationWith2fv(_uniform->location, _value.v2f.pointer, _value.v2f.size);
+                    glProgram_->setUniformLocationWith2fv(uniform_->location, value_.v2f.pointer, value_.v2f.size);
                     break;
 
                 case GL_FLOAT_VEC3:
-                    _glprogram->setUniformLocationWith3fv(_uniform->location, _value.v3f.pointer, _value.v3f.size);
+                    glProgram_->setUniformLocationWith3fv(uniform_->location, value_.v3f.pointer, value_.v3f.size);
                     break;
 
                 case GL_FLOAT_VEC4:
-                    _glprogram->setUniformLocationWith4fv(_uniform->location, _value.v4f.pointer, _value.v4f.size);
+                    glProgram_->setUniformLocationWith4fv(uniform_->location, value_.v4f.pointer, value_.v4f.size);
                     break;
 
                 default:
@@ -987,39 +987,39 @@ namespace GRAPH
             }
         }
         else{
-            switch (_uniform->type) {
+            switch (uniform_->type) {
                 case GL_SAMPLER_2D:
-                    _glprogram->setUniformLocationWith1i(_uniform->location, _value.tex.textureUnit);
-                    GLStateCache::BindTexture2DN(_value.tex.textureUnit, _value.tex.textureId);
+                    glProgram_->setUniformLocationWith1i(uniform_->location, value_.tex.textureUnit);
+                    GLStateCache::BindTexture2DN(value_.tex.textureUnit, value_.tex.textureId);
                     break;
 
                 case GL_SAMPLER_CUBE:
-                    _glprogram->setUniformLocationWith1i(_uniform->location, _value.tex.textureUnit);
-                    GLStateCache::BindTextureN(_value.tex.textureUnit, _value.tex.textureId, GL_TEXTURE_CUBE_MAP);
+                    glProgram_->setUniformLocationWith1i(uniform_->location, value_.tex.textureUnit);
+                    GLStateCache::BindTextureN(value_.tex.textureUnit, value_.tex.textureId, GL_TEXTURE_CUBE_MAP);
                     break;
 
                 case GL_INT:
-                    _glprogram->setUniformLocationWith1i(_uniform->location, _value.intValue);
+                    glProgram_->setUniformLocationWith1i(uniform_->location, value_.intValue);
                     break;
 
                 case GL_FLOAT:
-                    _glprogram->setUniformLocationWith1f(_uniform->location, _value.floatValue);
+                    glProgram_->setUniformLocationWith1f(uniform_->location, value_.floatValue);
                     break;
 
                 case GL_FLOAT_VEC2:
-                    _glprogram->setUniformLocationWith2f(_uniform->location, _value.v2Value[0], _value.v2Value[1]);
+                    glProgram_->setUniformLocationWith2f(uniform_->location, value_.v2Value[0], value_.v2Value[1]);
                     break;
 
                 case GL_FLOAT_VEC3:
-                    _glprogram->setUniformLocationWith3f(_uniform->location, _value.v3Value[0], _value.v3Value[1], _value.v3Value[2]);
+                    glProgram_->setUniformLocationWith3f(uniform_->location, value_.v3Value[0], value_.v3Value[1], value_.v3Value[2]);
                     break;
 
                 case GL_FLOAT_VEC4:
-                    _glprogram->setUniformLocationWith4f(_uniform->location, _value.v4Value[0], _value.v4Value[1], _value.v4Value[2], _value.v4Value[3]);
+                    glProgram_->setUniformLocationWith4f(uniform_->location, value_.v4Value[0], value_.v4Value[1], value_.v4Value[2], value_.v4Value[3]);
                     break;
 
                 case GL_FLOAT_MAT4:
-                    _glprogram->setUniformLocationWithMatrix4fv(_uniform->location, (GLfloat*)&_value.matrixValue, 1);
+                    glProgram_->setUniformLocationWithMatrix4fv(uniform_->location, (GLfloat*)&value_.matrixValue, 1);
                     break;
 
                 default:
@@ -1029,124 +1029,124 @@ namespace GRAPH
     }
 
     void UniformValue::setCallback(const std::function<void(GLProgram*, Uniform*)> &callback) {
-        if (_type == Type::CALLBACK_FN)
-            delete _value.callback;
+        if (type_ == Type::CALLBACK_FN)
+            delete value_.callback;
 
-        _value.callback = new std::function<void(GLProgram*, Uniform*)>();
-        *_value.callback = callback;
+        value_.callback = new std::function<void(GLProgram*, Uniform*)>();
+        *value_.callback = callback;
 
-        _type = Type::CALLBACK_FN;
+        type_ = Type::CALLBACK_FN;
     }
 
     void UniformValue::setTexture(GLuint textureId, GLuint textureUnit) {
-        _value.tex.textureId = textureId;
-        _value.tex.textureUnit = textureUnit;
-        _type = Type::VALUE;
+        value_.tex.textureId = textureId;
+        value_.tex.textureUnit = textureUnit;
+        type_ = Type::VALUE;
     }
 
     void UniformValue::setInt(int value) {
-        _value.intValue = value;
-        _type = Type::VALUE;
+        value_.intValue = value;
+        type_ = Type::VALUE;
     }
 
     void UniformValue::setFloat(float value) {
-        _value.floatValue = value;
-        _type = Type::VALUE;
+        value_.floatValue = value;
+        type_ = Type::VALUE;
     }
 
     void UniformValue::setFloatv(ssize_t size, const float* pointer) {
-        _value.floatv.pointer = (const float*)pointer;
-        _value.floatv.size = (GLsizei)size;
-        _type = Type::POINTER;
+        value_.floatv.pointer = (const float*)pointer;
+        value_.floatv.size = (GLsizei)size;
+        type_ = Type::POINTER;
     }
 
     void UniformValue::setVec2(const MATH::Vector2f& value) {
-        memcpy(_value.v2Value, &value, sizeof(_value.v2Value));
-        _type = Type::VALUE;
+        memcpy(value_.v2Value, &value, sizeof(value_.v2Value));
+        type_ = Type::VALUE;
     }
 
     void UniformValue::setVec2v(ssize_t size, const MATH::Vector2f* pointer) {
-        _value.v2f.pointer = (const float*)pointer;
-        _value.v2f.size = (GLsizei)size;
-        _type = Type::POINTER;
+        value_.v2f.pointer = (const float*)pointer;
+        value_.v2f.size = (GLsizei)size;
+        type_ = Type::POINTER;
     }
 
     void UniformValue::setVec3(const MATH::Vector3f& value) {
-        memcpy(_value.v3Value, &value, sizeof(_value.v3Value));
-        _type = Type::VALUE;
+        memcpy(value_.v3Value, &value, sizeof(value_.v3Value));
+        type_ = Type::VALUE;
 
     }
 
     void UniformValue::setVec3v(ssize_t size, const MATH::Vector3f* pointer) {
-        _value.v3f.pointer = (const float*)pointer;
-        _value.v3f.size = (GLsizei)size;
-        _type = Type::POINTER;
+        value_.v3f.pointer = (const float*)pointer;
+        value_.v3f.size = (GLsizei)size;
+        type_ = Type::POINTER;
 
     }
 
     void UniformValue::setVec4(const MATH::Vector4f& value) {
-        memcpy(_value.v4Value, &value, sizeof(_value.v4Value));
-        _type = Type::VALUE;
+        memcpy(value_.v4Value, &value, sizeof(value_.v4Value));
+        type_ = Type::VALUE;
     }
 
     void UniformValue::setVec4v(ssize_t size, const MATH::Vector4f* pointer) {
-        _value.v4f.pointer = (const float*)pointer;
-        _value.v4f.size = (GLsizei)size;
-        _type = Type::POINTER;
+        value_.v4f.pointer = (const float*)pointer;
+        value_.v4f.size = (GLsizei)size;
+        type_ = Type::POINTER;
     }
 
     void UniformValue::setMat4(const MATH::Matrix4& value) {
-        memcpy(_value.matrixValue, &value, sizeof(_value.matrixValue));
-        _type = Type::VALUE;
+        memcpy(value_.matrixValue, &value, sizeof(value_.matrixValue));
+        type_ = Type::VALUE;
     }
 
     VertexAttribValue::VertexAttribValue()
-        : _vertexAttrib(nullptr)
-        , _useCallback(false)
-        , _enabled(false) {
+        : vertexAttrib_(nullptr)
+        , useCallback_(false)
+        , enabled_(false) {
     }
 
     VertexAttribValue::VertexAttribValue(VertexAttrib *vertexAttrib)
-        : _vertexAttrib(vertexAttrib)
-        , _useCallback(false)
-        , _enabled(false) {
+        : vertexAttrib_(vertexAttrib)
+        , useCallback_(false)
+        , enabled_(false) {
     }
 
     VertexAttribValue::~VertexAttribValue() {
-        if (_useCallback)
-            delete _value.callback;
+        if (useCallback_)
+            delete value_.callback;
     }
 
     void VertexAttribValue::apply() {
-        if(_enabled) {
-            if(_useCallback) {
-                (*_value.callback)(_vertexAttrib);
+        if(enabled_) {
+            if(useCallback_) {
+                (*value_.callback)(vertexAttrib_);
             }
             else {
-                glVertexAttribPointer(_vertexAttrib->index,
-                                      _value.pointer.size,
-                                      _value.pointer.type,
-                                      _value.pointer.normalized,
-                                      _value.pointer.stride,
-                                      _value.pointer.pointer);
+                glVertexAttribPointer(vertexAttrib_->index,
+                                      value_.pointer.size,
+                                      value_.pointer.type,
+                                      value_.pointer.normalized,
+                                      value_.pointer.stride,
+                                      value_.pointer.pointer);
             }
         }
     }
 
     void VertexAttribValue::setCallback(const std::function<void(VertexAttrib*)> &callback) {
-        _value.callback = new std::function<void(VertexAttrib*)>();
-        *_value.callback = callback;
-        _useCallback = true;
-        _enabled = true;
+        value_.callback = new std::function<void(VertexAttrib*)>();
+        *value_.callback = callback;
+        useCallback_ = true;
+        enabled_ = true;
     }
 
     void VertexAttribValue::setPointer(GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid *pointer) {
-        _value.pointer.size = size;
-        _value.pointer.type = type;
-        _value.pointer.normalized = normalized;
-        _value.pointer.stride = stride;
-        _value.pointer.pointer = pointer;
-        _enabled = true;
+        value_.pointer.size = size;
+        value_.pointer.type = type;
+        value_.pointer.normalized = normalized;
+        value_.pointer.stride = stride;
+        value_.pointer.pointer = pointer;
+        enabled_ = true;
     }
 
     GLProgramState* GLProgramState::create(GLProgram *glprogram) {
@@ -1188,40 +1188,40 @@ namespace GRAPH
     }
 
     GLProgramState::GLProgramState()
-        : _uniformAttributeValueDirty(true)
-        , _textureUnitIndex(4)  // first 4 textures unites are reserved for CC_Texture0-3
-        , _vertexAttribsFlags(0)
-        , _glprogram(nullptr) {
+        : uniformAttributeValueDirty_(true)
+        , textureUnitIndex_(4)  // first 4 textures unites are reserved for CC_Texture0-3
+        , vertexAttribsFlags_(0)
+        , glProgram_(nullptr) {
     }
 
     GLProgramState::~GLProgramState() {
-        SAFE_RELEASE(_glprogram);
+        SAFE_RELEASE(glProgram_);
     }
 
     bool GLProgramState::init(GLProgram* glprogram) {
-        _glprogram = glprogram;
-        _glprogram->retain();
+        glProgram_ = glprogram;
+        glProgram_->retain();
 
-        for(auto &attrib : _glprogram->vertexAttribs_) {
+        for(auto &attrib : glProgram_->vertexAttribs_) {
             VertexAttribValue value(&attrib.second);
-            _attributes[attrib.first] = value;
+            attributes_[attrib.first] = value;
         }
 
-        for(auto &uniform : _glprogram->userUniforms_) {
-            UniformValue value(&uniform.second, _glprogram);
-            _uniforms[uniform.second.location] = value;
-            _uniformsByName[uniform.first] = uniform.second.location;
+        for(auto &uniform : glProgram_->userUniforms_) {
+            UniformValue value(&uniform.second, glProgram_);
+            uniforms_[uniform.second.location] = value;
+            uniformsByName_[uniform.first] = uniform.second.location;
         }
 
         return true;
     }
 
     void GLProgramState::resetGLProgram() {
-        SAFE_RELEASE(_glprogram);
-        _glprogram = nullptr;
-        _uniforms.clear();
-        _attributes.clear();
-        _textureUnitIndex = 1;
+        SAFE_RELEASE(glProgram_);
+        glProgram_ = nullptr;
+        uniforms_.clear();
+        attributes_.clear();
+        textureUnitIndex_ = 1;
     }
 
     void GLProgramState::apply(const MATH::Matrix4& modelView) {
@@ -1231,81 +1231,81 @@ namespace GRAPH
     }
 
     void GLProgramState::updateUniformsAndAttributes() {
-        if(_uniformAttributeValueDirty) {
-            for(auto& uniformLocation : _uniformsByName) {
-                _uniforms[uniformLocation.second]._uniform = _glprogram->getUniform(uniformLocation.first);
+        if(uniformAttributeValueDirty_) {
+            for(auto& uniformLocation : uniformsByName_) {
+                uniforms_[uniformLocation.second].uniform_ = glProgram_->getUniform(uniformLocation.first);
             }
 
-            _vertexAttribsFlags = 0;
-            for(auto& attributeValue : _attributes) {
-                attributeValue.second._vertexAttrib = _glprogram->getVertexAttrib(attributeValue.first);;
-                if(attributeValue.second._enabled)
-                    _vertexAttribsFlags |= 1 << attributeValue.second._vertexAttrib->index;
+            vertexAttribsFlags_ = 0;
+            for(auto& attributeValue : attributes_) {
+                attributeValue.second.vertexAttrib_ = glProgram_->getVertexAttrib(attributeValue.first);;
+                if(attributeValue.second.enabled_)
+                    vertexAttribsFlags_ |= 1 << attributeValue.second.vertexAttrib_->index;
             }
 
-            _uniformAttributeValueDirty = false;
+            uniformAttributeValueDirty_ = false;
 
         }
     }
 
     void GLProgramState::applyGLProgram(const MATH::Matrix4& modelView) {
         updateUniformsAndAttributes();
-        _glprogram->use();
-        _glprogram->setUniformsForBuiltins(modelView);
+        glProgram_->use();
+        glProgram_->setUniformsForBuiltins(modelView);
     }
 
     void GLProgramState::applyAttributes(bool applyAttribFlags) {
         updateUniformsAndAttributes();
-        if(_vertexAttribsFlags) {
+        if(vertexAttribsFlags_) {
             if (applyAttribFlags)
-                GLStateCache::EnableVertexAttribs(_vertexAttribsFlags);
-            for(auto &attribute : _attributes) {
+                GLStateCache::EnableVertexAttribs(vertexAttribsFlags_);
+            for(auto &attribute : attributes_) {
                 attribute.second.apply();
             }
         }
     }
     void GLProgramState::applyUniforms() {
         updateUniformsAndAttributes();
-        for(auto& uniform : _uniforms) {
+        for(auto& uniform : uniforms_) {
             uniform.second.apply();
         }
     }
 
     void GLProgramState::setGLProgram(GLProgram *glprogram) {
-        if( _glprogram != glprogram) {
+        if( glProgram_ != glprogram) {
             resetGLProgram();
             init(glprogram);
         }
     }
 
     uint32_t GLProgramState::getVertexAttribsFlags() const {
-        return _vertexAttribsFlags;
+        return vertexAttribsFlags_;
     }
 
     ssize_t GLProgramState::getVertexAttribCount() const {
-        return _attributes.size();
+        return attributes_.size();
     }
 
     UniformValue* GLProgramState::getUniformValue(GLint uniformLocation) {
         updateUniformsAndAttributes();
-        const auto itr = _uniforms.find(uniformLocation);
-        if (itr != _uniforms.end())
+        const auto itr = uniforms_.find(uniformLocation);
+        if (itr != uniforms_.end())
             return &itr->second;
         return nullptr;
     }
 
     UniformValue* GLProgramState::getUniformValue(const std::string& name) {
         updateUniformsAndAttributes();
-        const auto itr = _uniformsByName.find(name);
-        if (itr != _uniformsByName.end())
-            return &_uniforms[itr->second];
+        const auto itr = uniformsByName_.find(name);
+        if (itr != uniformsByName_.end())
+            return &uniforms_[itr->second];
         return nullptr;
     }
 
     VertexAttribValue* GLProgramState::getVertexAttribValue(const std::string& name) {
         updateUniformsAndAttributes();
-        const auto itr = _attributes.find(name);
-        if( itr != _attributes.end())
+        const auto itr = attributes_.find(name);
+        if( itr != attributes_.end())
             return &itr->second;
         return nullptr;
     }
@@ -1314,7 +1314,7 @@ namespace GRAPH
         VertexAttribValue *v = getVertexAttribValue(name);
         if(v) {
             v->setCallback(callback);
-            _vertexAttribsFlags |= 1 << v->_vertexAttrib->index;
+            vertexAttribsFlags_ |= 1 << v->vertexAttrib_->index;
         }
     }
 
@@ -1322,7 +1322,7 @@ namespace GRAPH
         auto v = getVertexAttribValue(name);
         if(v) {
             v->setPointer(size, type, normalized, stride, pointer);
-            _vertexAttribsFlags |= 1 << v->_vertexAttrib->index;
+            vertexAttribsFlags_ |= 1 << v->vertexAttrib_->index;
         }
     }
 
@@ -1471,12 +1471,12 @@ namespace GRAPH
     void GLProgramState::setUniformTexture(const std::string& uniformName, GLuint textureId) {
         auto v = getUniformValue(uniformName);
         if (v) {
-            if (_boundTextureUnits.find(uniformName) != _boundTextureUnits.end()) {
-                v->setTexture(textureId, _boundTextureUnits[uniformName]);
+            if (boundTextureUnits_.find(uniformName) != boundTextureUnits_.end()) {
+                v->setTexture(textureId, boundTextureUnits_[uniformName]);
             }
             else {
-                v->setTexture(textureId, _textureUnitIndex);
-                _boundTextureUnits[uniformName] = _textureUnitIndex++;
+                v->setTexture(textureId, textureUnitIndex_);
+                boundTextureUnits_[uniformName] = textureUnitIndex_++;
             }
         }
     }
@@ -1484,12 +1484,12 @@ namespace GRAPH
     void GLProgramState::setUniformTexture(GLint uniformLocation, GLuint textureId) {
         auto v = getUniformValue(uniformLocation);
         if (v) {
-            if (_boundTextureUnits.find(v->_uniform->name) != _boundTextureUnits.end()) {
-                v->setTexture(textureId, _boundTextureUnits[v->_uniform->name]);
+            if (boundTextureUnits_.find(v->uniform_->name) != boundTextureUnits_.end()) {
+                v->setTexture(textureId, boundTextureUnits_[v->uniform_->name]);
             }
             else {
-                v->setTexture(textureId, _textureUnitIndex);
-                _boundTextureUnits[v->_uniform->name] = _textureUnitIndex++;
+                v->setTexture(textureId, textureUnitIndex_);
+                boundTextureUnits_[v->uniform_->name] = textureUnitIndex_++;
             }
         }
     }
@@ -1498,7 +1498,7 @@ namespace GRAPH
     }
 
     GLProgramStateCache::~GLProgramStateCache() {
-        _glProgramStates.clear();
+        glProgramStates_.clear();
     }
 
     GLProgramStateCache& GLProgramStateCache::getInstance() {
@@ -1507,14 +1507,14 @@ namespace GRAPH
     }
 
     GLProgramState* GLProgramStateCache::getGLProgramState(GLProgram* glprogram) {
-        const auto& itr = _glProgramStates.find(glprogram);
-        if (itr != _glProgramStates.end()) {
+        const auto& itr = glProgramStates_.find(glprogram);
+        if (itr != glProgramStates_.end()) {
             return itr->second;
         }
 
         auto ret = new (std::nothrow) GLProgramState;
         if(ret && ret->init(glprogram)) {
-            _glProgramStates.insert(glprogram, ret);
+            glProgramStates_.insert(glprogram, ret);
             ret->release();
             return ret;
         }
@@ -1524,10 +1524,10 @@ namespace GRAPH
     }
 
     void GLProgramStateCache::removeUnusedGLProgramState() {
-        for( auto it=_glProgramStates.cbegin(); it!=_glProgramStates.cend(); /* nothing */) {
+        for( auto it=glProgramStates_.cbegin(); it!=glProgramStates_.cend(); /* nothing */) {
             auto value = it->second;
             if( value->getReferenceCount() == 1 ) {
-                _glProgramStates.erase(it++);
+                glProgramStates_.erase(it++);
             }
             else {
                 ++it;
@@ -1536,6 +1536,6 @@ namespace GRAPH
     }
 
     void GLProgramStateCache::removeAllGLProgramState() {
-        _glProgramStates.clear();
+        glProgramStates_.clear();
     }
 }
