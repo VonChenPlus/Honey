@@ -2,6 +2,7 @@
 #include "GRAPH/Director.h"
 #include "GRAPH/RENDERER/GLStateCache.h"
 #include "GRAPH/RENDERER/Shaders.h"
+#include "GRAPH/RENDERER/Texture2D.h"
 #include "IO/FileUtils.h"
 #include "UTILS/RANDOM/RandomUtils.h"
 
@@ -156,8 +157,6 @@ namespace GRAPH
     bool GLProgram::initWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray, const std::string& compileTimeDefines) {
         program_ = glCreateProgram();
 
-        // convert defines here. If we do it in "compileShader" we will do it it twice.
-        // a cache for the defines could be useful, but seems like overkill at this point
         std::string replacedDefines = "";
         ReplaceDefines(compileTimeDefines, replacedDefines);
 
@@ -169,7 +168,6 @@ namespace GRAPH
            }
         }
 
-        // Create and compile fragment shader
         if (fShaderByteArray) {
             if (!compileShader(&fragShader_, GL_FRAGMENT_SHADER, fShaderByteArray, replacedDefines)) {
                 return false;
@@ -671,277 +669,873 @@ namespace GRAPH
     }
 
     enum
-        {
-            kShaderType_PositionTextureColor,
-            kShaderType_PositionTextureColor_noMVP,
-            kShaderType_PositionTextureColorAlphaTest,
-            kShaderType_PositionTextureColorAlphaTestNoMV,
-            kShaderType_PositionColor,
-            kShaderType_PositionColorTextureAsPointsize,
-            kShaderType_PositionColor_noMVP,
-            kShaderType_PositionTexture,
-            kShaderType_PositionTexture_uColor,
-            kShaderType_PositionTextureA8Color,
-            kShaderType_Position_uColor,
-            kShaderType_PositionLengthTexureColor,
-            kShaderType_LabelDistanceFieldNormal,
-            kShaderType_LabelDistanceFieldGlow,
-            kShaderType_UIGrayScale,
-            kShaderType_LabelNormal,
-            kShaderType_LabelOutline,
-            kShaderType_MAX,
-        };
+    {
+        kShaderType_PositionTextureColor,
+        kShaderType_PositionTextureColor_noMVP,
+        kShaderType_PositionTextureColorAlphaTest,
+        kShaderType_PositionTextureColorAlphaTestNoMV,
+        kShaderType_PositionColor,
+        kShaderType_PositionColorTextureAsPointsize,
+        kShaderType_PositionColor_noMVP,
+        kShaderType_PositionTexture,
+        kShaderType_PositionTexture_uColor,
+        kShaderType_PositionTextureA8Color,
+        kShaderType_Position_uColor,
+        kShaderType_PositionLengthTexureColor,
+        kShaderType_LabelDistanceFieldNormal,
+        kShaderType_LabelDistanceFieldGlow,
+        kShaderType_UIGrayScale,
+        kShaderType_LabelNormal,
+        kShaderType_LabelOutline,
+        kShaderType_MAX,
+    };
 
-        static GLProgramCache *_sharedGLProgramCache = 0;
+    static GLProgramCache *_sharedGLProgramCache = 0;
 
-        GLProgramCache* GLProgramCache::getInstance()
-        {
-            if (!_sharedGLProgramCache) {
-                _sharedGLProgramCache = new (std::nothrow) GLProgramCache();
-                if (!_sharedGLProgramCache->init())
-                {
-                    SAFE_DELETE(_sharedGLProgramCache);
-                }
-            }
-            return _sharedGLProgramCache;
-        }
-
-        void GLProgramCache::destroyInstance()
-        {
-            SAFE_RELEASE_NULL(_sharedGLProgramCache);
-        }
-
-        GLProgramCache::GLProgramCache()
-            : programs_() {
-
-        }
-
-        GLProgramCache::~GLProgramCache() {
-            for( auto it = programs_.begin(); it != programs_.end(); ++it ) {
-                (it->second)->release();
+    GLProgramCache* GLProgramCache::getInstance()
+    {
+        if (!_sharedGLProgramCache) {
+            _sharedGLProgramCache = new (std::nothrow) GLProgramCache();
+            if (!_sharedGLProgramCache->init())
+            {
+                SAFE_DELETE(_sharedGLProgramCache);
             }
         }
+        return _sharedGLProgramCache;
+    }
 
-        bool GLProgramCache::init() {
-            loadDefaultGLPrograms();
-            return true;
+    void GLProgramCache::destroyInstance()
+    {
+        SAFE_RELEASE_NULL(_sharedGLProgramCache);
+    }
+
+    GLProgramCache::GLProgramCache()
+        : programs_() {
+
+    }
+
+    GLProgramCache::~GLProgramCache() {
+        for( auto it = programs_.begin(); it != programs_.end(); ++it ) {
+            (it->second)->release();
         }
+    }
 
-        void GLProgramCache::loadDefaultGLPrograms() {
-            GLProgram *p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_PositionTextureColor);
-            programs_.insert( std::make_pair( GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR, p ) );
+    bool GLProgramCache::init() {
+        loadDefaultGLPrograms();
+        return true;
+    }
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_PositionTextureColor_noMVP);
-            programs_.insert( std::make_pair( GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, p ) );
+    void GLProgramCache::loadDefaultGLPrograms() {
+        GLProgram *p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_PositionTextureColor);
+        programs_.insert( std::make_pair( GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR, p ) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_PositionTextureColorAlphaTest);
-            programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST, p) );
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_PositionTextureColor_noMVP);
+        programs_.insert( std::make_pair( GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, p ) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_PositionTextureColorAlphaTestNoMV);
-            programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV, p) );
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_PositionTextureColorAlphaTest);
+        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST, p) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_PositionColor);
-            programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_COLOR, p) );
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_PositionTextureColorAlphaTestNoMV);
+        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV, p) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_PositionColorTextureAsPointsize);
-            programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE, p) );
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_PositionColor);
+        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_COLOR, p) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_PositionColor_noMVP);
-            programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_COLOR_NO_MVP, p) );
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_PositionColorTextureAsPointsize);
+        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE, p) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_PositionTexture);
-            programs_.insert( std::make_pair( GLProgram::SHADER_NAME_POSITION_TEXTURE, p) );
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_PositionColor_noMVP);
+        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_COLOR_NO_MVP, p) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_PositionTexture_uColor);
-            programs_.insert( std::make_pair( GLProgram::SHADER_NAME_POSITION_TEXTURE_U_COLOR, p) );
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_PositionTexture);
+        programs_.insert( std::make_pair( GLProgram::SHADER_NAME_POSITION_TEXTURE, p) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_PositionTextureA8Color);
-            programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_TEXTURE_A8_COLOR, p) );
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_PositionTexture_uColor);
+        programs_.insert( std::make_pair( GLProgram::SHADER_NAME_POSITION_TEXTURE_U_COLOR, p) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_Position_uColor);
-            programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_U_COLOR, p) );
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_PositionTextureA8Color);
+        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_TEXTURE_A8_COLOR, p) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_PositionLengthTexureColor);
-            programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR, p) );
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_Position_uColor);
+        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_U_COLOR, p) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_LabelDistanceFieldNormal);
-            programs_.insert( std::make_pair(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL, p) );
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_PositionLengthTexureColor);
+        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR, p) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_LabelDistanceFieldGlow);
-            programs_.insert( std::make_pair(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW, p) );
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_LabelDistanceFieldNormal);
+        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL, p) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_UIGrayScale);
-            programs_.insert(std::make_pair(GLProgram::SHADER_NAME_POSITION_GRAYSCALE, p));
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_LabelDistanceFieldGlow);
+        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW, p) );
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_LabelNormal);
-            programs_.insert( std::make_pair(GLProgram::SHADER_NAME_LABEL_NORMAL, p) );
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_UIGrayScale);
+        programs_.insert(std::make_pair(GLProgram::SHADER_NAME_POSITION_GRAYSCALE, p));
 
-            p = new (std::nothrow) GLProgram();
-            loadDefaultGLProgram(p, kShaderType_LabelOutline);
-            programs_.insert( std::make_pair(GLProgram::SHADER_NAME_LABEL_OUTLINE, p) );
-        }
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_LabelNormal);
+        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_LABEL_NORMAL, p) );
 
-        void GLProgramCache::reloadDefaultGLPrograms() {
-            GLProgram *p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_PositionTextureColor);
+        p = new (std::nothrow) GLProgram();
+        loadDefaultGLProgram(p, kShaderType_LabelOutline);
+        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_LABEL_OUTLINE, p) );
+    }
 
-            p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_PositionTextureColor_noMVP);
+    void GLProgramCache::reloadDefaultGLPrograms() {
+        GLProgram *p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_PositionTextureColor);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_PositionTextureColorAlphaTest);
+        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_PositionTextureColor_noMVP);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_PositionTextureColorAlphaTestNoMV);
+        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_PositionTextureColorAlphaTest);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_POSITION_COLOR);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_PositionColor);
+        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_PositionTextureColorAlphaTestNoMV);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_PositionColorTextureAsPointsize);
+        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_COLOR);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_PositionColor);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_POSITION_COLOR_NO_MVP);
-            loadDefaultGLProgram(p, kShaderType_PositionColor_noMVP);
+        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_PositionColorTextureAsPointsize);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_PositionTexture);
+        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_COLOR_NO_MVP);
+        loadDefaultGLProgram(p, kShaderType_PositionColor_noMVP);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_U_COLOR);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_PositionTexture_uColor);
+        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_PositionTexture);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_A8_COLOR);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_PositionTextureA8Color);
+        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_U_COLOR);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_PositionTexture_uColor);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_POSITION_U_COLOR);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_Position_uColor);
+        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_A8_COLOR);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_PositionTextureA8Color);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_PositionLengthTexureColor);
+        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_U_COLOR);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_Position_uColor);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_LabelDistanceFieldNormal);
+        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_PositionLengthTexureColor);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_LabelDistanceFieldGlow);
+        p = getGLProgram(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_LabelDistanceFieldNormal);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_LABEL_NORMAL);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_LabelNormal);
+        p = getGLProgram(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_LabelDistanceFieldGlow);
 
-            p = getGLProgram(GLProgram::SHADER_NAME_LABEL_OUTLINE);
-            p->reset();
-            loadDefaultGLProgram(p, kShaderType_LabelOutline);
-        }
+        p = getGLProgram(GLProgram::SHADER_NAME_LABEL_NORMAL);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_LabelNormal);
 
-        void GLProgramCache::loadDefaultGLProgram(GLProgram *p, int type) {
-            switch (type) {
-                case kShaderType_PositionTextureColor:
-                    p->initWithByteArrays(PositionTextureColor_vert, PositionTextureColor_frag);
-                    break;
-                case kShaderType_PositionTextureColor_noMVP:
-                    p->initWithByteArrays(PositionTextureColor_noMVP_vert, PositionTextureColor_noMVP_frag);
-                    break;
-                case kShaderType_PositionTextureColorAlphaTest:
-                    p->initWithByteArrays(PositionTextureColor_vert, PositionTextureColorAlphaTest_frag);
-                    break;
-                case kShaderType_PositionTextureColorAlphaTestNoMV:
-                    p->initWithByteArrays(PositionTextureColor_noMVP_vert, PositionTextureColorAlphaTest_frag);
-                    break;
-                case kShaderType_PositionColor:
-                    p->initWithByteArrays(PositionColor_vert ,PositionColor_frag);
-                    break;
-                case kShaderType_PositionColorTextureAsPointsize:
-                    p->initWithByteArrays(PositionColorTextureAsPointsize_vert ,PositionColor_frag);
-                    break;
-                case kShaderType_PositionColor_noMVP:
-                    p->initWithByteArrays(PositionTextureColor_noMVP_vert ,PositionColor_frag);
-                    break;
-                case kShaderType_PositionTexture:
-                    p->initWithByteArrays(PositionTexture_vert ,PositionTexture_frag);
-                    break;
-                case kShaderType_PositionTexture_uColor:
-                    p->initWithByteArrays(PositionTexture_uColor_vert, PositionTexture_uColor_frag);
-                    break;
-                case kShaderType_PositionTextureA8Color:
-                    p->initWithByteArrays(PositionTextureA8Color_vert, PositionTextureA8Color_frag);
-                    break;
-                case kShaderType_Position_uColor:
-                    p->initWithByteArrays(Position_uColor_vert, Position_uColor_frag);
-                    p->bindAttribLocation("aVertex", GLProgram::VERTEX_ATTRIB_POSITION);
-                    break;
-                case kShaderType_PositionLengthTexureColor:
-                    p->initWithByteArrays(PositionColorLengthTexture_vert, PositionColorLengthTexture_frag);
-                    break;
-                case kShaderType_LabelDistanceFieldNormal:
-                    p->initWithByteArrays(Label_vert, LabelDistanceFieldNormal_frag);
-                    break;
-                case kShaderType_LabelDistanceFieldGlow:
-                    p->initWithByteArrays(Label_vert, LabelDistanceFieldGlow_frag);
-                    break;
-                case kShaderType_UIGrayScale:
-                    p->initWithByteArrays(PositionTextureColor_noMVP_vert,
-                                          PositionTexture_GrayScale_frag);
-                    break;
-                case kShaderType_LabelNormal:
-                    p->initWithByteArrays(Label_vert, LabelNormal_frag);
-                    break;
-                case kShaderType_LabelOutline:
-                    p->initWithByteArrays(Label_vert, LabelOutline_frag);
-                    break;
-                default:
-                    return;
-            }
+        p = getGLProgram(GLProgram::SHADER_NAME_LABEL_OUTLINE);
+        p->reset();
+        loadDefaultGLProgram(p, kShaderType_LabelOutline);
+    }
 
-            p->link();
-            p->updateUniforms();
-        }
-
-        GLProgram* GLProgramCache::getGLProgram(const std::string &key) {
-            auto it = programs_.find(key);
-            if( it != programs_.end() )
-                return it->second;
-            return nullptr;
-        }
-
-        void GLProgramCache::addGLProgram(GLProgram* program, const std::string &key) {
-            auto prev = getGLProgram(key);
-            if( prev == program )
+    void GLProgramCache::loadDefaultGLProgram(GLProgram *p, int type) {
+        switch (type) {
+            case kShaderType_PositionTextureColor:
+                p->initWithByteArrays(PositionTextureColor_vert, PositionTextureColor_frag);
+                break;
+            case kShaderType_PositionTextureColor_noMVP:
+                p->initWithByteArrays(PositionTextureColor_noMVP_vert, PositionTextureColor_noMVP_frag);
+                break;
+            case kShaderType_PositionTextureColorAlphaTest:
+                p->initWithByteArrays(PositionTextureColor_vert, PositionTextureColorAlphaTest_frag);
+                break;
+            case kShaderType_PositionTextureColorAlphaTestNoMV:
+                p->initWithByteArrays(PositionTextureColor_noMVP_vert, PositionTextureColorAlphaTest_frag);
+                break;
+            case kShaderType_PositionColor:
+                p->initWithByteArrays(PositionColor_vert ,PositionColor_frag);
+                break;
+            case kShaderType_PositionColorTextureAsPointsize:
+                p->initWithByteArrays(PositionColorTextureAsPointsize_vert ,PositionColor_frag);
+                break;
+            case kShaderType_PositionColor_noMVP:
+                p->initWithByteArrays(PositionTextureColor_noMVP_vert ,PositionColor_frag);
+                break;
+            case kShaderType_PositionTexture:
+                p->initWithByteArrays(PositionTexture_vert ,PositionTexture_frag);
+                break;
+            case kShaderType_PositionTexture_uColor:
+                p->initWithByteArrays(PositionTexture_uColor_vert, PositionTexture_uColor_frag);
+                break;
+            case kShaderType_PositionTextureA8Color:
+                p->initWithByteArrays(PositionTextureA8Color_vert, PositionTextureA8Color_frag);
+                break;
+            case kShaderType_Position_uColor:
+                p->initWithByteArrays(Position_uColor_vert, Position_uColor_frag);
+                p->bindAttribLocation("aVertex", GLProgram::VERTEX_ATTRIB_POSITION);
+                break;
+            case kShaderType_PositionLengthTexureColor:
+                p->initWithByteArrays(PositionColorLengthTexture_vert, PositionColorLengthTexture_frag);
+                break;
+            case kShaderType_LabelDistanceFieldNormal:
+                p->initWithByteArrays(Label_vert, LabelDistanceFieldNormal_frag);
+                break;
+            case kShaderType_LabelDistanceFieldGlow:
+                p->initWithByteArrays(Label_vert, LabelDistanceFieldGlow_frag);
+                break;
+            case kShaderType_UIGrayScale:
+                p->initWithByteArrays(PositionTextureColor_noMVP_vert,
+                                      PositionTexture_GrayScale_frag);
+                break;
+            case kShaderType_LabelNormal:
+                p->initWithByteArrays(Label_vert, LabelNormal_frag);
+                break;
+            case kShaderType_LabelOutline:
+                p->initWithByteArrays(Label_vert, LabelOutline_frag);
+                break;
+            default:
                 return;
-
-            programs_.erase(key);
-            SAFE_RELEASE_NULL(prev);
-
-            if (program)
-                program->retain();
-            programs_[key] = program;
         }
+
+        p->link();
+        p->updateUniforms();
+    }
+
+    GLProgram* GLProgramCache::getGLProgram(const std::string &key) {
+        auto it = programs_.find(key);
+        if( it != programs_.end() )
+            return it->second;
+        return nullptr;
+    }
+
+    void GLProgramCache::addGLProgram(GLProgram* program, const std::string &key) {
+        auto prev = getGLProgram(key);
+        if( prev == program )
+            return;
+
+        programs_.erase(key);
+        SAFE_RELEASE_NULL(prev);
+
+        if (program)
+            program->retain();
+        programs_[key] = program;
+    }
+
+    UniformValue::UniformValue()
+        : _uniform(nullptr)
+        , _glprogram(nullptr)
+        , _type(Type::VALUE) {
+    }
+
+    UniformValue::UniformValue(Uniform *uniform, GLProgram* glprogram)
+        : _uniform(uniform)
+        , _glprogram(glprogram)
+        , _type(Type::VALUE) {
+    }
+
+    UniformValue::~UniformValue() {
+        if (_type == Type::CALLBACK_FN)
+            delete _value.callback;
+    }
+
+    void UniformValue::apply() {
+        if (_type == Type::CALLBACK_FN) {
+            (*_value.callback)(_glprogram, _uniform);
+        }
+        else if (_type == Type::POINTER) {
+            switch (_uniform->type) {
+                case GL_FLOAT:
+                    _glprogram->setUniformLocationWith1fv(_uniform->location, _value.floatv.pointer, _value.floatv.size);
+                    break;
+
+                case GL_FLOAT_VEC2:
+                    _glprogram->setUniformLocationWith2fv(_uniform->location, _value.v2f.pointer, _value.v2f.size);
+                    break;
+
+                case GL_FLOAT_VEC3:
+                    _glprogram->setUniformLocationWith3fv(_uniform->location, _value.v3f.pointer, _value.v3f.size);
+                    break;
+
+                case GL_FLOAT_VEC4:
+                    _glprogram->setUniformLocationWith4fv(_uniform->location, _value.v4f.pointer, _value.v4f.size);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+        else{
+            switch (_uniform->type) {
+                case GL_SAMPLER_2D:
+                    _glprogram->setUniformLocationWith1i(_uniform->location, _value.tex.textureUnit);
+                    GLStateCache::BindTexture2DN(_value.tex.textureUnit, _value.tex.textureId);
+                    break;
+
+                case GL_SAMPLER_CUBE:
+                    _glprogram->setUniformLocationWith1i(_uniform->location, _value.tex.textureUnit);
+                    GLStateCache::BindTextureN(_value.tex.textureUnit, _value.tex.textureId, GL_TEXTURE_CUBE_MAP);
+                    break;
+
+                case GL_INT:
+                    _glprogram->setUniformLocationWith1i(_uniform->location, _value.intValue);
+                    break;
+
+                case GL_FLOAT:
+                    _glprogram->setUniformLocationWith1f(_uniform->location, _value.floatValue);
+                    break;
+
+                case GL_FLOAT_VEC2:
+                    _glprogram->setUniformLocationWith2f(_uniform->location, _value.v2Value[0], _value.v2Value[1]);
+                    break;
+
+                case GL_FLOAT_VEC3:
+                    _glprogram->setUniformLocationWith3f(_uniform->location, _value.v3Value[0], _value.v3Value[1], _value.v3Value[2]);
+                    break;
+
+                case GL_FLOAT_VEC4:
+                    _glprogram->setUniformLocationWith4f(_uniform->location, _value.v4Value[0], _value.v4Value[1], _value.v4Value[2], _value.v4Value[3]);
+                    break;
+
+                case GL_FLOAT_MAT4:
+                    _glprogram->setUniformLocationWithMatrix4fv(_uniform->location, (GLfloat*)&_value.matrixValue, 1);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    void UniformValue::setCallback(const std::function<void(GLProgram*, Uniform*)> &callback) {
+        if (_type == Type::CALLBACK_FN)
+            delete _value.callback;
+
+        _value.callback = new std::function<void(GLProgram*, Uniform*)>();
+        *_value.callback = callback;
+
+        _type = Type::CALLBACK_FN;
+    }
+
+    void UniformValue::setTexture(GLuint textureId, GLuint textureUnit) {
+        _value.tex.textureId = textureId;
+        _value.tex.textureUnit = textureUnit;
+        _type = Type::VALUE;
+    }
+
+    void UniformValue::setInt(int value) {
+        _value.intValue = value;
+        _type = Type::VALUE;
+    }
+
+    void UniformValue::setFloat(float value) {
+        _value.floatValue = value;
+        _type = Type::VALUE;
+    }
+
+    void UniformValue::setFloatv(ssize_t size, const float* pointer) {
+        _value.floatv.pointer = (const float*)pointer;
+        _value.floatv.size = (GLsizei)size;
+        _type = Type::POINTER;
+    }
+
+    void UniformValue::setVec2(const MATH::Vector2f& value) {
+        memcpy(_value.v2Value, &value, sizeof(_value.v2Value));
+        _type = Type::VALUE;
+    }
+
+    void UniformValue::setVec2v(ssize_t size, const MATH::Vector2f* pointer) {
+        _value.v2f.pointer = (const float*)pointer;
+        _value.v2f.size = (GLsizei)size;
+        _type = Type::POINTER;
+    }
+
+    void UniformValue::setVec3(const MATH::Vector3f& value) {
+        memcpy(_value.v3Value, &value, sizeof(_value.v3Value));
+        _type = Type::VALUE;
+
+    }
+
+    void UniformValue::setVec3v(ssize_t size, const MATH::Vector3f* pointer) {
+        _value.v3f.pointer = (const float*)pointer;
+        _value.v3f.size = (GLsizei)size;
+        _type = Type::POINTER;
+
+    }
+
+    void UniformValue::setVec4(const MATH::Vector4f& value) {
+        memcpy(_value.v4Value, &value, sizeof(_value.v4Value));
+        _type = Type::VALUE;
+    }
+
+    void UniformValue::setVec4v(ssize_t size, const MATH::Vector4f* pointer) {
+        _value.v4f.pointer = (const float*)pointer;
+        _value.v4f.size = (GLsizei)size;
+        _type = Type::POINTER;
+    }
+
+    void UniformValue::setMat4(const MATH::Matrix4& value) {
+        memcpy(_value.matrixValue, &value, sizeof(_value.matrixValue));
+        _type = Type::VALUE;
+    }
+
+    VertexAttribValue::VertexAttribValue()
+        : _vertexAttrib(nullptr)
+        , _useCallback(false)
+        , _enabled(false) {
+    }
+
+    VertexAttribValue::VertexAttribValue(VertexAttrib *vertexAttrib)
+        : _vertexAttrib(vertexAttrib)
+        , _useCallback(false)
+        , _enabled(false) {
+    }
+
+    VertexAttribValue::~VertexAttribValue() {
+        if (_useCallback)
+            delete _value.callback;
+    }
+
+    void VertexAttribValue::apply() {
+        if(_enabled) {
+            if(_useCallback) {
+                (*_value.callback)(_vertexAttrib);
+            }
+            else {
+                glVertexAttribPointer(_vertexAttrib->index,
+                                      _value.pointer.size,
+                                      _value.pointer.type,
+                                      _value.pointer.normalized,
+                                      _value.pointer.stride,
+                                      _value.pointer.pointer);
+            }
+        }
+    }
+
+    void VertexAttribValue::setCallback(const std::function<void(VertexAttrib*)> &callback) {
+        _value.callback = new std::function<void(VertexAttrib*)>();
+        *_value.callback = callback;
+        _useCallback = true;
+        _enabled = true;
+    }
+
+    void VertexAttribValue::setPointer(GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid *pointer) {
+        _value.pointer.size = size;
+        _value.pointer.type = type;
+        _value.pointer.normalized = normalized;
+        _value.pointer.stride = stride;
+        _value.pointer.pointer = pointer;
+        _enabled = true;
+    }
+
+    GLProgramState* GLProgramState::create(GLProgram *glprogram) {
+        GLProgramState* ret = nullptr;
+        ret = new (std::nothrow) GLProgramState();
+        if(ret && ret->init(glprogram))
+        {
+            ret->autorelease();
+            return ret;
+        }
+        SAFE_DELETE(ret);
+        return nullptr;
+    }
+
+    GLProgramState* GLProgramState::getOrCreateWithGLProgramName(const std::string& glProgramName ) {
+        GLProgram *glProgram = GLProgramCache::getInstance()->getGLProgram(glProgramName);
+        if( glProgram )
+            return getOrCreateWithGLProgram(glProgram);
+
+        return nullptr;
+    }
+
+    GLProgramState* GLProgramState::getOrCreateWithGLProgram(GLProgram *glprogram) {
+        GLProgramState* ret = GLProgramStateCache::getInstance().getGLProgramState(glprogram);
+        return ret;
+    }
+
+    GLProgramState* GLProgramState::getOrCreateWithShaders(const std::string& vertexShader, const std::string& fragShader, const std::string& compileTimeDefines) {
+        auto glprogramcache = GLProgramCache::getInstance();
+        const std::string key = vertexShader + "+" + fragShader + "+" + compileTimeDefines;
+        auto glprogram = glprogramcache->getGLProgram(key);
+
+        if (!glprogram) {
+            glprogram = GLProgram::createWithFilenames(vertexShader, fragShader, compileTimeDefines);
+            glprogramcache->addGLProgram(glprogram, key);
+        }
+
+        return create(glprogram);
+    }
+
+    GLProgramState::GLProgramState()
+        : _uniformAttributeValueDirty(true)
+        , _textureUnitIndex(4)  // first 4 textures unites are reserved for CC_Texture0-3
+        , _vertexAttribsFlags(0)
+        , _glprogram(nullptr) {
+    }
+
+    GLProgramState::~GLProgramState() {
+        SAFE_RELEASE(_glprogram);
+    }
+
+    bool GLProgramState::init(GLProgram* glprogram) {
+        _glprogram = glprogram;
+        _glprogram->retain();
+
+        for(auto &attrib : _glprogram->vertexAttribs_) {
+            VertexAttribValue value(&attrib.second);
+            _attributes[attrib.first] = value;
+        }
+
+        for(auto &uniform : _glprogram->userUniforms_) {
+            UniformValue value(&uniform.second, _glprogram);
+            _uniforms[uniform.second.location] = value;
+            _uniformsByName[uniform.first] = uniform.second.location;
+        }
+
+        return true;
+    }
+
+    void GLProgramState::resetGLProgram() {
+        SAFE_RELEASE(_glprogram);
+        _glprogram = nullptr;
+        _uniforms.clear();
+        _attributes.clear();
+        _textureUnitIndex = 1;
+    }
+
+    void GLProgramState::apply(const MATH::Matrix4& modelView) {
+        applyGLProgram(modelView);
+        applyAttributes();
+        applyUniforms();
+    }
+
+    void GLProgramState::updateUniformsAndAttributes() {
+        if(_uniformAttributeValueDirty) {
+            for(auto& uniformLocation : _uniformsByName) {
+                _uniforms[uniformLocation.second]._uniform = _glprogram->getUniform(uniformLocation.first);
+            }
+
+            _vertexAttribsFlags = 0;
+            for(auto& attributeValue : _attributes) {
+                attributeValue.second._vertexAttrib = _glprogram->getVertexAttrib(attributeValue.first);;
+                if(attributeValue.second._enabled)
+                    _vertexAttribsFlags |= 1 << attributeValue.second._vertexAttrib->index;
+            }
+
+            _uniformAttributeValueDirty = false;
+
+        }
+    }
+
+    void GLProgramState::applyGLProgram(const MATH::Matrix4& modelView) {
+        updateUniformsAndAttributes();
+        _glprogram->use();
+        _glprogram->setUniformsForBuiltins(modelView);
+    }
+
+    void GLProgramState::applyAttributes(bool applyAttribFlags) {
+        updateUniformsAndAttributes();
+        if(_vertexAttribsFlags) {
+            if (applyAttribFlags)
+                GLStateCache::EnableVertexAttribs(_vertexAttribsFlags);
+            for(auto &attribute : _attributes) {
+                attribute.second.apply();
+            }
+        }
+    }
+    void GLProgramState::applyUniforms() {
+        updateUniformsAndAttributes();
+        for(auto& uniform : _uniforms) {
+            uniform.second.apply();
+        }
+    }
+
+    void GLProgramState::setGLProgram(GLProgram *glprogram) {
+        if( _glprogram != glprogram) {
+            resetGLProgram();
+            init(glprogram);
+        }
+    }
+
+    uint32_t GLProgramState::getVertexAttribsFlags() const {
+        return _vertexAttribsFlags;
+    }
+
+    ssize_t GLProgramState::getVertexAttribCount() const {
+        return _attributes.size();
+    }
+
+    UniformValue* GLProgramState::getUniformValue(GLint uniformLocation) {
+        updateUniformsAndAttributes();
+        const auto itr = _uniforms.find(uniformLocation);
+        if (itr != _uniforms.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    UniformValue* GLProgramState::getUniformValue(const std::string& name) {
+        updateUniformsAndAttributes();
+        const auto itr = _uniformsByName.find(name);
+        if (itr != _uniformsByName.end())
+            return &_uniforms[itr->second];
+        return nullptr;
+    }
+
+    VertexAttribValue* GLProgramState::getVertexAttribValue(const std::string& name) {
+        updateUniformsAndAttributes();
+        const auto itr = _attributes.find(name);
+        if( itr != _attributes.end())
+            return &itr->second;
+        return nullptr;
+    }
+
+    void GLProgramState::setVertexAttribCallback(const std::string& name, const std::function<void(VertexAttrib*)> &callback) {
+        VertexAttribValue *v = getVertexAttribValue(name);
+        if(v) {
+            v->setCallback(callback);
+            _vertexAttribsFlags |= 1 << v->_vertexAttrib->index;
+        }
+    }
+
+    void GLProgramState::setVertexAttribPointer(const std::string& name, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid *pointer) {
+        auto v = getVertexAttribValue(name);
+        if(v) {
+            v->setPointer(size, type, normalized, stride, pointer);
+            _vertexAttribsFlags |= 1 << v->_vertexAttrib->index;
+        }
+    }
+
+    void GLProgramState::setUniformCallback(const std::string& uniformName, const std::function<void(GLProgram*, Uniform*)> &callback) {
+        auto v = getUniformValue(uniformName);
+        if (v)
+            v->setCallback(callback);
+    }
+
+    void GLProgramState::setUniformCallback(GLint uniformLocation, const std::function<void(GLProgram*, Uniform*)> &callback) {
+        auto v = getUniformValue(uniformLocation);
+        if (v)
+            v->setCallback(callback);
+    }
+
+    void GLProgramState::setUniformFloat(const std::string& uniformName, float value) {
+        auto v = getUniformValue(uniformName);
+        if (v)
+            v->setFloat(value);
+    }
+
+    void GLProgramState::setUniformFloat(GLint uniformLocation, float value) {
+        auto v = getUniformValue(uniformLocation);
+        if (v)
+            v->setFloat(value);
+    }
+
+    void GLProgramState::setUniformInt(const std::string& uniformName, int value) {
+        auto v = getUniformValue(uniformName);
+        if(v)
+            v->setInt(value);
+    }
+
+    void GLProgramState::setUniformInt(GLint uniformLocation, int value) {
+        auto v = getUniformValue(uniformLocation);
+        if (v)
+            v->setInt(value);
+
+    }
+
+    void GLProgramState::setUniformFloatv(const std::string& uniformName, ssize_t size, const float* pointer) {
+        auto v = getUniformValue(uniformName);
+        if (v)
+            v->setFloatv(size, pointer);
+    }
+
+    void GLProgramState::setUniformFloatv(GLint uniformLocation, ssize_t size, const float* pointer) {
+        auto v = getUniformValue(uniformLocation);
+        if (v)
+            v->setFloatv(size, pointer);
+    }
+
+    void GLProgramState::setUniformVec2(const std::string& uniformName, const MATH::Vector2f& value) {
+        auto v = getUniformValue(uniformName);
+        if (v)
+            v->setVec2(value);
+    }
+
+    void GLProgramState::setUniformVec2(GLint uniformLocation, const MATH::Vector2f& value) {
+        auto v = getUniformValue(uniformLocation);
+        if (v)
+            v->setVec2(value);
+    }
+
+    void GLProgramState::setUniformVec2v(const std::string& uniformName, ssize_t size, const MATH::Vector2f* pointer) {
+        auto v = getUniformValue(uniformName);
+        if (v)
+            v->setVec2v(size, pointer);
+    }
+
+    void GLProgramState::setUniformVec2v(GLint uniformLocation, ssize_t size, const MATH::Vector2f* pointer) {
+        auto v = getUniformValue(uniformLocation);
+        if (v)
+            v->setVec2v(size, pointer);
+    }
+
+    void GLProgramState::setUniformVec3(const std::string& uniformName, const MATH::Vector3f& value) {
+        auto v = getUniformValue(uniformName);
+        if (v)
+            v->setVec3(value);
+    }
+
+    void GLProgramState::setUniformVec3(GLint uniformLocation, const MATH::Vector3f& value) {
+        auto v = getUniformValue(uniformLocation);
+        if (v)
+            v->setVec3(value);
+    }
+
+    void GLProgramState::setUniformVec3v(const std::string& uniformName, ssize_t size, const MATH::Vector3f* pointer) {
+        auto v = getUniformValue(uniformName);
+        if (v)
+            v->setVec3v(size, pointer);
+    }
+
+    void GLProgramState::setUniformVec3v(GLint uniformLocation, ssize_t size, const MATH::Vector3f* pointer) {
+        auto v = getUniformValue(uniformLocation);
+        if (v)
+            v->setVec3v(size, pointer);
+    }
+
+    void GLProgramState::setUniformVec4(const std::string& uniformName, const MATH::Vector4f& value) {
+        auto v = getUniformValue(uniformName);
+        if (v)
+            v->setVec4(value);
+    }
+
+    void GLProgramState::setUniformVec4(GLint uniformLocation, const MATH::Vector4f& value) {
+        auto v = getUniformValue(uniformLocation);
+        if (v)
+            v->setVec4(value);
+    }
+
+    void GLProgramState::setUniformVec4v(const std::string& uniformName, ssize_t size, const MATH::Vector4f* value) {
+        auto v = getUniformValue(uniformName);
+        if (v)
+            v->setVec4v(size, value);
+    }
+
+    void GLProgramState::setUniformVec4v(GLint uniformLocation, ssize_t size, const MATH::Vector4f* pointer) {
+        auto v = getUniformValue(uniformLocation);
+        if (v)
+            v->setVec4v(size, pointer);
+    }
+
+    void GLProgramState::setUniformMat4(const std::string& uniformName, const MATH::Matrix4& value) {
+        auto v = getUniformValue(uniformName);
+        if (v)
+            v->setMat4(value);
+    }
+
+    void GLProgramState::setUniformMat4(GLint uniformLocation, const MATH::Matrix4& value) {
+        auto v = getUniformValue(uniformLocation);
+        if (v)
+            v->setMat4(value);
+    }
+
+    // Textures
+    void GLProgramState::setUniformTexture(const std::string& uniformName, Texture2D *texture) {
+        setUniformTexture(uniformName, texture->getName());
+    }
+
+    void GLProgramState::setUniformTexture(GLint uniformLocation, Texture2D *texture) {
+        setUniformTexture(uniformLocation, texture->getName());
+    }
+
+    void GLProgramState::setUniformTexture(const std::string& uniformName, GLuint textureId) {
+        auto v = getUniformValue(uniformName);
+        if (v) {
+            if (_boundTextureUnits.find(uniformName) != _boundTextureUnits.end()) {
+                v->setTexture(textureId, _boundTextureUnits[uniformName]);
+            }
+            else {
+                v->setTexture(textureId, _textureUnitIndex);
+                _boundTextureUnits[uniformName] = _textureUnitIndex++;
+            }
+        }
+    }
+
+    void GLProgramState::setUniformTexture(GLint uniformLocation, GLuint textureId) {
+        auto v = getUniformValue(uniformLocation);
+        if (v) {
+            if (_boundTextureUnits.find(v->_uniform->name) != _boundTextureUnits.end()) {
+                v->setTexture(textureId, _boundTextureUnits[v->_uniform->name]);
+            }
+            else {
+                v->setTexture(textureId, _textureUnitIndex);
+                _boundTextureUnits[v->_uniform->name] = _textureUnitIndex++;
+            }
+        }
+    }
+
+    GLProgramStateCache::GLProgramStateCache() {
+    }
+
+    GLProgramStateCache::~GLProgramStateCache() {
+        _glProgramStates.clear();
+    }
+
+    GLProgramStateCache& GLProgramStateCache::getInstance() {
+        static GLProgramStateCache instance;
+        return instance;
+    }
+
+    GLProgramState* GLProgramStateCache::getGLProgramState(GLProgram* glprogram) {
+        const auto& itr = _glProgramStates.find(glprogram);
+        if (itr != _glProgramStates.end()) {
+            return itr->second;
+        }
+
+        auto ret = new (std::nothrow) GLProgramState;
+        if(ret && ret->init(glprogram)) {
+            _glProgramStates.insert(glprogram, ret);
+            ret->release();
+            return ret;
+        }
+
+        SAFE_RELEASE(ret);
+        return ret;
+    }
+
+    void GLProgramStateCache::removeUnusedGLProgramState() {
+        for( auto it=_glProgramStates.cbegin(); it!=_glProgramStates.cend(); /* nothing */) {
+            auto value = it->second;
+            if( value->getReferenceCount() == 1 ) {
+                _glProgramStates.erase(it++);
+            }
+            else {
+                ++it;
+            }
+        }
+    }
+
+    void GLProgramStateCache::removeAllGLProgramState() {
+        _glProgramStates.clear();
+    }
 }
