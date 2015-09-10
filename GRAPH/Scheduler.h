@@ -29,13 +29,13 @@ namespace GRAPH
         void update(float dt);
 
     protected:
-        Scheduler* _scheduler;
-        float _elapsed;
-        bool _runForever;
-        bool _useDelay;
-        unsigned int _timesExecuted;
-        unsigned int _repeat; //0 = once, 1 is 2 x executed
-        float _delay;
+        Scheduler* scheduler_;
+        float elapsed_;
+        bool runForever_;
+        bool useDelay_;
+        unsigned int timesExecuted_;
+        unsigned int repeat_; //0 = once, 1 is 2 x executed
+        float delay_;
         float _interval;
     };
 
@@ -44,16 +44,16 @@ namespace GRAPH
     public:
         TimerTargetSelector();
 
-        bool initWithSelector(Scheduler* scheduler, CallFuncF selector, HObject* target, float seconds, unsigned int repeat, float delay);
+        bool initWithSelector(Scheduler* scheduler, SelectorF selector, HObject* target, float seconds, unsigned int repeat, float delay);
 
-        inline CallFuncF getSelector() const { return _selector; }
+        inline SelectorF getSelector() const { return selector_; }
 
         virtual void trigger() override;
         virtual void cancel() override;
 
     protected:
-        HObject* _target;
-        CallFuncF _selector;
+        HObject* target_;
+        SelectorF selector_;
     };
 
     class TimerTargetCallback : public Timer
@@ -63,16 +63,16 @@ namespace GRAPH
 
         bool initWithCallback(Scheduler* scheduler, const SchedulerFunc& callback, void *target, const std::string& key, float seconds, unsigned int repeat, float delay);
 
-        inline const SchedulerFunc& getCallback() const { return _callback; }
-        inline const std::string& getKey() const { return _key; }
+        inline const SchedulerFunc& getCallback() const { return callback_; }
+        inline const std::string& getKey() const { return key_; }
 
         virtual void trigger() override;
         virtual void cancel() override;
 
     protected:
-        void* _target;
-        SchedulerFunc _callback;
-        std::string _key;
+        void* target_;
+        SchedulerFunc callback_;
+        std::string key_;
     };
 
     struct ListEntry
@@ -81,18 +81,17 @@ namespace GRAPH
         void                *target;
         int                 priority;
         bool                paused;
-        bool                markedForDeletion; // selector will no longer be called and entry will be removed at end of the next tick
+        bool                markedForDeletion;
     };
 
     struct UpdateEntry
     {
-        std::list<ListEntry *> *list;        // Which list does it belong to ?
-        ListEntry *entry;        // entry in the list
+        std::list<ListEntry *> *list;
+        ListEntry *entry;
         void                *target;
         SchedulerFunc     callback;
     };
 
-    // Hash Element used for "selectors with interval"
     struct TimerEntry
     {
         HObjectArray        *timers;
@@ -112,15 +111,13 @@ namespace GRAPH
         Scheduler();
         virtual ~Scheduler();
 
-        inline float getTimeScale() { return _timeScale; }
-        inline void setTimeScale(float timeScale) { _timeScale = timeScale; }
-
-        void update(float dt);
+        inline float getTimeScale() { return timeScale_; }
+        inline void setTimeScale(float timeScale) { timeScale_ = timeScale; }
 
         void schedule(const SchedulerFunc& callback, void *target, float interval, unsigned int repeat, float delay, bool paused, const std::string& key);
         void schedule(const SchedulerFunc& callback, void *target, float interval, bool paused, const std::string& key);
-        void schedule(CallFuncF selector, HObject *target, float interval, unsigned int repeat, float delay, bool paused);
-        void schedule(CallFuncF selector, HObject *target, float interval, bool paused);
+        void schedule(SelectorF selector, HObject *target, float interval, unsigned int repeat, float delay, bool paused);
+        void schedule(SelectorF selector, HObject *target, float interval, bool paused);
 
         template <class T>
         void scheduleUpdate(T *target, int priority, bool paused)
@@ -131,14 +128,16 @@ namespace GRAPH
         }
 
         void unschedule(const std::string& key, void *target);
-        void unschedule(CallFuncF selector, HObject *target);
+        void unschedule(SelectorF selector, HObject *target);
         void unscheduleUpdate(void *target);
         void unscheduleAllForTarget(void *target);
         void unscheduleAll();
         void unscheduleAllWithMinPriority(int minPriority);
 
         bool isScheduled(const std::string& key, void *target);
-        bool isScheduled(CallFuncF selector, HObject *target);
+        bool isScheduled(SelectorF selector, HObject *target);
+
+        void update(float dt);
 
         void pauseTarget(void *target);
         void resumeTarget(void *target);
@@ -148,28 +147,26 @@ namespace GRAPH
         std::set<void*> pauseAllTargetsWithMinPriority(int minPriority);
 
         void resumeTargets(const std::set<void*>& targetsToResume);
-        void performFunctionInCocosThread( const std::function<void()> &function);
 
     protected:
         void schedulePerFrame(const SchedulerFunc& callback, void *target, int priority, bool paused);
 
-        void removeHashElement(TimerEntry *element);
-        void removeUpdateFromHash(ListEntry *entry);
+        void removeTimerElement(TimerEntry *element);
+        void removeUpdateElement(ListEntry *entry);
 
-        void priorityIn(std::list<ListEntry *> *list, const SchedulerFunc& callback, void *target, int priority, bool paused);
-        void appendIn(std::list<ListEntry *> *list, const SchedulerFunc& callback, void *target, bool paused);
+        void priorityIn(std::list<ListEntry *> &list, const SchedulerFunc& callback, void *target, int priority, bool paused);
+        void appendIn(std::list<ListEntry *> &list, const SchedulerFunc& callback, void *target, bool paused);
 
-        float _timeScale;
-        std::list<ListEntry *> _updatesNegList;        // list of priority < 0
-        std::list<ListEntry *> _updates0List;            // list priority == 0
-        std::list<ListEntry *> _updatesPosList;        // list priority > 0
-        std::unordered_map<void *, UpdateEntry *> _hashForUpdates;
-        std::unordered_map<void *, TimerEntry *> _hashForTimers;
-        TimerEntry * _currentTarget;
-        bool _currentTargetSalvaged;
-        bool _updateHashLocked;
-        std::vector<std::function<void()>> _functionsToPerform;
-        std::mutex _performMutex;
+    private:
+        float timeScale_;
+        std::list<ListEntry *> updatesNegList_;
+        std::list<ListEntry *> updates0List_;
+        std::list<ListEntry *> updatesPosList_;
+        std::unordered_map<void *, UpdateEntry *> updatesMap_;
+        std::unordered_map<void *, TimerEntry *> timersMap_;
+        TimerEntry * currentTimer_;
+        bool currentTimerSalvaged_;
+        bool updateMapLocked_;
     };
 }
 

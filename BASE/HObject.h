@@ -34,9 +34,9 @@ private:
     uint32 referenceCount_;
 };
 
-typedef void (HObject::*CallFuncV)();
-typedef void (HObject::*CallFuncO)(HObject*);
-typedef void (HObject::*CallFuncF)(float);
+typedef void (HObject::*SelectorV)();
+typedef void (HObject::*SelectorO)(HObject*);
+typedef void (HObject::*SelectorF)(float);
 
 class HObjectArray
 {
