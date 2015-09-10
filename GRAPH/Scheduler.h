@@ -7,7 +7,6 @@
 #include <list>
 #include <unordered_map>
 #include "BASE/HObject.h"
-#include "UTILS/HASH/uthash.h"
 
 namespace GRAPH
 {
@@ -87,7 +86,7 @@ namespace GRAPH
 
     struct UpdateEntry
     {
-        std::list<ListEntry *> **list;        // Which list does it belong to ?
+        std::list<ListEntry *> *list;        // Which list does it belong to ?
         ListEntry *entry;        // entry in the list
         void                *target;
         SchedulerFunc     callback;
@@ -155,7 +154,7 @@ namespace GRAPH
         void schedulePerFrame(const SchedulerFunc& callback, void *target, int priority, bool paused);
 
         void removeHashElement(TimerEntry *element);
-        void removeUpdateFromHash(UpdateEntry *entry);
+        void removeUpdateFromHash(ListEntry *entry);
 
         void priorityIn(std::list<ListEntry *> *list, const SchedulerFunc& callback, void *target, int priority, bool paused);
         void appendIn(std::list<ListEntry *> *list, const SchedulerFunc& callback, void *target, bool paused);

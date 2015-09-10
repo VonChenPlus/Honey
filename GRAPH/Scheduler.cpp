@@ -288,11 +288,11 @@ namespace GRAPH
         {
             bool added = false;
 
-            for (auto element : *list)
+            for (auto iter = list->begin(); iter != list->end(); ++iter)
             {
-                if (priority < element->priority)
+                if (priority < (*iter)->priority)
                 {
-                    list->insert(element, listElement);
+                    list->insert(iter, listElement);
                     added = true;
                     break;
                 }
@@ -308,9 +308,9 @@ namespace GRAPH
         // update hash entry for quick access
         UpdateEntry *hashElement = (UpdateEntry *)calloc(sizeof(*hashElement), 1);
         hashElement->target = target;
-        hashElement->list = &list;
+        hashElement->list = list;
         hashElement->entry = listElement;
-        _hashForUpdates.insert(std::unordered_map<void *, TimerEntry *>::value_type(target, hashElement));
+        _hashForUpdates.insert(std::unordered_map<void *, UpdateEntry *>::value_type(target, hashElement));
     }
 
     void Scheduler::appendIn(std::list<ListEntry *> *list, const SchedulerFunc& callback, void *target, bool paused)
@@ -330,7 +330,7 @@ namespace GRAPH
         hashElement->target = target;
         hashElement->list = list;
         hashElement->entry = listElement;
-        _hashForUpdates.insert(std::unordered_map<void *, TimerEntry *>::value_type(target, hashElement));
+        _hashForUpdates.insert(std::unordered_map<void *, UpdateEntry *>::value_type(target, hashElement));
     }
 
     void Scheduler::schedulePerFrame(const SchedulerFunc& callback, void *target, int priority, bool paused)
@@ -341,7 +341,7 @@ namespace GRAPH
         if (hashElement)
         {
             // check if priority has changed
-            if ((*hashElement->list)->priority != priority)
+            if ((*hashElement->list->begin())->priority != priority)
             {
                 if (_updateHashLocked)
                 {
@@ -384,7 +384,7 @@ namespace GRAPH
     {
         TimerEntry *element = nullptr;
         if (_hashForTimers.find(target) != _hashForTimers.end())
-            hashElement = _hashForTimers[target];
+            element = _hashForTimers[target];
 
         if (!element)
         {
@@ -413,15 +413,19 @@ namespace GRAPH
         return false;  // should never get here
     }
 
-    void Scheduler::removeUpdateFromHash(UpdateEntry *entry)
+    void Scheduler::removeUpdateFromHash(ListEntry *entry)
     {
         UpdateEntry *element = nullptr;
         if (_hashForUpdates.find(entry->target) != _hashForUpdates.end())
-            hashElement = _hashForUpdates[target];
+            element = _hashForUpdates[entry->target];
         if (element)
         {
             // list entry
-            (*element->list)->erase(element->entry);
+            for (auto iter = element->list->begin(); iter != element->list->end(); ++iter) {
+                if ((*iter) == element->entry) {
+                    element->list->erase(iter);
+                }
+            }
             SAFE_DELETE(element->entry);
 
             // hash entry
@@ -438,7 +442,9 @@ namespace GRAPH
         }
 
         UpdateEntry *element = nullptr;
-        HASH_FIND_PTR(_hashForUpdates, &target, element);
+        if (_hashForUpdates.find(target) != _hashForUpdates.end())
+            element = _hashForUpdates[target];
+
         if (element)
         {
             if (_updateHashLocked)
@@ -460,15 +466,8 @@ namespace GRAPH
     void Scheduler::unscheduleAllWithMinPriority(int minPriority)
     {
         // Custom Selectors
-        tHashTimerEntry *element = nullptr;
-        tHashTimerEntry *nextElement = nullptr;
-        for (element = _hashForTimers; element != nullptr;)
-        {
-            // element may be removed in unscheduleAllSelectorsForTarget
-            nextElement = (tHashTimerEntry *)element->hh.next;
-            unscheduleAllForTarget(element->target);
-
-            element = nextElement;
+        for (auto element = _hashForTimers.begin(); element != _hashForTimers.end(); ++element) {
+            unscheduleAllForTarget(element->first);
         }
 
         // Updates selectors
@@ -506,8 +505,9 @@ namespace GRAPH
         }
 
         // Custom Selectors
-        tHashTimerEntry *element = nullptr;
-        HASH_FIND_PTR(_hashForTimers, &target, element);
+        TimerEntry *element = nullptr;
+        if (_hashForTimers.find(target) != _hashForTimers.end())
+            element = _hashForTimers[target];
 
         if (element)
         {
@@ -536,8 +536,10 @@ namespace GRAPH
     void Scheduler::resumeTarget(void *target)
     {
         // custom selectors
-        tHashTimerEntry *element = nullptr;
-        HASH_FIND_PTR(_hashForTimers, &target, element);
+        TimerEntry *element = nullptr;
+        if (_hashForTimers.find(target) != _hashForTimers.end())
+            element = _hashForTimers[target];
+
         if (element)
         {
             element->paused = false;
@@ -545,7 +547,8 @@ namespace GRAPH
 
         // update selector
         UpdateEntry *elementUpdate = nullptr;
-        HASH_FIND_PTR(_hashForUpdates, &target, elementUpdate);
+        if (_hashForUpdates.find(target) != _hashForUpdates.end())
+            elementUpdate = _hashForUpdates[target];
         if (elementUpdate)
         {
             elementUpdate->entry->paused = false;
@@ -555,8 +558,10 @@ namespace GRAPH
     void Scheduler::pauseTarget(void *target)
     {
         // custom selectors
-        tHashTimerEntry *element = nullptr;
-        HASH_FIND_PTR(_hashForTimers, &target, element);
+        TimerEntry *element = nullptr;
+        if (_hashForTimers.find(target) != _hashForTimers.end())
+            element = _hashForTimers[target];
+
         if (element)
         {
             element->paused = true;
@@ -564,7 +569,8 @@ namespace GRAPH
 
         // update selector
         UpdateEntry *elementUpdate = nullptr;
-        HASH_FIND_PTR(_hashForUpdates, &target, elementUpdate);
+        if (_hashForUpdates.find(target) != _hashForUpdates.end())
+            elementUpdate = _hashForUpdates[target];
         if (elementUpdate)
         {
             elementUpdate->entry->paused = true;
@@ -574,8 +580,9 @@ namespace GRAPH
     bool Scheduler::isTargetPaused(void *target)
     {
         // Custom selectors
-        tHashTimerEntry *element = nullptr;
-        HASH_FIND_PTR(_hashForTimers, &target, element);
+        TimerEntry *element = nullptr;
+        if (_hashForTimers.find(target) != _hashForTimers.end())
+            element = _hashForTimers[target];
         if( element )
         {
             return element->paused;
@@ -583,7 +590,8 @@ namespace GRAPH
 
         // We should check update selectors if target does not have custom selectors
         UpdateEntry *elementUpdate = nullptr;
-        HASH_FIND_PTR(_hashForUpdates, &target, elementUpdate);
+        if (_hashForUpdates.find(target) != _hashForUpdates.end())
+            elementUpdate = _hashForUpdates[target];
         if ( elementUpdate )
         {
             return elementUpdate->entry->paused;
@@ -602,21 +610,16 @@ namespace GRAPH
         std::set<void*> idsWithSelectors;
 
         // Custom Selectors
-        for(tHashTimerEntry *element = _hashForTimers; element != nullptr;
-            element = (tHashTimerEntry*)element->hh.next)
-        {
-            element->paused = true;
-            idsWithSelectors.insert(element->target);
+        for(auto element = _hashForTimers.begin(); element != _hashForTimers.end(); ++element) {
+            element->second->paused = true;
+            idsWithSelectors.insert(element->first);
         }
 
         // Updates selectors
-        tListEntry *entry, *tmp;
         if(minPriority < 0)
         {
-            DL_FOREACH_SAFE( _updatesNegList, entry, tmp )
-            {
-                if(entry->priority >= minPriority)
-                {
+            for (auto entry : _updatesNegList) {
+                if (entry->priority >= minPriority) {
                     entry->paused = true;
                     idsWithSelectors.insert(entry->target);
                 }
@@ -625,17 +628,14 @@ namespace GRAPH
 
         if(minPriority <= 0)
         {
-            DL_FOREACH_SAFE( _updates0List, entry, tmp )
-            {
+            for (auto entry : _updates0List) {
                 entry->paused = true;
                 idsWithSelectors.insert(entry->target);
             }
         }
 
-        DL_FOREACH_SAFE( _updatesPosList, entry, tmp )
-        {
-            if(entry->priority >= minPriority)
-            {
+        for (auto entry : _updatesPosList) {
+            if (entry->priority >= minPriority) {
                 entry->paused = true;
                 idsWithSelectors.insert(entry->target);
             }
@@ -674,12 +674,8 @@ namespace GRAPH
         // Selector callbacks
         //
 
-        // Iterate over all the Updates' selectors
-        tListEntry *entry, *tmp;
-
         // updates with priority < 0
-        DL_FOREACH_SAFE(_updatesNegList, entry, tmp)
-        {
+        for (auto entry : _updatesNegList) {
             if ((! entry->paused) && (! entry->markedForDeletion))
             {
                 entry->callback(dt);
@@ -687,8 +683,7 @@ namespace GRAPH
         }
 
         // updates with priority == 0
-        DL_FOREACH_SAFE(_updates0List, entry, tmp)
-        {
+        for (auto entry : _updates0List) {
             if ((! entry->paused) && (! entry->markedForDeletion))
             {
                 entry->callback(dt);
@@ -696,8 +691,7 @@ namespace GRAPH
         }
 
         // updates with priority > 0
-        DL_FOREACH_SAFE(_updatesPosList, entry, tmp)
-        {
+        for (auto entry : _updatesPosList) {
             if ((! entry->paused) && (! entry->markedForDeletion))
             {
                 entry->callback(dt);
@@ -705,36 +699,32 @@ namespace GRAPH
         }
 
         // Iterate over all the custom selectors
-        for (tHashTimerEntry *elt = _hashForTimers; elt != nullptr; )
+        for (auto element = _hashForTimers.begin(); element != _hashForTimers.end(); ++element)
         {
-            _currentTarget = elt;
+            _currentTarget = element->second;
             _currentTargetSalvaged = false;
 
             if (! _currentTarget->paused)
             {
                 // The 'timers' array may change while inside this loop
-                for (elt->timerIndex = 0; elt->timerIndex < elt->timers->number(); ++(elt->timerIndex))
+                for (element->second->timerIndex = 0; element->second->timerIndex < element->second->timers->number(); ++(element->second->timerIndex))
                 {
-                    elt->currentTimer = (Timer*)((*elt->timers)[elt->timerIndex]);
-                    elt->currentTimerSalvaged = false;
+                    element->second->currentTimer = (Timer*)((*element->second->timers)[element->second->timerIndex]);
+                    element->second->currentTimerSalvaged = false;
 
-                    elt->currentTimer->update(dt);
+                    element->second->currentTimer->update(dt);
 
-                    if (elt->currentTimerSalvaged)
+                    if (element->second->currentTimerSalvaged)
                     {
                         // The currentTimer told the remove itself. To prevent the timer from
                         // accidentally deallocating itself before finishing its step, we retained
                         // it. Now that step is done, it's safe to release it.
-                        elt->currentTimer->release();
+                        element->second->currentTimer->release();
                     }
 
-                    elt->currentTimer = nullptr;
+                    element->second->currentTimer = nullptr;
                 }
             }
-
-            // elt, at this moment, is still valid
-            // so it is safe to ask this here (issue #490)
-            elt = (tHashTimerEntry *)elt->hh.next;
 
             // only delete currentTarget if no actions were scheduled during the cycle (issue #481)
             if (_currentTargetSalvaged && _currentTarget->timers->number() == 0)
@@ -745,8 +735,7 @@ namespace GRAPH
 
         // delete all updates that are marked for deletion
         // updates with priority < 0
-        DL_FOREACH_SAFE(_updatesNegList, entry, tmp)
-        {
+        for (auto entry : _updatesNegList) {
             if (entry->markedForDeletion)
             {
                 this->removeUpdateFromHash(entry);
@@ -754,8 +743,7 @@ namespace GRAPH
         }
 
         // updates with priority == 0
-        DL_FOREACH_SAFE(_updates0List, entry, tmp)
-        {
+        for (auto entry : _updates0List) {
             if (entry->markedForDeletion)
             {
                 this->removeUpdateFromHash(entry);
@@ -763,8 +751,7 @@ namespace GRAPH
         }
 
         // updates with priority > 0
-        DL_FOREACH_SAFE(_updatesPosList, entry, tmp)
-        {
+        for (auto entry : _updatesPosList) {
             if (entry->markedForDeletion)
             {
                 this->removeUpdateFromHash(entry);
@@ -795,15 +782,16 @@ namespace GRAPH
 
     void Scheduler::schedule(CallFuncF selector, HObject *target, float interval, unsigned int repeat, float delay, bool paused)
     {
-        tHashTimerEntry *element = nullptr;
-        HASH_FIND_PTR(_hashForTimers, &target, element);
+        TimerEntry *element = nullptr;
+        if (_hashForTimers.find(target) != _hashForTimers.end())
+            element = _hashForTimers[target];
 
         if (! element)
         {
-            element = (tHashTimerEntry *)calloc(sizeof(*element), 1);
+            element = (TimerEntry *)calloc(sizeof(*element), 1);
             element->target = target;
 
-            HASH_ADD_PTR(_hashForTimers, target, element);
+            _hashForTimers.insert(std::unordered_map<void *,TimerEntry *>::value_type(target, element));
 
             // Is this the 1st element ? Then set the pause level to all the selectors of this target
             element->paused = paused;
@@ -841,8 +829,9 @@ namespace GRAPH
 
     bool Scheduler::isScheduled(CallFuncF selector, HObject *target)
     {
-        tHashTimerEntry *element = nullptr;
-        HASH_FIND_PTR(_hashForTimers, &target, element);
+        TimerEntry *element = nullptr;
+        if (_hashForTimers.find(target) != _hashForTimers.end())
+            element = _hashForTimers[target];
 
         if (!element)
         {
@@ -879,11 +868,9 @@ namespace GRAPH
             return;
         }
 
-        //CCASSERT(target);
-        //CCASSERT(selector);
-
-        tHashTimerEntry *element = nullptr;
-        HASH_FIND_PTR(_hashForTimers, &target, element);
+        TimerEntry *element = nullptr;
+        if (_hashForTimers.find(target) != _hashForTimers.end())
+            element = _hashForTimers[target];
 
         if (element)
         {
