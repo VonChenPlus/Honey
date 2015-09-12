@@ -1,5 +1,6 @@
 ﻿#include <string>
 #include "GRAPH/Director.h"
+#include "GRAPH/GLView.h"
 #include "GRAPH/RENDERER/Texture2D.h"
 
 namespace GRAPH
@@ -46,10 +47,6 @@ namespace GRAPH
         modelViewMatrixStack_.push(MATH::Matrix4::IDENTITY);
         projectionMatrixStack_.push(MATH::Matrix4::IDENTITY);
         textureMatrixStack_.push(MATH::Matrix4::IDENTITY);
-    }
-
-    void Director::resetMatrixStack() {
-        initMatrixStack();
     }
 
     void Director::popMatrix(MATRIX_STACK_TYPE type) {
@@ -124,5 +121,36 @@ namespace GRAPH
         }
 
         return  modelViewMatrixStack_.top();
+    }
+
+    void Director::resetMatrixStack() {
+        initMatrixStack();
+    }
+
+    MATH::Vector2f Director::convertToGL(const MATH::Vector2f& uiPoint) {
+        MATH::Matrix4 transform;
+        glToClipTransform(&transform);
+
+        MATH::Matrix4 transformInv = transform.getInversed();
+
+        // Calculate z=0 using -> transform*[0, 0, 0, 1]/w
+        float zClip = transform.m[14]/transform.m[15];
+
+        MATH::Sizef glSize = glView_->getDesignResolutionSize();
+        MATH::Vector4f clipCoord(2.0f*uiPoint.x/glSize.width - 1.0f, 1.0f - 2.0f*uiPoint.y/glSize.height, zClip, 1);
+
+        MATH::Vector4f glCoord;
+        //transformInv.transformPoint(clipCoord, &glCoord);
+        transformInv.transformVector(clipCoord, &glCoord);
+        float factor = 1.0/glCoord.w;
+        return MATH::Vector2f(glCoord.x * factor, glCoord.y * factor);
+    }
+
+    void Director::glToClipTransform(MATH::Matrix4 *transformOut) {
+        if(nullptr == transformOut) return;
+
+        auto projection = getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+        auto modelview = getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+        *transformOut = projection * modelview;
     }
 }

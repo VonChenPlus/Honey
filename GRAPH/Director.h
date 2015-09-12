@@ -8,6 +8,7 @@
 namespace GRAPH
 {
     class TextureCache;
+    class GLView;
 
     enum class MATRIX_STACK_TYPE
     {
@@ -41,8 +42,12 @@ namespace GRAPH
         const MATH::Matrix4& getMatrix(MATRIX_STACK_TYPE type);
         void resetMatrixStack();
 
+        MATH::Vector2f convertToGL(const MATH::Vector2f& point);
+
     protected:
         void initMatrixStack();
+
+        void glToClipTransform(MATH::Matrix4 *transformOut);
 
     private:
         std::stack<MATH::Matrix4> modelViewMatrixStack_;
@@ -50,6 +55,7 @@ namespace GRAPH
         std::stack<MATH::Matrix4> textureMatrixStack_;
         //texture cache belongs to this director
         TextureCache *textureCache_;
+        GLView *glView_;
     };
 }
 
