@@ -4,6 +4,7 @@
 #include <stack>
 #include "BASE/HObject.h"
 #include "MATH/Matrix.h"
+#include "MATH/Size.h"
 
 namespace GRAPH
 {
@@ -42,6 +43,7 @@ namespace GRAPH
         const MATH::Matrix4& getMatrix(MATRIX_STACK_TYPE type);
         void resetMatrixStack();
 
+        const MATH::Sizef& getWinSize() const;
         MATH::Vector2f convertToGL(const MATH::Vector2f& point);
 
     protected:

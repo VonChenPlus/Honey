@@ -127,6 +127,10 @@ namespace GRAPH
         initMatrixStack();
     }
 
+    const MATH::Sizef& Director::getWinSize() const {
+        return glView_->getDesignResolutionSize();
+    }
+
     MATH::Vector2f Director::convertToGL(const MATH::Vector2f& uiPoint) {
         MATH::Matrix4 transform;
         glToClipTransform(&transform);
