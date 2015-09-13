@@ -1,7 +1,12 @@
 ﻿#include <string>
 #include "GRAPH/Director.h"
+#include "GRAPH/Action.h"
+#include "GRAPH/Event.h"
+#include "GRAPH/Scheduler.h"
+#include "GRAPH/EventDispatcher.h"
 #include "GRAPH/GLView.h"
 #include "GRAPH/RENDERER/Texture2D.h"
+#include "GRAPH/RENDERER/Renderer.h"
 
 namespace GRAPH
 {
@@ -15,7 +20,12 @@ namespace GRAPH
 
     bool Director::init(void) {
         initMatrixStack();
-        textureCache_ = new (std::nothrow) TextureCache();
+
+        actionManager_ = new (std::nothrow) ActionManager;
+        scheduler_ = new (std::nothrow) Scheduler;
+        eventDispatcher_ = new (std::nothrow) EventDispatcher;
+        textureCache_ = new (std::nothrow) TextureCache;
+        renderer_ = new (std::nothrow) Renderer;
 
         return true;
     }
@@ -25,10 +35,6 @@ namespace GRAPH
             textureCache_->waitForQuit();
             SAFE_RELEASE_NULL(textureCache_);
         }
-    }
-
-    TextureCache* Director::getTextureCache() const {
-        return textureCache_;
     }
 
     void Director::initMatrixStack() {
@@ -148,6 +154,24 @@ namespace GRAPH
         transformInv.transformVector(clipCoord, &glCoord);
         float factor = 1.0/glCoord.w;
         return MATH::Vector2f(glCoord.x * factor, glCoord.y * factor);
+    }
+
+    MATH::Vector2f Director::convertToUI(const MATH::Vector2f& glPoint) {
+        MATH::Matrix4 transform;
+        glToClipTransform(&transform);
+
+        MATH::Vector4f clipCoord;
+        // Need to calculate the zero depth from the transform.
+        MATH::Vector4f glCoord(glPoint.x, glPoint.y, 0.0, 1);
+        transform.transformVector(glCoord, &clipCoord);
+
+        clipCoord.x = clipCoord.x / clipCoord.w;
+        clipCoord.y = clipCoord.y / clipCoord.w;
+        clipCoord.z = clipCoord.z / clipCoord.w;
+
+        MATH::Sizef glSize = glView_->getDesignResolutionSize();
+        float factor = 1.0/glCoord.w;
+        return MATH::Vector2f(glSize.width*(clipCoord.x*0.5 + 0.5) * factor, glSize.height*(-clipCoord.y*0.5 + 0.5) * factor);
     }
 
     void Director::glToClipTransform(MATH::Matrix4 *transformOut) {

@@ -73,6 +73,8 @@ namespace GRAPH
     private:
         HObjectMap<std::string, Component*>* _components;
         HObject *_owner;
+
+        friend class Node;
     };
 }
 

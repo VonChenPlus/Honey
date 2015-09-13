@@ -1,6 +1,7 @@
 #include "GRAPH/Action.h"
 #include "GRAPH/Director.h"
 #include "MATH/Size.h"
+#include "GRAPH/Node.h"
 
 namespace GRAPH
 {
@@ -8,33 +9,29 @@ namespace GRAPH
         :_originalTarget(nullptr)
         ,_target(nullptr)
         ,_tag(Action::INVALID_TAG) {
+
     }
 
-    Action::~Action()
-    {
+    Action::~Action() {
+
     }
 
-    void Action::startWithTarget(HObject *aTarget)
-    {
+    void Action::startWithTarget(HObject *aTarget) {
         _originalTarget = _target = aTarget;
     }
 
-    void Action::stop()
-    {
+    void Action::stop() {
         _target = nullptr;
     }
 
-    bool Action::isDone() const
-    {
+    bool Action::isDone() const {
         return true;
     }
 
-    void Action::step(float)
-    {
+    void Action::step(float) {
     }
 
-    void Action::update(float)
-    {
+    void Action::update(float) {
     }
 
     Follow::Follow()
@@ -49,16 +46,13 @@ namespace GRAPH
 
     }
 
-    Follow::~Follow()
-    {
+    Follow::~Follow() {
         SAFE_RELEASE(_followedHObject);
     }
 
-    Follow* Follow::create(HObject *followedHObject, const MATH::Rectf& rect)
-    {
+    Follow* Follow::create(HObject *followedHObject, const MATH::Rectf& rect) {
         Follow *follow = new (std::nothrow) Follow();
-        if (follow && follow->initWithTarget(followedHObject, rect))
-        {
+        if (follow && follow->initWithTarget(followedHObject, rect)) {
             follow->autorelease();
             return follow;
         }
@@ -66,8 +60,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    bool Follow::initWithTarget(HObject *followedHObject, const MATH::Rectf& rect)
-    {
+    bool Follow::initWithTarget(HObject *followedHObject, const MATH::Rectf& rect) {
         followedHObject->retain();
         _followedHObject = followedHObject;
         _worldRect = rect;
@@ -78,28 +71,24 @@ namespace GRAPH
         _fullScreenSize.set(winSize.width, winSize.height);
         _halfScreenSize = _fullScreenSize * 0.5f;
 
-        if (_boundarySet)
-        {
+        if (_boundarySet) {
             _leftBoundary = -((rect.origin.x+rect.size.width) - _fullScreenSize.x);
             _rightBoundary = -rect.origin.x ;
             _topBoundary = -rect.origin.y;
             _bottomBoundary = -((rect.origin.y+rect.size.height) - _fullScreenSize.y);
 
-            if(_rightBoundary < _leftBoundary)
-            {
+            if(_rightBoundary < _leftBoundary) {
                 // screen width is larger than world's boundary width
                 //set both in the middle of the world
                 _rightBoundary = _leftBoundary = (_leftBoundary + _rightBoundary) / 2;
             }
-            if(_topBoundary < _bottomBoundary)
-            {
+            if(_topBoundary < _bottomBoundary) {
                 // screen width is larger than world's boundary width
                 //set both in the middle of the world
                 _topBoundary = _bottomBoundary = (_topBoundary + _bottomBoundary) / 2;
             }
 
-            if( (_topBoundary == _bottomBoundary) && (_leftBoundary == _rightBoundary) )
-            {
+            if( (_topBoundary == _bottomBoundary) && (_leftBoundary == _rightBoundary) ) {
                 _boundaryFullyCovered = true;
             }
         }
@@ -107,34 +96,28 @@ namespace GRAPH
         return true;
     }
 
-    void Follow::step(float)
-    {
-        if(_boundarySet)
-        {
+    void Follow::step(float) {
+        if(_boundarySet) {
             // whole map fits inside a single screen, no need to modify the position - unless map boundaries are increased
-            if(_boundaryFullyCovered)
-            {
+            if(_boundaryFullyCovered) {
                 return;
             }
 
-            MATH::Vector2f tempPos = _halfScreenSize - _followedHObject->getPosition();
+            MATH::Vector2f tempPos = _halfScreenSize - dynamic_cast<Node *>(_followedHObject)->getPosition();
 
-            _target->setPosition(MATH_CLAMP(tempPos.x, _leftBoundary, _rightBoundary),
+            dynamic_cast<Node *>(_target)->setPosition(MATH_CLAMP(tempPos.x, _leftBoundary, _rightBoundary),
                                        MATH_CLAMP(tempPos.y, _bottomBoundary, _topBoundary));
         }
-        else
-        {
-            _target->setPosition(_halfScreenSize - _followedHObject->getPosition());
+        else {
+            dynamic_cast<Node *>(_target)->setPosition(_halfScreenSize - dynamic_cast<Node *>(_followedHObject)->getPosition());
         }
     }
 
-    bool Follow::isDone() const
-    {
-        return ( !_followedHObject->isRunning() );
+    bool Follow::isDone() const {
+        return ( !dynamic_cast<Node *>(_followedHObject)->isRunning() );
     }
 
-    void Follow::stop()
-    {
+    void Follow::stop() {
         _target = nullptr;
         Action::stop();
     }

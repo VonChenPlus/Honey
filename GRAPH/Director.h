@@ -8,8 +8,12 @@
 
 namespace GRAPH
 {
-    class TextureCache;
     class GLView;
+    class ActionManager;
+    class Scheduler;
+    class EventDispatcher;
+    class Renderer;
+    class TextureCache;
 
     enum class MATRIX_STACK_TYPE
     {
@@ -33,7 +37,11 @@ namespace GRAPH
         virtual ~Director();
         virtual bool init();
 
-        TextureCache* getTextureCache() const;
+        ActionManager* getActionManager() const { return actionManager_; }
+        Scheduler *getScheduler() const { return scheduler_; }
+        EventDispatcher *getEventDispatcher() const { return eventDispatcher_; }
+        TextureCache* getTextureCache() const { return textureCache_; }
+        Renderer* getRenderer() const { return renderer_; }
 
         void pushMatrix(MATRIX_STACK_TYPE type);
         void popMatrix(MATRIX_STACK_TYPE type);
@@ -44,7 +52,9 @@ namespace GRAPH
         void resetMatrixStack();
 
         const MATH::Sizef& getWinSize() const;
+
         MATH::Vector2f convertToGL(const MATH::Vector2f& point);
+        MATH::Vector2f convertToUI(const MATH::Vector2f& point);
 
     protected:
         void initMatrixStack();
@@ -55,9 +65,13 @@ namespace GRAPH
         std::stack<MATH::Matrix4> modelViewMatrixStack_;
         std::stack<MATH::Matrix4> projectionMatrixStack_;
         std::stack<MATH::Matrix4> textureMatrixStack_;
-        //texture cache belongs to this director
-        TextureCache *textureCache_;
+
+        ActionManager *actionManager_;
+        Scheduler *scheduler_;
+        EventDispatcher *eventDispatcher_;
         GLView *glView_;
+        TextureCache *textureCache_;
+        Renderer *renderer_;
     };
 }
 

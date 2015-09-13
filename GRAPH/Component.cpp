@@ -1,4 +1,5 @@
 #include "GRAPH/Component.h"
+#include "GRAPH/Node.h"
 
 namespace GRAPH
 {
@@ -150,7 +151,7 @@ namespace GRAPH
             _components->clear();
             SAFE_DELETE(_components);
 
-            _owner->unscheduleUpdate();
+            dynamic_cast<Node *>(_owner)->unscheduleUpdate();
         }
     }
 
