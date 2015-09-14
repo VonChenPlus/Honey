@@ -582,7 +582,6 @@ namespace GRAPH
         dispatchEvent(&ev);
     }
 
-
     void EventDispatcher::dispatchTouchEvent(EventTouch* event) {
         sortEventListeners(EventListenerTouchOneByOne::LISTENER_ID);
         sortEventListeners(EventListenerTouchAllAtOnce::LISTENER_ID);

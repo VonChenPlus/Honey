@@ -2,6 +2,7 @@
 #include <string>
 #include <regex>
 #include "GRAPH/Node.h"
+#include "GRAPH/Scene.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/Action.h"
 #include "GRAPH/Scheduler.h"
@@ -923,6 +924,18 @@ namespace GRAPH
         auto renderer = _director->getRenderer();
         auto& parentTransform = _director->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
         visit(renderer, parentTransform, true);
+    }
+
+    Scene* Node::getScene() const {
+        if (!_parent)
+            return nullptr;
+
+        auto sceneNode = _parent;
+        while (sceneNode->_parent) {
+            sceneNode = sceneNode->_parent;
+        }
+
+        return dynamic_cast<Scene*>(sceneNode);
     }
 
     uint32_t Node::processParentFlags(const MATH::Matrix4& parentTransform, uint32_t parentFlags)

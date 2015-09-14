@@ -85,6 +85,7 @@ namespace GRAPH
 
         void dispatchTouchEvent(EventTouch* event);
         void dispatchEventToListeners(EventListenerVector* listeners, const std::function<bool(EventListener*)>& onEvent);
+        void dispatchTouchEventToListeners(EventListenerVector* listeners, const std::function<bool(EventListener*)>& onEvent);
 
         void associateNodeAndEventListener(HObject* target, EventListener* listener);
         void dissociateNodeAndEventListener(HObject* target, EventListener* listener);

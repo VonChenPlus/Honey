@@ -37,6 +37,45 @@ namespace GRAPH
         }
     }
 
+    void Director::setProjection(Projection projection) {
+        MATH::Sizef size = getWinSize();
+
+        switch (projection) {
+            case Projection::_2D: {
+                loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+
+                MATH::Matrix4 orthoMatrix;
+                MATH::Matrix4::createOrthographicOffCenter(0, size.width, 0, size.height, -1024, 1024, &orthoMatrix);
+                multiplyMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, orthoMatrix);
+                loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+                break;
+            }
+            case Projection::_3D: {
+                float zeye = this->getZEye();
+
+                MATH::Matrix4 matrixPerspective, matrixLookup;
+
+                loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+
+                // issue #1334
+                MATH::Matrix4::createPerspective(60, (GLfloat)size.width/size.height, 10, zeye+size.height/2, &matrixPerspective);
+
+                multiplyMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, matrixPerspective);
+
+                MATH::Vector3f eye(size.width/2, size.height/2, zeye), center(size.width/2, size.height/2, 0.0f), up(0.0f, 1.0f, 0.0f);
+                MATH::Matrix4::createLookAt(eye, center, up, &matrixLookup);
+                multiplyMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, matrixLookup);
+
+                loadIdentityMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+                break;
+            }
+            default:
+                break;
+        }
+
+        projection_ = projection;
+    }
+
     void Director::initMatrixStack() {
         while (!modelViewMatrixStack_.empty()) {
             modelViewMatrixStack_.pop();

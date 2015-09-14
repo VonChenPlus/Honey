@@ -180,6 +180,8 @@ namespace GRAPH
         virtual void visit(Renderer *renderer, const MATH::Matrix4& parentTransform, uint32_t parentFlags);
         virtual void visit() final;
 
+        virtual Scene* getScene() const;
+
         virtual MATH::Rectf getBoundingBox() const;
 
         virtual void setEventDispatcher(EventDispatcher* dispatcher);
