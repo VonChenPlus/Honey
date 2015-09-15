@@ -6,6 +6,27 @@
 namespace GRAPH
 {
     class Scene;
+    class FrameBuffer;
+
+    struct Viewport
+    {
+        Viewport(float left, float bottom, float width, float height)
+            : _left(left)
+            , _bottom(bottom)
+            , _width(width)
+            , _height(height) {
+
+            }
+        Viewport() {
+            _left = _bottom = 0.f;
+            _width = _height = 1.0f;
+        }
+
+        float _left;
+        float _bottom;
+        float _width;
+        float _height;
+    };
 
     enum class CameraFlag
     {
@@ -67,8 +88,17 @@ namespace GRAPH
         virtual void onEnter() override;
         virtual void onExit() override;
 
+        void clearBackground(float depth);
+
+        void apply();
+
+        void setFrameBufferObject(FrameBuffer* fbo);
+        void setViewport(const Viewport& vp) { _viewport = vp; }
+
         static const Camera* getVisitingCamera() { return _visitingCamera; }
         static Camera* getDefaultCamera();
+        static const Viewport& getDefaultViewport() { return _defaultViewport; }
+        static void setDefaultViewport(const Viewport& vp) { _defaultViewport = vp; }
 
     public:
         Camera();
@@ -79,6 +109,9 @@ namespace GRAPH
         bool initDefault();
         bool initPerspective(float fieldOfView, float aspectRatio, float nearPlane, float farPlane);
         bool initOrthographic(float zoomX, float zoomY, float nearPlane, float farPlane);
+
+        void applyFrameBufferObject();
+        void applyViewport();
 
     protected:
         Scene* _scene;
@@ -97,7 +130,10 @@ namespace GRAPH
         unsigned short _cameraFlag;
         mutable bool _frustumDirty;
         int8_t  _depth;
+        Viewport _viewport;
+        FrameBuffer* _fbo;
         static Camera* _visitingCamera;
+        static Viewport _defaultViewport;
     };
 }
 

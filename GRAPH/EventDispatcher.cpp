@@ -1,6 +1,9 @@
 #include "GRAPH/EventDispatcher.h"
 #include <algorithm>
+#include "GRAPH/Director.h"
 #include "GRAPH/Node.h"
+#include "GRAPH/Camera.h"
+#include "GRAPH/Scene.h"
 
 namespace GRAPH
 {
@@ -538,6 +541,78 @@ namespace GRAPH
         }
     }
 
+    void EventDispatcher::dispatchTouchEventToListeners(EventListenerVector* listeners, const std::function<bool(EventListener*)>& onEvent) {
+        bool shouldStopPropagation = false;
+        auto fixedPriorityListeners = listeners->getFixedPriorityListeners();
+        auto sceneGraphPriorityListeners = listeners->getSceneGraphPriorityListeners();
+
+        ssize_t i = 0;
+        // priority < 0
+        if (fixedPriorityListeners) {
+            if (!fixedPriorityListeners->empty()) {
+                for (; i < listeners->getGt0Index(); ++i) {
+                    auto l = fixedPriorityListeners->at(i);
+                    if (l->isEnabled() && !l->isPaused() && l->isRegistered() && onEvent(l)) {
+                        shouldStopPropagation = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (sceneGraphPriorityListeners) {
+            if (!shouldStopPropagation) {
+                // priority == 0, scene graph priority
+
+                // first, get all enabled, unPaused and registered listeners
+                std::vector<EventListener*> sceneListeners;
+                for (auto& l : *sceneGraphPriorityListeners) {
+                    if (l->isEnabled() && !l->isPaused() && l->isRegistered()) {
+                        sceneListeners.push_back(l);
+                    }
+                }
+                // second, for all camera call all listeners
+                // get a copy of cameras, prevent it's been modified in linstener callback
+                // if camera's depth is greater, process it earler
+                auto cameras = Director::getInstance().getRunningScene()->getCameras();
+                Camera* camera;
+                for (int j = int(cameras.size()) - 1; j >= 0; --j) {
+                    camera = cameras[j];
+                    if (camera->isVisible() == false) {
+                        continue;
+                    }
+
+                    Camera::_visitingCamera = camera;
+                    for (auto& l : sceneListeners) {
+                        if (onEvent(l)) {
+                            shouldStopPropagation = true;
+                            break;
+                        }
+                    }
+                    if (shouldStopPropagation) {
+                        break;
+                    }
+                }
+                Camera::_visitingCamera = nullptr;
+            }
+        }
+
+        if (fixedPriorityListeners) {
+            if (!shouldStopPropagation) {
+                // priority > 0
+                ssize_t size = fixedPriorityListeners->size();
+                for (; i < size; ++i) {
+                    auto l = fixedPriorityListeners->at(i);
+
+                    if (l->isEnabled() && !l->isPaused() && l->isRegistered() && onEvent(l)) {
+                        shouldStopPropagation = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     void EventDispatcher::dispatchEvent(Event* event) {
         if (!_isEnabled)
             return;
@@ -557,8 +632,7 @@ namespace GRAPH
 
         auto pfnDispatchEventToListeners = &EventDispatcher::dispatchEventToListeners;
         if (event->getType() == Event::Type::MOUSE) {
-            // TODO
-            //pfnDispatchEventToListeners = &EventDispatcher::dispatchTouchEventToListeners;
+            pfnDispatchEventToListeners = &EventDispatcher::dispatchTouchEventToListeners;
         }
         auto iter = _listenerMap.find(listenerID);
         if (iter != _listenerMap.end()) {
@@ -681,8 +755,7 @@ namespace GRAPH
                     return false;
                 };
 
-                // TODO
-                //dispatchTouchEventToListeners(oneByOneListeners, onTouchEvent);
+                dispatchTouchEventToListeners(oneByOneListeners, onTouchEvent);
                 if (event->isStopped()) {
                     return;
                 }
@@ -735,8 +808,7 @@ namespace GRAPH
                 return false;
             };
 
-            // TODO
-            //dispatchTouchEventToListeners(allAtOnceListeners, onTouchesEvent);
+            dispatchTouchEventToListeners(allAtOnceListeners, onTouchesEvent);
             if (event->isStopped()) {
                 return;
             }
@@ -853,14 +925,13 @@ namespace GRAPH
             }
 
             if ((int)dirtyFlag & (int)DirtyFlag::SCENE_GRAPH_PRIORITY) {
-                // TODO
-                //auto rootNode = Director::getInstance()->getRunningScene();
-                //if (rootNode) {
-                //    sortEventListenersOfSceneGraphPriority(listenerID, rootNode);
-                //}
-                //else {
-                //    dirtyIter->second = DirtyFlag::SCENE_GRAPH_PRIORITY;
-                //}
+                auto rootNode = Director::getInstance().getRunningScene();
+                if (rootNode) {
+                    sortEventListenersOfSceneGraphPriority(listenerID, rootNode);
+                }
+                else {
+                    dirtyIter->second = DirtyFlag::SCENE_GRAPH_PRIORITY;
+                }
             }
         }
     }

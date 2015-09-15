@@ -4,6 +4,7 @@
 #include "GRAPH/RENDERER/Renderer.h"
 #include "GRAPH/RENDERER/GLProgram.h"
 #include "GRAPH/RENDERER/GLStateCache.h"
+#include "GRAPH/RENDERER/FrameBuffer.h"
 
 namespace GRAPH
 {
@@ -55,11 +56,12 @@ namespace GRAPH
         , _viewProjectionDirty(true)
         , _cameraFlag(1)
         , _frustumDirty(true)
-        , _depth(-1) {
+        , _depth(-1)
+        , _fbo(nullptr) {
     }
 
     Camera::~Camera() {
-
+        SAFE_RELEASE_NULL(_fbo);
     }
 
     const MATH::Matrix4& Camera::getProjectionMatrix() const {
@@ -279,6 +281,111 @@ namespace GRAPH
         Node::onExit();
     }
 
+    void Camera::setFrameBufferObject(FrameBuffer *fbo) {
+        SAFE_RETAIN(fbo);
+        SAFE_RELEASE_NULL(_fbo);
+        _fbo = fbo;
+        if(_scene) {
+            _scene->setCameraOrderDirty();
+        }
+    }
+
+    void Camera::applyFrameBufferObject() {
+        if(nullptr == _fbo) {
+            FrameBuffer::applyDefaultFBO();
+        }
+        else {
+            _fbo->applyFBO();
+        }
+    }
+
+    void Camera::clearBackground(float) {
+        GLboolean oldDepthTest;
+        GLint oldDepthFunc;
+        GLboolean oldDepthMask;
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        glStencilMask(0);
+
+        oldDepthTest = glIsEnabled(GL_DEPTH_TEST);
+        glGetIntegerv(GL_DEPTH_FUNC, &oldDepthFunc);
+        glGetBooleanv(GL_DEPTH_WRITEMASK, &oldDepthMask);
+
+        glDepthMask(GL_TRUE);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_ALWAYS);
+
+        //draw
+        static V3F_C4B_T2F_Quad quad;
+        quad.bl.vertices = MATH::Vector3f(-1,-1,0);
+        quad.br.vertices = MATH::Vector3f(1,-1,0);
+        quad.tl.vertices = MATH::Vector3f(-1,1,0);
+        quad.tr.vertices = MATH::Vector3f(1,1,0);
+
+        quad.bl.colors = quad.br.colors = quad.tl.colors = quad.tr.colors = Color4B(0,0,0,1);
+
+        quad.bl.texCoords = Tex2F(0,0);
+        quad.br.texCoords = Tex2F(1,0);
+        quad.tl.texCoords = Tex2F(0,1);
+        quad.tr.texCoords = Tex2F(1,1);
+
+        auto shader = GLProgramCache::getInstance()->getGLProgram(GLProgram::SHADER_CAMERA_CLEAR);
+        auto programState = GLProgramState::getOrCreateWithGLProgram(shader);
+        programState->setUniformFloat("depth", 1.0);
+        programState->apply(MATH::Matrix4());
+        GLshort indices[6] = {0, 1, 2, 3, 2, 1};
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
+
+        // vertices
+        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), &quad.tl.vertices);
+
+        // colors
+        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V3F_C4B_T2F), &quad.tl.colors);
+
+        // tex coords
+        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), &quad.tl.texCoords);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
+
+        if(GL_FALSE == oldDepthTest)
+        {
+            glDisable(GL_DEPTH_TEST);
+        }
+        glDepthFunc(oldDepthFunc);
+
+        if(GL_FALSE == oldDepthMask)
+        {
+            glDepthMask(GL_FALSE);
+        }
+
+        /* IMPORTANT: We only need to update the states that are not restored.
+         Since we don't know what was the previous value of the mask, we update the RenderState
+         after setting it.
+         The other values don't need to be updated since they were restored to their original values
+         */
+        glStencilMask(0xFFFFF);
+
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    }
+
+    void Camera::apply() {
+        applyFrameBufferObject();
+        applyViewport();
+    }
+
+    void Camera::applyViewport() {
+        if(nullptr == _fbo) {
+            glViewport(getDefaultViewport()._left, getDefaultViewport()._bottom, getDefaultViewport()._width, getDefaultViewport()._height);
+        }
+        else {
+            glViewport(_viewport._left * _fbo->getWidth(), _viewport._bottom * _fbo->getHeight(),
+                       _viewport._width * _fbo->getWidth(), _viewport._height * _fbo->getHeight());
+        }
+    }
+
     void Camera::setScene(Scene* scene) {
         if (_scene != scene) {
             //remove old scene
@@ -304,8 +411,13 @@ namespace GRAPH
     }
 
     int Camera::getRenderOrder() const {
-        int result(0);
-        result = 127 <<8;
+        int result = 0;
+        if(_fbo) {
+            result = _fbo->getFID()<<8;
+        }
+        else {
+            result = 127 <<8;
+        }
         result += _depth;
         return result;
     }

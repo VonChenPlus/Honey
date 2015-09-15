@@ -83,11 +83,9 @@ namespace GRAPH
 
             director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
             director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, Camera::_visitingCamera->getViewProjectionMatrix());
-            // TODO
-            //camera->apply();
+            camera->apply();
             //clear background with max depth
-            // TODO
-            //camera->clearBackground(1.0);
+            camera->clearBackground(1.0);
             //visit the scene
             visit(renderer, transform, 0);
 

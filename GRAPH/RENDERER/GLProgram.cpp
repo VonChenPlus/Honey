@@ -40,6 +40,7 @@ namespace GRAPH
     const char* GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW = "ShaderLabelDFGlow";
     const char* GLProgram::SHADER_NAME_LABEL_NORMAL = "ShaderLabelNormal";
     const char* GLProgram::SHADER_NAME_LABEL_OUTLINE = "ShaderLabelOutline";
+    const char* GLProgram::SHADER_CAMERA_CLEAR = "ShaderCameraClear";
 
     // uniform names
     const char* GLProgram::UNIFORM_NAME_AMBIENT_COLOR = "AmbientColor";
@@ -687,6 +688,7 @@ namespace GRAPH
         kShaderType_UIGrayScale,
         kShaderType_LabelNormal,
         kShaderType_LabelOutline,
+        kShaderType_CameraClear,
         kShaderType_MAX,
     };
 
@@ -793,6 +795,10 @@ namespace GRAPH
         p = new (std::nothrow) GLProgram();
         loadDefaultGLProgram(p, kShaderType_LabelOutline);
         programs_.insert( std::make_pair(GLProgram::SHADER_NAME_LABEL_OUTLINE, p) );
+
+        p = new GLProgram();
+        loadDefaultGLProgram(p, kShaderType_CameraClear);
+        programs_.insert( std::make_pair(GLProgram::SHADER_CAMERA_CLEAR, p));
     }
 
     void GLProgramCache::reloadDefaultGLPrograms() {
