@@ -2,7 +2,6 @@
 #include <algorithm>
 #include "GRAPH/Director.h"
 #include "GRAPH/Node.h"
-#include "GRAPH/Camera.h"
 #include "GRAPH/Scene.h"
 
 namespace GRAPH
@@ -571,29 +570,13 @@ namespace GRAPH
                         sceneListeners.push_back(l);
                     }
                 }
-                // second, for all camera call all listeners
-                // get a copy of cameras, prevent it's been modified in linstener callback
-                // if camera's depth is greater, process it earler
-                auto cameras = Director::getInstance().getRunningScene()->getCameras();
-                Camera* camera;
-                for (int j = int(cameras.size()) - 1; j >= 0; --j) {
-                    camera = cameras[j];
-                    if (camera->isVisible() == false) {
-                        continue;
-                    }
 
-                    Camera::_visitingCamera = camera;
-                    for (auto& l : sceneListeners) {
-                        if (onEvent(l)) {
-                            shouldStopPropagation = true;
-                            break;
-                        }
-                    }
-                    if (shouldStopPropagation) {
+                for (auto& l : sceneListeners) {
+                    if (onEvent(l)) {
+                        shouldStopPropagation = true;
                         break;
                     }
                 }
-                Camera::_visitingCamera = nullptr;
             }
         }
 
