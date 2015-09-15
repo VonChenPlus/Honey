@@ -156,6 +156,16 @@ namespace IMAGE
         void premultipliedAlpha();
 
     protected:
+        // noncopyable
+        TinyImage(const TinyImage&    rImg);
+        TinyImage & operator=(const TinyImage&);
+
+        Format detectFormat(const unsigned char * data, ssize_t dataLen);
+        bool isPng(const unsigned char * data, ssize_t dataLen);
+        bool isJpg(const unsigned char * data, ssize_t dataLen);
+        bool isEtc(const unsigned char * data, ssize_t dataLen);
+
+    protected:
         unsigned char *data_;
         ssize_t dataLen_;
         int width_;
@@ -165,16 +175,6 @@ namespace IMAGE
         // false if we cann't auto detect the image is premultiplied or not.
         bool hasPremultipliedAlpha_;
         std::string filePath_;
-
-    protected:
-        // noncopyable
-        TinyImage(const TinyImage&    rImg);
-        TinyImage & operator=(const TinyImage&);
-
-        Format detectFormat(const unsigned char * data, ssize_t dataLen);
-        bool isPng(const unsigned char * data, ssize_t dataLen);
-        bool isJpg(const unsigned char * data, ssize_t dataLen);
-        bool isEtc(const unsigned char * data, ssize_t dataLen);
     };
 }
 
