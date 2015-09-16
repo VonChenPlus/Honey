@@ -978,10 +978,6 @@ namespace GRAPH
         _director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
         _director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, _modelViewTransform);
 
-        // TODO
-        //bool visibleByCamera = isVisitableByVisitingCamera();
-        bool visibleByCamera = true;
-
         int i = 0;
 
         if(!_children.empty())
@@ -997,13 +993,12 @@ namespace GRAPH
                     break;
             }
 
-            if (visibleByCamera)
-                this->draw(renderer, _modelViewTransform, flags);
+            this->draw(renderer, _modelViewTransform, flags);
 
             for(auto it=_children.cbegin()+i; it != _children.cend(); ++it)
                 (*it)->visit(renderer, _modelViewTransform, flags);
         }
-        else if (visibleByCamera)
+        else
         {
             this->draw(renderer, _modelViewTransform, flags);
         }
@@ -1874,9 +1869,7 @@ namespace GRAPH
                 break;
         }
 
-        // TODO
-        //if (isVisitableByVisitingCamera())
-            this->draw(renderer, _modelViewTransform, flags);
+        this->draw(renderer, _modelViewTransform, flags);
 
         for(auto it=_protectedChildren.cbegin()+j; it != _protectedChildren.cend(); ++it)
             (*it)->visit(renderer, _modelViewTransform, flags);

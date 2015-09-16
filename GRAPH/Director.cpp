@@ -24,7 +24,7 @@ namespace GRAPH
         actionManager_ = new (std::nothrow) ActionManager;
         scheduler_ = new (std::nothrow) Scheduler;
         eventDispatcher_ = new (std::nothrow) EventDispatcher;
-        textureCache_ = new (std::nothrow) TextureCache;
+        textureCache_ = new (std::nothrow) TextureCache(scheduler_);
         renderer_ = new (std::nothrow) Renderer;
 
         return true;

@@ -1,5 +1,6 @@
 #include "BASE/HData.h"
 #include "GRAPH/Director.h"
+#include "GRAPH/Scheduler.h"
 #include "GRAPH/RENDERER/Texture2D.h"
 #include "GRAPH/RENDERER/GLProgram.h"
 #include "GRAPH/RENDERER/GLStateCache.h"
@@ -435,8 +436,9 @@ namespace GRAPH
         return g_defaultAlphaPixelFormat;
     }
 
-    TextureCache::TextureCache()
-        : loadingThread_(nullptr)
+    TextureCache::TextureCache(HObject *scheduler)
+        : scheduler_(scheduler)
+        , loadingThread_(nullptr)
         , asyncStructQueue_(nullptr)
         , imageInfoQueue_(nullptr)
         , needQuit_(false)
@@ -482,8 +484,7 @@ namespace GRAPH
         }
 
         if (0 == asyncRefCount_) {
-            // TODO
-            // Director::getInstance()->getScheduler()->schedule(CC_SCHEDULE_SELECTOR(TextureCache::addImageAsyncCallBack), this, 0, false);
+            dynamic_cast<Scheduler *>(scheduler_)->schedule(static_cast<SelectorF>(&TextureCache::addImageAsyncCallBack), this, 0, false);
         }
 
         ++asyncRefCount_;
@@ -663,8 +664,7 @@ namespace GRAPH
 
             --asyncRefCount_;
             if (0 == asyncRefCount_) {
-                // TODO
-                // Director::getInstance()->getScheduler()->unschedule(CC_SCHEDULE_SELECTOR(TextureCache::addImageAsyncCallBack), this);
+                dynamic_cast<Scheduler *>(scheduler_)->unschedule(static_cast<SelectorF>(&TextureCache::addImageAsyncCallBack), this);
             }
         }
     }
