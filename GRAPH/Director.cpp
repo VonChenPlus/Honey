@@ -4,7 +4,7 @@
 #include "GRAPH/Event.h"
 #include "GRAPH/Scheduler.h"
 #include "GRAPH/EventDispatcher.h"
-#include "GRAPH/GLView.h"
+#include "GRAPH/RenderView.h"
 #include "GRAPH/RENDERER/Texture2D.h"
 #include "GRAPH/RENDERER/Renderer.h"
 
@@ -173,7 +173,7 @@ namespace GRAPH
     }
 
     const MATH::Sizef& Director::getWinSize() const {
-        return glView_->getDesignResolutionSize();
+        return renderView_->getDesignResolutionSize();
     }
 
     MATH::Vector2f Director::convertToGL(const MATH::Vector2f& uiPoint) {
@@ -185,7 +185,7 @@ namespace GRAPH
         // Calculate z=0 using -> transform*[0, 0, 0, 1]/w
         float zClip = transform.m[14]/transform.m[15];
 
-        MATH::Sizef glSize = glView_->getDesignResolutionSize();
+        MATH::Sizef glSize = renderView_->getDesignResolutionSize();
         MATH::Vector4f clipCoord(2.0f*uiPoint.x/glSize.width - 1.0f, 1.0f - 2.0f*uiPoint.y/glSize.height, zClip, 1);
 
         MATH::Vector4f glCoord;
@@ -208,7 +208,7 @@ namespace GRAPH
         clipCoord.y = clipCoord.y / clipCoord.w;
         clipCoord.z = clipCoord.z / clipCoord.w;
 
-        MATH::Sizef glSize = glView_->getDesignResolutionSize();
+        MATH::Sizef glSize = renderView_->getDesignResolutionSize();
         float factor = 1.0/glCoord.w;
         return MATH::Vector2f(glSize.width*(clipCoord.x*0.5 + 0.5) * factor, glSize.height*(-clipCoord.y*0.5 + 0.5) * factor);
     }

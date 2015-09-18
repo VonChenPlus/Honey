@@ -1,19 +1,19 @@
-#include "GRAPH/GLView.h"
+#include "GRAPH/RenderView.h"
 
 namespace GRAPH
 {
-    GLView::GLView()
+    RenderView::RenderView()
         : scaleX_(1.0f)
         , scaleY_(1.0f)
         , resolutionPolicy_(ResolutionPolicy::UNKNOWN) {
 
     }
 
-    GLView::~GLView() {
+    RenderView::~RenderView() {
 
     }
 
-    void GLView::updateDesignResolutionSize() {
+    void RenderView::updateDesignResolutionSize() {
         if (screenSize_.width > 0 && screenSize_.height > 0
             && designResolutionSize_.width > 0 && designResolutionSize_.height > 0) {
             scaleX_ = (float)screenSize_.width / designResolutionSize_.width;
@@ -42,7 +42,7 @@ namespace GRAPH
         }
     }
 
-    void GLView::setDesignResolutionSize(float width, float height, ResolutionPolicy resolutionPolicy) {
+    void RenderView::setDesignResolutionSize(float width, float height, ResolutionPolicy resolutionPolicy) {
         if (width == 0.0f || height == 0.0f) {
             return;
         }
@@ -53,26 +53,26 @@ namespace GRAPH
         updateDesignResolutionSize();
     }
 
-    const MATH::Sizef& GLView::getDesignResolutionSize() const {
+    const MATH::Sizef& RenderView::getDesignResolutionSize() const {
         return designResolutionSize_;
     }
 
-    const MATH::Sizef& GLView::getFrameSize() const {
+    const MATH::Sizef& RenderView::getFrameSize() const {
         return screenSize_;
     }
 
-    void GLView::setFrameSize(float width, float height) {
+    void RenderView::setFrameSize(float width, float height) {
         designResolutionSize_ = screenSize_ = MATH::Sizef(width, height);
     }
 
-    MATH::Rectf GLView::getVisibleRect() const {
+    MATH::Rectf RenderView::getVisibleRect() const {
         MATH::Rectf ret;
         ret.size = getVisibleSize();
         ret.origin = getVisibleOrigin();
         return ret;
     }
 
-    MATH::Sizef GLView::getVisibleSize() const {
+    MATH::Sizef RenderView::getVisibleSize() const {
         if (resolutionPolicy_ == ResolutionPolicy::NO_BORDER) {
             return MATH::Sizef(screenSize_.width/scaleX_, screenSize_.height/scaleY_);
         }
@@ -81,7 +81,7 @@ namespace GRAPH
         }
     }
 
-    MATH::Vector2f GLView::getVisibleOrigin() const {
+    MATH::Vector2f RenderView::getVisibleOrigin() const {
         if (resolutionPolicy_ == ResolutionPolicy::NO_BORDER) {
             return MATH::Vector2f((designResolutionSize_.width - screenSize_.width/scaleX_)/2,
                                (designResolutionSize_.height - screenSize_.height/scaleY_)/2);
@@ -91,15 +91,15 @@ namespace GRAPH
         }
     }
 
-    const MATH::Rectf& GLView::getViewPortRect() const {
+    const MATH::Rectf& RenderView::getViewPortRect() const {
         return viewPortRect_;
     }
 
-    float GLView::getScaleX() const {
+    float RenderView::getScaleX() const {
         return scaleX_;
     }
 
-    float GLView::getScaleY() const {
+    float RenderView::getScaleY() const {
         return scaleY_;
     }
 }

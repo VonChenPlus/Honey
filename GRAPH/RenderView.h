@@ -1,5 +1,5 @@
-#ifndef GLVIEW_H
-#define GLVIEW_H
+#ifndef RENDERVIEW_H
+#define RENDERVIEW_H
 
 #include <vector>
 #include "MATH/Size.h"
@@ -37,11 +37,11 @@ namespace GRAPH
         UNKNOWN,
     };
 
-    class GLView
+    class RenderView
     {
     public:
-        GLView();
-        virtual ~GLView();
+        RenderView();
+        virtual ~RenderView();
 
         virtual const MATH::Sizef& getFrameSize() const;
         virtual void setFrameSize(float width, float height);
@@ -86,4 +86,4 @@ namespace GRAPH
     };
 }
 
-#endif // GLVIEW_H
+#endif // RENDERVIEW_H

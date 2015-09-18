@@ -8,7 +8,7 @@
 
 namespace GRAPH
 {
-    class GLView;
+    class RenderView;
     class ActionManager;
     class Scheduler;
     class EventDispatcher;
@@ -94,7 +94,7 @@ namespace GRAPH
         ActionManager *actionManager_;
         Scheduler *scheduler_;
         EventDispatcher *eventDispatcher_;
-        GLView *glView_;
+        RenderView *renderView_;
         TextureCache *textureCache_;
         Renderer *renderer_;
     };
