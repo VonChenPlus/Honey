@@ -79,14 +79,22 @@ namespace GRAPH
         MATH::Vector2f convertToGL(const MATH::Vector2f& point);
         MATH::Vector2f convertToUI(const MATH::Vector2f& point);
 
+        void drawScene();
+
     protected:
+        void setNextScene();
+
         void initMatrixStack();
 
         void glToClipTransform(MATH::Matrix4 *transformOut);
 
     private:
+        bool paused_;
+
         Camera *camera_;
+
         Scene *runningScene_;
+        Scene *nextScene_;
 
         Projection projection_;
 

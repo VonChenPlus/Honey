@@ -6,6 +6,7 @@
 #include "GRAPH/Scheduler.h"
 #include "GRAPH/EventDispatcher.h"
 #include "GRAPH/RenderView.h"
+#include "GRAPH/Scene.h"
 #include "GRAPH/RENDERER/Texture2D.h"
 #include "GRAPH/RENDERER/Renderer.h"
 
@@ -20,6 +21,8 @@ namespace GRAPH
     }
 
     bool Director::init(void) {
+        paused_ = false;
+
         initMatrixStack();
 
         camera_ = Camera::create();
@@ -225,5 +228,34 @@ namespace GRAPH
         auto projection = getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
         auto modelview = getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
         *transformOut = projection * modelview;
+    }
+
+
+    void Director::drawScene() {
+        if (paused_) {
+            scheduler_->update(0);
+        }
+
+        renderer_->clear();
+
+        if (nextScene_) {
+            setNextScene();
+        }
+
+        pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+
+        if (runningScene_) {
+            renderer_->clearDrawStats();
+
+            runningScene_->render(renderer_);
+        }
+
+        renderer_->render();
+
+        popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    }
+
+    void Director::setNextScene() {
+
     }
 }
