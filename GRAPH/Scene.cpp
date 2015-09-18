@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "GRAPH/Director.h"
 #include "GRAPH/Scene.h"
+#include "GRAPH/Camera.h"
 #include "GRAPH/RENDERER/Renderer.h"
 #include "MATH/Vector.h"
 
@@ -53,7 +54,7 @@ namespace GRAPH
         const auto& transform = getNodeToParentTransform();
 
         director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
-        director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, getNodeToWorldTransform());
+        director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, Director::getInstance().getCamera()->getViewProjectionMatrix());
         //visit the scene
         visit(renderer, transform, 0);
 

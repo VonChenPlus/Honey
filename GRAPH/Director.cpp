@@ -1,5 +1,6 @@
 ﻿#include <string>
 #include "GRAPH/Director.h"
+#include "GRAPH/Camera.h"
 #include "GRAPH/Action.h"
 #include "GRAPH/Event.h"
 #include "GRAPH/Scheduler.h"
@@ -21,8 +22,13 @@ namespace GRAPH
     bool Director::init(void) {
         initMatrixStack();
 
-        actionManager_ = new (std::nothrow) ActionManager;
+        camera_ = Camera::create();
+
         scheduler_ = new (std::nothrow) Scheduler;
+
+        actionManager_ = new (std::nothrow) ActionManager;
+        scheduler_->scheduleUpdate(actionManager_, Scheduler::PRIORITY_SYSTEM, false);
+
         eventDispatcher_ = new (std::nothrow) EventDispatcher;
         textureCache_ = new (std::nothrow) TextureCache(scheduler_);
         renderer_ = new (std::nothrow) Renderer;

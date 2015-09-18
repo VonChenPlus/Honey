@@ -15,6 +15,7 @@ namespace GRAPH
     class Renderer;
     class TextureCache;
     class Scene;
+    class Camera;
 
     enum class Projection
     {
@@ -50,6 +51,7 @@ namespace GRAPH
         virtual ~Director();
         virtual bool init();
 
+        inline Camera* getCamera() { return camera_; }
         inline Scene* getRunningScene() { return runningScene_; }
 
         ActionManager* getActionManager() const { return actionManager_; }
@@ -83,6 +85,7 @@ namespace GRAPH
         void glToClipTransform(MATH::Matrix4 *transformOut);
 
     private:
+        Camera *camera_;
         Scene *runningScene_;
 
         Projection projection_;
