@@ -1,5 +1,5 @@
-#ifndef SPRITE_H
-#define SPRITE_H
+#ifndef SPRITEFRAME_H
+#define SPRITEFRAME_H
 
 #include <string>
 #include <set>
@@ -90,4 +90,4 @@ namespace GRAPH
     };
 }
 
-#endif // SPRITE_H
+#endif // SPRITEFRAME_H
