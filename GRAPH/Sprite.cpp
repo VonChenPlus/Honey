@@ -59,39 +59,31 @@ namespace GRAPH
         triangles.verts = (V3F_C4B_T2F*) quad;
     }
 
-    void PolygonInfo::releaseVertsAndIndices()
-    {
-        if (isVertsOwner)
-        {
-            if (nullptr != triangles.verts)
-            {
+    void PolygonInfo::releaseVertsAndIndices() {
+        if (isVertsOwner) {
+            if (nullptr != triangles.verts) {
                 SAFE_DELETE_ARRAY(triangles.verts);
             }
 
-            if (nullptr != triangles.indices)
-            {
+            if (nullptr != triangles.indices) {
                 SAFE_DELETE_ARRAY(triangles.indices);
             }
         }
     }
 
-    const unsigned int PolygonInfo::getVertCount() const
-    {
+    const unsigned int PolygonInfo::getVertCount() const {
         return (unsigned int) triangles.vertCount;
     }
 
-    const unsigned int PolygonInfo::getTriaglesCount() const
-    {
+    const unsigned int PolygonInfo::getTriaglesCount() const {
         return (unsigned int) triangles.indexCount / 3;
     }
 
-    const float PolygonInfo::getArea() const
-    {
+    const float PolygonInfo::getArea() const {
         float area = 0;
         V3F_C4B_T2F *verts = triangles.verts;
         unsigned short *indices = triangles.indices;
-        for (int i = 0; i < triangles.indexCount; i += 3)
-        {
+        for (int i = 0; i < triangles.indexCount; i += 3) {
             auto A = verts[indices[i]].vertices;
             auto B = verts[indices[i + 1]].vertices;
             auto C = verts[indices[i + 2]].vertices;
@@ -100,12 +92,9 @@ namespace GRAPH
         return area;
     }
 
-    // MARK: create, init, dealloc
-    Sprite* Sprite::createWithTexture(Texture2D *texture)
-    {
+    Sprite* Sprite::createWithTexture(Texture2D *texture) {
         Sprite *sprite = new (std::nothrow) Sprite();
-        if (sprite && sprite->initWithTexture(texture))
-        {
+        if (sprite && sprite->initWithTexture(texture)) {
             sprite->autorelease();
             return sprite;
         }
@@ -113,11 +102,9 @@ namespace GRAPH
         return nullptr;
     }
 
-    Sprite* Sprite::createWithTexture(Texture2D *texture, const MATH::Rectf& rect, bool rotated)
-    {
+    Sprite* Sprite::createWithTexture(Texture2D *texture, const MATH::Rectf& rect, bool rotated) {
         Sprite *sprite = new (std::nothrow) Sprite();
-        if (sprite && sprite->initWithTexture(texture, rect, rotated))
-        {
+        if (sprite && sprite->initWithTexture(texture, rect, rotated)) {
             sprite->autorelease();
             return sprite;
         }
@@ -125,11 +112,9 @@ namespace GRAPH
         return nullptr;
     }
 
-    Sprite* Sprite::createWithSpriteFrame(SpriteFrame *spriteFrame)
-    {
+    Sprite* Sprite::createWithSpriteFrame(SpriteFrame *spriteFrame) {
         Sprite *sprite = new (std::nothrow) Sprite();
-        if (sprite && spriteFrame && sprite->initWithSpriteFrame(spriteFrame))
-        {
+        if (sprite && spriteFrame && sprite->initWithSpriteFrame(spriteFrame)) {
             sprite->autorelease();
             return sprite;
         }
@@ -137,17 +122,14 @@ namespace GRAPH
         return nullptr;
     }
 
-    Sprite* Sprite::createWithSpriteFrameName(const std::string& spriteFrameName)
-    {
+    Sprite* Sprite::createWithSpriteFrameName(const std::string& spriteFrameName) {
         SpriteFrame *frame = SpriteFrameCache::getInstance().getSpriteFrameByName(spriteFrameName);
         return createWithSpriteFrame(frame);
     }
 
-    Sprite* Sprite::create(const std::string& filename)
-    {
+    Sprite* Sprite::create(const std::string& filename) {
         Sprite *sprite = new (std::nothrow) Sprite();
-        if (sprite && sprite->initWithFile(filename))
-        {
+        if (sprite && sprite->initWithFile(filename)) {
             sprite->autorelease();
             return sprite;
         }
@@ -155,11 +137,9 @@ namespace GRAPH
         return nullptr;
     }
 
-    Sprite* Sprite::create(const PolygonInfo& info)
-    {
+    Sprite* Sprite::create(const PolygonInfo& info) {
         Sprite *sprite = new (std::nothrow) Sprite();
-        if(sprite && sprite->initWithPolygon(info))
-        {
+        if(sprite && sprite->initWithPolygon(info)) {
             sprite->autorelease();
             return sprite;
         }
@@ -167,11 +147,9 @@ namespace GRAPH
         return nullptr;
     }
 
-    Sprite* Sprite::create(const std::string& filename, const MATH::Rectf& rect)
-    {
+    Sprite* Sprite::create(const std::string& filename, const MATH::Rectf& rect) {
         Sprite *sprite = new (std::nothrow) Sprite();
-        if (sprite && sprite->initWithFile(filename, rect))
-        {
+        if (sprite && sprite->initWithFile(filename, rect)) {
             sprite->autorelease();
             return sprite;
         }
@@ -179,11 +157,9 @@ namespace GRAPH
         return nullptr;
     }
 
-    Sprite* Sprite::create()
-    {
+    Sprite* Sprite::create() {
         Sprite *sprite = new (std::nothrow) Sprite();
-        if (sprite && sprite->init())
-        {
+        if (sprite && sprite->init()) {
             sprite->autorelease();
             return sprite;
         }
@@ -191,157 +167,109 @@ namespace GRAPH
         return nullptr;
     }
 
-    bool Sprite::init(void)
-    {
+    bool Sprite::init(void) {
         return initWithTexture(nullptr, MATH::RectfZERO );
     }
 
-    bool Sprite::initWithTexture(Texture2D *texture)
-    {
+    bool Sprite::initWithTexture(Texture2D *texture) {
         MATH::Rectf rect = MATH::RectfZERO;
         rect.size = texture->getContentSize();
 
         return initWithTexture(texture, rect);
     }
 
-    bool Sprite::initWithTexture(Texture2D *texture, const MATH::Rectf& rect)
-    {
+    bool Sprite::initWithTexture(Texture2D *texture, const MATH::Rectf& rect) {
         return initWithTexture(texture, rect, false);
     }
 
-    bool Sprite::initWithSpriteFrameName(const std::string& spriteFrameName)
-    {
+    bool Sprite::initWithSpriteFrameName(const std::string& spriteFrameName) {
         SpriteFrame *frame = SpriteFrameCache::getInstance().getSpriteFrameByName(spriteFrameName);
         return initWithSpriteFrame(frame);
     }
 
-    bool Sprite::initWithSpriteFrame(SpriteFrame *spriteFrame)
-    {
+    bool Sprite::initWithSpriteFrame(SpriteFrame *spriteFrame) {
         bool bRet = initWithTexture(spriteFrame->getTexture(), spriteFrame->getRect());
         setSpriteFrame(spriteFrame);
 
         return bRet;
     }
 
-    bool Sprite::initWithFile(const std::string& filename)
-    {
+    bool Sprite::initWithFile(const std::string& filename) {
         Texture2D *texture = Director::getInstance().getTextureCache()->addImage(filename);
-        if (texture)
-        {
+        if (texture) {
             MATH::Rectf rect = MATH::RectfZERO;
             rect.size = texture->getContentSize();
             return initWithTexture(texture, rect);
         }
 
-        // don't release here.
-        // when load texture failed, it's better to get a "transparent" sprite then a crashed program
-        // this->release();
         return false;
     }
 
-    bool Sprite::initWithFile(const std::string &filename, const MATH::Rectf& rect)
-    {
+    bool Sprite::initWithFile(const std::string &filename, const MATH::Rectf& rect) {
         Texture2D *texture = Director::getInstance().getTextureCache()->addImage(filename);
-        if (texture)
-        {
+        if (texture) {
             return initWithTexture(texture, rect);
         }
 
-        // don't release here.
-        // when load texture failed, it's better to get a "transparent" sprite then a crashed program
-        // this->release();
         return false;
     }
 
-    bool Sprite::initWithPolygon(const PolygonInfo &info)
-    {
-        _polyInfo = info;
-        setContentSize(_polyInfo.rect.size);
+    bool Sprite::initWithPolygon(const PolygonInfo &info) {
+        polyInfo_ = info;
+        setContentSize(polyInfo_.rect.size);
         return true;
     }
 
-    // designated initializer
-    bool Sprite::initWithTexture(Texture2D *texture, const MATH::Rectf& rect, bool rotated)
-    {
+    bool Sprite::initWithTexture(Texture2D *texture, const MATH::Rectf& rect, bool rotated) {
         bool result;
-        if (Node::init())
-        {
-            _batchNode = nullptr;
-
-            _recursiveDirty = false;
+        if (Node::init()) {
+            batchNode_ = nullptr;
+            recursiveDirty_ = false;
             setDirty(false);
-
-            _opacityModifyRGB = true;
-
-            _blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
-
-            _flippedX = _flippedY = false;
-
+            opacityModifyRGB_ = true;
+            blendFunc_ = BlendFunc::ALPHA_PREMULTIPLIED;
+            flippedX_ = flippedY_ = false;
             // default transform anchor: center
             setAnchorPoint(MATH::Vector2f(0.5f, 0.5f));
-
             // zwoptex default values
-            _offsetPosition.setZero();
-
+            offsetPosition_.setZero();
             // clean the Quad
-            memset(&_quad, 0, sizeof(_quad));
-
+            memset(&quad_, 0, sizeof(quad_));
             // Atlas: Color
-            _quad.bl.colors = Color4B::WHITE;
-            _quad.br.colors = Color4B::WHITE;
-            _quad.tl.colors = Color4B::WHITE;
-            _quad.tr.colors = Color4B::WHITE;
-
+            quad_.bl.colors = Color4B::WHITE;
+            quad_.br.colors = Color4B::WHITE;
+            quad_.tl.colors = Color4B::WHITE;
+            quad_.tr.colors = Color4B::WHITE;
             // shader state
             setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
-
             // update texture (calls updateBlendFunc)
             setTexture(texture);
             setTextureRect(rect, rotated, rect.size);
-
-            _polyInfo.setQuad(&_quad);
+            polyInfo_.setQuad(&quad_);
             // by default use "Self Render".
             // if the sprite is added to a batchnode, then it will automatically switch to "batchnode Render"
             setBatchNode(nullptr);
             result = true;
         }
-        else
-        {
+        else {
             result = false;
         }
-        _recursiveDirty = true;
+        recursiveDirty_ = true;
         setDirty(true);
         return result;
     }
 
     Sprite::Sprite(void)
-    : _shouldBeHidden(false)
-    , _texture(nullptr)
-    , _spriteFrame(nullptr)
-    , _insideBounds(true)
-    {
+        : shouldBeHidden_(false)
+        , texture_(nullptr)
+        , spriteFrame_(nullptr) {
     }
 
-    Sprite::~Sprite(void)
-    {
-        SAFE_RELEASE(_spriteFrame);
-        SAFE_RELEASE(_texture);
+    Sprite::~Sprite(void) {
+        SAFE_RELEASE(spriteFrame_);
+        SAFE_RELEASE(texture_);
     }
 
-    /*
-     * Texture methods
-     */
-
-    /*
-     * This array is the data of a white image with 2 by 2 dimension.
-     * It's used for creating a default texture when sprite's texture is set to nullptr.
-     * Supposing codes as follows:
-     *
-     *   auto sp = new (std::nothrow) Sprite();
-     *   sp->init();  // Texture was set to nullptr, in order to make opacity and color to work correctly, we need to create a 2x2 white texture.
-     *
-     * The test is in "TestCpp/SpriteTest/Sprite without texture".
-     */
     static unsigned char _2x2_white_image[] = {
         // RGBA8888
         0xFF, 0xFF, 0xFF, 0xFF,
@@ -352,9 +280,7 @@ namespace GRAPH
 
     #define _2x2_WHITE_IMAGE_KEY  "/_2x2_white_image"
 
-    // MARK: texture
-    void Sprite::setTexture(const std::string &filename)
-    {
+    void Sprite::setTexture(const std::string &filename) {
         Texture2D *texture = Director::getInstance().getTextureCache()->addImage(filename);
         setTexture(texture);
 
@@ -364,16 +290,11 @@ namespace GRAPH
         setTextureRect(rect);
     }
 
-    void Sprite::setTexture(Texture2D *texture)
-    {
-        if (texture == nullptr)
-        {
-            // Gets the texture by key firstly.
+    void Sprite::setTexture(Texture2D *texture) {
+        if (texture == nullptr) {
             texture = Director::getInstance().getTextureCache()->getTextureForKey(_2x2_WHITE_IMAGE_KEY);
 
-            // If texture wasn't in cache, create it from RAW data.
-            if (texture == nullptr)
-            {
+            if (texture == nullptr) {
                 IMAGE::TinyImage* image = new (std::nothrow) IMAGE::TinyImage();
                 image->initWithRawData(_2x2_white_image, sizeof(_2x2_white_image), 2, 2, 8);
                 texture = Director::getInstance().getTextureCache()->addImage(image, _2x2_WHITE_IMAGE_KEY);
@@ -381,137 +302,108 @@ namespace GRAPH
             }
         }
 
-        if (_texture != texture)
-        {
+        if (texture_ != texture) {
             SAFE_RETAIN(texture);
-            SAFE_RELEASE(_texture);
-            _texture = texture;
+            SAFE_RELEASE(texture_);
+            texture_ = texture;
             updateBlendFunc();
         }
     }
 
-    Texture2D* Sprite::getTexture() const
-    {
-        return _texture;
+    Texture2D* Sprite::getTexture() const {
+        return texture_;
     }
 
-    void Sprite::setTextureRect(const MATH::Rectf& rect)
-    {
+    void Sprite::setTextureRect(const MATH::Rectf& rect) {
         setTextureRect(rect, false, rect.size);
     }
 
-    void Sprite::setTextureRect(const MATH::Rectf& rect, bool rotated, const MATH::Sizef& untrimmedSize)
-    {
-        _rectRotated = rotated;
+    void Sprite::setTextureRect(const MATH::Rectf& rect, bool rotated, const MATH::Sizef& untrimmedSize) {
+        rectRotated_ = rotated;
 
         setContentSize(untrimmedSize);
         setVertexRect(rect);
         setTextureCoords(rect);
 
-        float relativeOffsetX = _unflippedOffsetPositionFromCenter.x;
-        float relativeOffsetY = _unflippedOffsetPositionFromCenter.y;
+        float relativeOffsetX = unflippedOffsetPositionFromCenter_.x;
+        float relativeOffsetY = unflippedOffsetPositionFromCenter_.y;
 
-        // issue #732
-        if (_flippedX)
-        {
+        if (flippedX_) {
             relativeOffsetX = -relativeOffsetX;
         }
-        if (_flippedY)
-        {
+        if (flippedY_) {
             relativeOffsetY = -relativeOffsetY;
         }
 
-        _offsetPosition.x = relativeOffsetX + (_contentSize.width - _rect.size.width) / 2;
-        _offsetPosition.y = relativeOffsetY + (_contentSize.height - _rect.size.height) / 2;
+        offsetPosition_.x = relativeOffsetX + (_contentSize.width - rect_.size.width) / 2;
+        offsetPosition_.y = relativeOffsetY + (_contentSize.height - rect_.size.height) / 2;
 
-        // rendering using batch node
-        if (_batchNode)
-        {
-            // update dirty_, don't update recursiveDirty_
+        if (batchNode_) {
             setDirty(true);
         }
-        else
-        {
-            // self rendering
+        else {
+            float x1 = 0.0f + offsetPosition_.x;
+            float y1 = 0.0f + offsetPosition_.y;
+            float x2 = x1 + rect_.size.width;
+            float y2 = y1 + rect_.size.height;
 
-            // Atlas: Vertex
-            float x1 = 0.0f + _offsetPosition.x;
-            float y1 = 0.0f + _offsetPosition.y;
-            float x2 = x1 + _rect.size.width;
-            float y2 = y1 + _rect.size.height;
-
-            // Don't update Z.
-            _quad.bl.vertices.set(x1, y1, 0.0f);
-            _quad.br.vertices.set(x2, y1, 0.0f);
-            _quad.tl.vertices.set(x1, y2, 0.0f);
-            _quad.tr.vertices.set(x2, y2, 0.0f);
+            quad_.bl.vertices.set(x1, y1, 0.0f);
+            quad_.br.vertices.set(x2, y1, 0.0f);
+            quad_.tl.vertices.set(x1, y2, 0.0f);
+            quad_.tr.vertices.set(x2, y2, 0.0f);
         }
     }
 
-    // override this method to generate "double scale" sprites
-    void Sprite::setVertexRect(const MATH::Rectf& rect)
-    {
-        _rect = rect;
+    void Sprite::setVertexRect(const MATH::Rectf& rect) {
+        rect_ = rect;
     }
 
-    void Sprite::setSpriteFrame(const std::string &spriteFrameName)
-    {
+    void Sprite::setSpriteFrame(const std::string &spriteFrameName) {
         SpriteFrame *spriteFrame = SpriteFrameCache::getInstance().getSpriteFrameByName(spriteFrameName);
-
         setSpriteFrame(spriteFrame);
     }
 
-    void Sprite::setSpriteFrame(SpriteFrame *spriteFrame)
-    {
-        // retain the sprite frame
-        // do not removed by SpriteFrameCache::removeUnusedSpriteFrames
-        if (_spriteFrame != spriteFrame)
-        {
-            SAFE_RELEASE(_spriteFrame);
-            _spriteFrame = spriteFrame;
+    void Sprite::setSpriteFrame(SpriteFrame *spriteFrame) {
+        if (spriteFrame_ != spriteFrame) {
+            SAFE_RELEASE(spriteFrame_);
+            spriteFrame_ = spriteFrame;
             spriteFrame->retain();
         }
-        _unflippedOffsetPositionFromCenter = spriteFrame->getOffset();
+
+        unflippedOffsetPositionFromCenter_ = spriteFrame->getOffset();
 
         Texture2D *texture = spriteFrame->getTexture();
-        // update texture before updating texture rect
-        if (texture != _texture)
-        {
+        if (texture != texture_) {
             setTexture(texture);
         }
 
-        // update rect
-        _rectRotated = spriteFrame->isRotated();
-        setTextureRect(spriteFrame->getRect(), _rectRotated, spriteFrame->getOriginalSize());
+        rectRotated_ = spriteFrame->isRotated();
+        setTextureRect(spriteFrame->getRect(), rectRotated_, spriteFrame->getOriginalSize());
     }
 
-    bool Sprite::isFrameDisplayed(SpriteFrame *frame) const
-    {
-        MATH::Rectf r = frame->getRect();
+    bool Sprite::isFrameDisplayed(SpriteFrame *frame) const {
+        MATH::Rectf rect = frame->getRect();
 
-        return (r.equals(_rect) &&
-                frame->getTexture()->getName() == _texture->getName() &&
-                frame->getOffset().equals(_unflippedOffsetPositionFromCenter));
+        return (rect.equals(rect_) &&
+                frame->getTexture()->getName() == texture_->getName() &&
+                frame->getOffset().equals(unflippedOffsetPositionFromCenter_));
     }
 
-    SpriteFrame* Sprite::getSpriteFrame() const
-    {
-        if(nullptr != this->_spriteFrame)
-        {
-            return this->_spriteFrame;
+    SpriteFrame* Sprite::getSpriteFrame() const {
+        if(nullptr != this->spriteFrame_) {
+            return this->spriteFrame_;
         }
-        return SpriteFrame::createWithTexture(_texture,
-                                               _rect,
-                                               _rectRotated,
-                                               _unflippedOffsetPositionFromCenter,
+
+        return SpriteFrame::createWithTexture(texture_,
+                                               rect_,
+                                               rectRotated_,
+                                               unflippedOffsetPositionFromCenter_,
                                                _contentSize);
     }
 
-    void Sprite::setTextureCoords(MATH::Rectf rect)
-    {
-        Texture2D *tex = _batchNode ? _textureAtlas->getTexture() : _texture;
-        if (! tex)
-        {
+    void Sprite::setTextureCoords(MATH::Rectf rect) {
+        Texture2D *tex = batchNode_ ? textureAtlas_->getTexture() : texture_;
+        if (! tex) {
             return;
         }
 
@@ -520,109 +412,89 @@ namespace GRAPH
 
         float left, right, top, bottom;
 
-        if (_rectRotated)
-        {
+        if (rectRotated_) {
             left    = rect.origin.x/atlasWidth;
             right   = (rect.origin.x+rect.size.height) / atlasWidth;
             top     = rect.origin.y/atlasHeight;
             bottom  = (rect.origin.y+rect.size.width) / atlasHeight;
 
-            if (_flippedX)
-            {
+            if (flippedX_) {
                 std::swap(top, bottom);
             }
 
-            if (_flippedY)
-            {
+            if (flippedY_) {
                 std::swap(left, right);
             }
 
-            _quad.bl.texCoords.u = left;
-            _quad.bl.texCoords.v = top;
-            _quad.br.texCoords.u = left;
-            _quad.br.texCoords.v = bottom;
-            _quad.tl.texCoords.u = right;
-            _quad.tl.texCoords.v = top;
-            _quad.tr.texCoords.u = right;
-            _quad.tr.texCoords.v = bottom;
+            quad_.bl.texCoords.u = left;
+            quad_.bl.texCoords.v = top;
+            quad_.br.texCoords.u = left;
+            quad_.br.texCoords.v = bottom;
+            quad_.tl.texCoords.u = right;
+            quad_.tl.texCoords.v = top;
+            quad_.tr.texCoords.u = right;
+            quad_.tr.texCoords.v = bottom;
         }
-        else
-        {
+        else {
             left    = rect.origin.x/atlasWidth;
             right    = (rect.origin.x + rect.size.width) / atlasWidth;
             top        = rect.origin.y/atlasHeight;
             bottom    = (rect.origin.y + rect.size.height) / atlasHeight;
 
-            if(_flippedX)
-            {
+            if(flippedX_) {
                 std::swap(left, right);
             }
 
-            if(_flippedY)
-            {
+            if(flippedY_) {
                 std::swap(top, bottom);
             }
 
-            _quad.bl.texCoords.u = left;
-            _quad.bl.texCoords.v = bottom;
-            _quad.br.texCoords.u = right;
-            _quad.br.texCoords.v = bottom;
-            _quad.tl.texCoords.u = left;
-            _quad.tl.texCoords.v = top;
-            _quad.tr.texCoords.u = right;
-            _quad.tr.texCoords.v = top;
+            quad_.bl.texCoords.u = left;
+            quad_.bl.texCoords.v = bottom;
+            quad_.br.texCoords.u = right;
+            quad_.br.texCoords.v = bottom;
+            quad_.tl.texCoords.u = left;
+            quad_.tl.texCoords.v = top;
+            quad_.tr.texCoords.u = right;
+            quad_.tr.texCoords.v = top;
         }
     }
 
-    // MARK: visit, draw, transform
-
-    void Sprite::updateTransform(void)
-    {
-        // recalculate matrix only if it is dirty
+    void Sprite::updateTransform(void) {
         if( isDirty() ) {
-
-            // If it is not visible, or one of its ancestors is not visible, then do nothing:
-            if( !_visible || ( _parent && _parent != _batchNode && static_cast<Sprite*>(_parent)->_shouldBeHidden) )
-            {
-                _quad.br.vertices.setZero();
-                _quad.tl.vertices.setZero();
-                _quad.tr.vertices.setZero();
-                _quad.bl.vertices.setZero();
-                _shouldBeHidden = true;
+            if( !_visible || ( _parent && _parent != batchNode_ && static_cast<Sprite*>(_parent)->shouldBeHidden_) ) {
+                quad_.br.vertices.setZero();
+                quad_.tl.vertices.setZero();
+                quad_.tr.vertices.setZero();
+                quad_.bl.vertices.setZero();
+                shouldBeHidden_ = true;
             }
-            else
-            {
-                _shouldBeHidden = false;
+            else {
+                shouldBeHidden_ = false;
 
-                if( ! _parent || _parent == _batchNode )
-                {
-                    _transformToBatch = getNodeToParentTransform();
+                if( ! _parent || _parent == batchNode_ ) {
+                    transformToBatch_ = getNodeToParentTransform();
                 }
-                else
-                {
+                else {
                     const MATH::Matrix4 &nodeToParent = getNodeToParentTransform();
-                    MATH::Matrix4 &parentTransform = static_cast<Sprite*>(_parent)->_transformToBatch;
-                    _transformToBatch = parentTransform * nodeToParent;
+                    MATH::Matrix4 &parentTransform = static_cast<Sprite*>(_parent)->transformToBatch_;
+                    transformToBatch_ = parentTransform * nodeToParent;
                 }
 
-                //
-                // calculate the Quad based on the Affine Matrix
-                //
+                MATH::Sizef &size = rect_.size;
 
-                MATH::Sizef &size = _rect.size;
-
-                float x1 = _offsetPosition.x;
-                float y1 = _offsetPosition.y;
+                float x1 = offsetPosition_.x;
+                float y1 = offsetPosition_.y;
 
                 float x2 = x1 + size.width;
                 float y2 = y1 + size.height;
-                float x = _transformToBatch.m[12];
-                float y = _transformToBatch.m[13];
+                float x = transformToBatch_.m[12];
+                float y = transformToBatch_.m[13];
 
-                float cr = _transformToBatch.m[0];
-                float sr = _transformToBatch.m[1];
-                float cr2 = _transformToBatch.m[5];
-                float sr2 = -_transformToBatch.m[4];
+                float cr = transformToBatch_.m[0];
+                float sr = transformToBatch_.m[1];
+                float cr2 = transformToBatch_.m[5];
+                float sr2 = -transformToBatch_.m[4];
                 float ax = x1 * cr - y1 * sr2 + x;
                 float ay = x1 * sr + y1 * cr2 + y;
 
@@ -635,99 +507,75 @@ namespace GRAPH
                 float dx = x1 * cr - y2 * sr2 + x;
                 float dy = x1 * sr + y2 * cr2 + y;
 
-                _quad.bl.vertices.set(ax, ay, _positionZ);
-                _quad.br.vertices.set(bx, by, _positionZ);
-                _quad.tl.vertices.set(dx, dy, _positionZ);
-                _quad.tr.vertices.set(cx, cy, _positionZ);
+                quad_.bl.vertices.set(ax, ay, _positionZ);
+                quad_.br.vertices.set(bx, by, _positionZ);
+                quad_.tl.vertices.set(dx, dy, _positionZ);
+                quad_.tr.vertices.set(cx, cy, _positionZ);
             }
 
-            // MARMALADE CHANGE: ADDED CHECK FOR nullptr, TO PERMIT SPRITES WITH NO BATCH NODE / TEXTURE ATLAS
-            if (_textureAtlas)
-            {
-                _textureAtlas->updateQuad(&_quad, _atlasIndex);
+            if (textureAtlas_) {
+                textureAtlas_->updateQuad(&quad_, atlasIndex_);
             }
 
-            _recursiveDirty = false;
+            recursiveDirty_ = false;
             setDirty(false);
         }
 
         Node::updateTransform();
     }
 
-    // draw
-
-    void Sprite::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags)
-    {
-        _trianglesCommand.init(_globalZOrder, _texture->getName(), getGLProgramState(), _blendFunc, _polyInfo.triangles, transform, flags);
-        renderer->addCommand(&_trianglesCommand);
+    void Sprite::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags) {
+        trianglesCommand_.init(_globalZOrder, texture_->getName(), getGLProgramState(), blendFunc_, polyInfo_.triangles, transform, flags);
+        renderer->addCommand(&trianglesCommand_);
     }
 
-    // MARK: visit, draw, transform
-
-    void Sprite::addChild(Node *child, int zOrder, int tag)
-    {
-        if (_batchNode)
-        {
+    void Sprite::addChild(Node *child, int zOrder, int tag) {
+        if (batchNode_) {
             Sprite* childSprite = dynamic_cast<Sprite*>(child);
-            //put it in descendants array of batch node
-            _batchNode->appendChild(childSprite);
+            batchNode_->appendChild(childSprite);
 
-            if (!_reorderChildDirty)
-            {
+            if (!_reorderChildDirty) {
                 setReorderChildDirtyRecursively();
             }
         }
-        //CCNode already sets isReorderChildDirty_ so this needs to be after batchNode check
         Node::addChild(child, zOrder, tag);
     }
 
-    void Sprite::addChild(Node *child, int zOrder, const std::string &name)
-    {
-        if (_batchNode)
-        {
+    void Sprite::addChild(Node *child, int zOrder, const std::string &name) {
+        if (batchNode_) {
             Sprite* childSprite = dynamic_cast<Sprite*>(child);
-            //put it in descendants array of batch node
-            _batchNode->appendChild(childSprite);
+            batchNode_->appendChild(childSprite);
 
-            if (!_reorderChildDirty)
-            {
+            if (!_reorderChildDirty) {
                 setReorderChildDirtyRecursively();
             }
         }
-        //CCNode already sets isReorderChildDirty_ so this needs to be after batchNode check
         Node::addChild(child, zOrder, name);
     }
 
-    void Sprite::reorderChild(Node *child, int zOrder)
-    {
-        if( _batchNode && ! _reorderChildDirty)
-        {
+    void Sprite::reorderChild(Node *child, int zOrder) {
+        if( batchNode_ && ! _reorderChildDirty) {
             setReorderChildDirtyRecursively();
-            _batchNode->reorderBatch(true);
+            batchNode_->reorderBatch(true);
         }
 
         Node::reorderChild(child, zOrder);
     }
 
-    void Sprite::removeChild(Node *child, bool cleanup)
-    {
-        if (_batchNode)
-        {
-            _batchNode->removeSpriteFromAtlas((Sprite*)(child));
+    void Sprite::removeChild(Node *child, bool cleanup) {
+        if (batchNode_) {
+            batchNode_->removeSpriteFromAtlas((Sprite*)(child));
         }
 
         Node::removeChild(child, cleanup);
     }
 
-    void Sprite::removeAllChildrenWithCleanup(bool cleanup)
-    {
-        if (_batchNode)
-        {
+    void Sprite::removeAllChildrenWithCleanup(bool cleanup) {
+        if (batchNode_) {
             for(const auto &child : _children) {
                 Sprite* sprite = dynamic_cast<Sprite*>(child);
-                if (sprite)
-                {
-                    _batchNode->removeSpriteFromAtlas(sprite);
+                if (sprite) {
+                    batchNode_->removeSpriteFromAtlas(sprite);
                 }
             }
         }
@@ -735,14 +583,11 @@ namespace GRAPH
         Node::removeAllChildrenWithCleanup(cleanup);
     }
 
-    void Sprite::sortAllChildren()
-    {
-        if (_reorderChildDirty)
-        {
+    void Sprite::sortAllChildren() {
+        if (_reorderChildDirty) {
             std::sort(std::begin(_children), std::end(_children), NodeComparisonLess);
 
-            if ( _batchNode)
-            {
+            if ( batchNode_) {
                 for(const auto &child : _children)
                     child->sortAllChildren();
             }
@@ -751,284 +596,212 @@ namespace GRAPH
         }
     }
 
-    //
-    // Node property overloads
-    // used only when parent is SpriteBatchNode
-    //
-
-    void Sprite::setReorderChildDirtyRecursively(void)
-    {
-        //only set parents flag the first time
-        if ( ! _reorderChildDirty )
-        {
+    void Sprite::setReorderChildDirtyRecursively(void) {
+        if ( ! _reorderChildDirty ) {
             _reorderChildDirty = true;
             Node* node = static_cast<Node*>(_parent);
-            while (node && node != _batchNode)
-            {
+            while (node && node != batchNode_) {
                 static_cast<Sprite*>(node)->setReorderChildDirtyRecursively();
                 node=node->getParent();
             }
         }
     }
 
-    void Sprite::setDirtyRecursively(bool bValue)
-    {
-        _recursiveDirty = bValue;
+    void Sprite::setDirtyRecursively(bool bValue) {
+        recursiveDirty_ = bValue;
         setDirty(bValue);
 
         for(const auto &child: _children) {
             Sprite* sp = dynamic_cast<Sprite*>(child);
-            if (sp)
-            {
+            if (sp) {
                 sp->setDirtyRecursively(true);
             }
         }
     }
 
-    // FIXME: HACK: optimization
-    #define SET_DIRTY_RECURSIVELY() {                       \
-                        if (! _recursiveDirty) {            \
-                            _recursiveDirty = true;         \
+    #define SETdirty__RECURSIVELY() {                       \
+                        if (! recursiveDirty_) {            \
+                            recursiveDirty_ = true;         \
                             setDirty(true);                 \
                             if (!_children.empty())         \
                                 setDirtyRecursively(true);  \
                             }                               \
                         }
 
-    void Sprite::setPosition(const MATH::Vector2f& pos)
-    {
+    void Sprite::setPosition(const MATH::Vector2f& pos) {
         Node::setPosition(pos);
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::setPosition(float x, float y)
-    {
+    void Sprite::setPosition(float x, float y) {
         Node::setPosition(x, y);
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::setRotation(float rotation)
-    {
+    void Sprite::setRotation(float rotation) {
         Node::setRotation(rotation);
-
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::setRotationSkewX(float fRotationX)
-    {
+    void Sprite::setRotationSkewX(float fRotationX) {
         Node::setRotationSkewX(fRotationX);
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::setRotationSkewY(float fRotationY)
-    {
+    void Sprite::setRotationSkewY(float fRotationY) {
         Node::setRotationSkewY(fRotationY);
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::setSkewX(float sx)
-    {
+    void Sprite::setSkewX(float sx) {
         Node::setSkewX(sx);
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::setSkewY(float sy)
-    {
+    void Sprite::setSkewY(float sy) {
         Node::setSkewY(sy);
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::setScaleX(float scaleX)
-    {
+    void Sprite::setScaleX(float scaleX) {
         Node::setScaleX(scaleX);
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::setScaleY(float scaleY)
-    {
+    void Sprite::setScaleY(float scaleY) {
         Node::setScaleY(scaleY);
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::setScale(float fScale)
-    {
+    void Sprite::setScale(float fScale) {
         Node::setScale(fScale);
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::setScale(float scaleX, float scaleY)
-    {
+    void Sprite::setScale(float scaleX, float scaleY) {
         Node::setScale(scaleX, scaleY);
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::setPositionZ(float fVertexZ)
-    {
+    void Sprite::setPositionZ(float fVertexZ) {
         Node::setPositionZ(fVertexZ);
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::setAnchorPoint(const MATH::Vector2f& anchor)
-    {
+    void Sprite::setAnchorPoint(const MATH::Vector2f& anchor) {
         Node::setAnchorPoint(anchor);
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::ignoreAnchorPointForPosition(bool value)
-    {
-        Node::ignoreAnchorPointForPosition(value);
-    }
-
-    void Sprite::setVisible(bool bVisible)
-    {
+    void Sprite::setVisible(bool bVisible) {
         Node::setVisible(bVisible);
-        SET_DIRTY_RECURSIVELY();
+        SETdirty__RECURSIVELY();
     }
 
-    void Sprite::setFlippedX(bool flippedX)
-    {
-        if (_flippedX != flippedX)
-        {
-            _flippedX = flippedX;
-            setTextureRect(_rect, _rectRotated, _contentSize);
+    void Sprite::setFlippedX(bool flippedX) {
+        if (flippedX_ != flippedX) {
+            flippedX_ = flippedX;
+            setTextureRect(rect_, rectRotated_, _contentSize);
         }
     }
 
-    bool Sprite::isFlippedX(void) const
-    {
-        return _flippedX;
+    bool Sprite::isFlippedX(void) const {
+        return flippedX_;
     }
 
-    void Sprite::setFlippedY(bool flippedY)
-    {
-        if (_flippedY != flippedY)
-        {
-            _flippedY = flippedY;
-            setTextureRect(_rect, _rectRotated, _contentSize);
+    void Sprite::setFlippedY(bool flippedY) {
+        if (flippedY_ != flippedY) {
+            flippedY_ = flippedY;
+            setTextureRect(rect_, rectRotated_, _contentSize);
         }
     }
 
-    bool Sprite::isFlippedY(void) const
-    {
-        return _flippedY;
+    bool Sprite::isFlippedY(void) const {
+        return flippedY_;
     }
 
-    //
-    // MARK: RGBA protocol
-    //
-
-    void Sprite::updateColor(void)
-    {
+    void Sprite::updateColor(void) {
         Color4B color4( _displayedColor.red, _displayedColor.green, _displayedColor.blue, _displayedOpacity );
-
-        // special opacity for premultiplied textures
-        if (_opacityModifyRGB)
-        {
+        if (opacityModifyRGB_) {
             color4.red *= _displayedOpacity/255.0f;
             color4.green *= _displayedOpacity/255.0f;
             color4.blue *= _displayedOpacity/255.0f;
         }
 
-        _quad.bl.colors = color4;
-        _quad.br.colors = color4;
-        _quad.tl.colors = color4;
-        _quad.tr.colors = color4;
+        quad_.bl.colors = color4;
+        quad_.br.colors = color4;
+        quad_.tl.colors = color4;
+        quad_.tr.colors = color4;
 
-        // renders using batch node
-        if (_batchNode)
-        {
-            if (_atlasIndex != INDEX_NOT_INITIALIZED)
-            {
-                _textureAtlas->updateQuad(&_quad, _atlasIndex);
+        if (batchNode_) {
+            if (atlasIndex_ != INDEX_NOT_INITIALIZED) {
+                textureAtlas_->updateQuad(&quad_, atlasIndex_);
             }
-            else
-            {
-                // no need to set it recursively
-                // update dirty_, don't update recursiveDirty_
+            else {
                 setDirty(true);
             }
         }
-
-        // self render
-        // do nothing
     }
 
-    void Sprite::setOpacityModifyRGB(bool modify)
-    {
-        if (_opacityModifyRGB != modify)
-        {
-            _opacityModifyRGB = modify;
+    void Sprite::setOpacityModifyRGB(bool modify) {
+        if (opacityModifyRGB_ != modify) {
+            opacityModifyRGB_ = modify;
             updateColor();
         }
     }
 
-    bool Sprite::isOpacityModifyRGB(void) const
-    {
-        return _opacityModifyRGB;
+    bool Sprite::isOpacityModifyRGB(void) const {
+        return opacityModifyRGB_;
     }
 
-    SpriteBatchNode* Sprite::getBatchNode() const
-    {
-        return _batchNode;
+    SpriteBatchNode* Sprite::getBatchNode() const {
+        return batchNode_;
     }
 
-    void Sprite::setBatchNode(SpriteBatchNode *spriteBatchNode)
-    {
-        _batchNode = spriteBatchNode; // weak reference
+    void Sprite::setBatchNode(SpriteBatchNode *spriteBatchNode) {
+        batchNode_ = spriteBatchNode;
 
-        // self render
-        if( ! _batchNode ) {
-            _atlasIndex = INDEX_NOT_INITIALIZED;
+        if( ! batchNode_ ) {
+            atlasIndex_ = INDEX_NOT_INITIALIZED;
             setTextureAtlas(nullptr);
-            _recursiveDirty = false;
+            recursiveDirty_ = false;
             setDirty(false);
 
-            float x1 = _offsetPosition.x;
-            float y1 = _offsetPosition.y;
-            float x2 = x1 + _rect.size.width;
-            float y2 = y1 + _rect.size.height;
-            _quad.bl.vertices.set( x1, y1, 0 );
-            _quad.br.vertices.set(x2, y1, 0);
-            _quad.tl.vertices.set(x1, y2, 0);
-            _quad.tr.vertices.set(x2, y2, 0);
+            float x1 = offsetPosition_.x;
+            float y1 = offsetPosition_.y;
+            float x2 = x1 + rect_.size.width;
+            float y2 = y1 + rect_.size.height;
+            quad_.bl.vertices.set( x1, y1, 0 );
+            quad_.br.vertices.set(x2, y1, 0);
+            quad_.tl.vertices.set(x1, y2, 0);
+            quad_.tr.vertices.set(x2, y2, 0);
 
         } else {
-
-            // using batch
-            _transformToBatch = MATH::Matrix4::IDENTITY;
-            setTextureAtlas(_batchNode->getTextureAtlas()); // weak ref
+            transformToBatch_ = MATH::Matrix4::IDENTITY;
+            setTextureAtlas(batchNode_->getTextureAtlas()); // weak ref
         }
     }
 
-    // MARK: Texture protocol
-
-    void Sprite::updateBlendFunc(void)
-    {
-        // it is possible to have an untextured spritec
-        if (! _texture || ! _texture->hasPremultipliedAlpha())
-        {
-            _blendFunc = BlendFunc::ALPHA_NON_PREMULTIPLIED;
+    void Sprite::updateBlendFunc(void) {
+        if (! texture_ || ! texture_->hasPremultipliedAlpha()) {
+            blendFunc_ = BlendFunc::ALPHA_NON_PREMULTIPLIED;
             setOpacityModifyRGB(false);
         }
-        else
-        {
-            _blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
+        else {
+            blendFunc_ = BlendFunc::ALPHA_PREMULTIPLIED;
             setOpacityModifyRGB(true);
         }
     }
 
-    PolygonInfo Sprite::getPolygonInfo() const
-    {
-        return _polyInfo;
+    PolygonInfo Sprite::getPolygonInfo() const {
+        return polyInfo_;
     }
 
-    void Sprite::setPolygonInfo(const PolygonInfo& info)
-    {
-        _polyInfo = info;
+    void Sprite::setPolygonInfo(const PolygonInfo& info) {
+        polyInfo_ = info;
     }
 
-    SpriteBatchNode* SpriteBatchNode::createWithTexture(Texture2D* tex, ssize_t capacity/* = DEFAULT_CAPACITY*/)
-    {
+    SpriteBatchNode* SpriteBatchNode::createWithTexture(Texture2D* tex, ssize_t capacity/* = DEFAULT_CAPACITY*/) {
         SpriteBatchNode *batchNode = new (std::nothrow) SpriteBatchNode();
         batchNode->initWithTexture(tex, capacity);
         batchNode->autorelease();
@@ -1036,87 +809,58 @@ namespace GRAPH
         return batchNode;
     }
 
-    /*
-    * creation with File Image
-    */
-
-    SpriteBatchNode* SpriteBatchNode::create(const std::string& fileImage, ssize_t capacity/* = DEFAULT_CAPACITY*/)
-    {
+    SpriteBatchNode* SpriteBatchNode::create(const std::string& fileImage, ssize_t capacity/* = DEFAULT_CAPACITY*/) {
         SpriteBatchNode *batchNode = new (std::nothrow) SpriteBatchNode();
         batchNode->initWithFile(fileImage, capacity);
         batchNode->autorelease();
-
         return batchNode;
     }
 
-    /*
-    * init with Texture2D
-    */
-    bool SpriteBatchNode::initWithTexture(Texture2D *tex, ssize_t capacity/* = DEFAULT_CAPACITY*/)
-    {
-        _blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
-        if (!tex->hasPremultipliedAlpha())
-        {
-            _blendFunc = BlendFunc::ALPHA_NON_PREMULTIPLIED;
+    bool SpriteBatchNode::initWithTexture(Texture2D *tex, ssize_t capacity/* = DEFAULT_CAPACITY*/) {
+        blendFunc_ = BlendFunc::ALPHA_PREMULTIPLIED;
+        if (!tex->hasPremultipliedAlpha()) {
+            blendFunc_ = BlendFunc::ALPHA_NON_PREMULTIPLIED;
         }
-        _textureAtlas = new (std::nothrow) TextureAtlas();
+        textureAtlas_ = new (std::nothrow) TextureAtlas();
 
-        if (capacity == 0)
-        {
+        if (capacity == 0) {
             capacity = DEFAULT_CAPACITY;
         }
 
-        _textureAtlas->initWithTexture(tex, capacity);
+        textureAtlas_->initWithTexture(tex, capacity);
 
         updateBlendFunc();
 
         _children.reserve(capacity);
 
-        _descendants.reserve(capacity);
+        descendants_.reserve(capacity);
 
         setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR));
         return true;
     }
 
-    bool SpriteBatchNode::init()
-    {
+    bool SpriteBatchNode::init() {
         Texture2D * texture = new (std::nothrow) Texture2D();
         texture->autorelease();
         return this->initWithTexture(texture, 0);
     }
 
-    /*
-    * init with FileImage
-    */
-    bool SpriteBatchNode::initWithFile(const std::string& fileImage, ssize_t capacity/* = DEFAULT_CAPACITY*/)
-    {
+    bool SpriteBatchNode::initWithFile(const std::string& fileImage, ssize_t capacity/* = DEFAULT_CAPACITY*/) {
         Texture2D *texture2D = Director::getInstance().getTextureCache()->addImage(fileImage);
         return initWithTexture(texture2D, capacity);
     }
 
     SpriteBatchNode::SpriteBatchNode()
-        : _textureAtlas(nullptr)
-    {
+        : textureAtlas_(nullptr) {
+
     }
 
-    SpriteBatchNode::~SpriteBatchNode()
-    {
-        SAFE_RELEASE(_textureAtlas);
+    SpriteBatchNode::~SpriteBatchNode() {
+        SAFE_RELEASE(textureAtlas_);
     }
 
-    // override visit
-    // don't call visit on it's children
-    void SpriteBatchNode::visit(Renderer *renderer, const MATH::Matrix4 &parentTransform, uint32_t parentFlags)
-    {
-        // CAREFUL:
-        // This visit is almost identical to CocosNode#visit
-        // with the exception that it doesn't call visit on it's children
-        //
-        // The alternative is to have a void Sprite#visit, but
-        // although this is less maintainable, is faster
-        //
-        if (!_visible)
-        {
+    void SpriteBatchNode::visit(Renderer *renderer, const MATH::Matrix4 &parentTransform, uint32_t parentFlags) {
+        if (!_visible) {
             return;
         }
 
@@ -1132,8 +876,7 @@ namespace GRAPH
         Director::getInstance().popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
     }
 
-    void SpriteBatchNode::addChild(Node *child, int zOrder, int tag)
-    {
+    void SpriteBatchNode::addChild(Node *child, int zOrder, int tag) {
         Sprite *sprite = static_cast<Sprite*>(child);
 
         Node::addChild(child, zOrder, tag);
@@ -1141,8 +884,7 @@ namespace GRAPH
         appendChild(sprite);
     }
 
-    void SpriteBatchNode::addChild(Node * child, int zOrder, const std::string &name)
-    {
+    void SpriteBatchNode::addChild(Node * child, int zOrder, const std::string &name) {
         Sprite *sprite = static_cast<Sprite*>(child);
 
         Node::addChild(child, zOrder, name);
@@ -1150,81 +892,59 @@ namespace GRAPH
         appendChild(sprite);
     }
 
-    // override reorderChild
-    void SpriteBatchNode::reorderChild(Node *child, int zOrder)
-    {
-        if (zOrder == child->getLocalZOrder())
-        {
+    void SpriteBatchNode::reorderChild(Node *child, int zOrder) {
+        if (zOrder == child->getLocalZOrder()) {
             return;
         }
 
-        //set the z-order and sort later
         Node::reorderChild(child, zOrder);
     }
 
-    // override remove child
-    void SpriteBatchNode::removeChild(Node *child, bool cleanup)
-    {
+    void SpriteBatchNode::removeChild(Node *child, bool cleanup) {
         Sprite *sprite = static_cast<Sprite*>(child);
 
-        // explicit null handling
-        if (sprite == nullptr)
-        {
+        if (sprite == nullptr) {
             return;
         }
 
-        // cleanup before removing
         removeSpriteFromAtlas(sprite);
 
         Node::removeChild(sprite, cleanup);
     }
 
     void SpriteBatchNode::setTextureAtlas(TextureAtlas* textureAtlas) {
-        if (textureAtlas != _textureAtlas) {
+        if (textureAtlas != textureAtlas_) {
             SAFE_RETAIN(textureAtlas);
-            SAFE_RELEASE(_textureAtlas);
-            _textureAtlas = textureAtlas;
+            SAFE_RELEASE(textureAtlas_);
+            textureAtlas_ = textureAtlas;
         }
     }
 
-    void SpriteBatchNode::removeChildAtIndex(ssize_t index, bool doCleanup)
-    {
+    void SpriteBatchNode::removeChildAtIndex(ssize_t index, bool doCleanup) {
         removeChild(_children.at(index), doCleanup);
     }
 
-    void SpriteBatchNode::removeAllChildrenWithCleanup(bool doCleanup)
-    {
-        // Invalidate atlas index. issue #569
-        // useSelfRender should be performed on all descendants. issue #1216
-        for (const auto &sprite : _descendants) {
+    void SpriteBatchNode::removeAllChildrenWithCleanup(bool doCleanup) {
+        for (const auto &sprite : descendants_) {
             sprite->setBatchNode(nullptr);
         }
 
         Node::removeAllChildrenWithCleanup(doCleanup);
 
-        _descendants.clear();
-        _textureAtlas->removeAllQuads();
+        descendants_.clear();
+        textureAtlas_->removeAllQuads();
     }
 
-    //override sortAllChildren
-    void SpriteBatchNode::sortAllChildren()
-    {
-        if (_reorderChildDirty)
-        {
+    void SpriteBatchNode::sortAllChildren() {
+        if (_reorderChildDirty) {
             std::sort(std::begin(_children), std::end(_children), NodeComparisonLess);
 
-            //sorted now check all children
-            if (!_children.empty())
-            {
-                //first sort all children recursively based on zOrder
+            if (!_children.empty()) {
                 for (const auto &child : _children) {
                     child->sortAllChildren();
                 }
 
                 ssize_t index = 0;
-
-                //fast dispatch, give every child a new atlasIndex based on their relative zOrder (keep parent -> child relations intact)
-                // and at the same time reorder descendants and the quads to the right index
                 for (const auto &child : _children) {
                     Sprite* sp = static_cast<Sprite*>(child);
                     updateAtlasIndex(sp, &index);
@@ -1235,15 +955,13 @@ namespace GRAPH
         }
     }
 
-    void SpriteBatchNode::updateAtlasIndex(Sprite* sprite, ssize_t* curIndex)
-    {
+    void SpriteBatchNode::updateAtlasIndex(Sprite* sprite, ssize_t* curIndex) {
         auto& array = sprite->getChildren();
         auto count = array.size();
 
         ssize_t oldIndex = 0;
 
-        if (count == 0)
-        {
+        if (count == 0) {
             oldIndex = sprite->getAtlasIndex();
             sprite->setAtlasIndex(*curIndex);
             if (oldIndex != *curIndex){
@@ -1251,17 +969,13 @@ namespace GRAPH
             }
             (*curIndex)++;
         }
-        else
-        {
+        else {
             bool needNewIndex = true;
 
-            if (array.at(0)->getLocalZOrder() >= 0)
-            {
-                //all children are in front of the parent
+            if (array.at(0)->getLocalZOrder() >= 0) {
                 oldIndex = sprite->getAtlasIndex();
                 sprite->setAtlasIndex(*curIndex);
-                if (oldIndex != *curIndex)
-                {
+                if (oldIndex != *curIndex) {
                     swap(oldIndex, *curIndex);
                 }
                 (*curIndex)++;
@@ -1271,8 +985,7 @@ namespace GRAPH
 
             for (const auto &child : array) {
                 Sprite* sp = static_cast<Sprite*>(child);
-                if (needNewIndex && sp->getLocalZOrder() >= 0)
-                {
+                if (needNewIndex && sp->getLocalZOrder() >= 0) {
                     oldIndex = sprite->getAtlasIndex();
                     sprite->setAtlasIndex(*curIndex);
                     if (oldIndex != *curIndex) {
@@ -1285,8 +998,7 @@ namespace GRAPH
                 updateAtlasIndex(sp, curIndex);
             }
 
-            if (needNewIndex)
-            {//all children have a zOrder < 0)
+            if (needNewIndex) {
                 oldIndex = sprite->getAtlasIndex();
                 sprite->setAtlasIndex(*curIndex);
                 if (oldIndex != *curIndex) {
@@ -1297,85 +1009,59 @@ namespace GRAPH
         }
     }
 
-    void SpriteBatchNode::swap(ssize_t oldIndex, ssize_t newIndex)
-    {
-        V3F_C4B_T2F_Quad* quads = _textureAtlas->getQuads();
+    void SpriteBatchNode::swap(ssize_t oldIndex, ssize_t newIndex) {
+        V3F_C4B_T2F_Quad* quads = textureAtlas_->getQuads();
         std::swap(quads[oldIndex], quads[newIndex]);
 
-        //update the index of other swapped item
-
-        auto oldIt = std::next(_descendants.begin(), oldIndex);
-        auto newIt = std::next(_descendants.begin(), newIndex);
+        auto oldIt = std::next(descendants_.begin(), oldIndex);
+        auto newIt = std::next(descendants_.begin(), newIndex);
 
         (*newIt)->setAtlasIndex(oldIndex);
-        //    (*oldIt)->setAtlasIndex(newIndex);
 
         std::swap(*oldIt, *newIt);
     }
 
-    void SpriteBatchNode::reorderBatch(bool reorder)
-    {
+    void SpriteBatchNode::reorderBatch(bool reorder) {
         _reorderChildDirty = reorder;
     }
 
-    void SpriteBatchNode::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags)
-    {
-        // Optimization: Fast Dispatch
-        if (_textureAtlas->getTotalQuads() == 0)
-        {
+    void SpriteBatchNode::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags) {
+        if (textureAtlas_->getTotalQuads() == 0) {
             return;
         }
 
-        for (const auto &child : _children)
-        {
-#if CC_USE_PHYSICS
-            auto physicsBody = child->getPhysicsBody();
-            if (physicsBody)
-            {
-                child->updateTransformFromPhysics(transform, flags);
-            }
-#endif
+        for (const auto &child : _children) {
             child->updateTransform();
         }
 
-        _batchCommand.init(_globalZOrder, getGLProgram(), _blendFunc, _textureAtlas, transform, flags);
-        renderer->addCommand(&_batchCommand);
+        batchCommand_.init(_globalZOrder, getGLProgram(), blendFunc_, textureAtlas_, transform, flags);
+        renderer->addCommand(&batchCommand_);
     }
 
-    void SpriteBatchNode::increaseAtlasCapacity()
-    {
-        // if we're going beyond the current TextureAtlas's capacity,
-        // all the previously initialized sprites will need to redo their texture coords
-        // this is likely computationally expensive
-        ssize_t quantity = (_textureAtlas->getCapacity() + 1) * 4 / 3;
+    void SpriteBatchNode::increaseAtlasCapacity() {
+        ssize_t quantity = (textureAtlas_->getCapacity() + 1) * 4 / 3;
 
-        if (!_textureAtlas->resizeCapacity(quantity))
-        {
+        if (!textureAtlas_->resizeCapacity(quantity)) {
         }
     }
 
-    ssize_t SpriteBatchNode::rebuildIndexInOrder(Sprite *parent, ssize_t index)
-    {
+    ssize_t SpriteBatchNode::rebuildIndexInOrder(Sprite *parent, ssize_t index) {
         auto& children = parent->getChildren();
         for (const auto &child : children) {
             Sprite* sp = static_cast<Sprite*>(child);
-            if (sp && (sp->getLocalZOrder() < 0))
-            {
+            if (sp && (sp->getLocalZOrder() < 0)) {
                 index = rebuildIndexInOrder(sp, index);
             }
         }
 
-        // ignore self (batch node)
-        if (parent != static_cast<HObject*>(this))
-        {
+        if (parent != static_cast<HObject*>(this)) {
             parent->setAtlasIndex(index);
             index++;
         }
 
         for (const auto &child : children) {
             Sprite* sp = static_cast<Sprite*>(child);
-            if (sp && (sp->getLocalZOrder() >= 0))
-            {
+            if (sp && (sp->getLocalZOrder() >= 0)) {
                 index = rebuildIndexInOrder(sp, index);
             }
         }
@@ -1383,84 +1069,60 @@ namespace GRAPH
         return index;
     }
 
-    ssize_t SpriteBatchNode::highestAtlasIndexInChild(Sprite *sprite)
-    {
+    ssize_t SpriteBatchNode::highestAtlasIndexInChild(Sprite *sprite) {
         auto& children = sprite->getChildren();
 
-        if (children.size() == 0)
-        {
+        if (children.size() == 0) {
             return sprite->getAtlasIndex();
         }
-        else
-        {
+        else {
             return highestAtlasIndexInChild(static_cast<Sprite*>(children.back()));
         }
     }
 
-    ssize_t SpriteBatchNode::lowestAtlasIndexInChild(Sprite *sprite)
-    {
+    ssize_t SpriteBatchNode::lowestAtlasIndexInChild(Sprite *sprite) {
         auto& children = sprite->getChildren();
 
-        if (children.size() == 0)
-        {
+        if (children.size() == 0) {
             return sprite->getAtlasIndex();
         }
-        else
-        {
+        else {
             return lowestAtlasIndexInChild(static_cast<Sprite*>(children.at(0)));
         }
     }
 
-    ssize_t SpriteBatchNode::atlasIndexForChild(Sprite *sprite, int nZ)
-    {
+    ssize_t SpriteBatchNode::atlasIndexForChild(Sprite *sprite, int nZ) {
         auto& siblings = sprite->getParent()->getChildren();
         auto childIndex = siblings.getIndex(sprite);
 
-        // ignore parent Z if parent is spriteSheet
         bool ignoreParent = (SpriteBatchNode*) (sprite->getParent()) == this;
         Sprite *prev = nullptr;
-        if (childIndex > 0 && childIndex != -1)
-        {
+        if (childIndex > 0 && childIndex != -1) {
             prev = static_cast<Sprite*>(siblings.at(childIndex - 1));
         }
 
-        // first child of the sprite sheet
-        if (ignoreParent)
-        {
-            if (childIndex == 0)
-            {
+        if (ignoreParent) {
+            if (childIndex == 0) {
                 return 0;
             }
 
             return highestAtlasIndexInChild(prev) + 1;
         }
 
-        // parent is a Sprite, so, it must be taken into account
-
-        // first child of an Sprite ?
-        if (childIndex == 0)
-        {
+        if (childIndex == 0) {
             Sprite *p = static_cast<Sprite*>(sprite->getParent());
-
-            // less than parent and brothers
-            if (nZ < 0)
-            {
+            if (nZ < 0) {
                 return p->getAtlasIndex();
             }
-            else
-            {
+            else {
                 return p->getAtlasIndex() + 1;
             }
         }
-        else
-        {
-            // previous & sprite belong to the same branch
-            if ((prev->getLocalZOrder() < 0 && nZ < 0) || (prev->getLocalZOrder() >= 0 && nZ >= 0))
-            {
+        else {
+            if ((prev->getLocalZOrder() < 0 && nZ < 0) || (prev->getLocalZOrder() >= 0 && nZ >= 0)) {
                 return highestAtlasIndexInChild(prev) + 1;
             }
 
-            // else (previous < 0 and sprite >= 0 )
             Sprite *p = static_cast<Sprite*>(sprite->getParent());
             return p->getAtlasIndex() + 1;
         }
@@ -1468,24 +1130,22 @@ namespace GRAPH
         return 0;
     }
 
-    // addChild helper, faster than insertChild
-    void SpriteBatchNode::appendChild(Sprite* sprite)
-    {
+    void SpriteBatchNode::appendChild(Sprite* sprite) {
         _reorderChildDirty = true;
         sprite->setBatchNode(this);
         sprite->setDirty(true);
 
-        if (_textureAtlas->getTotalQuads() == _textureAtlas->getCapacity()) {
+        if (textureAtlas_->getTotalQuads() == textureAtlas_->getCapacity()) {
             increaseAtlasCapacity();
         }
 
-        _descendants.push_back(sprite);
-        int index = static_cast<int>(_descendants.size() - 1);
+        descendants_.push_back(sprite);
+        int index = static_cast<int>(descendants_.size() - 1);
 
         sprite->setAtlasIndex(index);
 
         V3F_C4B_T2F_Quad quad = sprite->getQuad();
-        _textureAtlas->insertQuad(&quad, index);
+        textureAtlas_->insertQuad(&quad, index);
 
         // add children recursively
         auto& children = sprite->getChildren();
@@ -1494,139 +1154,98 @@ namespace GRAPH
         }
     }
 
-    void SpriteBatchNode::removeSpriteFromAtlas(Sprite *sprite)
-    {
-        // remove from TextureAtlas
-        _textureAtlas->removeQuadAtIndex(sprite->getAtlasIndex());
-
-        // Cleanup sprite. It might be reused (issue #569)
+    void SpriteBatchNode::removeSpriteFromAtlas(Sprite *sprite) {
+        textureAtlas_->removeQuadAtIndex(sprite->getAtlasIndex());
         sprite->setBatchNode(nullptr);
 
-        auto it = std::find(_descendants.begin(), _descendants.end(), sprite);
-        if (it != _descendants.end())
-        {
+        auto it = std::find(descendants_.begin(), descendants_.end(), sprite);
+        if (it != descendants_.end()) {
             auto next = std::next(it);
 
             Sprite *spr = nullptr;
-            for (; next != _descendants.end(); ++next) {
+            for (; next != descendants_.end(); ++next) {
                 spr = *next;
                 spr->setAtlasIndex(spr->getAtlasIndex() - 1);
             }
 
-            _descendants.erase(it);
+            descendants_.erase(it);
         }
 
-        // remove children recursively
         auto& children = sprite->getChildren();
         for (const auto &obj : children) {
             Sprite* child = static_cast<Sprite*>(obj);
-            if (child)
-            {
+            if (child) {
                 removeSpriteFromAtlas(child);
             }
         }
     }
 
-    void SpriteBatchNode::updateBlendFunc()
-    {
-        if (!_textureAtlas->getTexture()->hasPremultipliedAlpha())
-        {
-            _blendFunc = BlendFunc::ALPHA_NON_PREMULTIPLIED;
+    void SpriteBatchNode::updateBlendFunc() {
+        if (!textureAtlas_->getTexture()->hasPremultipliedAlpha()) {
+            blendFunc_ = BlendFunc::ALPHA_NON_PREMULTIPLIED;
             setOpacityModifyRGB(false);
         }
-        else
-        {
-            _blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
+        else {
+            blendFunc_ = BlendFunc::ALPHA_PREMULTIPLIED;
             setOpacityModifyRGB(true);
         }
     }
 
-    // CocosNodeTexture protocol
-    void SpriteBatchNode::setBlendFunc(const BlendFunc &blendFunc)
-    {
-        _blendFunc = blendFunc;
+    void SpriteBatchNode::setBlendFunc(const BlendFunc &blendFunc) {
+        blendFunc_ = blendFunc;
     }
 
-    const BlendFunc& SpriteBatchNode::getBlendFunc() const
-    {
-        return _blendFunc;
+    const BlendFunc& SpriteBatchNode::getBlendFunc() const {
+        return blendFunc_;
     }
 
-    Texture2D* SpriteBatchNode::getTexture() const
-    {
-        return _textureAtlas->getTexture();
+    Texture2D* SpriteBatchNode::getTexture() const {
+        return textureAtlas_->getTexture();
     }
 
-    void SpriteBatchNode::setTexture(Texture2D *texture)
-    {
-        _textureAtlas->setTexture(texture);
+    void SpriteBatchNode::setTexture(Texture2D *texture) {
+        textureAtlas_->setTexture(texture);
         updateBlendFunc();
     }
 
-    // SpriteSheet Extension
-    //implementation SpriteSheet (TMXTiledMapExtension)
-
-    void SpriteBatchNode::insertQuadFromSprite(Sprite *sprite, ssize_t index)
-    {
-        // make needed room
-        while (index >= _textureAtlas->getCapacity() || _textureAtlas->getCapacity() == _textureAtlas->getTotalQuads())
-        {
+    void SpriteBatchNode::insertQuadFromSprite(Sprite *sprite, ssize_t index) {
+        while (index >= textureAtlas_->getCapacity() || textureAtlas_->getCapacity() == textureAtlas_->getTotalQuads()) {
             this->increaseAtlasCapacity();
         }
-        //
-        // update the quad directly. Don't add the sprite to the scene graph
-        //
+
         sprite->setBatchNode(this);
         sprite->setAtlasIndex(index);
 
         V3F_C4B_T2F_Quad quad = sprite->getQuad();
-        _textureAtlas->insertQuad(&quad, index);
+        textureAtlas_->insertQuad(&quad, index);
 
-        // FIXME:: updateTransform will update the textureAtlas too, using updateQuad.
-        // FIXME:: so, it should be AFTER the insertQuad
         sprite->setDirty(true);
         sprite->updateTransform();
     }
 
-    void SpriteBatchNode::updateQuadFromSprite(Sprite *sprite, ssize_t index)
-    {
-        // make needed room
-        while (index >= _textureAtlas->getCapacity() || _textureAtlas->getCapacity() == _textureAtlas->getTotalQuads())
-        {
+    void SpriteBatchNode::updateQuadFromSprite(Sprite *sprite, ssize_t index) {
+        while (index >= textureAtlas_->getCapacity() || textureAtlas_->getCapacity() == textureAtlas_->getTotalQuads()) {
             this->increaseAtlasCapacity();
         }
 
-        //
-        // update the quad directly. Don't add the sprite to the scene graph
-        //
         sprite->setBatchNode(this);
         sprite->setAtlasIndex(index);
-
         sprite->setDirty(true);
-
-        // UpdateTransform updates the textureAtlas quad
         sprite->updateTransform();
     }
 
-    SpriteBatchNode * SpriteBatchNode::addSpriteWithoutQuad(Sprite*child, int z, int aTag)
-    {
-        // quad index is Z
+    SpriteBatchNode *SpriteBatchNode::addSpriteWithoutQuad(Sprite*child, int z, int aTag) {
         child->setAtlasIndex(z);
 
-        // FIXME:: optimize with a binary search
-        auto it = _descendants.begin();
-        for (; it != _descendants.end(); ++it)
-        {
+        auto it = descendants_.begin();
+        for (; it != descendants_.end(); ++it) {
             if ((*it)->getAtlasIndex() >= z)
                 break;
         }
 
-        _descendants.insert(it, child);
+        descendants_.insert(it, child);
 
-        // IMPORTANT: Call super, and not self. Avoid adding it to the texture atlas array
-        Node::addChild(child, z, aTag);
-
-        //#issue 1262 don't use lazy sorting, tiles are added as quads not as sprites, so sprites need to be added in order
+        Node::addChild(child, z, aTag);        
         reorderBatch(false);
 
         return this;

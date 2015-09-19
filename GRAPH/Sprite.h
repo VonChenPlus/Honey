@@ -61,9 +61,7 @@ namespace GRAPH
 
         virtual void setTextureRect(const MATH::Rectf& rect);
         virtual void setTextureRect(const MATH::Rectf& rect, bool rotated, const MATH::Sizef& untrimmedSize);
-
         virtual void setVertexRect(const MATH::Rectf& rect);
-
         virtual void setSpriteFrame(const std::string &spriteFrameName);
         virtual void setSpriteFrame(SpriteFrame* newFrame);
 
@@ -71,23 +69,22 @@ namespace GRAPH
 
         virtual SpriteFrame* getSpriteFrame() const;
 
-        virtual bool isDirty() const { return _dirty; }
+        virtual bool isDirty() const { return dirty_; }
+        virtual void setDirty(bool dirty) { dirty_ = dirty; }
 
-        virtual void setDirty(bool dirty) { _dirty = dirty; }
+        inline V3F_C4B_T2F_Quad getQuad() const { return quad_; }
 
-        inline V3F_C4B_T2F_Quad getQuad() const { return _quad; }
+        inline bool isTextureRectRotated() const { return rectRotated_; }
 
-        inline bool isTextureRectRotated() const { return _rectRotated; }
+        inline ssize_t getAtlasIndex() const { return atlasIndex_; }
+        inline void setAtlasIndex(ssize_t atlasIndex) { atlasIndex_ = atlasIndex; }
 
-        inline ssize_t getAtlasIndex() const { return _atlasIndex; }
-        inline void setAtlasIndex(ssize_t atlasIndex) { _atlasIndex = atlasIndex; }
+        inline const MATH::Rectf& getTextureRect() const { return rect_; }
 
-        inline const MATH::Rectf& getTextureRect() const { return _rect; }
+        inline TextureAtlas* getTextureAtlas() const { return textureAtlas_; }
+        inline void setTextureAtlas(TextureAtlas *textureAtlas) { textureAtlas_ = textureAtlas; }
 
-        inline TextureAtlas* getTextureAtlas() const { return _textureAtlas; }
-        inline void setTextureAtlas(TextureAtlas *textureAtlas) { _textureAtlas = textureAtlas; }
-
-        inline const MATH::Vector2f& getOffsetPosition() const { return _offsetPosition; }
+        inline const MATH::Vector2f& getOffsetPosition() const { return offsetPosition_; }
 
         bool isFlippedX() const;
         void setFlippedX(bool flippedX);
@@ -95,8 +92,8 @@ namespace GRAPH
         bool isFlippedY() const;
         void setFlippedY(bool flippedY);
 
-        inline void setBlendFunc(const BlendFunc &blendFunc) override { _blendFunc = blendFunc; }
-        inline const BlendFunc& getBlendFunc() const override { return _blendFunc; }
+        inline void setBlendFunc(const BlendFunc &blendFunc) override { blendFunc_ = blendFunc; }
+        inline const BlendFunc& getBlendFunc() const override { return blendFunc_; }
 
         virtual void setScaleX(float scaleX) override;
         virtual void setScaleY(float scaleY) override;
@@ -118,7 +115,6 @@ namespace GRAPH
         virtual void setScale(float scale) override;
         virtual void setPositionZ(float positionZ) override;
         virtual void setAnchorPoint(const MATH::Vector2f& anchor) override;
-        virtual void ignoreAnchorPointForPosition(bool value) override;
         virtual void setVisible(bool bVisible) override;
         virtual void draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags) override;
         virtual void setOpacityModifyRGB(bool modify) override;
@@ -148,36 +144,27 @@ namespace GRAPH
         virtual void setReorderChildDirtyRecursively();
         virtual void setDirtyRecursively(bool value);
 
-        TextureAtlas*       _textureAtlas;
-        ssize_t             _atlasIndex;
-        SpriteBatchNode*    _batchNode;
+        TextureAtlas*       textureAtlas_;
+        ssize_t             atlasIndex_;
+        SpriteBatchNode*    batchNode_;
+        bool                dirty_;
+        bool                recursiveDirty_;
+        bool                shouldBeHidden_;
+        MATH::Matrix4       transformToBatch_;
+        BlendFunc        blendFunc_;
+        Texture2D*       texture_;
+        SpriteFrame*     spriteFrame_;
+        TrianglesCommand trianglesCommand_;
+        MATH::Rectf rect_;
+        bool   rectRotated_;
+        MATH::Vector2f offsetPosition_;
+        MATH::Vector2f unflippedOffsetPositionFromCenter_;
+        V3F_C4B_T2F_Quad quad_;
+        PolygonInfo  polyInfo_;
+        bool opacityModifyRGB_;
+        bool flippedX_;
+        bool flippedY_;
 
-        bool                _dirty;
-        bool                _recursiveDirty;
-        bool                _shouldBeHidden;
-        MATH::Matrix4       _transformToBatch;
-
-        BlendFunc        _blendFunc;
-        Texture2D*       _texture;
-        SpriteFrame*     _spriteFrame;
-        TrianglesCommand _trianglesCommand;
-
-        MATH::Rectf _rect;
-        bool   _rectRotated;
-
-        MATH::Vector2f _offsetPosition;
-        MATH::Vector2f _unflippedOffsetPositionFromCenter;
-
-        V3F_C4B_T2F_Quad _quad;
-        PolygonInfo  _polyInfo;
-
-        bool _opacityModifyRGB;
-
-        bool _flippedX;
-        bool _flippedY;
-
-        bool _insideBounds;
-    private:
         DISALLOW_COPY_AND_ASSIGN(Sprite)
     };
 
@@ -189,10 +176,10 @@ namespace GRAPH
         static SpriteBatchNode* createWithTexture(Texture2D* tex, ssize_t capacity = DEFAULT_CAPACITY);
         static SpriteBatchNode* create(const std::string& fileImage, ssize_t capacity = DEFAULT_CAPACITY);
 
-        inline TextureAtlas* getTextureAtlas() { return _textureAtlas; }
+        inline TextureAtlas* getTextureAtlas() { return textureAtlas_; }
         void setTextureAtlas(TextureAtlas* textureAtlas);
 
-        inline const std::vector<Sprite*>& getDescendants() const { return _descendants; }
+        inline const std::vector<Sprite*>& getDescendants() const { return descendants_; }
 
         void increaseAtlasCapacity();
         void removeChildAtIndex(ssize_t index, bool doCleanup);
@@ -242,10 +229,10 @@ namespace GRAPH
         void swap(ssize_t oldIndex, ssize_t newIndex);
         void updateBlendFunc();
 
-        TextureAtlas *_textureAtlas;
-        BlendFunc _blendFunc;
-        BatchCommand _batchCommand;
-        std::vector<Sprite*> _descendants;
+        TextureAtlas *textureAtlas_;
+        BlendFunc blendFunc_;
+        BatchCommand batchCommand_;
+        std::vector<Sprite*> descendants_;
     };
 }
 
