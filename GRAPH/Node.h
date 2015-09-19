@@ -22,7 +22,6 @@ namespace GRAPH
     class Director;
     class GLProgram;
     class GLProgramState;
-    class Node;
     class Component;
     class ComponentContainer;
 

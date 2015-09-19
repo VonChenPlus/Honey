@@ -72,7 +72,7 @@ namespace GRAPH
         void resetMatrixStack();
 
         const MATH::Sizef& getWinSize() const;
-        float Director::getZEye(void) const {
+        float getZEye(void) const {
             return (getWinSize().height / 1.1566f);
         }
 
