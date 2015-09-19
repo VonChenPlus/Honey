@@ -450,6 +450,12 @@ namespace GRAPH
     private:
         DISALLOW_COPY_AND_ASSIGN(ProtectedNode)
     };
+
+    inline bool NodeComparisonLess(Node* n1, Node* n2) {
+        return( n1->getLocalZOrder() < n2->getLocalZOrder() ||
+               ( n1->getLocalZOrder() == n2->getLocalZOrder() && n1->getOrderOfArrival() < n2->getOrderOfArrival() )
+               );
+    }
 }
 
 #endif // NODE_H

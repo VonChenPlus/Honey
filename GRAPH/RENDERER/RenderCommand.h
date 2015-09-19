@@ -130,6 +130,7 @@ namespace GRAPH
             ssize_t vertCount;
             ssize_t indexCount;
         };
+
         TrianglesCommand();
         ~TrianglesCommand();
 

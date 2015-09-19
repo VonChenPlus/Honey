@@ -1,7 +1,7 @@
 #include <algorithm>
+#include "GRAPH/SpriteFrame.h"
 #include "IO/FileUtils.h"
 #include "UTILS/STRING/StringUtils.h"
-#include "GRAPH/Sprite.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/RENDERER/Texture2D.h"
 
