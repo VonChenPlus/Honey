@@ -112,7 +112,7 @@ namespace GRAPH
     class TextureCache : public HObject
     {
     public:
-        TextureCache(HObject *scheduler);
+        TextureCache();
         virtual ~TextureCache();
 
         Texture2D* addImage(const std::string &filepath);
@@ -133,6 +133,7 @@ namespace GRAPH
         const std::string getTextureFilePath(Texture2D* texture)const;
 
         void waitForQuit();
+
     private:
         void addImageAsyncCallBack(float dt);
         void loadImageThread();
@@ -153,7 +154,6 @@ namespace GRAPH
             IMAGE::TinyImage *image;
         };
 
-        HObject *scheduler_;
         std::thread* loadingThread_;
         std::deque<AsyncStruct*>* asyncStructQueue_;
         std::deque<ImageInfo*>* imageInfoQueue_;

@@ -33,7 +33,7 @@ namespace GRAPH
         scheduler_->scheduleUpdate(actionManager_, Scheduler::PRIORITY_SYSTEM, false);
 
         eventDispatcher_ = new (std::nothrow) EventDispatcher;
-        textureCache_ = new (std::nothrow) TextureCache(scheduler_);
+        textureCache_ = new (std::nothrow) TextureCache();
         renderer_ = new (std::nothrow) Renderer;
 
         return true;
