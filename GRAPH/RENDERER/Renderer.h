@@ -88,13 +88,6 @@ namespace GRAPH
         void clear();
 
         void setClearColor(const Color4F& clearColor);
-
-        ssize_t getDrawnBatches() const { return drawnBatches_; }
-        void addDrawnBatches(ssize_t number) { drawnBatches_ += number; }
-        ssize_t getDrawnVertices() const { return drawnVertices_; }
-        void addDrawnVertices(ssize_t number) { drawnVertices_ += number; }
-        void clearDrawStats() { drawnBatches_ = drawnVertices_ = 0; }
-
         void setDepthTest(bool enable);
 
         inline GroupCommandManager* getGroupCommandManager() const { return groupCommandManager_; }
@@ -134,8 +127,6 @@ namespace GRAPH
         GLuint quadbuffersVBO_[2]; //0: vertex  1: indices
         int numberQuads_;
         bool glViewAssigned_;
-        ssize_t drawnBatches_;
-        ssize_t drawnVertices_;
         bool isRendering_;
         bool isDepthTestFor2D_;
         uint32_t lastMaterialID_;

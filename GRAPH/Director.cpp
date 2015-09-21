@@ -245,8 +245,6 @@ namespace GRAPH
         pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
 
         if (runningScene_) {
-            renderer_->clearDrawStats();
-
             runningScene_->render(renderer_);
         }
 

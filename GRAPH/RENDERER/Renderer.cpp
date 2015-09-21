@@ -458,26 +458,24 @@ namespace GRAPH
             return;
         }
 
-        {
-    #define kQuadSize sizeof(verts_[0])
-            glBindBuffer(GL_ARRAY_BUFFER, buffersVBO_[0]);
+        #define kQuadSize sizeof(verts_[0])
+        glBindBuffer(GL_ARRAY_BUFFER, buffersVBO_[0]);
 
-            glBufferData(GL_ARRAY_BUFFER, sizeof(verts_[0]) * filledVertex_ , verts_, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(verts_[0]) * filledVertex_ , verts_, GL_DYNAMIC_DRAW);
 
-            GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
+        GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
 
-            // vertices
-            glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
+        // vertices
+        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
 
-            // colors
-            glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, colors));
+        // colors
+        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, colors));
 
-            // tex coords
-            glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
+        // tex coords
+        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffersVBO_[1]);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_[0]) * filledIndex_, indices_, GL_STATIC_DRAW);
-        }
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffersVBO_[1]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_[0]) * filledIndex_, indices_, GL_STATIC_DRAW);
 
         //Start drawing verties in batch
         for(const auto& cmd : batchedCommands_) {
@@ -486,9 +484,6 @@ namespace GRAPH
                 //Draw quads
                 if(indexToDraw > 0) {
                     glDrawElements(GL_TRIANGLES, (GLsizei) indexToDraw, GL_UNSIGNED_SHORT, (GLvoid*) (startIndex*sizeof(indices_[0])) );
-                    drawnBatches_++;
-                    drawnVertices_ += indexToDraw;
-
                     startIndex += indexToDraw;
                     indexToDraw = 0;
                 }
@@ -504,8 +499,6 @@ namespace GRAPH
         //Draw any remaining triangles
         if(indexToDraw > 0) {
             glDrawElements(GL_TRIANGLES, (GLsizei) indexToDraw, GL_UNSIGNED_SHORT, (GLvoid*) (startIndex*sizeof(indices_[0])) );
-            drawnBatches_++;
-            drawnVertices_ += indexToDraw;
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -558,9 +551,6 @@ namespace GRAPH
                 // flush buffer
                 if(indexToDraw > 0) {
                     glDrawElements(GL_TRIANGLES, (GLsizei) indexToDraw, GL_UNSIGNED_SHORT, (GLvoid*) (startIndex*sizeof(indices_[0])) );
-                    drawnBatches_++;
-                    drawnVertices_ += indexToDraw;
-
                     startIndex += indexToDraw;
                     indexToDraw = 0;
                 }
@@ -579,8 +569,6 @@ namespace GRAPH
         //Draw any remaining quad
         if(indexToDraw > 0) {
             glDrawElements(GL_TRIANGLES, (GLsizei) indexToDraw, GL_UNSIGNED_SHORT, (GLvoid*) (startIndex*sizeof(indices_[0])) );
-            drawnBatches_++;
-            drawnVertices_ += indexToDraw;
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);

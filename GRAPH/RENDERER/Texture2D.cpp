@@ -1204,37 +1204,31 @@ namespace GRAPH
 
         GLStateCache::BindTexture2D(texture_->getName());
 
-        {
-            #define kQuadSize sizeof(quads_[0].bl)
-            glBindBuffer(GL_ARRAY_BUFFER, buffersVBO_[0]);
+        #define kQuadSize sizeof(quads_[0].bl)
+        glBindBuffer(GL_ARRAY_BUFFER, buffersVBO_[0]);
 
-            // FIXME:: update is done in draw... perhaps it should be done in a timer
-            if (dirty_) {
-                glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(quads_[0]) * totalQuads_ , &quads_[0] );
-                dirty_ = false;
-            }
-
-            GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
-
-            // vertices
-            glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
-
-            // colors
-            glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, colors));
-
-            // tex coords
-            glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
-
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffersVBO_[1]);
-
-            glDrawElements(GL_TRIANGLES, (GLsizei)numberOfQuads*6, GL_UNSIGNED_SHORT, (GLvoid*) (start*6*sizeof(indices_[0])));
-
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        // FIXME:: update is done in draw... perhaps it should be done in a timer
+        if (dirty_) {
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(quads_[0]) * totalQuads_ , &quads_[0] );
+            dirty_ = false;
         }
 
-        do {
-            // TODO
-        } while(0);
+        GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
+
+        // vertices
+        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
+
+        // colors
+        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, colors));
+
+        // tex coords
+        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, kQuadSize, (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffersVBO_[1]);
+
+        glDrawElements(GL_TRIANGLES, (GLsizei)numberOfQuads*6, GL_UNSIGNED_SHORT, (GLvoid*) (start*6*sizeof(indices_[0])));
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 }
