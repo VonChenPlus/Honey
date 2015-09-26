@@ -44,36 +44,30 @@ namespace GRAPH
         virtual bool init() override;
 
     protected:
-        void ensureCapacity(int count);
-        void ensureCapacityGLPoint(int count);
-        void ensureCapacityGLLine(int count);
+        enum VertexArrayObjectType
+        {
+            DEFAULT,
+            POINT,
+            LINE,
+            MAX
+        };
+
+        void ensureCapacity(VertexArrayObjectType type, int count);
 
     private:
-        GLuint      vbo_;
-        GLuint      vboGLPoint_;
-        GLuint      vboGLLine_;
-
-        int         bufferCapacity_;
-        GLsizei     bufferCount_;
-        V2F_C4B_T2F *buffer_;
-
-        int         bufferCapacityGLPoint_;
-        GLsizei     bufferCountGLPoint_;
-        V2F_C4B_T2F *bufferGLPoint_;
-        Color4F     pointColor_;
-
-        int         bufferCapacityGLLine_;
-        GLsizei     bufferCountGLLine_;
-        V2F_C4B_T2F *bufferGLLine_;
+        struct VertexArrayObject
+        {
+            GLuint objectID;
+            int bufferCapacity;
+            GLsizei     bufferCount;
+            V2F_C4B_T2F *bufferData;
+            bool dirty;
+        } vboArray_[MAX];
 
         BlendFunc   blendFunc_;
         CustomCommand customCommand_;
         CustomCommand customCommandGLPoint_;
         CustomCommand customCommandGLLine_;
-
-        bool        dirty_;
-        bool        dirtyGLPoint_;
-        bool        dirtyGLLine_;
 
     private:
         DISALLOW_COPY_AND_ASSIGN(DrawNode)
