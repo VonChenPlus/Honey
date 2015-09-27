@@ -143,15 +143,6 @@ namespace GRAPH
     }
 
     void Renderer::initGLView() {
-        for( int i=0; i < VBO_SIZE/4; i++) {
-            vboArray_[1].indexData[i*6+0] = (GLushort) (i*4+0);
-            vboArray_[1].indexData[i*6+1] = (GLushort) (i*4+1);
-            vboArray_[1].indexData[i*6+2] = (GLushort) (i*4+2);
-            vboArray_[1].indexData[i*6+3] = (GLushort) (i*4+3);
-            vboArray_[1].indexData[i*6+4] = (GLushort) (i*4+2);
-            vboArray_[1].indexData[i*6+5] = (GLushort) (i*4+1);
-        }
-
         setupBuffer();
         glViewAssigned_ = true;
     }
@@ -386,12 +377,10 @@ namespace GRAPH
         batchQuadCommands_.clear();
         lastMaterialID_ = 0;
 
-        memset(vboArray_, 0, sizeof(VBOBufferAndIndex) * 2);
-        for (auto &object : vboArray_) {
-            object.bufferData = new V3F_C4B_T2F[VBO_SIZE];
-            object.bufferCapacity = VBO_SIZE;
-            object.indexData = new GLushort[INDEX_VBO_SIZE];
-            object.indexCapacity = INDEX_VBO_SIZE;
+        for (auto object : vboArray_) {
+            delete[] object.bufferData;
+            delete[] object.indexData;
+            glDeleteBuffers(2, object.objectID);
         }
     }
 
