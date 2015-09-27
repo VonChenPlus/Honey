@@ -44,26 +44,11 @@ namespace GRAPH
         virtual bool init() override;
 
     protected:
-        enum VertexArrayObjectType
-        {
-            DEFAULT,
-            POINT,
-            LINE,
-            MAX
-        };
-
-        void ensureCapacity(VertexArrayObjectType type, int count);
+        void ensureCapacity(int type, int count);
 
     private:
-        struct VertexArrayObject
-        {
-            GLuint objectID;
-            int bufferCapacity;
-            GLsizei     bufferCount;
-            V2F_C4B_T2F *bufferData;
-            bool dirty;
-        } vboArray_[MAX];
-
+        VBOBuffer vboArray_[3]; // default, point, line
+        bool dirty_[3];
         BlendFunc   blendFunc_;
         CustomCommand customCommand_;
         CustomCommand customCommandGLPoint_;

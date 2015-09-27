@@ -8,7 +8,7 @@ namespace GRAPH
 {
     DrawNode::DrawNode() {
         blendFunc_ = BlendFunc::ALPHA_PREMULTIPLIED;
-        memset(vboArray_, 0, sizeof(VertexArrayObject) * MAX);
+        memset(vboArray_, 0, sizeof(VBOBuffer) * 3);
     }
 
     DrawNode::~DrawNode() {
@@ -30,7 +30,7 @@ namespace GRAPH
         return ret;
     }
 
-    void DrawNode::ensureCapacity(VertexArrayObjectType type, int count) {
+    void DrawNode::ensureCapacity(int type, int count) {
         if(vboArray_[type].bufferCount + count > vboArray_[type].bufferCapacity) {
             vboArray_[type].bufferCapacity += MATH::MATH_MAX(vboArray_[type].bufferCapacity, count);
             vboArray_[type].bufferData = (V2F_C4B_T2F*)realloc(vboArray_[type].bufferData, vboArray_[type].bufferCapacity*sizeof(V2F_C4B_T2F));
@@ -42,34 +42,34 @@ namespace GRAPH
 
         setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR));
 
-        ensureCapacity(DEFAULT, 512);
-        ensureCapacity(POINT, 512);
-        ensureCapacity(LINE, 512);
+        ensureCapacity(0, 512);
+        ensureCapacity(1, 512);
+        ensureCapacity(2, 512);
 
         for (auto &object : vboArray_) {
             glGenBuffers(1, &object.objectID);
             glBindBuffer(GL_ARRAY_BUFFER, object.objectID);
             glBufferData(GL_ARRAY_BUFFER, sizeof(V2F_C4B_T2F)* object.bufferCapacity, object.bufferData, GL_STREAM_DRAW);
-            object.dirty = true;
         }
+        memset(dirty_, 0, sizeof(bool) * 3);
 
         return true;
     }
 
     void DrawNode::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags) {
-        if(vboArray_[DEFAULT].bufferCount) {
+        if(vboArray_[0].bufferCount) {
             customCommand_.init(_globalZOrder, transform, flags);
             customCommand_.func = std::bind(&DrawNode::onDraw, this, transform, flags);
             renderer->addCommand(&customCommand_);
         }
 
-        if(vboArray_[POINT].bufferCount) {
+        if(vboArray_[1].bufferCount) {
             customCommandGLPoint_.init(_globalZOrder, transform, flags);
             customCommandGLPoint_.func = std::bind(&DrawNode::onDrawGLPoint, this, transform, flags);
             renderer->addCommand(&customCommandGLPoint_);
         }
 
-        if(vboArray_[LINE].bufferCount) {
+        if(vboArray_[2].bufferCount) {
             customCommandGLLine_.init(_globalZOrder, transform, flags);
             customCommandGLLine_.func = std::bind(&DrawNode::onDrawGLLine, this, transform, flags);
             renderer->addCommand(&customCommandGLLine_);
@@ -83,15 +83,15 @@ namespace GRAPH
 
         GLStateCache::BlendFunc(blendFunc_.src, blendFunc_.dst);
 
-        if (vboArray_[DEFAULT].dirty) {
-            glBindBuffer(GL_ARRAY_BUFFER, vboArray_[DEFAULT].objectID);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(V2F_C4B_T2F)*vboArray_[DEFAULT].bufferCapacity, vboArray_[DEFAULT].bufferData, GL_STREAM_DRAW);
-            vboArray_[DEFAULT].dirty = false;
+        if (dirty_[0]) {
+            glBindBuffer(GL_ARRAY_BUFFER, vboArray_[0].objectID);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(V2F_C4B_T2F)*vboArray_[0].bufferCapacity, vboArray_[0].bufferData, GL_STREAM_DRAW);
+            dirty_[0] = false;
         }
 
         GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
 
-        glBindBuffer(GL_ARRAY_BUFFER, vboArray_[DEFAULT].objectID);
+        glBindBuffer(GL_ARRAY_BUFFER, vboArray_[0].objectID);
         // vertex
         glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), (GLvoid *)offsetof(V2F_C4B_T2F, vertices));
         // color
@@ -99,7 +99,7 @@ namespace GRAPH
         // texcood
         glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), (GLvoid *)offsetof(V2F_C4B_T2F, texCoords));
 
-        glDrawArrays(GL_TRIANGLES, 0, vboArray_[DEFAULT].bufferCount);
+        glDrawArrays(GL_TRIANGLES, 0, vboArray_[0].bufferCount);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
@@ -108,13 +108,13 @@ namespace GRAPH
         glProgram->use();
         glProgram->setUniformsForBuiltins(transform);
 
-        if (vboArray_[LINE].dirty) {
-            glBindBuffer(GL_ARRAY_BUFFER, vboArray_[LINE].objectID);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(V2F_C4B_T2F)*vboArray_[LINE].bufferCapacity, vboArray_[LINE].bufferData, GL_STREAM_DRAW);
-            vboArray_[LINE].dirty = false;
+        if (dirty_[2]) {
+            glBindBuffer(GL_ARRAY_BUFFER, vboArray_[2].objectID);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(V2F_C4B_T2F)*vboArray_[2].bufferCapacity, vboArray_[2].bufferData, GL_STREAM_DRAW);
+            dirty_[2] = false;
         }
 
-        glBindBuffer(GL_ARRAY_BUFFER, vboArray_[LINE].objectID);
+        glBindBuffer(GL_ARRAY_BUFFER, vboArray_[2].objectID);
         GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
         // vertex
         glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), (GLvoid *)offsetof(V2F_C4B_T2F, vertices));
@@ -124,7 +124,7 @@ namespace GRAPH
         glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), (GLvoid *)offsetof(V2F_C4B_T2F, texCoords));
 
         glLineWidth(2);
-        glDrawArrays(GL_LINES, 0, vboArray_[LINE].bufferCount);
+        glDrawArrays(GL_LINES, 0, vboArray_[2].bufferCount);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -134,33 +134,32 @@ namespace GRAPH
         glProgram->use();
         glProgram->setUniformsForBuiltins(transform);
 
-        if (vboArray_[POINT].dirty) {
-            glBindBuffer(GL_ARRAY_BUFFER, vboArray_[POINT].objectID);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(V2F_C4B_T2F)*vboArray_[POINT].bufferCapacity, vboArray_[POINT].bufferData, GL_STREAM_DRAW);
-
-            vboArray_[POINT].dirty = false;
+        if (dirty_[1]) {
+            glBindBuffer(GL_ARRAY_BUFFER, vboArray_[1].objectID);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(V2F_C4B_T2F)*vboArray_[1].bufferCapacity, vboArray_[1].bufferData, GL_STREAM_DRAW);
+            dirty_[1] = false;
         }
 
-        glBindBuffer(GL_ARRAY_BUFFER, vboArray_[POINT].objectID);
+        glBindBuffer(GL_ARRAY_BUFFER, vboArray_[1].objectID);
         GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
         glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), (GLvoid *)offsetof(V2F_C4B_T2F, vertices));
         glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V2F_C4B_T2F), (GLvoid *)offsetof(V2F_C4B_T2F, colors));
         glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), (GLvoid *)offsetof(V2F_C4B_T2F, texCoords));
 
-        glDrawArrays(GL_POINTS, 0, vboArray_[POINT].bufferCount);
+        glDrawArrays(GL_POINTS, 0, vboArray_[1].bufferCount);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     void DrawNode::drawPoint(const MATH::Vector2f& position, const float pointSize, const Color4F &color) {
-        ensureCapacity(POINT, 1);
+        ensureCapacity(1, 1);
 
-        V2F_C4B_T2F *point = (V2F_C4B_T2F*)(vboArray_[POINT].bufferData + vboArray_[POINT].bufferCount);
+        V2F_C4B_T2F *point = (V2F_C4B_T2F*)(vboArray_[1].bufferData + vboArray_[1].bufferCount);
         V2F_C4B_T2F a = {position, Color4B(color), Tex2F(pointSize,0)};
         *point = a;
 
-        vboArray_[POINT].bufferCount += 1;
-        vboArray_[POINT].dirty = true;
+        vboArray_[1].bufferCount += 1;
+        dirty_[1] = true;
     }
 
     void DrawNode::drawPoints(const MATH::Vector2f *position, unsigned int numberOfPoints, const Color4F &color) {
@@ -168,23 +167,23 @@ namespace GRAPH
     }
 
     void DrawNode::drawPoints(const MATH::Vector2f *position, unsigned int numberOfPoints, const float pointSize, const Color4F &color) {
-        ensureCapacity(POINT, numberOfPoints);
+        ensureCapacity(1, numberOfPoints);
 
-        V2F_C4B_T2F *point = (V2F_C4B_T2F*)(vboArray_[POINT].bufferData + vboArray_[POINT].bufferCount);
+        V2F_C4B_T2F *point = (V2F_C4B_T2F*)(vboArray_[1].bufferData + vboArray_[1].bufferCount);
 
         for(unsigned int i=0; i < numberOfPoints; i++,point++) {
             V2F_C4B_T2F a = {position[i], Color4B(color), Tex2F(pointSize,0)};
             *point = a;
         }
 
-        vboArray_[POINT].bufferCount += numberOfPoints;
-        vboArray_[POINT].dirty = true;
+        vboArray_[1].bufferCount += numberOfPoints;
+        dirty_[1] = true;
     }
 
     void DrawNode::drawLine(const MATH::Vector2f &origin, const MATH::Vector2f &destination, const Color4F &color) {
-        ensureCapacity(LINE, 2);
+        ensureCapacity(2, 2);
 
-        V2F_C4B_T2F *point = (V2F_C4B_T2F*)(vboArray_[LINE].bufferCount + vboArray_[LINE].bufferCount);
+        V2F_C4B_T2F *point = (V2F_C4B_T2F*)(vboArray_[2].bufferCount + vboArray_[2].bufferCount);
 
         V2F_C4B_T2F a = {origin, Color4B(color), Tex2F(0.0, 0.0)};
         V2F_C4B_T2F b = {destination, Color4B(color), Tex2F(0.0, 0.0)};
@@ -192,8 +191,8 @@ namespace GRAPH
         *point = a;
         *(point+1) = b;
 
-        vboArray_[LINE].bufferCount += 2;
-        vboArray_[LINE].dirty = true;
+        vboArray_[2].bufferCount += 2;
+        dirty_[2] = true;
     }
 
     void DrawNode::drawRect(const MATH::Vector2f &origin, const MATH::Vector2f &destination, const Color4F &color) {
@@ -207,14 +206,14 @@ namespace GRAPH
         unsigned int vertext_count;
         if(closePolygon) {
             vertext_count = 2 * numberOfPoints;
-            ensureCapacity(LINE, vertext_count);
+            ensureCapacity(2, vertext_count);
         }
         else {
             vertext_count = 2 * (numberOfPoints - 1);
-            ensureCapacity(LINE, vertext_count);
+            ensureCapacity(2, vertext_count);
         }
 
-        V2F_C4B_T2F *point = (V2F_C4B_T2F*)(vboArray_[LINE].bufferCount + vboArray_[LINE].bufferCount);
+        V2F_C4B_T2F *point = (V2F_C4B_T2F*)(vboArray_[2].bufferCount + vboArray_[2].bufferCount);
 
         unsigned int i = 0;
         for(; i<numberOfPoints-1; i++) {
@@ -233,7 +232,7 @@ namespace GRAPH
             *(point+1) = b;
         }
 
-        vboArray_[LINE].bufferCount += vertext_count;
+        vboArray_[2].bufferCount += vertext_count;
     }
 
     void DrawNode::drawCircle(const MATH::Vector2f& center, float radius, float angle, unsigned int segments, bool drawLineToCenter, float scaleX, float scaleY, const Color4F &color) {
@@ -307,21 +306,21 @@ namespace GRAPH
 
     void DrawNode::drawDot(const MATH::Vector2f &pos, float radius, const Color4F &color) {
         unsigned int vertex_count = 2*3;
-        ensureCapacity(DEFAULT, vertex_count);
+        ensureCapacity(0, vertex_count);
 
         V2F_C4B_T2F a = {MATH::Vector2f(pos.x - radius, pos.y - radius), Color4B(color), Tex2F(-1.0, -1.0) };
         V2F_C4B_T2F b = {MATH::Vector2f(pos.x - radius, pos.y + radius), Color4B(color), Tex2F(-1.0,  1.0) };
         V2F_C4B_T2F c = {MATH::Vector2f(pos.x + radius, pos.y + radius), Color4B(color), Tex2F( 1.0,  1.0) };
         V2F_C4B_T2F d = {MATH::Vector2f(pos.x + radius, pos.y - radius), Color4B(color), Tex2F( 1.0, -1.0) };
 
-        V2F_C4B_T2F_Triangle *triangles = (V2F_C4B_T2F_Triangle *)(vboArray_[DEFAULT].bufferData + vboArray_[DEFAULT].bufferCount);
+        V2F_C4B_T2F_Triangle *triangles = (V2F_C4B_T2F_Triangle *)(vboArray_[0].bufferData + vboArray_[0].bufferCount);
         V2F_C4B_T2F_Triangle triangle0 = {a, b, c};
         V2F_C4B_T2F_Triangle triangle1 = {a, c, d};
         triangles[0] = triangle0;
         triangles[1] = triangle1;
 
-        vboArray_[DEFAULT].bufferCount += vertex_count;
-        vboArray_[DEFAULT].dirty = true;
+        vboArray_[0].bufferCount += vertex_count;
+        dirty_[0] = true;
     }
 
     void DrawNode::drawRect(const MATH::Vector2f &p1, const MATH::Vector2f &p2, const MATH::Vector2f &p3, const MATH::Vector2f& p4, const Color4F &color) {
@@ -337,9 +336,9 @@ namespace GRAPH
 
         auto  triangle_count = outline ? (3*count - 2) : (count - 2);
         auto vertex_count = 3*triangle_count;
-        ensureCapacity(DEFAULT, vertex_count);
+        ensureCapacity(0, vertex_count);
 
-        V2F_C4B_T2F_Triangle *triangles = (V2F_C4B_T2F_Triangle *)(vboArray_[DEFAULT].bufferData + vboArray_[DEFAULT].bufferCount);
+        V2F_C4B_T2F_Triangle *triangles = (V2F_C4B_T2F_Triangle *)(vboArray_[0].bufferData + vboArray_[0].bufferCount);
         V2F_C4B_T2F_Triangle *cursor = triangles;
 
         for (int i = 0; i < count-2; i++) {
@@ -403,32 +402,32 @@ namespace GRAPH
             free(extrude);
         }
 
-        vboArray_[DEFAULT].bufferCount += vertex_count;
-        vboArray_[DEFAULT].dirty = true;
+        vboArray_[0].bufferCount += vertex_count;
+        dirty_[0] = true;
     }
 
     void DrawNode::drawTriangle(const MATH::Vector2f &p1, const MATH::Vector2f &p2, const MATH::Vector2f &p3, const Color4F &color) {
         unsigned int vertex_count = 3;
-        ensureCapacity(DEFAULT, vertex_count);
+        ensureCapacity(0, vertex_count);
 
         Color4B col = Color4B(color);
         V2F_C4B_T2F a = {MATH::Vector2f(p1.x, p1.y), col, Tex2F(0.0, 0.0) };
         V2F_C4B_T2F b = {MATH::Vector2f(p2.x, p2.y), col, Tex2F(0.0,  0.0) };
         V2F_C4B_T2F c = {MATH::Vector2f(p3.x, p3.y), col, Tex2F(0.0,  0.0) };
 
-        V2F_C4B_T2F_Triangle *triangles = (V2F_C4B_T2F_Triangle *)(vboArray_[DEFAULT].bufferData + vboArray_[DEFAULT].bufferCount);
+        V2F_C4B_T2F_Triangle *triangles = (V2F_C4B_T2F_Triangle *)(vboArray_[0].bufferData + vboArray_[0].bufferCount);
         V2F_C4B_T2F_Triangle triangle = {a, b, c};
         triangles[0] = triangle;
 
-        vboArray_[DEFAULT].bufferCount += vertex_count;
-        vboArray_[DEFAULT].dirty = true;
+        vboArray_[0].bufferCount += vertex_count;
+        dirty_[0] = true;
     }
 
     void DrawNode::clear() {
         for (auto &object : vboArray_) {
             object.bufferCount = 0;
-            object.dirty = true;
         }
+        memset(dirty_, 0, sizeof(bool) * 3);
     }
 
     const BlendFunc& DrawNode::getBlendFunc() const {

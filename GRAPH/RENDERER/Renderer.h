@@ -117,15 +117,9 @@ namespace GRAPH
         std::vector<RenderQueue> renderGroups_;
         std::vector<TrianglesCommand*> batchedCommands_;
         std::vector<QuadCommand*> batchQuadCommands_;
-        V3F_C4B_T2F verts_[VBO_SIZE];
-        GLushort indices_[INDEX_VBO_SIZE];
-        GLuint buffersVBO_[2]; //0: vertex  1: indices
-        int filledVertex_;
-        int filledIndex_;
-        V3F_C4B_T2F quadVerts_[VBO_SIZE];
-        GLushort quadIndices_[INDEX_VBO_SIZE];
-        GLuint quadbuffersVBO_[2]; //0: vertex  1: indices
-        int numberQuads_;
+
+        VBOBufferAndIndex vboArray_[2]; //0: vertex  1: indices
+
         bool glViewAssigned_;
         bool isRendering_;
         bool isDepthTestFor2D_;
