@@ -44,10 +44,10 @@ namespace GRAPH
         virtual bool init() override;
 
     protected:
-        void ensureCapacity(int type, int count);
+        void ensureCapacity(int type, int64 count);
 
     private:
-        VBOBuffer vboArray_[3]; // default, point, line
+        VertexBufferObject<V2F_C4B_T2F> vboArray_[3]; // default, point, line
         bool dirty_[3];
         BlendFunc   blendFunc_;
         CustomCommand customCommand_;

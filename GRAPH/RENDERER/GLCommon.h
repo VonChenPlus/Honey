@@ -109,23 +109,28 @@ namespace GRAPH
         V3F_T2F    tr;
     };
 
-    struct VBOBuffer
+    template <typename T>
+    class VertexBufferObject
     {
-        GLuint objectID;
-        int bufferCapacity;
-        GLsizei bufferCount;
-        V2F_C4B_T2F *bufferData;
-    };
-
-    struct VBOBufferAndIndex
-    {
-        GLuint objectID[2];
-        int bufferCapacity;
-        GLsizei bufferCount;
-        V3F_C4B_T2F *bufferData;
-        GLushort *indexData;
-        int indexCapacity;
-        GLsizei indexCount;
+    public:
+        union
+        {
+            struct {
+                GLuint objectID;
+                int64 bufferCapacity;
+                int64 bufferCount;
+                T *bufferData;
+            } u1;
+            struct{
+                GLuint objectID[2];
+                int64 bufferCapacity;
+                int64 bufferCount;
+                T *bufferData;
+                GLushort *indexData;
+                int64 indexCapacity;
+                int64 indexCount;
+            } u2;
+        };
     };
 }
 

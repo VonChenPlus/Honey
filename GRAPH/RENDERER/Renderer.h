@@ -118,7 +118,7 @@ namespace GRAPH
         std::vector<TrianglesCommand*> batchedCommands_;
         std::vector<QuadCommand*> batchQuadCommands_;
 
-        VBOBufferAndIndex vboArray_[2]; //0: vertex  1: indices
+        VertexBufferObject<V3F_C4B_T2F> vboArray_[2]; //0: vertex  1: indices
 
         bool glViewAssigned_;
         bool isRendering_;

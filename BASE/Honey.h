@@ -15,7 +15,7 @@ typedef int64_t int64;
 typedef intptr_t IntPtr;
 typedef uintptr_t UIntPtr;
 typedef unsigned char HBYTE;
-typedef int64_t ssize_t;
+typedef int64 ssize_t;
 
 #define GCC_VER(x,y,z)	((x) * 10000 + (y) * 100 + (z))
 #define GCC_VERSION GCC_VER(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__)
