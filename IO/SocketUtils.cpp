@@ -102,9 +102,9 @@ namespace IO
         // First argument to select is the highest socket in the set + 1.
         int rval = 0;
         if (!write)
-            rval = select(fd + 1, &fds, NULLPTR, NULLPTR, tvp);
+            rval = select(fd + 1, &fds, nullptr, nullptr, tvp);
         else
-            rval = select(fd + 1, NULLPTR, &fds, NULLPTR, tvp);
+            rval = select(fd + 1, nullptr, &fds, nullptr, tvp);
 
         if (rval < 0) {
             throw _HException_("Error calling select", HException::IO);

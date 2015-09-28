@@ -123,25 +123,25 @@ HValue& HValue::operator= (const HValue& other) {
                 _field.boolVal = other._field.boolVal;
                 break;
             case Type::STRING:
-                if (_field.strVal == NULLPTR) {
+                if (_field.strVal == nullptr) {
                     _field.strVal = new std::string();
                 }
                 *_field.strVal = *other._field.strVal;
                 break;
             case Type::VECTOR:
-                if (_field.vectorVal == NULLPTR) {
+                if (_field.vectorVal == nullptr) {
                     _field.vectorVal = new (std::nothrow) ValueVector();
                 }
                 *_field.vectorVal = *other._field.vectorVal;
                 break;
             case Type::MAP:
-                if (_field.mapVal == NULLPTR) {
+                if (_field.mapVal == nullptr) {
                     _field.mapVal = new (std::nothrow) ValueMap();
                 }
                 *_field.mapVal = *other._field.mapVal;
                 break;
             case Type::INT_KEY_MAP:
-                if (_field.intKeyMapVal == NULLPTR) {
+                if (_field.intKeyMapVal == nullptr) {
                     _field.intKeyMapVal = new (std::nothrow) ValueMapIntKey();
                 }
                 *_field.intKeyMapVal = *other._field.intKeyMapVal;

@@ -9,7 +9,7 @@ using THIN3D::Thin3DTexture;
 
 namespace GFX
 {
-    TextDrawer::TextDrawer(Thin3DContext *thin3d) : thin3d_(thin3d), ctx_(NULLPTR) {
+    TextDrawer::TextDrawer(Thin3DContext *thin3d) : thin3d_(thin3d), ctx_(nullptr) {
         fontScaleX_ = 1.0f;
         fontScaleY_ = 1.0f;
         frameCount_ = 0;

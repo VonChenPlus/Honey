@@ -42,7 +42,7 @@ HObjectArray::HObjectArray(int64 capacity) {
 }
 
 HObjectArray::~HObjectArray() {
-    if( array_ == NULLPTR ) {
+    if( array_ == nullptr ) {
         return;
     }
     removeAllObjects();

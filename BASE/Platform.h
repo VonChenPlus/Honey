@@ -30,24 +30,6 @@
 #define __THREAD __thread
 #endif
 
-#ifndef NULL
-#ifdef __cplusplus
-#define NULL    0
-#else
-#define NULL    ((void *)0)
-#endif /* __cplusplus */
-#endif /* NULL */
-
-#ifdef _MSC_VER
-    #if _MSC_VER > 1600
-        #define NULLPTR nullptr
-    #else
-        #define NULLPTR NULL
-    #endif
-#else
-    #define NULLPTR NULL
-#endif
-
 #ifdef _WIN32
 
 #include <tchar.h>
@@ -60,10 +42,10 @@
 
 #else
 
-#define ALIGNED16(x)  __attribute__((aligned(16))) x
+#define Anullptrnullptr_attribute__((aligned(16))) x
 #define ALIGNED32(x)  __attribute__((aligned(32))) x
 #define ALIGNED64(x)  __attribute__((aligned(64))) x
-#define ALIGNED16_DECL(x) __attribute__((aligned(16))) x
+#define ALIGnullptrECL(x) __attribute__((aligned(16))) x
 #define ALIGNED64_DECL(x) __attribute__((aligned(64))) x
 
 #endif  // _WIN32

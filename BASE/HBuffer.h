@@ -87,7 +87,7 @@ public:
     }
 
     void skip(size_t length, bool wait = true) {
-        readAny(length, (uint8 *)NULLPTR, wait);
+        readAny(length, (uint8 *)nullptr, wait);
     }
 
     template <typename T>

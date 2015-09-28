@@ -201,7 +201,7 @@ namespace THIN3D
 
     void Thin3DTexture::loadFromFileData(const uint8 *data, size_t dataSize, T3DImageType type) {
         int width[16], height[16];
-        uint8 *image[16] = { NULLPTR };
+        uint8 *image[16] = { nullptr };
 
         int num_levels;
         int zim_flags;
@@ -244,7 +244,7 @@ namespace THIN3D
         int num_levels = 0;
         int zim_flags = 0;
         T3DImageFormat fmt;
-        uint8 *image[16] = { NULLPTR };
+        uint8 *image[16] = { nullptr };
 
         LoadTextureLevels(data, size, type, width, height, &num_levels, &fmt, image, &zim_flags);
 

@@ -46,7 +46,7 @@ namespace UTILS
         double FetchCurrentTime() {
             static time_t start;
             struct timeval tv;
-            gettimeofday(&tv, NULLPTR);
+            gettimeofday(&tv, nullptr);
             if (start == 0) {
                 start = tv.tv_sec;
             }

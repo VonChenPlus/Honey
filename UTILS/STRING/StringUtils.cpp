@@ -183,7 +183,7 @@ namespace UTILS
 
         std::string StringFromFormat(const char* format, ...) {
             va_list args;
-            char *buf = NULLPTR;
+            char *buf = nullptr;
             std::string temp = "";
         #ifdef _WIN32
             int required = 0;
@@ -201,10 +201,10 @@ namespace UTILS
         #else
             va_start(args, format);
             if(vasprintf(&buf, format, args) < 0)
-                buf = NULLPTR;
+                buf = nullptr;
             va_end(args);
 
-            if(buf != NULLPTR) {
+            if(buf != nullptr) {
                 temp = buf;
                 free(buf);
             }

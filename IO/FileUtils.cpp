@@ -141,13 +141,13 @@ namespace IO
             // Read the file from hardware
             std::string fullPath = fullPathForFilename(filename);
             FILE *fp = fopen(getSuitableFOpen(fullPath).c_str(), mode.c_str());
-            if (fp == NULLPTR) {
+            if (fp == nullptr) {
                 throw _HException_("fopen failed", HException::IO);
             }
             return fp;
         } while(0);
 
-        return NULLPTR;
+        return nullptr;
     }
 
     std::string FileUtils::getStringFromFile(const std::string& filename) {
@@ -179,7 +179,7 @@ namespace IO
         do {
             // Read the file from hardware
             FILE *fp = fopen(getSuitableFOpen(fullPath).c_str(), mode);
-            if (fp == NULLPTR) {
+            if (fp == nullptr) {
                 throw _HException_("fopen failed", HException::IO);
             }
 
@@ -458,7 +458,7 @@ namespace IO
         }
 
         HData ret;
-        HBYTE* buffer = NULLPTR;
+        HBYTE* buffer = nullptr;
         size_t size = 0;
         size_t readSize = 0;
 
@@ -466,7 +466,7 @@ namespace IO
             // Read the file from hardware
             std::string fullPath = fullPathForFilename(filename);
             FILE *fp = fopen(getSuitableFOpen(fullPath).c_str(), mode.c_str());
-            if (fp == NULLPTR) {
+            if (fp == nullptr) {
                 throw _HException_("fopen failed", HException::IO);
             }
 
@@ -480,7 +480,7 @@ namespace IO
             fclose(fp);
         } while (0);
 
-        if (NULLPTR == buffer || 0 == readSize) {
+        if (nullptr == buffer || 0 == readSize) {
             throw _HException_("Get data from file failed", HException::IO);
         }
         else {

@@ -8,7 +8,7 @@ namespace IO
     {
     public:
         XmlSaxHander()
-            : saxParserImp_(NULLPTR){
+            : saxParserImp_(nullptr){
         }
 
         virtual bool visitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* firstAttribute );
@@ -31,7 +31,7 @@ namespace IO
             attsVector.push_back(attrib->Value());
         }
 
-        attsVector.push_back(NULLPTR);
+        attsVector.push_back(nullptr);
 
         SAXParser::startElement(saxParserImp_, element.Value(), &attsVector[0]);
         return true;
@@ -48,7 +48,7 @@ namespace IO
     }
 
     SAXParser::SAXParser() {
-        delegator_ = NULLPTR;
+        delegator_ = nullptr;
     }
 
     SAXParser::~SAXParser(void) {

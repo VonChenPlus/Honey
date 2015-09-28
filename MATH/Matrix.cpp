@@ -118,7 +118,7 @@ namespace MATH
 
     void Matrix4::createBillboard(const Vector3f& objectPosition, const Vector3f& cameraPosition,
                                  const Vector3f& cameraUpVector, Matrix4* dst) {
-        createBillboardHelper(objectPosition, cameraPosition, cameraUpVector, NULLPTR, dst);
+        createBillboardHelper(objectPosition, cameraPosition, cameraUpVector, nullptr, dst);
     }
 
     void Matrix4::createBillboard(const Vector3f& objectPosition, const Vector3f& cameraPosition,
@@ -379,7 +379,7 @@ namespace MATH
         }
 
         // Nothing left to do.
-        if (scale == NULLPTR && rotation == NULLPTR)
+        if (scale == nullptr && rotation == nullptr)
             return true;
 
         // Extract the scale.
@@ -407,7 +407,7 @@ namespace MATH
         }
 
         // Nothing left to do.
-        if (rotation == NULLPTR)
+        if (rotation == nullptr)
             return true;
 
         // Scale too close to zero, can't decompose rotation.
@@ -493,15 +493,15 @@ namespace MATH
     }
 
     void Matrix4::getScale(Vector3f* scale) const {
-        decompose(scale, NULLPTR, NULLPTR);
+        decompose(scale, nullptr, nullptr);
     }
 
     bool Matrix4::getRotation(Quaternion* rotation) const {
-        return decompose(NULLPTR, rotation, NULLPTR);
+        return decompose(nullptr, rotation, nullptr);
     }
 
     void Matrix4::getTranslation(Vector3f* translation) const {
-        decompose(NULLPTR, NULLPTR, translation);
+        decompose(nullptr, nullptr, translation);
     }
 
     void Matrix4::getUpVector(Vector3f* dst) const {

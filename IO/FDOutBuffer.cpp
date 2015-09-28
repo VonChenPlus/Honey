@@ -46,6 +46,6 @@ namespace IO
 
         if (length == 0)
             length = this->size();
-        WriteWithProgress(fd_, length, *this, NULLPTR);
+        WriteWithProgress(fd_, length, *this, nullptr);
     }
 }

@@ -569,7 +569,7 @@ namespace UTILS
             memset(utf16, 0, utf16Bytes);
 
             char* utf16ptr = reinterpret_cast<char*>(utf16);
-            const UTF8* error = NULLPTR;
+            const UTF8* error = nullptr;
 
             if (!ConvertUTF8toWide(2, utf8, utf16ptr, error)) {
                 throw _HException_Normal("ConvertUTF8toWide Error!");
@@ -590,7 +590,7 @@ namespace UTILS
             memset(utf32, 0, utf32Bytes);
 
             char* utf32ptr = reinterpret_cast<char*>(utf32);
-            const UTF8* error = NULLPTR;
+            const UTF8* error = nullptr;
 
             if (!ConvertUTF8toWide(4, utf8, utf32ptr, error)) {
                 throw _HException_Normal("ConvertUTF8toWide Error!");

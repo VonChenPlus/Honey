@@ -154,7 +154,7 @@ namespace THIN3D
     class Thin3DGLVertexFormat : public Thin3DVertexFormat
     {
     public:
-        void apply(const void *base = NULLPTR);
+        void apply(const void *base = nullptr);
 
         void unApply();
 

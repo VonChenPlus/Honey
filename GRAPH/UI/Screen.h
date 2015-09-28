@@ -20,9 +20,9 @@ namespace UI
     class Screen
     {
     public:
-        Screen() : screenManager_(NULLPTR) { }
+        Screen() : screenManager_(nullptr) { }
         virtual ~Screen() {
-            screenManager_ = NULLPTR;
+            screenManager_ = nullptr;
         }
 
         virtual void onFinish(DialogResult) {}

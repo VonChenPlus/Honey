@@ -89,9 +89,9 @@ namespace THREAD
         void startThread(FuncObject* funcObj)
         {
     #ifdef USE_BEGINTHREADEX
-            handle_ = (HANDLE)_beginthreadex(NULLPTR, 0, &RunAndDelete<FuncObject>, funcObj, 0, &id_.thread_);
+            handle_ = (HANDLE)_beginthreadex(nullptr, 0, &RunAndDelete<FuncObject>, funcObj, 0, &id_.thread_);
     #elif defined(_WIN32)
-            handle_ = CreateThread(NULLPTR, 0, &RunAndDelete<FuncObject>, funcObj, 0, &id_.thread_);
+            handle_ = CreateThread(nullptr, 0, &RunAndDelete<FuncObject>, funcObj, 0, &id_.thread_);
     #else
             pthread_attr_t attr;
             pthread_attr_init(&attr);

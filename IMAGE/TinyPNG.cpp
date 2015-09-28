@@ -27,7 +27,7 @@ namespace IMAGE
         int stride = PNG_IMAGE_ROW_STRIDE(png);
         *datalen = PNG_IMAGE_SIZE(png);
         *data = (unsigned char *)malloc(*datalen);
-        png_image_finish_read(&png, NULLPTR, *data, stride, NULLPTR);
+        png_image_finish_read(&png, nullptr, *data, stride, nullptr);
     }
 
     void PNGLoadPtr(const unsigned char *input_ptr, size_t input_len, int *pwidth, int *pheight, int *pcolor, unsigned char **data, int *datalen) {
@@ -47,6 +47,6 @@ namespace IMAGE
         int stride = PNG_IMAGE_ROW_STRIDE(png);
         *datalen = PNG_IMAGE_SIZE(png);
         *data = (unsigned char *)malloc(*datalen);
-        png_image_finish_read(&png, NULLPTR, *data, stride, NULLPTR);
+        png_image_finish_read(&png, nullptr, *data, stride, nullptr);
     }
 }

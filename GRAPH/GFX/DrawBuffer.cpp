@@ -57,7 +57,7 @@ namespace GFX
     #ifdef USE_VBO
         vbuf_ = t3d_->createBuffer(MAX_VERTS * sizeof(Vertex), T3DBufferUsage::DYNAMIC | T3DBufferUsage::VERTEXDATA);
     #else
-        vbuf_ = NULLPTR;
+        vbuf_ = nullptr;
     #endif
         inited_ = true;
         std::vector<Thin3DVertexComponent> components;

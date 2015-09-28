@@ -38,7 +38,7 @@ namespace IO
                 }
             }
         }
-        ReadWithProgress(fd_, length, *this, NULLPTR);
+        ReadWithProgress(fd_, length, *this, nullptr);
     }
 }
 

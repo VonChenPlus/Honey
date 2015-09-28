@@ -82,7 +82,7 @@ namespace THIN3D
         bind();
         if (size > knownSize_) {
             // Allocate the buffer.
-            glBufferData(target_, size + offset, NULLPTR, usage_);
+            glBufferData(target_, size + offset, nullptr, usage_);
             knownSize_ = size + offset;
         }
         glBufferSubData(target_, offset, size, data);
@@ -217,7 +217,7 @@ namespace THIN3D
             glGetProgramiv(program_, GL_INFO_LOG_LENGTH, &bufLength);
             if (bufLength) {
                 char* buf = new char[bufLength];
-                glGetProgramInfoLog(program_, bufLength, NULLPTR, buf);
+                glGetProgramInfoLog(program_, bufLength, nullptr, buf);
                 std::string log = StringFromFormat("Could not link program:\n %s", buf);
                 delete[] buf;
                 // We've thrown out the source at this point. Might want to do something about that.

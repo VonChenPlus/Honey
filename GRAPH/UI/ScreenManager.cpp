@@ -11,9 +11,9 @@ namespace UI
     extern void UIDisableEnd();
 
     ScreenManager::ScreenManager() {
-        nextScreen_ = NULLPTR;
-        dialogFinished_ = NULLPTR;
-        uiContext_ = NULLPTR;
+        nextScreen_ = nullptr;
+        dialogFinished_ = nullptr;
+        uiContext_ = nullptr;
     }
 
     ScreenManager::~ScreenManager() {
@@ -28,10 +28,10 @@ namespace UI
         // will only become apparent if the dialog is closed. The previous screen will stick around
         // until that switch.
         // TODO: is this still true?
-        if (nextScreen_ != NULLPTR) {
+        if (nextScreen_ != nullptr) {
             //FLOG("Already had a nextScreen_");
         }
-        if (screen == NULLPTR) {
+        if (screen == nullptr) {
             //WLOG("Swiching to a zero screen, this can't be good");
         }
         if (stack_.empty() || screen != stack_.back().screen) {
@@ -99,7 +99,7 @@ namespace UI
         if (!stack_.empty())
             return stack_.back().screen;
         else
-            return NULLPTR;
+            return nullptr;
     }
     void ScreenManager::shutdown() {
         for (const auto &iter : stack_)

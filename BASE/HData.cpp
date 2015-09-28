@@ -5,18 +5,18 @@
 const HData HData::Null;
 
 HData::HData()
-    : bytes_(NULLPTR)
+    : bytes_(nullptr)
     , size_(0) {
 }
 
 HData::HData(HData&& other)
-    : bytes_(NULLPTR)
+    : bytes_(nullptr)
     , size_(0) {
     move(other);
 }
 
 HData::HData(const HData& other)
-    : bytes_(NULLPTR)
+    : bytes_(nullptr)
     , size_(0) {
     copy(other.bytes_, other.size_);
 }
@@ -39,12 +39,12 @@ void HData::move(HData& other) {
     bytes_ = other.bytes_;
     size_ = other.size_;
 
-    other.bytes_ = NULLPTR;
+    other.bytes_ = nullptr;
     other.size_ = 0;
 }
 
 bool HData::isNull() const {
-    return (bytes_ == NULLPTR || size_ == 0);
+    return (bytes_ == nullptr || size_ == 0);
 }
 
 HBYTE* HData::getBytes() const {
@@ -72,7 +72,7 @@ void HData::fastSet(HBYTE* bytes, const size_t size) {
 
 void HData::clear() {
     free(bytes_);
-    bytes_ = NULLPTR;
+    bytes_ = nullptr;
     size_ = 0;
 }
 
