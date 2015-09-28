@@ -84,7 +84,7 @@ namespace GRAPH
         commandType_ = RenderCommand::Type::QUAD_COMMAND;
     }
 
-    void QuadCommand::init(float globalOrder, GLuint textureID, GLProgramState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, ssize_t quadCount,
+    void QuadCommand::init(float globalOrder, GLuint textureID, GLProgramState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, int64 quadCount,
                            const MATH::Matrix4& mv, uint32_t flags) {
         RenderCommand::init(globalOrder, mv, flags);
 
@@ -143,7 +143,7 @@ namespace GRAPH
 
         _triangles = triangles;
         if(_triangles.indexCount % 3 != 0) {
-            ssize_t count = _triangles.indexCount;
+            int64 count = _triangles.indexCount;
             _triangles.indexCount = count / 3 * 3;
         }
         matrix4_ = mv;

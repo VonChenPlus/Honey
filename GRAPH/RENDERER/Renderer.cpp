@@ -37,8 +37,8 @@ namespace GRAPH
         }
     }
 
-    ssize_t RenderQueue::size() const {
-        ssize_t result(0);
+    int64 RenderQueue::size() const {
+        int64 result(0);
         for(int index = 0; index < QUEUE_GROUP::QUEUE_COUNT; ++index) {
             result += commands_[index].size();
         }
@@ -53,9 +53,9 @@ namespace GRAPH
         std::sort(std::begin(commands_[QUEUE_GROUP::GLOBALZ_POS]), std::end(commands_[QUEUE_GROUP::GLOBALZ_POS]), compareRenderCommand);
     }
 
-    RenderCommand* RenderQueue::operator[](ssize_t index) const {
+    RenderCommand* RenderQueue::operator[](int64 index) const {
         for(int queIndex = 0; queIndex < QUEUE_GROUP::QUEUE_COUNT; ++queIndex) {
-            if(index < static_cast<ssize_t>(commands_[queIndex].size()))
+            if(index < static_cast<int64>(commands_[queIndex].size()))
                 return commands_[queIndex][index];
             else {
                 index -= commands_[queIndex].size();
@@ -415,7 +415,7 @@ namespace GRAPH
         memcpy(vboArray_[0].u2.bufferData + vboArray_[0].u2.bufferCount, cmd->getVertices(), sizeof(V3F_C4B_T2F) * cmd->getVertexCount());
         const MATH::Matrix4& modelView = cmd->getModelView();
 
-        for(ssize_t i=0; i< cmd->getVertexCount(); ++i) {
+        for(int64 i=0; i< cmd->getVertexCount(); ++i) {
             V3F_C4B_T2F *q = &vboArray_[0].u2.bufferData[i + vboArray_[0].u2.bufferCount];
             MATH::Vector3f *vec1 = (MATH::Vector3f*)&q->vertices;
             modelView.transformPoint(vec1);
@@ -423,7 +423,7 @@ namespace GRAPH
 
         const unsigned short* indices = cmd->getIndices();
         //fill index
-        for(ssize_t i=0; i< cmd->getIndexCount(); ++i) {
+        for(int64 i=0; i< cmd->getIndexCount(); ++i) {
             vboArray_[0].u2.indexData[vboArray_[0].u2.indexCount + i] = vboArray_[0].u2.bufferCount + indices[i];
         }
 
@@ -434,7 +434,7 @@ namespace GRAPH
     void Renderer::fillQuads(const QuadCommand *cmd) {
         const MATH::Matrix4& modelView = cmd->getModelView();
         const V3F_C4B_T2F* quads =  (V3F_C4B_T2F*)cmd->getQuads();
-        for(ssize_t i=0; i< cmd->getQuadCount() * 4; ++i) {
+        for(int64 i=0; i< cmd->getQuadCount() * 4; ++i) {
             vboArray_[1].u2.bufferData[i + vboArray_[1].u2.bufferCount * 4] = quads[i];
             modelView.transformPoint(quads[i].vertices,&(vboArray_[1].u2.bufferData[i + vboArray_[1].u2.bufferCount * 4].vertices));
         }
@@ -505,7 +505,7 @@ namespace GRAPH
 
     void Renderer::drawBatchedQuads() {
         //TODO: we can improve the draw performance by insert material switching command before hand.
-        ssize_t indexToDraw = 0;
+        int64 indexToDraw = 0;
         int startIndex = 0;
 
         //Upload buffer to VBO

@@ -96,14 +96,14 @@ namespace GRAPH
         QuadCommand();
         ~QuadCommand();
 
-        void init(float globalOrder, GLuint textureID, GLProgramState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, ssize_t quadCount,
+        void init(float globalOrder, GLuint textureID, GLProgramState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, int64 quadCount,
                   const MATH::Matrix4& mv, uint32_t flags);
 
         void useMaterial() const;
         inline uint32_t getMaterialID() const { return materialID_; }
         inline GLuint getTextureID() const { return textureID_; }
         inline V3F_C4B_T2F_Quad* getQuads() const { return quads_; }
-        inline ssize_t getQuadCount() const { return quadsCount_; }
+        inline int64 getQuadCount() const { return quadsCount_; }
         inline GLProgramState* getGLProgramState() const { return glProgramState_; }
         inline BlendFunc getBlendType() const { return blendType_; }
         inline const MATH::Matrix4& getModelView() const { return matrix4_; }
@@ -116,7 +116,7 @@ namespace GRAPH
         GLProgramState* glProgramState_;
         BlendFunc blendType_;
         V3F_C4B_T2F_Quad* quads_;
-        ssize_t quadsCount_;
+        int64 quadsCount_;
         MATH::Matrix4 matrix4_;
     };
 
@@ -127,8 +127,8 @@ namespace GRAPH
         {
             V3F_C4B_T2F* verts;
             unsigned short* indices;
-            ssize_t vertCount;
-            ssize_t indexCount;
+            int64 vertCount;
+            int64 indexCount;
         };
 
         TrianglesCommand();
@@ -139,8 +139,8 @@ namespace GRAPH
         inline uint32_t getMaterialID() const { return materialID_; }
         inline GLuint getTextureID() const { return textureID_; }
         inline const Triangles& getTriangles() const { return _triangles; }
-        inline ssize_t getVertexCount() const { return _triangles.vertCount; }
-        inline ssize_t getIndexCount() const { return _triangles.indexCount; }
+        inline int64 getVertexCount() const { return _triangles.vertCount; }
+        inline int64 getIndexCount() const { return _triangles.indexCount; }
         inline const V3F_C4B_T2F* getVertices() const { return _triangles.verts; }
         inline const unsigned short* getIndices() const { return _triangles.indices; }
         inline GLProgramState* getGLProgramState() const { return glProgramState_; }

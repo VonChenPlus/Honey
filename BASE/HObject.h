@@ -111,7 +111,7 @@ public:
         : data_() {        
     }
 
-    explicit HObjectVector<T>(ssize_t capacity)
+    explicit HObjectVector<T>(int64 capacity)
         : data_() {
         reserve(capacity);
     }
@@ -146,15 +146,15 @@ public:
         return *this;
     }
 
-    void reserve(ssize_t n) {
+    void reserve(int64 n) {
         data_.reserve(n);
     }
 
-    ssize_t capacity() const {
+    int64 capacity() const {
         return data_.capacity();
     }
 
-    ssize_t size() const {
+    int64 size() const {
         return  data_.size();
     }
 
@@ -162,11 +162,11 @@ public:
         return data_.empty();
     }
 
-    ssize_t max_size() const {
+    int64 max_size() const {
         return data_.max_size();
     }
 
-    ssize_t getIndex(T object) const {
+    int64 getIndex(T object) const {
         auto iter = std::find(data_.begin(), data_.end(), object);
         if (iter != data_.end())
             return iter - data_.begin();
@@ -182,7 +182,7 @@ public:
         return std::find(data_.begin(), data_.end(), object);
     }
 
-    T at(ssize_t index) const {
+    T at(int64 index) const {
         return data_[index];
     }
 
@@ -197,7 +197,7 @@ public:
     T getRandomObject() const {
         if (!data_.empty())
         {
-            ssize_t randIdx = rand() % data_.size();
+            int64 randIdx = rand() % data_.size();
             return *(data_.begin() + randIdx);
         }
         return nullptr;
@@ -208,11 +208,11 @@ public:
     }
 
     bool equals(const HObjectVector<T> &other) {
-        ssize_t s = this->size();
+        int64 s = this->size();
         if (s != other.size())
             return false;
 
-        for (ssize_t i = 0; i < s; i++)
+        for (int64 i = 0; i < s; i++)
         {
             if (this->at(i) != other.at(i))
             {
@@ -235,7 +235,7 @@ public:
         }
     }
 
-    void insert(ssize_t index, T object) {
+    void insert(int64 index, T object) {
         data_.insert((std::begin(data_) + index), object);
         object->retain();
     }
@@ -280,7 +280,7 @@ public:
         return data_.erase(first, last);
     }
 
-    iterator erase(ssize_t index) {
+    iterator erase(int64 index) {
         auto it = std::next( begin(), index );
         (*it)->release();
         return data_.erase(it);
@@ -294,17 +294,17 @@ public:
     }
 
     void swap(T object1, T object2) {
-        ssize_t idx1 = getIndex(object1);
-        ssize_t idx2 = getIndex(object2);
+        int64 idx1 = getIndex(object1);
+        int64 idx2 = getIndex(object2);
 
         std::swap( data_[idx1], data_[idx2] );
     }
 
-    void swap(ssize_t index1, ssize_t index2) {
+    void swap(int64 index1, int64 index2) {
         std::swap( data_[index1], data_[index2] );
     }
 
-    void replace(ssize_t index, T object) {
+    void replace(int64 index, T object) {
         data_[index]->release();
         data_[index] = object;
         object->retain();
@@ -350,7 +350,7 @@ public:
         : data_() {
     }
 
-    explicit HObjectMap<K, V>(ssize_t capacity)
+    explicit HObjectMap<K, V>(int64 capacity)
         : data_() {
         data_.reserve(capacity);
     }
@@ -369,23 +369,23 @@ public:
         clear();
     }
 
-    void reserve(ssize_t capacity) {
+    void reserve(int64 capacity) {
         data_.reserve(capacity);
     }
 
-    ssize_t bucketCount() const {
+    int64 bucketCount() const {
         return data_.bucket_count();
     }
 
-    ssize_t bucketSize(ssize_t n) const {
+    int64 bucketSize(int64 n) const {
         return data_.bucket_size(n);
     }
 
-    ssize_t bucket(const K& k) const {
+    int64 bucket(const K& k) const {
         return data_.bucket(k);
     }
 
-    ssize_t size() const {
+    int64 size() const {
         return data_.size();
     }
 
@@ -486,7 +486,7 @@ public:
     V getRandomObject() const {
         if (!data_.empty())
         {
-            ssize_t randIdx = rand() % data_.size();
+            int64 randIdx = rand() % data_.size();
             const_iterator randIter = data_.begin();
             std::advance(randIter , randIdx);
             return randIter->second;

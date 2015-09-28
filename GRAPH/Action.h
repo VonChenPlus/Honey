@@ -122,7 +122,7 @@ namespace GRAPH
         void removeAllActionsByTag(int tag, HObject *target);
 
         Action* getActionByTag(int tag, const HObject *target) const;
-        ssize_t getNumberOfRunningActionsInTarget(const HObject *target) const;
+        int64 getNumberOfRunningActionsInTarget(const HObject *target) const;
 
         void pauseTarget(HObject *target);
         void resumeTarget(HObject *target);
@@ -133,7 +133,7 @@ namespace GRAPH
         void update(float dt);
 
     protected:
-        void removeActionAtIndex(ssize_t index, ActionEntry *element);
+        void removeActionAtIndex(int64 index, ActionEntry *element);
         void deleteHashElement(ActionEntry *element);
         void actionAllocWithHashElement(ActionEntry *element);
 

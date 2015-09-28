@@ -66,7 +66,7 @@ namespace GRAPH
 
         bool prepareLetterDefinitions(const std::u16string& utf16String);
 
-        inline const std::unordered_map<ssize_t, Texture2D*>& getTextures() const{ return _atlasTextures;}
+        inline const std::unordered_map<int64, Texture2D*>& getTextures() const{ return _atlasTextures;}
         void  addTexture(Texture2D *texture, int slot);
         float getCommonLineHeight() const;
         void  setCommonLineHeight(float newHeight);
@@ -88,7 +88,7 @@ namespace GRAPH
         void relaseTextures();
 
     private:
-        std::unordered_map<ssize_t, Texture2D*> _atlasTextures;
+        std::unordered_map<int64, Texture2D*> _atlasTextures;
         std::unordered_map<unsigned short, FontLetterDefinition> _fontLetterDefinitions;
         float _commonLineHeight;
         Font * _font;

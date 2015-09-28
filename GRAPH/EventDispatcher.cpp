@@ -500,7 +500,7 @@ namespace GRAPH
         auto fixedPriorityListeners = listeners->getFixedPriorityListeners();
         auto sceneGraphPriorityListeners = listeners->getSceneGraphPriorityListeners();
 
-        ssize_t i = 0;
+        int64 i = 0;
         if (fixedPriorityListeners) {
             if (!fixedPriorityListeners->empty()) {
                 for (; i < listeners->getGt0Index(); ++i) {
@@ -526,7 +526,7 @@ namespace GRAPH
 
         if (fixedPriorityListeners) {
             if (!shouldStopPropagation) {
-                ssize_t size = fixedPriorityListeners->size();
+                int64 size = fixedPriorityListeners->size();
                 for (; i < size; ++i)
                 {
                     auto l = fixedPriorityListeners->at(i);
@@ -545,7 +545,7 @@ namespace GRAPH
         auto fixedPriorityListeners = listeners->getFixedPriorityListeners();
         auto sceneGraphPriorityListeners = listeners->getSceneGraphPriorityListeners();
 
-        ssize_t i = 0;
+        int64 i = 0;
         // priority < 0
         if (fixedPriorityListeners) {
             if (!fixedPriorityListeners->empty()) {
@@ -583,7 +583,7 @@ namespace GRAPH
         if (fixedPriorityListeners) {
             if (!shouldStopPropagation) {
                 // priority > 0
-                ssize_t size = fixedPriorityListeners->size();
+                int64 size = fixedPriorityListeners->size();
                 for (; i < size; ++i) {
                     auto l = fixedPriorityListeners->at(i);
 

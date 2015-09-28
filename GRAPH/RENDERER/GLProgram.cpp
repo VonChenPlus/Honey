@@ -1060,7 +1060,7 @@ namespace GRAPH
         type_ = Type::VALUE;
     }
 
-    void UniformValue::setFloatv(ssize_t size, const float* pointer) {
+    void UniformValue::setFloatv(int64 size, const float* pointer) {
         value_.floatv.pointer = (const float*)pointer;
         value_.floatv.size = (GLsizei)size;
         type_ = Type::POINTER;
@@ -1071,7 +1071,7 @@ namespace GRAPH
         type_ = Type::VALUE;
     }
 
-    void UniformValue::setVec2v(ssize_t size, const MATH::Vector2f* pointer) {
+    void UniformValue::setVec2v(int64 size, const MATH::Vector2f* pointer) {
         value_.v2f.pointer = (const float*)pointer;
         value_.v2f.size = (GLsizei)size;
         type_ = Type::POINTER;
@@ -1083,7 +1083,7 @@ namespace GRAPH
 
     }
 
-    void UniformValue::setVec3v(ssize_t size, const MATH::Vector3f* pointer) {
+    void UniformValue::setVec3v(int64 size, const MATH::Vector3f* pointer) {
         value_.v3f.pointer = (const float*)pointer;
         value_.v3f.size = (GLsizei)size;
         type_ = Type::POINTER;
@@ -1095,7 +1095,7 @@ namespace GRAPH
         type_ = Type::VALUE;
     }
 
-    void UniformValue::setVec4v(ssize_t size, const MATH::Vector4f* pointer) {
+    void UniformValue::setVec4v(int64 size, const MATH::Vector4f* pointer) {
         value_.v4f.pointer = (const float*)pointer;
         value_.v4f.size = (GLsizei)size;
         type_ = Type::POINTER;
@@ -1288,7 +1288,7 @@ namespace GRAPH
         return vertexAttribsFlags_;
     }
 
-    ssize_t GLProgramState::getVertexAttribCount() const {
+    int64 GLProgramState::getVertexAttribCount() const {
         return attributes_.size();
     }
 
@@ -1369,13 +1369,13 @@ namespace GRAPH
 
     }
 
-    void GLProgramState::setUniformFloatv(const std::string& uniformName, ssize_t size, const float* pointer) {
+    void GLProgramState::setUniformFloatv(const std::string& uniformName, int64 size, const float* pointer) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setFloatv(size, pointer);
     }
 
-    void GLProgramState::setUniformFloatv(GLint uniformLocation, ssize_t size, const float* pointer) {
+    void GLProgramState::setUniformFloatv(GLint uniformLocation, int64 size, const float* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setFloatv(size, pointer);
@@ -1393,13 +1393,13 @@ namespace GRAPH
             v->setVec2(value);
     }
 
-    void GLProgramState::setUniformVec2v(const std::string& uniformName, ssize_t size, const MATH::Vector2f* pointer) {
+    void GLProgramState::setUniformVec2v(const std::string& uniformName, int64 size, const MATH::Vector2f* pointer) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec2v(size, pointer);
     }
 
-    void GLProgramState::setUniformVec2v(GLint uniformLocation, ssize_t size, const MATH::Vector2f* pointer) {
+    void GLProgramState::setUniformVec2v(GLint uniformLocation, int64 size, const MATH::Vector2f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec2v(size, pointer);
@@ -1417,13 +1417,13 @@ namespace GRAPH
             v->setVec3(value);
     }
 
-    void GLProgramState::setUniformVec3v(const std::string& uniformName, ssize_t size, const MATH::Vector3f* pointer) {
+    void GLProgramState::setUniformVec3v(const std::string& uniformName, int64 size, const MATH::Vector3f* pointer) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec3v(size, pointer);
     }
 
-    void GLProgramState::setUniformVec3v(GLint uniformLocation, ssize_t size, const MATH::Vector3f* pointer) {
+    void GLProgramState::setUniformVec3v(GLint uniformLocation, int64 size, const MATH::Vector3f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec3v(size, pointer);
@@ -1441,13 +1441,13 @@ namespace GRAPH
             v->setVec4(value);
     }
 
-    void GLProgramState::setUniformVec4v(const std::string& uniformName, ssize_t size, const MATH::Vector4f* value) {
+    void GLProgramState::setUniformVec4v(const std::string& uniformName, int64 size, const MATH::Vector4f* value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec4v(size, value);
     }
 
-    void GLProgramState::setUniformVec4v(GLint uniformLocation, ssize_t size, const MATH::Vector4f* pointer) {
+    void GLProgramState::setUniformVec4v(GLint uniformLocation, int64 size, const MATH::Vector4f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec4v(size, pointer);

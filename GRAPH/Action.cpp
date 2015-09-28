@@ -149,7 +149,7 @@ namespace GRAPH
         }
     }
 
-    void ActionManager::removeActionAtIndex(ssize_t index, ActionEntry *element) {
+    void ActionManager::removeActionAtIndex(int64 index, ActionEntry *element) {
         Action *action = (Action*)(*element->actions)[index];
         if (action == element->currentAction && (! element->currentActionSalvaged)) {
             element->currentAction->retain();
@@ -366,7 +366,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    ssize_t ActionManager::getNumberOfRunningActionsInTarget(const HObject *target) const
+    int64 ActionManager::getNumberOfRunningActionsInTarget(const HObject *target) const
     {
         ActionEntry *element = nullptr;
         for (auto iter : _targets) {

@@ -801,7 +801,7 @@ namespace GRAPH
         polyInfo_ = info;
     }
 
-    SpriteBatchNode* SpriteBatchNode::createWithTexture(Texture2D* tex, ssize_t capacity/* = DEFAULT_CAPACITY*/) {
+    SpriteBatchNode* SpriteBatchNode::createWithTexture(Texture2D* tex, int64 capacity/* = DEFAULT_CAPACITY*/) {
         SpriteBatchNode *batchNode = new (std::nothrow) SpriteBatchNode();
         batchNode->initWithTexture(tex, capacity);
         batchNode->autorelease();
@@ -809,14 +809,14 @@ namespace GRAPH
         return batchNode;
     }
 
-    SpriteBatchNode* SpriteBatchNode::create(const std::string& fileImage, ssize_t capacity/* = DEFAULT_CAPACITY*/) {
+    SpriteBatchNode* SpriteBatchNode::create(const std::string& fileImage, int64 capacity/* = DEFAULT_CAPACITY*/) {
         SpriteBatchNode *batchNode = new (std::nothrow) SpriteBatchNode();
         batchNode->initWithFile(fileImage, capacity);
         batchNode->autorelease();
         return batchNode;
     }
 
-    bool SpriteBatchNode::initWithTexture(Texture2D *tex, ssize_t capacity/* = DEFAULT_CAPACITY*/) {
+    bool SpriteBatchNode::initWithTexture(Texture2D *tex, int64 capacity/* = DEFAULT_CAPACITY*/) {
         blendFunc_ = BlendFunc::ALPHA_PREMULTIPLIED;
         if (!tex->hasPremultipliedAlpha()) {
             blendFunc_ = BlendFunc::ALPHA_NON_PREMULTIPLIED;
@@ -845,7 +845,7 @@ namespace GRAPH
         return this->initWithTexture(texture, 0);
     }
 
-    bool SpriteBatchNode::initWithFile(const std::string& fileImage, ssize_t capacity/* = DEFAULT_CAPACITY*/) {
+    bool SpriteBatchNode::initWithFile(const std::string& fileImage, int64 capacity/* = DEFAULT_CAPACITY*/) {
         Texture2D *texture2D = Director::getInstance().getTextureCache()->addImage(fileImage);
         return initWithTexture(texture2D, capacity);
     }
@@ -920,7 +920,7 @@ namespace GRAPH
         }
     }
 
-    void SpriteBatchNode::removeChildAtIndex(ssize_t index, bool doCleanup) {
+    void SpriteBatchNode::removeChildAtIndex(int64 index, bool doCleanup) {
         removeChild(_children.at(index), doCleanup);
     }
 
@@ -944,7 +944,7 @@ namespace GRAPH
                     child->sortAllChildren();
                 }
 
-                ssize_t index = 0;
+                int64 index = 0;
                 for (const auto &child : _children) {
                     Sprite* sp = static_cast<Sprite*>(child);
                     updateAtlasIndex(sp, &index);
@@ -955,11 +955,11 @@ namespace GRAPH
         }
     }
 
-    void SpriteBatchNode::updateAtlasIndex(Sprite* sprite, ssize_t* curIndex) {
+    void SpriteBatchNode::updateAtlasIndex(Sprite* sprite, int64* curIndex) {
         auto& array = sprite->getChildren();
         auto count = array.size();
 
-        ssize_t oldIndex = 0;
+        int64 oldIndex = 0;
 
         if (count == 0) {
             oldIndex = sprite->getAtlasIndex();
@@ -1009,7 +1009,7 @@ namespace GRAPH
         }
     }
 
-    void SpriteBatchNode::swap(ssize_t oldIndex, ssize_t newIndex) {
+    void SpriteBatchNode::swap(int64 oldIndex, int64 newIndex) {
         V3F_C4B_T2F_Quad* quads = textureAtlas_->getQuads();
         std::swap(quads[oldIndex], quads[newIndex]);
 
@@ -1039,13 +1039,13 @@ namespace GRAPH
     }
 
     void SpriteBatchNode::increaseAtlasCapacity() {
-        ssize_t quantity = (textureAtlas_->getCapacity() + 1) * 4 / 3;
+        int64 quantity = (textureAtlas_->getCapacity() + 1) * 4 / 3;
 
         if (!textureAtlas_->resizeCapacity(quantity)) {
         }
     }
 
-    ssize_t SpriteBatchNode::rebuildIndexInOrder(Sprite *parent, ssize_t index) {
+    int64 SpriteBatchNode::rebuildIndexInOrder(Sprite *parent, int64 index) {
         auto& children = parent->getChildren();
         for (const auto &child : children) {
             Sprite* sp = static_cast<Sprite*>(child);
@@ -1069,7 +1069,7 @@ namespace GRAPH
         return index;
     }
 
-    ssize_t SpriteBatchNode::highestAtlasIndexInChild(Sprite *sprite) {
+    int64 SpriteBatchNode::highestAtlasIndexInChild(Sprite *sprite) {
         auto& children = sprite->getChildren();
 
         if (children.size() == 0) {
@@ -1080,7 +1080,7 @@ namespace GRAPH
         }
     }
 
-    ssize_t SpriteBatchNode::lowestAtlasIndexInChild(Sprite *sprite) {
+    int64 SpriteBatchNode::lowestAtlasIndexInChild(Sprite *sprite) {
         auto& children = sprite->getChildren();
 
         if (children.size() == 0) {
@@ -1091,7 +1091,7 @@ namespace GRAPH
         }
     }
 
-    ssize_t SpriteBatchNode::atlasIndexForChild(Sprite *sprite, int nZ) {
+    int64 SpriteBatchNode::atlasIndexForChild(Sprite *sprite, int nZ) {
         auto& siblings = sprite->getParent()->getChildren();
         auto childIndex = siblings.getIndex(sprite);
 
@@ -1208,7 +1208,7 @@ namespace GRAPH
         updateBlendFunc();
     }
 
-    void SpriteBatchNode::insertQuadFromSprite(Sprite *sprite, ssize_t index) {
+    void SpriteBatchNode::insertQuadFromSprite(Sprite *sprite, int64 index) {
         while (index >= textureAtlas_->getCapacity() || textureAtlas_->getCapacity() == textureAtlas_->getTotalQuads()) {
             this->increaseAtlasCapacity();
         }
@@ -1223,7 +1223,7 @@ namespace GRAPH
         sprite->updateTransform();
     }
 
-    void SpriteBatchNode::updateQuadFromSprite(Sprite *sprite, ssize_t index) {
+    void SpriteBatchNode::updateQuadFromSprite(Sprite *sprite, int64 index) {
         while (index >= textureAtlas_->getCapacity() || textureAtlas_->getCapacity() == textureAtlas_->getTotalQuads()) {
             this->increaseAtlasCapacity();
         }

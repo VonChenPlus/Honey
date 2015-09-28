@@ -14,7 +14,7 @@
 
 namespace IMAGE
 {
-    IMAGE::PixelFormat convertI8ToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
+    IMAGE::PixelFormat convertI8ToFormat(const unsigned char* data, int64 dataLen, IMAGE::PixelFormat format, unsigned char** outData, int64* outDataLen)
     {
         switch (format)
         {
@@ -57,7 +57,7 @@ namespace IMAGE
         return format;
     }
 
-    IMAGE::PixelFormat convertAI88ToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
+    IMAGE::PixelFormat convertAI88ToFormat(const unsigned char* data, int64 dataLen, IMAGE::PixelFormat format, unsigned char** outData, int64* outDataLen)
     {
         switch (format)
         {
@@ -107,7 +107,7 @@ namespace IMAGE
         return format;
     }
 
-    IMAGE::PixelFormat convertRGB888ToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
+    IMAGE::PixelFormat convertRGB888ToFormat(const unsigned char* data, int64 dataLen, IMAGE::PixelFormat format, unsigned char** outData, int64* outDataLen)
     {
         switch (format)
         {
@@ -149,7 +149,7 @@ namespace IMAGE
         return format;
     }
 
-    IMAGE::PixelFormat convertRGBA8888ToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
+    IMAGE::PixelFormat convertRGBA8888ToFormat(const unsigned char* data, int64 dataLen, IMAGE::PixelFormat format, unsigned char** outData, int64* outDataLen)
     {
         switch (format)
         {
@@ -197,7 +197,7 @@ namespace IMAGE
         return format;
     }
 
-    IMAGE::PixelFormat convertDataToFormat(const unsigned char* data, ssize_t dataLen, IMAGE::PixelFormat originFormat, IMAGE::PixelFormat format, unsigned char** outData, ssize_t* outDataLen)
+    IMAGE::PixelFormat convertDataToFormat(const unsigned char* data, int64 dataLen, IMAGE::PixelFormat originFormat, IMAGE::PixelFormat format, unsigned char** outData, int64* outDataLen)
     {
         // don't need to convert
         if (format == originFormat || format == IMAGE::PixelFormat::AUTO)
@@ -225,9 +225,9 @@ namespace IMAGE
     }
 
     // IIIIIIII -> RRRRRRRRGGGGGGGGGBBBBBBBB
-    void convertI8ToRGB888(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertI8ToRGB888(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
-        for (ssize_t i=0; i < dataLen; ++i)
+        for (int64 i=0; i < dataLen; ++i)
         {
             *outData++ = data[i];     //R
             *outData++ = data[i];     //G
@@ -236,9 +236,9 @@ namespace IMAGE
     }
 
     // IIIIIIIIAAAAAAAA -> RRRRRRRRGGGGGGGGBBBBBBBB
-    void convertAI88ToRGB888(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertAI88ToRGB888(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
-        for (ssize_t i = 0, l = dataLen - 1; i < l; i += 2)
+        for (int64 i = 0, l = dataLen - 1; i < l; i += 2)
         {
             *outData++ = data[i];     //R
             *outData++ = data[i];     //G
@@ -247,9 +247,9 @@ namespace IMAGE
     }
 
     // IIIIIIII -> RRRRRRRRGGGGGGGGGBBBBBBBBAAAAAAAA
-    void convertI8ToRGBA8888(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertI8ToRGBA8888(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
-        for (ssize_t i = 0; i < dataLen; ++i)
+        for (int64 i = 0; i < dataLen; ++i)
         {
             *outData++ = data[i];     //R
             *outData++ = data[i];     //G
@@ -259,9 +259,9 @@ namespace IMAGE
     }
 
     // IIIIIIIIAAAAAAAA -> RRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA
-    void convertAI88ToRGBA8888(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertAI88ToRGBA8888(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
-        for (ssize_t i = 0, l = dataLen - 1; i < l; i += 2)
+        for (int64 i = 0, l = dataLen - 1; i < l; i += 2)
         {
             *outData++ = data[i];     //R
             *outData++ = data[i];     //G
@@ -271,7 +271,7 @@ namespace IMAGE
     }
 
     // IIIIIIII -> RRRRRGGGGGGBBBBB
-    void convertI8ToRGB565(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertI8ToRGB565(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
         for (int i = 0; i < dataLen; ++i)
@@ -283,10 +283,10 @@ namespace IMAGE
     }
 
     // IIIIIIIIAAAAAAAA -> RRRRRGGGGGGBBBBB
-    void convertAI88ToRGB565(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertAI88ToRGB565(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
-        for (ssize_t i = 0, l = dataLen - 1; i < l; i += 2)
+        for (int64 i = 0, l = dataLen - 1; i < l; i += 2)
         {
             *out16++ = (data[i] & 0x00F8) << 8    //R
                 | (data[i] & 0x00FC) << 3         //G
@@ -295,10 +295,10 @@ namespace IMAGE
     }
 
     // IIIIIIII -> RRRRGGGGBBBBAAAA
-    void convertI8ToRGBA4444(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertI8ToRGBA4444(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
-        for (ssize_t i = 0; i < dataLen; ++i)
+        for (int64 i = 0; i < dataLen; ++i)
         {
             *out16++ = (data[i] & 0x00F0) << 8    //R
             | (data[i] & 0x00F0) << 4             //G
@@ -308,10 +308,10 @@ namespace IMAGE
     }
 
     // IIIIIIIIAAAAAAAA -> RRRRGGGGBBBBAAAA
-    void convertAI88ToRGBA4444(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertAI88ToRGBA4444(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
-        for (ssize_t i = 0, l = dataLen - 1; i < l; i += 2)
+        for (int64 i = 0, l = dataLen - 1; i < l; i += 2)
         {
             *out16++ = (data[i] & 0x00F0) << 8    //R
             | (data[i] & 0x00F0) << 4             //G
@@ -321,7 +321,7 @@ namespace IMAGE
     }
 
     // IIIIIIII -> RRRRRGGGGGBBBBBA
-    void convertI8ToRGB5A1(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertI8ToRGB5A1(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
         for (int i = 0; i < dataLen; ++i)
@@ -334,10 +334,10 @@ namespace IMAGE
     }
 
     // IIIIIIIIAAAAAAAA -> RRRRRGGGGGBBBBBA
-    void convertAI88ToRGB5A1(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertAI88ToRGB5A1(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
-        for (ssize_t i = 0, l = dataLen - 1; i < l; i += 2)
+        for (int64 i = 0, l = dataLen - 1; i < l; i += 2)
         {
             *out16++ = (data[i] & 0x00F8) << 8    //R
                 | (data[i] & 0x00F8) << 3         //G
@@ -347,10 +347,10 @@ namespace IMAGE
     }
 
     // IIIIIIII -> IIIIIIIIAAAAAAAA
-    void convertI8ToAI88(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertI8ToAI88(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
-        for (ssize_t i = 0; i < dataLen; ++i)
+        for (int64 i = 0; i < dataLen; ++i)
         {
             *out16++ = 0xFF00     //A
             | data[i];            //I
@@ -358,27 +358,27 @@ namespace IMAGE
     }
 
     // IIIIIIIIAAAAAAAA -> AAAAAAAA
-    void convertAI88ToA8(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertAI88ToA8(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
-        for (ssize_t i = 1; i < dataLen; i += 2)
+        for (int64 i = 1; i < dataLen; i += 2)
         {
             *outData++ = data[i]; //A
         }
     }
 
     // IIIIIIIIAAAAAAAA -> IIIIIIII
-    void convertAI88ToI8(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertAI88ToI8(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
-        for (ssize_t i = 0, l = dataLen - 1; i < l; i += 2)
+        for (int64 i = 0, l = dataLen - 1; i < l; i += 2)
         {
             *outData++ = data[i]; //R
         }
     }
 
     // RRRRRRRRGGGGGGGGBBBBBBBB -> RRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA
-    void convertRGB888ToRGBA8888(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertRGB888ToRGBA8888(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
-        for (ssize_t i = 0, l = dataLen - 2; i < l; i += 3)
+        for (int64 i = 0, l = dataLen - 2; i < l; i += 3)
         {
             *outData++ = data[i];         //R
             *outData++ = data[i + 1];     //G
@@ -388,9 +388,9 @@ namespace IMAGE
     }
 
     // RRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA -> RRRRRRRRGGGGGGGGBBBBBBBB
-    void convertRGBA8888ToRGB888(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertRGBA8888ToRGB888(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
-        for (ssize_t i = 0, l = dataLen - 3; i < l; i += 4)
+        for (int64 i = 0, l = dataLen - 3; i < l; i += 4)
         {
             *outData++ = data[i];         //R
             *outData++ = data[i + 1];     //G
@@ -399,10 +399,10 @@ namespace IMAGE
     }
 
     // RRRRRRRRGGGGGGGGBBBBBBBB -> RRRRRGGGGGGBBBBB
-    void convertRGB888ToRGB565(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertRGB888ToRGB565(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
-        for (ssize_t i = 0, l = dataLen - 2; i < l; i += 3)
+        for (int64 i = 0, l = dataLen - 2; i < l; i += 3)
         {
             *out16++ = (data[i] & 0x00F8) << 8    //R
                 | (data[i + 1] & 0x00FC) << 3     //G
@@ -411,10 +411,10 @@ namespace IMAGE
     }
 
     // RRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA -> RRRRRGGGGGGBBBBB
-    void convertRGBA8888ToRGB565(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertRGBA8888ToRGB565(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
-        for (ssize_t i = 0, l = dataLen - 3; i < l; i += 4)
+        for (int64 i = 0, l = dataLen - 3; i < l; i += 4)
         {
             *out16++ = (data[i] & 0x00F8) << 8    //R
                 | (data[i + 1] & 0x00FC) << 3     //G
@@ -423,36 +423,36 @@ namespace IMAGE
     }
 
     // RRRRRRRRGGGGGGGGBBBBBBBB -> IIIIIIII
-    void convertRGB888ToI8(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertRGB888ToI8(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
-        for (ssize_t i = 0, l = dataLen - 2; i < l; i += 3)
+        for (int64 i = 0, l = dataLen - 2; i < l; i += 3)
         {
             *outData++ = (data[i] * 299 + data[i + 1] * 587 + data[i + 2] * 114 + 500) / 1000;  //I =  (R*299 + G*587 + B*114 + 500) / 1000
         }
     }
 
     // RRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA -> IIIIIIII
-    void convertRGBA8888ToI8(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertRGBA8888ToI8(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
-        for (ssize_t i = 0, l = dataLen - 3; i < l; i += 4)
+        for (int64 i = 0, l = dataLen - 3; i < l; i += 4)
         {
             *outData++ = (data[i] * 299 + data[i + 1] * 587 + data[i + 2] * 114 + 500) / 1000;  //I =  (R*299 + G*587 + B*114 + 500) / 1000
         }
     }
 
     // RRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA -> AAAAAAAA
-    void convertRGBA8888ToA8(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertRGBA8888ToA8(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
-        for (ssize_t i = 0, l = dataLen -3; i < l; i += 4)
+        for (int64 i = 0, l = dataLen -3; i < l; i += 4)
         {
             *outData++ = data[i + 3]; //A
         }
     }
 
     // RRRRRRRRGGGGGGGGBBBBBBBB -> IIIIIIIIAAAAAAAA
-    void convertRGB888ToAI88(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertRGB888ToAI88(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
-        for (ssize_t i = 0, l = dataLen - 2; i < l; i += 3)
+        for (int64 i = 0, l = dataLen - 2; i < l; i += 3)
         {
             *outData++ = (data[i] * 299 + data[i + 1] * 587 + data[i + 2] * 114 + 500) / 1000;  //I =  (R*299 + G*587 + B*114 + 500) / 1000
             *outData++ = 0xFF;
@@ -461,9 +461,9 @@ namespace IMAGE
 
 
     // RRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA -> IIIIIIIIAAAAAAAA
-    void convertRGBA8888ToAI88(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertRGBA8888ToAI88(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
-        for (ssize_t i = 0, l = dataLen - 3; i < l; i += 4)
+        for (int64 i = 0, l = dataLen - 3; i < l; i += 4)
         {
             *outData++ = (data[i] * 299 + data[i + 1] * 587 + data[i + 2] * 114 + 500) / 1000;  //I =  (R*299 + G*587 + B*114 + 500) / 1000
             *outData++ = data[i + 3];
@@ -471,10 +471,10 @@ namespace IMAGE
     }
 
     // RRRRRRRRGGGGGGGGBBBBBBBB -> RRRRGGGGBBBBAAAA
-    void convertRGB888ToRGBA4444(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertRGB888ToRGBA4444(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
-        for (ssize_t i = 0, l = dataLen - 2; i < l; i += 3)
+        for (int64 i = 0, l = dataLen - 2; i < l; i += 3)
         {
             *out16++ = ((data[i] & 0x00F0) << 8           //R
                         | (data[i + 1] & 0x00F0) << 4     //G
@@ -484,10 +484,10 @@ namespace IMAGE
     }
 
     // RRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA -> RRRRGGGGBBBBAAAA
-    void convertRGBA8888ToRGBA4444(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertRGBA8888ToRGBA4444(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
-        for (ssize_t i = 0, l = dataLen - 3; i < l; i += 4)
+        for (int64 i = 0, l = dataLen - 3; i < l; i += 4)
         {
             *out16++ = (data[i] & 0x00F0) << 8    //R
             | (data[i + 1] & 0x00F0) << 4         //G
@@ -497,10 +497,10 @@ namespace IMAGE
     }
 
     // RRRRRRRRGGGGGGGGBBBBBBBB -> RRRRRGGGGGBBBBBA
-    void convertRGB888ToRGB5A1(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertRGB888ToRGB5A1(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
-        for (ssize_t i = 0, l = dataLen - 2; i < l; i += 3)
+        for (int64 i = 0, l = dataLen - 2; i < l; i += 3)
         {
             *out16++ = (data[i] & 0x00F8) << 8    //R
                 | (data[i + 1] & 0x00F8) << 3     //G
@@ -510,10 +510,10 @@ namespace IMAGE
     }
 
     // RRRRRRRRGGGGGGGGBBBBBBBB -> RRRRRGGGGGBBBBBA
-    void convertRGBA8888ToRGB5A1(const unsigned char* data, ssize_t dataLen, unsigned char* outData)
+    void convertRGBA8888ToRGB5A1(const unsigned char* data, int64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
-        for (ssize_t i = 0, l = dataLen - 2; i < l; i += 4)
+        for (int64 i = 0, l = dataLen - 2; i < l; i += 4)
         {
             *out16++ = (data[i] & 0x00F8) << 8    //R
                 | (data[i + 1] & 0x00F8) << 3     //G
@@ -576,14 +576,14 @@ namespace IMAGE
         return ret;
     }
 
-    bool TinyImage::initWithImageData(const unsigned char *data, ssize_t dataLen) {
+    bool TinyImage::initWithImageData(const unsigned char *data, int64 dataLen) {
         bool ret = false;
 
         do {
             if (! data || dataLen <= 0) break;
 
             unsigned char* unpackedData = nullptr;
-            ssize_t unpackedLen = 0;
+            int64 unpackedLen = 0;
 
             unpackedData = const_cast<unsigned char*>(data);
             unpackedLen = dataLen;
@@ -613,7 +613,7 @@ namespace IMAGE
         return ret;
     }
 
-    bool TinyImage::isPng(const unsigned char *data, ssize_t dataLen) {
+    bool TinyImage::isPng(const unsigned char *data, int64 dataLen) {
         if (dataLen <= 8) {
             return false;
         }
@@ -623,11 +623,11 @@ namespace IMAGE
         return memcmp(PNG_SIGNATURE, data, sizeof(PNG_SIGNATURE)) == 0;
     }
 
-    bool TinyImage::isEtc(const unsigned char * data, ssize_t) {
+    bool TinyImage::isEtc(const unsigned char * data, int64) {
         return etc1_pkm_is_valid((etc1_byte*)data) ? true : false;
     }
 
-    bool TinyImage::isJpg(const unsigned char * data, ssize_t dataLen) {
+    bool TinyImage::isJpg(const unsigned char * data, int64 dataLen) {
         if (dataLen <= 4) {
             return false;
         }
@@ -637,7 +637,7 @@ namespace IMAGE
         return memcmp(data, JPG_SOI, 2) == 0;
     }
 
-    TinyImage::Format TinyImage::detectFormat(const unsigned char * data, ssize_t dataLen) {
+    TinyImage::Format TinyImage::detectFormat(const unsigned char * data, int64 dataLen) {
         if (isPng(data, dataLen)) {
             return Format::PNG;
         }
@@ -664,7 +664,7 @@ namespace IMAGE
         return getPixelFormatInfoMap().at(renderFormat_).compressed;
     }
 
-    bool TinyImage::initWithJpgData(const unsigned char * data, ssize_t dataLen) {
+    bool TinyImage::initWithJpgData(const unsigned char * data, int64 dataLen) {
         int actual_components = 0;
         data_ = (unsigned char*)jpgd::decompress_jpeg_image_from_memory((const unsigned char*)data, (int)dataLen, &width_, &height_, &actual_components, 4);
         renderFormat_ = PixelFormat::RGB888;
@@ -672,7 +672,7 @@ namespace IMAGE
         return true;
     }
 
-    bool TinyImage::initWithPngData(const unsigned char *data, ssize_t dataLen) {
+    bool TinyImage::initWithPngData(const unsigned char *data, int64 dataLen) {
         int color_type;
         PNGLoadPtr((const unsigned char*)data, dataLen, &width_, &height_, &color_type, (unsigned char**)&data_, (int *)&dataLen_);
 
@@ -705,7 +705,7 @@ namespace IMAGE
         return true;
     }
 
-    bool TinyImage::initWithETCData(const unsigned char * data, ssize_t) {
+    bool TinyImage::initWithETCData(const unsigned char * data, int64) {
         const etc1_byte* header = static_cast<const etc1_byte*>(data);
 
         //check the data
@@ -739,7 +739,7 @@ namespace IMAGE
         return true;
     }
 
-    bool TinyImage::initWithRawData(const unsigned char * data, ssize_t, int width, int height, int, bool preMulti) {
+    bool TinyImage::initWithRawData(const unsigned char * data, int64, int width, int height, int, bool preMulti) {
         bool ret = false;
         do
         {

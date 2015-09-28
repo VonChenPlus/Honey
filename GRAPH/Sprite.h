@@ -76,8 +76,8 @@ namespace GRAPH
 
         inline bool isTextureRectRotated() const { return rectRotated_; }
 
-        inline ssize_t getAtlasIndex() const { return atlasIndex_; }
-        inline void setAtlasIndex(ssize_t atlasIndex) { atlasIndex_ = atlasIndex; }
+        inline int64 getAtlasIndex() const { return atlasIndex_; }
+        inline void setAtlasIndex(int64 atlasIndex) { atlasIndex_ = atlasIndex; }
 
         inline const MATH::Rectf& getTextureRect() const { return rect_; }
 
@@ -145,7 +145,7 @@ namespace GRAPH
         virtual void setDirtyRecursively(bool value);
 
         TextureAtlas*       textureAtlas_;
-        ssize_t             atlasIndex_;
+        int64             atlasIndex_;
         SpriteBatchNode*    batchNode_;
         bool                dirty_;
         bool                recursiveDirty_;
@@ -173,8 +173,8 @@ namespace GRAPH
         static const int DEFAULT_CAPACITY = 29;
 
     public:
-        static SpriteBatchNode* createWithTexture(Texture2D* tex, ssize_t capacity = DEFAULT_CAPACITY);
-        static SpriteBatchNode* create(const std::string& fileImage, ssize_t capacity = DEFAULT_CAPACITY);
+        static SpriteBatchNode* createWithTexture(Texture2D* tex, int64 capacity = DEFAULT_CAPACITY);
+        static SpriteBatchNode* create(const std::string& fileImage, int64 capacity = DEFAULT_CAPACITY);
 
         inline TextureAtlas* getTextureAtlas() { return textureAtlas_; }
         void setTextureAtlas(TextureAtlas* textureAtlas);
@@ -182,14 +182,14 @@ namespace GRAPH
         inline const std::vector<Sprite*>& getDescendants() const { return descendants_; }
 
         void increaseAtlasCapacity();
-        void removeChildAtIndex(ssize_t index, bool doCleanup);
+        void removeChildAtIndex(int64 index, bool doCleanup);
         void appendChild(Sprite* sprite);
         void removeSpriteFromAtlas(Sprite *sprite);
 
-        ssize_t rebuildIndexInOrder(Sprite *parent, ssize_t index);
-        ssize_t highestAtlasIndexInChild(Sprite *sprite);
-        ssize_t lowestAtlasIndexInChild(Sprite *sprite);
-        ssize_t atlasIndexForChild(Sprite *sprite, int z);
+        int64 rebuildIndexInOrder(Sprite *parent, int64 index);
+        int64 highestAtlasIndexInChild(Sprite *sprite);
+        int64 lowestAtlasIndexInChild(Sprite *sprite);
+        int64 atlasIndexForChild(Sprite *sprite, int z);
         void reorderBatch(bool reorder);
 
         virtual Texture2D* getTexture() const override;
@@ -210,7 +210,7 @@ namespace GRAPH
 
         virtual void draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags) override;
 
-        void insertQuadFromSprite(Sprite *sprite, ssize_t index);
+        void insertQuadFromSprite(Sprite *sprite, int64 index);
         SpriteBatchNode * addSpriteWithoutQuad(Sprite *child, int z, int aTag);
 
     public:
@@ -218,15 +218,15 @@ namespace GRAPH
         virtual ~SpriteBatchNode();
 
 
-        bool initWithTexture(Texture2D *tex, ssize_t capacity = DEFAULT_CAPACITY);
-        bool initWithFile(const std::string& fileImage, ssize_t capacity = DEFAULT_CAPACITY);
+        bool initWithTexture(Texture2D *tex, int64 capacity = DEFAULT_CAPACITY);
+        bool initWithFile(const std::string& fileImage, int64 capacity = DEFAULT_CAPACITY);
         bool init() override;
 
     protected:
-        void updateQuadFromSprite(Sprite *sprite, ssize_t index);
+        void updateQuadFromSprite(Sprite *sprite, int64 index);
 
-        void updateAtlasIndex(Sprite* sprite, ssize_t* curIndex);
-        void swap(ssize_t oldIndex, ssize_t newIndex);
+        void updateAtlasIndex(Sprite* sprite, int64* curIndex);
+        void swap(int64 oldIndex, int64 newIndex);
         void updateBlendFunc();
 
         TextureAtlas *textureAtlas_;
