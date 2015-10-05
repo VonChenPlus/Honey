@@ -330,6 +330,119 @@ namespace GRAPH
         drawLine(MATH::Vector2f(p4.x, p4.y), MATH::Vector2f(p1.x, p1.y), color);
     }
 
+    void DrawNode::drawSolidRect(const MATH::Vector2f &origin, const MATH::Vector2f &destination, const Color4F &color) {
+        MATH::Vector2f vertices[] = {
+            origin,
+            MATH::Vector2f(destination.x, origin.y),
+            destination,
+            MATH::Vector2f(origin.x, destination.y)
+        };
+
+        drawSolidPoly(vertices, 4, color );
+    }
+
+    void DrawNode::drawSolidPoly(const MATH::Vector2f *poli, unsigned int numberOfPoints, const Color4F &color) {
+        drawPolygon(poli, numberOfPoints, color, 0.0, Color4F(0.0, 0.0, 0.0, 0.0));
+    }
+
+    void DrawNode::drawSolidCircle(const MATH::Vector2f& center, float radius, float angle, unsigned int segments, float scaleX, float scaleY, const Color4F &color) {
+        const float coef = 2.0f * (float)MATH_PI/segments;
+
+        MATH::Vector2f *vertices = new (std::nothrow) MATH::Vector2f[segments];
+        if( ! vertices )
+            return;
+
+        for(unsigned int i = 0;i < segments; i++)
+        {
+            float rads = i*coef;
+            GLfloat j = radius * cosf(rads + angle) * scaleX + center.x;
+            GLfloat k = radius * sinf(rads + angle) * scaleY + center.y;
+
+            vertices[i].x = j;
+            vertices[i].y = k;
+        }
+
+        drawSolidPoly(vertices, segments, color);
+
+        SAFE_DELETE_ARRAY(vertices);
+    }
+
+    void DrawNode::drawSolidCircle(const MATH::Vector2f& center, float radius, float angle, unsigned int segments, const Color4F& color) {
+        drawSolidCircle(center, radius, angle, segments, 1.0f, 1.0f, color);
+    }
+
+    void DrawNode::drawSegment(const MATH::Vector2f &from, const MATH::Vector2f &to, float radius, const Color4F &color) {
+        unsigned int vertex_count = 6*3;
+        GLStateCache::EnableVertexAttribs(vertex_count);
+
+        MATH::Vector2f a = from;
+        MATH::Vector2f b = to;
+
+
+        MATH::Vector2f n = MATH::Vector2f::normalize(MATH::Vector2f::perp(MATH::Vector2f::subtract(b, a)));
+        MATH::Vector2f t = MATH::Vector2f::perp(n);
+
+        MATH::Vector2f nw = MATH::Vector2f::scale(n, radius);
+        MATH::Vector2f tw = MATH::Vector2f::scale(t, radius);
+        MATH::Vector2f v0 = MATH::Vector2f::subtract(b, MATH::Vector2f::add(nw, tw));
+        MATH::Vector2f v1 = MATH::Vector2f::add(b, MATH::Vector2f::subtract(nw, tw));
+        MATH::Vector2f v2 = MATH::Vector2f::subtract(b, nw);
+        MATH::Vector2f v3 = MATH::Vector2f::add(b, nw);
+        MATH::Vector2f v4 = MATH::Vector2f::subtract(a, nw);
+        MATH::Vector2f v5 = MATH::Vector2f::add(a, nw);
+        MATH::Vector2f v6 = MATH::Vector2f::subtract(a, MATH::Vector2f::subtract(nw, tw));
+        MATH::Vector2f v7 = MATH::Vector2f::add(a, MATH::Vector2f::add(nw, tw));
+
+
+        V2F_C4B_T2F_Triangle *triangles = (V2F_C4B_T2F_Triangle *)(vboArray_[0].u1.bufferData + vboArray_[0].u1.bufferCount);
+
+        V2F_C4B_T2F_Triangle triangles0 = {
+            {v0, Color4B(color), MATH::Vector2f::negate(MATH::Vector2f::add(n, t))},
+            {v1, Color4B(color), MATH::Vector2f::subtract(n, t)},
+            {v2, Color4B(color), MATH::Vector2f::negate(n)},
+        };
+        triangles[0] = triangles0;
+
+        V2F_C4B_T2F_Triangle triangles1 = {
+            {v3, Color4B(color), n},
+            {v1, Color4B(color), MATH::Vector2f::subtract(n, t)},
+            {v2, Color4B(color), MATH::Vector2f::negate(n)},
+        };
+        triangles[1] = triangles1;
+
+        V2F_C4B_T2F_Triangle triangles2 = {
+            {v3, Color4B(color), n},
+            {v4, Color4B(color), MATH::Vector2f::negate(n)},
+            {v2, Color4B(color), MATH::Vector2f::negate(n)},
+        };
+        triangles[2] = triangles2;
+
+        V2F_C4B_T2F_Triangle triangles3 = {
+            {v3, Color4B(color), n},
+            {v4, Color4B(color), MATH::Vector2f::negate(n)},
+            {v5, Color4B(color), n },
+        };
+        triangles[3] = triangles3;
+
+        V2F_C4B_T2F_Triangle triangles4 = {
+            {v6, Color4B(color), MATH::Vector2f::subtract(t, n)},
+            {v4, Color4B(color), MATH::Vector2f::negate(n) },
+            {v5, Color4B(color), n},
+        };
+        triangles[4] = triangles4;
+
+        V2F_C4B_T2F_Triangle triangles5 = {
+            {v6, Color4B(color), MATH::Vector2f::subtract(t, n)},
+            {v7, Color4B(color), MATH::Vector2f::add(n, t)},
+            {v5, Color4B(color), n},
+        };
+        triangles[5] = triangles5;
+
+        vboArray_[0].u1.bufferCount += vertex_count;
+
+        dirty_[0] = true;
+    }
+
     void DrawNode::drawPolygon(const MATH::Vector2f *verts, int count, const Color4F &fillColor, float borderWidth, const Color4F &borderColor)
     {
         bool outline = (borderColor.alpha > 0.0 && borderWidth > 0.0);
