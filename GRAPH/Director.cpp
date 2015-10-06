@@ -230,6 +230,35 @@ namespace GRAPH
         *transformOut = projection * modelview;
     }
 
+    bool Director::checkVisibility(const MATH::Matrix4 &transform, const MATH::Sizef &size) {
+        auto scene = getRunningScene();
+
+        //If draw to Rendertexture, return true directly.
+        // only cull the default camera. The culling algorithm is valid for default camera.
+        if (!scene)
+            return true;
+
+        MATH::Rectf visiableRect(renderView_->getVisibleOrigin(), renderView_->getVisibleSize());
+
+        // transform center point to screen space
+        float hSizeX = size.width/2;
+        float hSizeY = size.height/2;
+        MATH::Vector3f v3p(hSizeX, hSizeY, 0);
+        transform.transformPoint(&v3p);
+        MATH::Vector2f v2p = camera_->projectGL(v3p);
+
+        // convert content size to world coordinates
+        float wshw = MATH::MATH_MAX(fabsf(hSizeX * transform.m[0] + hSizeY * transform.m[4]), fabsf(hSizeX * transform.m[0] - hSizeY * transform.m[4]));
+        float wshh = MATH::MATH_MAX(fabsf(hSizeX * transform.m[1] + hSizeY * transform.m[5]), fabsf(hSizeX * transform.m[1] - hSizeY * transform.m[5]));
+
+        // enlarge visable rect half size in screen coord
+        visiableRect.origin.x -= wshw;
+        visiableRect.origin.y -= wshh;
+        visiableRect.size.width += wshw * 2;
+        visiableRect.size.height += wshh * 2;
+        bool ret = visiableRect.contains(v2p);
+        return ret;
+    }
 
     void Director::drawScene() {
         if (paused_) {

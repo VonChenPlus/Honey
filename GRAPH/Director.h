@@ -79,6 +79,8 @@ namespace GRAPH
         MATH::Vector2f convertToGL(const MATH::Vector2f& point);
         MATH::Vector2f convertToUI(const MATH::Vector2f& point);
 
+        bool checkVisibility(const MATH::Matrix4 &transform, const MATH::Sizef &size);
+
         void drawScene();
 
     protected:

@@ -89,7 +89,7 @@ namespace GRAPH
 
     private:
         std::unordered_map<int64, Texture2D*> _atlasTextures;
-        std::unordered_map<unsigned short, FontLetterDefinition> _fontLetterDefinitions;
+        std::unordered_map<unsigned short, FontLetterDefinition> _letterDefinitions;
         float _commonLineHeight;
         Font * _font;
 
@@ -104,6 +104,8 @@ namespace GRAPH
         EventListenerCustom* _rendererRecreatedListener;
         bool _antialiasEnabled;
         int _currLineHeight;
+
+        friend class Label;
     };
 
     class FontAtlasCache

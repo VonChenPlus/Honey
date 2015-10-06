@@ -107,13 +107,13 @@ namespace GRAPH
     }
 
     void FontAtlas::addLetterDefinition(const FontLetterDefinition &letterDefinition) {
-        _fontLetterDefinitions[letterDefinition.letteCharUTF16] = letterDefinition;
+        _letterDefinitions[letterDefinition.letteCharUTF16] = letterDefinition;
     }
 
     bool FontAtlas::getLetterDefinitionForChar(char16_t letteCharUTF16, FontLetterDefinition &outDefinition) {
-        auto outIterator = _fontLetterDefinitions.find(letteCharUTF16);
+        auto outIterator = _letterDefinitions.find(letteCharUTF16);
 
-        if (outIterator != _fontLetterDefinitions.end()) {
+        if (outIterator != _letterDefinitions.end()) {
             outDefinition = (*outIterator).second;
             return true;
         }
@@ -139,9 +139,9 @@ namespace GRAPH
 
         for (size_t i = 0; i < length; ++i)
         {
-            auto outIterator = _fontLetterDefinitions.find(utf16String[i]);
+            auto outIterator = _letterDefinitions.find(utf16String[i]);
 
-            if (outIterator == _fontLetterDefinitions.end())
+            if (outIterator == _letterDefinitions.end())
             {
                 existNewLetter = true;
 
@@ -219,7 +219,7 @@ namespace GRAPH
                     _currentPageOrigX += 1;
                 }
 
-                _fontLetterDefinitions[tempDef.letteCharUTF16] = tempDef;
+                _letterDefinitions[tempDef.letteCharUTF16] = tempDef;
             }
         }
 
