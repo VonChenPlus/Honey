@@ -157,7 +157,7 @@ namespace GRAPH
 
         void reset();
 
-        FontDefinition _getFontDefinition() const;
+        FontDefinition getFontDefinition() const;
 
         virtual void updateColor() override;
 

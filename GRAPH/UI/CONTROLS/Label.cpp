@@ -1203,7 +1203,7 @@ namespace GRAPH
         }
     }
 
-    FontDefinition Label::_getFontDefinition() const
+    FontDefinition Label::getFontDefinition() const
     {
         FontDefinition systemFontDef;
         systemFontDef.fontName = _systemFont;
