@@ -8,15 +8,62 @@
 #include "GRAPH/Scheduler.h"
 #include "GRAPH/EventDispatcher.h"
 #include "GRAPH/Component.h"
+#include "GRAPH/Camera.h"
 #include "GRAPH/RENDERER/GLProgram.h"
 
 namespace GRAPH
 {
-    bool nodeComparisonLess(Node* n1, Node* n2)
+    bool Node::nodeComparisonLess(Node* n1, Node* n2)
     {
         return( n1->getLocalZOrder() < n2->getLocalZOrder() ||
                ( n1->getLocalZOrder() == n2->getLocalZOrder() && n1->getOrderOfArrival() < n2->getOrderOfArrival() )
                );
+    }
+
+    bool Node::isScreenPointInRect(const MATH::Vector2f &pt, const Camera* camera, const MATH::Matrix4& w2l,
+                                            const MATH::Rectf& rect, MATH::Vector3f *p) {
+        if (rect.size.width <= 0 || rect.size.height <= 0)
+        {
+            return false;
+        }
+
+        // first, convert pt to near/far plane, get Pn and Pf
+        MATH::Vector3f Pn(pt.x, pt.y, -1), Pf(pt.x, pt.y, 1);
+        Pn = camera->unprojectGL(Pn);
+        Pf = camera->unprojectGL(Pf);
+
+        //  then convert Pn and Pf to node space
+        w2l.transformPoint(&Pn);
+        w2l.transformPoint(&Pf);
+
+        // Pn and Pf define a line Q(t) = D + t * E which D = Pn
+        auto E = Pf - Pn;
+
+        // second, get three points which define content plane
+        //  these points define a plane P(u, w) = A + uB + wC
+        MATH::Vector3f A = MATH::Vector3f(rect.origin.x, rect.origin.y, 0);
+        MATH::Vector3f B(rect.origin.x + rect.size.width, rect.origin.y, 0);
+        MATH::Vector3f C(rect.origin.x, rect.origin.y + rect.size.height, 0);
+        B = B - A;
+        C = C - A;
+
+        //  the line Q(t) intercept with plane P(u, w)
+        //  calculate the intercept point P = Q(t)
+        //      (BxC).A - (BxC).D
+        //  t = -----------------
+        //          (BxC).E
+        MATH::Vector3f BxC;
+        MATH::Vector3f::cross(B, C, &BxC);
+        auto BxCdotE = BxC.dot(E);
+        if (BxCdotE == 0) {
+            return false;
+        }
+        auto t = (BxC.dot(A) - BxC.dot(Pn)) / BxCdotE;
+        MATH::Vector3f P = Pn + t * E;
+        if (p) {
+            *p = P;
+        }
+        return rect.contains(MATH::Vector2f(P.x, P.y));
     }
 
     void CGAffineToGL(const MATH::AffineTransform& t, GLfloat *m)

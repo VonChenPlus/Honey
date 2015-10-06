@@ -575,7 +575,7 @@ namespace GRAPH
 
         if (!_systemFontDirty && !_contentDirty && _textSprite)
         {
-            auto fontDef = _getFontDefinition();
+            auto fontDef = getFontDefinition();
             if (_shadowNode)
             {
                 if (shadowColor != _shadowColor4F)
@@ -753,7 +753,7 @@ namespace GRAPH
         }
         else
         {
-            auto fontDef = _getFontDefinition();
+            auto fontDef = getFontDefinition();
             createSpriteForSystemFont(fontDef);
             if (_shadowEnabled)
             {

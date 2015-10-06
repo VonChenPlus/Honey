@@ -53,11 +53,11 @@ namespace GRAPH
         _name = name;
     }
 
-    HObject* Component::getOwner() const {
+    Node* Component::getOwner() const {
         return _owner;
     }
 
-    void Component::setOwner(HObject *owner) {
+    void Component::setOwner(Node *owner) {
         _owner = owner;
     }
 
@@ -69,7 +69,7 @@ namespace GRAPH
         _enabled = enable;
     }
 
-    ComponentContainer::ComponentContainer(HObject *object)
+    ComponentContainer::ComponentContainer(Node *object)
         : _components(nullptr)
         , _owner(object) {
     }

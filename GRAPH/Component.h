@@ -6,6 +6,8 @@
 
 namespace GRAPH
 {
+    class Node;
+
     enum
     {
         kComponentOnEnter,
@@ -37,11 +39,11 @@ namespace GRAPH
         const std::string& getName() const;
         void setName(const std::string& name);
 
-        void setOwner(HObject *pOwner);
-        HObject* getOwner() const;
+        void setOwner(Node *pOwner);
+        Node* getOwner() const;
 
     protected:
-        HObject *_owner;
+        Node *_owner;
         std::string _name;
         bool _enabled;
     };
@@ -49,7 +51,7 @@ namespace GRAPH
     class ComponentContainer
     {
     protected:
-        ComponentContainer(HObject *pHObject);
+        ComponentContainer(Node *pHObject);
 
     public:
         virtual ~ComponentContainer(void);
@@ -72,7 +74,7 @@ namespace GRAPH
 
     private:
         HObjectMap<std::string, Component*>* _components;
-        HObject *_owner;
+        Node *_owner;
 
         friend class Node;
     };

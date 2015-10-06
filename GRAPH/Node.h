@@ -24,6 +24,7 @@ namespace GRAPH
     class GLProgramState;
     class Component;
     class ComponentContainer;
+    class Camera;
 
     enum
     {
@@ -398,6 +399,10 @@ namespace GRAPH
         std::function<void()> _onExitCallback;
         std::function<void()> _onEnterTransitionDidFinishCallback;
         std::function<void()> _onExitTransitionDidStartCallback;
+
+        static bool nodeComparisonLess(Node* n1, Node* n2);
+        static bool isScreenPointInRect(const MATH::Vector2f &pt, const Camera* camera, const MATH::Matrix4& w2l,
+                                        const MATH::Rectf& rect, MATH::Vector3f *p);
 
     private:
         DISALLOW_COPY_AND_ASSIGN(Node)

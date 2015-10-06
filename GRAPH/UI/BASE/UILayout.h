@@ -3,8 +3,7 @@
 
 #include "GRAPH/UI/BASE/UIWidget.h"
 #include "GRAPH/RENDERER/RenderCommand.h"
-#include "GRAPH/BASE/Macros.h"
-#include "GRAPH/BASE/Component.h"
+#include "GRAPH/Component.h"
 
 namespace GRAPH
 {
@@ -465,7 +464,7 @@ namespace GRAPH
             /**
              * find a focus enabled child Widget in the layout by index
              */
-            Widget* findFocusEnabledChildWidgetByIndex(ssize_t index);
+            Widget* findFocusEnabledChildWidgetByIndex(int64 index);
 
             /**
              * get the center point of a widget in world space
@@ -492,7 +491,7 @@ namespace GRAPH
              * find the nth elment in the _children array. Only the Widget descendant object will be returned
              *@param index  The index of a element in the _children array
              */
-            Widget* getChildWidgetByIndex(ssize_t index)const;
+            Widget* getChildWidgetByIndex(int64 index)const;
             /**
              * whether it is the last element according to all their parents
              */
@@ -681,7 +680,7 @@ namespace GRAPH
             bool caculateFinalPositionWithRelativeWidget(LayoutProtocol *layout);
             void caculateFinalPositionWithRelativeAlign();
 
-            ssize_t _unlayoutChildCount;
+            int64 _unlayoutChildCount;
             HObjectVector<Widget*> _widgetChildren;
             Widget* _widget;
             float _finalPositionX;

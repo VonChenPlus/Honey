@@ -1,4 +1,5 @@
 #include "GRAPH/RenderView.h"
+#include "GRAPH/RENDERER/GLCommon.h"
 
 namespace GRAPH
 {
@@ -101,5 +102,12 @@ namespace GRAPH
 
     float RenderView::getScaleY() const {
         return scaleY_;
+    }
+
+    void RenderView::setScissorInPoints(float x , float y , float w , float h) {
+        glScissor((GLint)(x * scaleX_ + viewPortRect_.origin.x),
+                      (GLint)(y * scaleY_ + viewPortRect_.origin.y),
+                      (GLsizei)(w * scaleX_),
+                      (GLsizei)(h * scaleY_));
     }
 }

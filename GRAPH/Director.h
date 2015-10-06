@@ -53,6 +53,7 @@ namespace GRAPH
 
         inline Camera* getCamera() { return camera_; }
         inline Scene* getRunningScene() { return runningScene_; }
+        inline RenderView *getRenderView() { return renderView_; }
 
         ActionManager* getActionManager() const { return actionManager_; }
         Scheduler *getScheduler() const { return scheduler_; }
