@@ -16,7 +16,7 @@ namespace GRAPH
 
     }
 
-    void Action::startWithTarget(HObject *aTarget) {
+    void Action::startWithTarget(Node *aTarget) {
         _originalTarget = _target = aTarget;
     }
 
@@ -32,6 +32,155 @@ namespace GRAPH
     }
 
     void Action::update(float) {
+    }
+
+    bool ActionInterval::initWithDuration(float d)
+    {
+        _duration = d;
+
+        // prevent division by 0
+        // This comparison could be in step:, but it might decrease the performance
+        // by 3% in heavy based action games.
+        if (_duration == 0)
+        {
+            _duration = MATH::MATH_FLOAT_EPSILON();
+        }
+
+        _elapsed = 0;
+        _firstTick = true;
+
+        return true;
+    }
+
+    bool ActionInterval::isDone() const
+    {
+        return _elapsed >= _duration;
+    }
+
+    void ActionInterval::step(float dt)
+    {
+        if (_firstTick)
+        {
+            _firstTick = false;
+            _elapsed = 0;
+        }
+        else
+        {
+            _elapsed += dt;
+        }
+
+        this->update(MATH::MATH_MAX (0.0f,                                  // needed for rewind. elapsed could be negative
+                          MATH::MATH_MIN(1.0f, _elapsed /
+                              MATH::MATH_MAX(_duration, MATH::MATH_FLOAT_MAX())   // division by 0
+                              )
+                          )
+                     );
+    }
+
+    void ActionInterval::setAmplitudeRate(float amp)
+    {
+    }
+
+    float ActionInterval::getAmplitudeRate()
+    {
+        return 0;
+    }
+
+    void ActionInterval::startWithTarget(Node *target)
+    {
+        FiniteTimeAction::startWithTarget(target);
+        _elapsed = 0.0f;
+        _firstTick = true;
+    }
+
+    ScaleTo* ScaleTo::create(float duration, float s)
+    {
+        ScaleTo *scaleTo = new (std::nothrow) ScaleTo();
+        scaleTo->initWithDuration(duration, s);
+        scaleTo->autorelease();
+
+        return scaleTo;
+    }
+
+    ScaleTo* ScaleTo::create(float duration, float sx, float sy)
+    {
+        ScaleTo *scaleTo = new (std::nothrow) ScaleTo();
+        scaleTo->initWithDuration(duration, sx, sy);
+        scaleTo->autorelease();
+
+        return scaleTo;
+    }
+
+    ScaleTo* ScaleTo::create(float duration, float sx, float sy, float sz)
+    {
+        ScaleTo *scaleTo = new (std::nothrow) ScaleTo();
+        scaleTo->initWithDuration(duration, sx, sy, sz);
+        scaleTo->autorelease();
+
+        return scaleTo;
+    }
+
+    bool ScaleTo::initWithDuration(float duration, float s)
+    {
+        if (ActionInterval::initWithDuration(duration))
+        {
+            _endScaleX = s;
+            _endScaleY = s;
+            _endScaleZ = s;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    bool ScaleTo::initWithDuration(float duration, float sx, float sy)
+    {
+        if (ActionInterval::initWithDuration(duration))
+        {
+            _endScaleX = sx;
+            _endScaleY = sy;
+            _endScaleZ = 1.f;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    bool ScaleTo::initWithDuration(float duration, float sx, float sy, float sz)
+    {
+        if (ActionInterval::initWithDuration(duration))
+        {
+            _endScaleX = sx;
+            _endScaleY = sy;
+            _endScaleZ = sz;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    void ScaleTo::startWithTarget(Node *target)
+    {
+        ActionInterval::startWithTarget(target);
+        _startScaleX = target->getScaleX();
+        _startScaleY = target->getScaleY();
+        _startScaleZ = target->getScaleZ();
+        _deltaX = _endScaleX - _startScaleX;
+        _deltaY = _endScaleY - _startScaleY;
+        _deltaZ = _endScaleZ - _startScaleZ;
+    }
+
+    void ScaleTo::update(float time)
+    {
+        if (_target)
+        {
+            _target->setScaleX(_startScaleX + _deltaX * time);
+            _target->setScaleY(_startScaleY + _deltaY * time);
+            _target->setScaleZ(_startScaleZ + _deltaZ * time);
+        }
     }
 
     Follow::Follow()
@@ -173,7 +322,7 @@ namespace GRAPH
         }
     }
 
-    void ActionManager::pauseTarget(HObject *target) {
+    void ActionManager::pauseTarget(Node *target) {
         ActionEntry *element = nullptr;
         for (auto iter : _targets) {
             if (iter.first == target) {
@@ -186,7 +335,7 @@ namespace GRAPH
         }
     }
 
-    void ActionManager::resumeTarget(HObject *target) {
+    void ActionManager::resumeTarget(Node *target) {
         ActionEntry *element = nullptr;
         for (auto iter : _targets) {
             if (iter.first == target) {
@@ -199,8 +348,8 @@ namespace GRAPH
         }
     }
 
-    std::vector<HObject*> ActionManager::pauseAllRunningActions() {
-        std::vector<HObject*> idsWithActions;
+    std::vector<Node*> ActionManager::pauseAllRunningActions() {
+        std::vector<Node*> idsWithActions;
 
         for (auto iter : _targets) {
             if (!iter.second->paused) {
@@ -212,13 +361,13 @@ namespace GRAPH
         return idsWithActions;
     }
 
-    void ActionManager::resumeTargets(const std::vector<HObject*>& targetsToResume) {
-        for(const auto &HObject : targetsToResume) {
-            this->resumeTarget(HObject);
+    void ActionManager::resumeTargets(const std::vector<Node*>& targetsToResume) {
+        for(const auto &object : targetsToResume) {
+            this->resumeTarget(object);
         }
     }
 
-    void ActionManager::addAction(Action *action, HObject *target, bool paused) {
+    void ActionManager::addAction(Action *action, Node *target, bool paused) {
         ActionEntry *element = nullptr;
         for (auto iter : _targets) {
             if (iter.first == target) {
@@ -231,7 +380,7 @@ namespace GRAPH
             element->paused = paused;
             target->retain();
             element->target = target;
-            _targets.insert(std::unordered_map<HObject *, ActionEntry *>::value_type(target, element));
+            _targets.insert(std::unordered_map<Node *, ActionEntry *>::value_type(target, element));
         }
 
          actionAllocWithHashElement(element);
@@ -246,7 +395,7 @@ namespace GRAPH
         }
     }
 
-    void ActionManager::removeAllActionsFromTarget(HObject *target) {
+    void ActionManager::removeAllActionsFromTarget(Node *target) {
         if (target == nullptr) {
             return;
         }
@@ -295,7 +444,7 @@ namespace GRAPH
         }
     }
 
-    void ActionManager::removeActionByTag(int tag, HObject *target) {
+    void ActionManager::removeActionByTag(int tag, Node *target) {
         ActionEntry *element = nullptr;
         for (auto iter : _targets) {
             if (iter.first == target) {
@@ -316,7 +465,7 @@ namespace GRAPH
         }
     }
 
-    void ActionManager::removeAllActionsByTag(int tag, HObject *target)
+    void ActionManager::removeAllActionsByTag(int tag, Node *target)
     {
         ActionEntry *element = nullptr;
         for (auto iter : _targets) {
@@ -341,7 +490,7 @@ namespace GRAPH
         }
     }
 
-    Action* ActionManager::getActionByTag(int tag, const HObject *target) const
+    Action* ActionManager::getActionByTag(int tag, const Node *target) const
     {
         ActionEntry *element = nullptr;
         for (auto iter : _targets) {
@@ -366,7 +515,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    int64 ActionManager::getNumberOfRunningActionsInTarget(const HObject *target) const
+    int64 ActionManager::getNumberOfRunningActionsInTarget(const Node *target) const
     {
         ActionEntry *element = nullptr;
         for (auto iter : _targets) {

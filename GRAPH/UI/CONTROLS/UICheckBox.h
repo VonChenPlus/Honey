@@ -1,8 +1,8 @@
 #ifndef UICHECKBOX_H
 #define UICHECKBOX_H
 
-#include "GRAPH/UI/BASE/UIWidget.h"
-#include "GRAPH/BASE/Sprite.h"
+#include "GRAPH/UI/UIWidget.h"
+#include "GRAPH/Sprite.h"
 
 namespace GRAPH
 {

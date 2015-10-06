@@ -1,7 +1,7 @@
 #ifndef UIBUTTON_H
 #define UIBUTTON_H
 
-#include "GRAPH/UI/BASE/UIWidget.h"
+#include "GRAPH/UI/UIWidget.h"
 
 namespace GRAPH
 {

@@ -100,7 +100,7 @@ namespace GRAPH
             return _labelRenderer->getString();
         }
 
-        ssize_t Text::getStringLength()const
+        int64 Text::getStringLength()const
         {
             return _labelRenderer->getStringLength();
         }
@@ -110,12 +110,6 @@ namespace GRAPH
             if (_type == Type::SYSTEM)
             {
                 _labelRenderer->setSystemFontSize(size);
-            }
-            else
-            {
-                TTFConfig config = _labelRenderer->getTTFConfig();
-                config.fontSize = size;
-                _labelRenderer->setTTFConfig(config);
             }
             _fontSize = size;
             updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
@@ -129,23 +123,8 @@ namespace GRAPH
 
         void Text::setFontName(const std::string& name)
         {
-            if(IO::FileUtils::getInstance().isFileExist(name))
-            {
-                TTFConfig config = _labelRenderer->getTTFConfig();
-                config.fontFilePath = name;
-                config.fontSize = _fontSize;
-                _labelRenderer->setTTFConfig(config);
-                _type = Type::TTF;
-            }
-            else
-            {
-                _labelRenderer->setSystemFontName(name);
-                if (_type == Type::TTF)
-                {
-                    _labelRenderer->requestSystemFontRefresh();
-                }
-                _type = Type::SYSTEM;
-            }
+            _labelRenderer->setSystemFontName(name);
+            _type = Type::SYSTEM;
             _fontName = name;
             updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
             _labelRendererAdaptDirty = true;
@@ -309,7 +288,7 @@ namespace GRAPH
 
         void Text::enableShadow(const Color4B& shadowColor,const MATH::Sizef &offset, int blurRadius)
         {
-            _labelRenderer->enableShadow(shadowColor, offset, blurRadius);
+            _labelRenderer->enableShadow(shadowColor, offset);
         }
 
         void Text::enableOutline(const Color4B& outlineColor,int outlineSize)
@@ -317,12 +296,6 @@ namespace GRAPH
             _labelRenderer->enableOutline(outlineColor, outlineSize);
             updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
             _labelRendererAdaptDirty = true;
-        }
-
-        void Text::enableGlow(const Color4B& glowColor)
-        {
-            if (_type == Type::TTF)
-                _labelRenderer->enableGlow(glowColor);
         }
 
         void Text::disableEffect()

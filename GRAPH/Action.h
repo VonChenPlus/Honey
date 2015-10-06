@@ -7,6 +7,8 @@
 
 namespace GRAPH
 {
+    class Node;
+
     class Action : public HObject
     {
     public:
@@ -14,16 +16,16 @@ namespace GRAPH
 
         virtual bool isDone() const;
 
-        virtual void startWithTarget(HObject *target);
+        virtual void startWithTarget(Node *target);
         virtual void stop();
         virtual void step(float dt);
         virtual void update(float time);
 
-        inline HObject* getTarget() const { return _target; }
-        inline void setTarget(HObject *target) { _target = target; }
+        inline Node* getTarget() const { return _target; }
+        inline void setTarget(Node *target) { _target = target; }
 
-        inline HObject* getOriginalTarget() const { return _originalTarget; }
-        inline void setOriginalTarget(HObject *originalTarget) { _originalTarget = originalTarget; }
+        inline Node* getOriginalTarget() const { return _originalTarget; }
+        inline void setOriginalTarget(Node *originalTarget) { _originalTarget = originalTarget; }
 
         inline int getTag() const { return _tag; }
         inline void setTag(int tag) { _tag = tag; }
@@ -33,8 +35,8 @@ namespace GRAPH
         virtual ~Action();
 
     protected:
-        HObject    *_originalTarget;
-        HObject    *_target;
+        Node    *_originalTarget;
+        Node    *_target;
         int     _tag;
 
     private:
@@ -59,6 +61,100 @@ namespace GRAPH
 
     private:
         DISALLOW_COPY_AND_ASSIGN(FiniteTimeAction)
+    };
+
+    class ActionInterval : public FiniteTimeAction
+    {
+    public:
+        inline float getElapsed(void) { return _elapsed; }
+
+        void setAmplitudeRate(float amp);
+        float getAmplitudeRate(void);
+
+        virtual bool isDone(void) const override;
+        virtual void step(float dt) override;
+        virtual void startWithTarget(Node *target) override;
+
+    public:
+        bool initWithDuration(float d);
+
+    protected:
+        float _elapsed;
+        bool   _firstTick;
+    };
+
+    class  ScaleTo : public ActionInterval
+    {
+    public:
+        /**
+         * Creates the action with the same scale factor for X and Y.
+         * @param duration Duration time, in seconds.
+         * @param s Scale factor of x and y.
+         * @return An autoreleased ScaleTo object.
+         */
+        static ScaleTo* create(float duration, float s);
+
+        /**
+         * Creates the action with and X factor and a Y factor.
+         * @param duration Duration time, in seconds.
+         * @param sx Scale factor of x.
+         * @param sy Scale factor of y.
+         * @return An autoreleased ScaleTo object.
+         */
+        static ScaleTo* create(float duration, float sx, float sy);
+
+        /**
+         * Creates the action with X Y Z factor.
+         * @param duration Duration time, in seconds.
+         * @param sx Scale factor of x.
+         * @param sy Scale factor of y.
+         * @param sz Scale factor of z.
+         * @return An autoreleased ScaleTo object.
+         */
+        static ScaleTo* create(float duration, float sx, float sy, float sz);
+
+        virtual void startWithTarget(Node *target) override;
+        /**
+         * @param time In seconds.
+         */
+        virtual void update(float time) override;
+
+    public:
+        ScaleTo() {}
+        virtual ~ScaleTo() {}
+
+        /**
+         * initializes the action with the same scale factor for X and Y
+         * @param duration in seconds
+         */
+        bool initWithDuration(float duration, float s);
+        /**
+         * initializes the action with and X factor and a Y factor
+         * @param duration in seconds
+         */
+        bool initWithDuration(float duration, float sx, float sy);
+        /**
+         * initializes the action with X Y Z factor
+         * @param duration in seconds
+         */
+        bool initWithDuration(float duration, float sx, float sy, float sz);
+
+    protected:
+        float _scaleX;
+        float _scaleY;
+        float _scaleZ;
+        float _startScaleX;
+        float _startScaleY;
+        float _startScaleZ;
+        float _endScaleX;
+        float _endScaleY;
+        float _endScaleZ;
+        float _deltaX;
+        float _deltaY;
+        float _deltaZ;
+
+    private:
+        DISALLOW_COPY_AND_ASSIGN(ScaleTo)
     };
 
     class Follow : public Action
@@ -100,7 +196,7 @@ namespace GRAPH
     struct ActionEntry
     {
         HObjectArray        *actions;
-        HObject             *target;
+        Node             *target;
         int                 actionIndex;
         Action              *currentAction;
         bool                currentActionSalvaged;
@@ -113,22 +209,22 @@ namespace GRAPH
         ActionManager(void);
         ~ActionManager(void);
 
-        void addAction(Action *action, HObject *target, bool paused);
+        void addAction(Action *action, Node *target, bool paused);
 
         void removeAllActions();
-        void removeAllActionsFromTarget(HObject *target);
+        void removeAllActionsFromTarget(Node *target);
         void removeAction(Action *action);
-        void removeActionByTag(int tag, HObject *target);
-        void removeAllActionsByTag(int tag, HObject *target);
+        void removeActionByTag(int tag, Node *target);
+        void removeAllActionsByTag(int tag, Node *target);
 
-        Action* getActionByTag(int tag, const HObject *target) const;
-        int64 getNumberOfRunningActionsInTarget(const HObject *target) const;
+        Action* getActionByTag(int tag, const Node *target) const;
+        int64 getNumberOfRunningActionsInTarget(const Node *target) const;
 
-        void pauseTarget(HObject *target);
-        void resumeTarget(HObject *target);
+        void pauseTarget(Node *target);
+        void resumeTarget(Node *target);
 
-        std::vector<HObject*> pauseAllRunningActions();
-        void resumeTargets(const std::vector<HObject*>& targetsToResume);
+        std::vector<Node*> pauseAllRunningActions();
+        void resumeTargets(const std::vector<Node*>& targetsToResume);
 
         void update(float dt);
 
@@ -138,7 +234,7 @@ namespace GRAPH
         void actionAllocWithHashElement(ActionEntry *element);
 
     protected:
-        std::unordered_map<HObject *, ActionEntry *> _targets;
+        std::unordered_map<Node *, ActionEntry *> _targets;
         ActionEntry    *_currentTarget;
         bool            _currentTargetSalvaged;
     };

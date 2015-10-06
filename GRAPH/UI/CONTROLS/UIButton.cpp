@@ -1,9 +1,9 @@
 #include <algorithm>
 #include "GRAPH/UI/CONTROLS/UIButton.h"
-#include "GRAPH/UI/BASE/UIScale9Sprite.h"
-#include "GRAPH/BASE/Label.h"
+#include "GRAPH/UI/UIScale9Sprite.h"
+#include "GRAPH/UI/CONTROLS//Label.h"
 #include "GRAPH/UI/BASE/UIHelper.h"
-#include "GRAPH/BASE/ActionInterval.h"
+#include "GRAPH/Action.h"
 #include "IO/FileUtils.h"
 
 namespace GRAPH
@@ -784,12 +784,6 @@ namespace GRAPH
             {
                 _titleRenderer->setSystemFontSize(_fontSize);
             }
-            else if (_type == FontType::TTF)
-            {
-                TTFConfig config = _titleRenderer->getTTFConfig();
-                config.fontSize = _fontSize;
-                _titleRenderer->setTTFConfig(config);
-            }
             //we can't change font size of BMFont.
             if(FontType::BMFONT != _type)
             {
@@ -818,34 +812,14 @@ namespace GRAPH
             {
                 this->createTitleRenderer();
             }
-            if(IO::FileUtils::getInstance().isFileExist(fontName))
+
+            _titleRenderer->setSystemFontName(fontName);
+            if (_type == FontType::TTF)
             {
-                std::string lowerCasedFontName = fontName;
-                std::transform(lowerCasedFontName.begin(), lowerCasedFontName.end(), lowerCasedFontName.begin(), ::tolower);
-                if (lowerCasedFontName.find(".fnt") != std::string::npos)
-                {
-                    _titleRenderer->setBMFontFilePath(fontName);
-                    _type = FontType::BMFONT;
-                }
-                else
-                {
-                    TTFConfig config = _titleRenderer->getTTFConfig();
-                    config.fontFilePath = fontName;
-                    config.fontSize = _fontSize;
-                    _titleRenderer->setTTFConfig(config);
-                    _type = FontType::TTF;
-                }
+                _titleRenderer->requestSystemFontRefresh();
             }
-            else
-            {
-                _titleRenderer->setSystemFontName(fontName);
-                if (_type == FontType::TTF)
-                {
-                    _titleRenderer->requestSystemFontRefresh();
-                }
-                _titleRenderer->setSystemFontSize(_fontSize);
-                _type = FontType::SYSTEM;
-            }
+            _titleRenderer->setSystemFontSize(_fontSize);
+            _type = FontType::SYSTEM;
             this->updateContentSize();
         }
 
@@ -862,19 +836,9 @@ namespace GRAPH
                 {
                     return _titleRenderer->getSystemFontName();
                 }
-                else if (this->_type == FontType::TTF)
-                {
-                    return  _titleRenderer->getTTFConfig().fontFilePath;
-                }
-                else
-                {
-                    return _titleRenderer->getBMFontFilePath();
-                }
             }
-            else
-            {
-                return "";
-            }
+
+            return "";
         }
 
         Widget* Button::createCloneInstance()

@@ -1,8 +1,8 @@
 #ifndef UITEXT_H
 #define UITEXT_H
 
-#include "GRAPH/UI/BASE/UIWidget.h"
-#include "GRAPH/BASE/Label.h"
+#include "GRAPH/UI/UIWidget.h"
+#include "GRAPH/UI/CONTROLS/Label.h"
 
 namespace GRAPH
 {
@@ -30,7 +30,7 @@ namespace GRAPH
             void setString(const std::string& text);
             const std::string& getString()const;
 
-            ssize_t getStringLength()const;
+            int64 getStringLength()const;
 
             void setFontSize(int size);
             int getFontSize()const;
@@ -64,7 +64,6 @@ namespace GRAPH
                               const MATH::Sizef &offset = MATH::Sizef(2,-2),
                               int blurRadius = 0);
             void enableOutline(const Color4B& outlineColor,int outlineSize = 1);
-            void enableGlow(const Color4B& glowColor);
             void disableEffect();
             void disableEffect(LabelEffect effect);
 
