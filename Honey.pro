@@ -14,8 +14,6 @@ INCLUDEPATH += $$P
 SOURCES += \
     $$P/BASE/*.cpp \
     $$P/GRAPH/*.cpp \
-    $$P/GRAPH/GFX/*.cpp \
-    $$P/GRAPH/THIN3D/*.cpp \
     $$P/GRAPH/RENDERER/*.cpp \
     $$P/GRAPH/RENDERER/SHADER/*.* \
     $$P/GRAPH/UI/*.cpp \
@@ -30,8 +28,6 @@ SOURCES += \
 HEADERS += \
     $$P/BASE/*.h \
     $$P/GRAPH/*.h \
-    $$P/GRAPH/GFX/*.h \
-    $$P/GRAPH/THIN3D/*.h \
     $$P/GRAPH/RENDERER/*.h \
     $$P/GRAPH/UI/*.h \
     $$P/GRAPH/UI/CONTROLS/*.h \
