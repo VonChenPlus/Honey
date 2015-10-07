@@ -7,8 +7,17 @@ namespace GRAPH
 {
     struct Viewport
     {
-        Viewport(float left, float bottom, float width, float height);
-        Viewport();
+        Viewport(float left, float bottom, float width, float height)
+            : _left(left)
+            , _bottom(bottom)
+            , _width(width)
+            , _height(height) {
+
+            }
+        Viewport() {
+            _left = _bottom = 0.f;
+            _width = _height = 1.0f;
+        }
 
         float _left;
         float _bottom;

@@ -47,13 +47,15 @@ namespace GRAPH
         static Director& getInstance();
 
         Director();
-
         virtual ~Director();
+
         virtual bool init();
 
         inline Camera* getCamera() { return camera_; }
         inline Scene* getRunningScene() { return runningScene_; }
+
         inline RenderView *getRenderView() { return renderView_; }
+        void setRenderView(RenderView *view);
 
         ActionManager* getActionManager() const { return actionManager_; }
         Scheduler *getScheduler() const { return scheduler_; }
@@ -61,8 +63,13 @@ namespace GRAPH
         TextureCache* getTextureCache() const { return textureCache_; }
         Renderer* getRenderer() const { return renderer_; }
 
+        void setGLDefaultValues();
+
         inline Projection getProjection() { return projection_; }
         void setProjection(Projection projection);
+
+        void setAlphaBlending(bool on);
+        void setDepthTest(bool on);
 
         void pushMatrix(MATRIX_STACK_TYPE type);
         void popMatrix(MATRIX_STACK_TYPE type);
@@ -82,6 +89,7 @@ namespace GRAPH
 
         bool checkVisibility(const MATH::Matrix4 &transform, const MATH::Sizef &size);
 
+        void mainLoop();
         void drawScene();
 
     protected:

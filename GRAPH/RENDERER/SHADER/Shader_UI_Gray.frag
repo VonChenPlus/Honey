@@ -1,4 +1,5 @@
-const char* ccPositionTexture_GrayScale_frag = STRINGIFY(
+
+const char* PositionTexture_GrayScale_frag = STRINGIFY(
 
 \n#ifdef GL_ES\n
 \nprecision mediump float;\n

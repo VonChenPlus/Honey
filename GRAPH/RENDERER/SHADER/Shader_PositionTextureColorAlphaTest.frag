@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-const char* ccPositionTextureColorAlphaTest_frag = STRINGIFY(
+const char* PositionTextureColorAlphaTest_frag = STRINGIFY(
 
 \n#ifdef GL_ES\n
 precision lowp float;

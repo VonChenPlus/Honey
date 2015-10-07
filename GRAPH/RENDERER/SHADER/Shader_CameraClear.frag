@@ -1,5 +1,5 @@
 
-const char* ccCameraClearFrag = STRINGIFY(
+const char* CameraClearFrag = STRINGIFY(
 
 \n#ifdef GL_ES\n
 varying mediump vec2 v_texCoord;

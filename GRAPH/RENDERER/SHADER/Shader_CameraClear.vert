@@ -1,5 +1,5 @@
 
-const char* ccCameraClearVert = STRINGIFY(
+const char* CameraClearVert = STRINGIFY(
                                           
 uniform float depth;
 

@@ -1,7 +1,7 @@
 #ifndef RENDERVIEW_H
 #define RENDERVIEW_H
 
-#include <vector>
+#include "BASE/HObject.h"
 #include "MATH/Size.h"
 #include "MATH/Rectangle.h"
 
@@ -37,7 +37,7 @@ namespace GRAPH
         UNKNOWN,
     };
 
-    class RenderView
+    class RenderView : public HObject
     {
     public:
         RenderView();

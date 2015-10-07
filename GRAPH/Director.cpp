@@ -9,6 +9,7 @@
 #include "GRAPH/Scene.h"
 #include "GRAPH/RENDERER/Texture2D.h"
 #include "GRAPH/RENDERER/Renderer.h"
+#include "GRAPH/RENDERER/GLStateCache.h"
 
 namespace GRAPH
 {
@@ -36,6 +37,8 @@ namespace GRAPH
         textureCache_ = new (std::nothrow) TextureCache();
         renderer_ = new (std::nothrow) Renderer;
 
+        projection_ = Projection::_2D;
+
         return true;
     }
 
@@ -44,6 +47,27 @@ namespace GRAPH
             textureCache_->waitForQuit();
             SAFE_RELEASE_NULL(textureCache_);
         }
+    }
+
+    void Director::setRenderView(RenderView *view) {
+        if (renderView_ != view) {
+            renderView_ = view;
+            renderView_->retain();
+
+            setGLDefaultValues();
+
+            renderer_->initGLView();
+
+            if (eventDispatcher_) {
+                eventDispatcher_->setEnabled(true);
+            }
+        }
+    }
+
+    void Director::setGLDefaultValues() {
+        setAlphaBlending(true);
+        setDepthTest(false);
+        setProjection(projection_);
     }
 
     void Director::setProjection(Projection projection) {
@@ -83,6 +107,19 @@ namespace GRAPH
         }
 
         projection_ = projection;
+    }
+
+    void Director::setAlphaBlending(bool on) {
+        if (on) {
+            GLStateCache::BlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        }
+        else {
+            GLStateCache::BlendFunc(GL_ONE, GL_ZERO);
+        }
+    }
+
+    void Director::setDepthTest(bool on) {
+        renderer_->setDepthTest(on);
     }
 
     void Director::initMatrixStack() {
@@ -260,6 +297,10 @@ namespace GRAPH
         return ret;
     }
 
+    void Director::mainLoop() {
+        drawScene();
+    }
+
     void Director::drawScene() {
         if (paused_) {
             scheduler_->update(0);
@@ -283,6 +324,7 @@ namespace GRAPH
     }
 
     void Director::setNextScene() {
-
     }
+
+
 }

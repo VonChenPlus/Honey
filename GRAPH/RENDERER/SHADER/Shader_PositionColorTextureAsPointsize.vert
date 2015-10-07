@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-const char* ccPositionColorTextureAsPointsize_vert = STRINGIFY(
+const char* PositionColorTextureAsPointsize_vert = STRINGIFY(
 
 attribute vec4 a_position;
 attribute vec4 a_color;

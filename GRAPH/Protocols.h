@@ -10,18 +10,6 @@ namespace GRAPH
 {
     class Texture2D;
 
-    class ApplicationProtocol
-    {
-    public:
-        virtual ~ApplicationProtocol(){
-        }
-
-        virtual void initGLContextAttrs() = 0;
-        virtual bool applicationDidFinishLaunching() = 0;
-        virtual void applicationDidEnterBackground() = 0;
-        virtual void applicationWillEnterForeground() = 0;
-    };
-
     class RGBAProtocol
     {
     public:

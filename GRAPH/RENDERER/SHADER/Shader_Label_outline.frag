@@ -1,7 +1,5 @@
-/*
- * LICENSE ???
- */
-const char* ccLabelOutline_frag = STRINGIFY(
+
+const char* LabelOutline_frag = STRINGIFY(
 \n#ifdef GL_ES\n
 precision lowp float; 
 \n#endif\n

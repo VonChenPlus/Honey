@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-const char* ccPositionTexture_frag = STRINGIFY(
+const char* PositionTexture_frag = STRINGIFY(
 
 \n#ifdef GL_ES\n
 precision lowp float;
