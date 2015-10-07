@@ -4,7 +4,7 @@
 #include "GRAPH/Node.h"
 #include "GRAPH/Component.h"
 #include "GRAPH/RENDERER/RenderCommand.h"
-#include "GRAPH/UI/BASE/UIWidget.h"
+#include "GRAPH/UI/UIWidget.h"
 
 namespace GRAPH
 {

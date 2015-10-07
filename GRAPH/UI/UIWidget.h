@@ -3,7 +3,7 @@
 
 #include "GRAPH/Protocols.h"
 #include "GRAPH/Node.h"
-#include "GRAPH/UI/BASE/UILayoutParameter.h"
+#include "GRAPH/UI/UILayoutParameter.h"
 #include "GRAPH/Event.h"
 
 namespace GRAPH

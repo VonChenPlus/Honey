@@ -23,7 +23,6 @@ SOURCES += \
     $$P/IMAGE/*.cpp \
     $$P/MATH/*.cpp \
     $$P/IO/*.cpp \
-    $$P/THREAD/*.cpp \
     $$P/UTILS/HASH/*.cpp \
     $$P/UTILS/STRING/*.cpp \
     $$P/UTILS/TIME/*.cpp
@@ -39,7 +38,6 @@ HEADERS += \
     $$P/IMAGE/*.h \
     $$P/MATH/*.h \
     $$P/IO/*.h \
-    $$P/THREAD/*.h \
     $$P/UTILS/HASH/*.h \
     $$P/UTILS/STRING/*.h \
     $$P/UTILS/TIME/*.h \
