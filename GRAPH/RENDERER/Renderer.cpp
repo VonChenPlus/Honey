@@ -373,14 +373,14 @@ namespace GRAPH
         for (size_t j = 0 ; j < renderGroups_.size(); j++) {
             renderGroups_[j].clear();
         }
+
         batchedCommands_.clear();
         batchQuadCommands_.clear();
         lastMaterialID_ = 0;
 
-        for (auto object : vboArray_) {
-            delete[] object.u2.bufferData;
-            delete[] object.u2.indexData;
-            glDeleteBuffers(2, object.u2.objectID);
+        for (auto &object : vboArray_) {
+            object.u2.bufferCount = 0;
+            object.u2.indexCount = 0;
         }
     }
 

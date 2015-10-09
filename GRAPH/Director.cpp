@@ -19,6 +19,7 @@ namespace GRAPH
     }
 
     Director::Director() {
+        init();
     }
 
     bool Director::init(void) {
@@ -26,17 +27,12 @@ namespace GRAPH
 
         initMatrixStack();
 
-        camera_ = Camera::create();
-
         scheduler_ = new (std::nothrow) Scheduler;
-
         actionManager_ = new (std::nothrow) ActionManager;
         scheduler_->scheduleUpdate(actionManager_, Scheduler::PRIORITY_SYSTEM, false);
-
         eventDispatcher_ = new (std::nothrow) EventDispatcher;
         textureCache_ = new (std::nothrow) TextureCache();
         renderer_ = new (std::nothrow) Renderer;
-
         projection_ = Projection::_2D;
 
         return true;
@@ -53,6 +49,8 @@ namespace GRAPH
         if (renderView_ != view) {
             renderView_ = view;
             renderView_->retain();
+
+            camera_ = Camera::create();
 
             setGLDefaultValues();
 

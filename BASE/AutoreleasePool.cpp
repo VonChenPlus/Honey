@@ -56,7 +56,6 @@ PoolManager::~PoolManager() {
     while (!releasePoolStack_.empty()) {
         AutoreleasePool *pool = releasePoolStack_.back();
         delete pool;
-        releasePoolStack_.pop_back();
     }
 }
 
