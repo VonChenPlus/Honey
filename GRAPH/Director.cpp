@@ -220,6 +220,27 @@ namespace GRAPH
         return renderView_->getDesignResolutionSize();
     }
 
+    float Director::getZEye(void) const {
+        return (getWinSize().height / 1.1566f);
+    }
+
+    void Director::runWithScene(Scene *scene) {
+        pushScene(scene);
+    }
+
+    void Director::pushScene(Scene *scene) {
+        scenesStack_.pushBack(scene);
+        nextScene_ = scene;
+    }
+
+    void Director::popScene(void) {
+        scenesStack_.popBack();
+        int64 size = scenesStack_.size();
+        if (size != 0) {
+            nextScene_ = scenesStack_.at(size - 1);
+        }
+    }
+
     MATH::Vector2f Director::convertToGL(const MATH::Vector2f& uiPoint) {
         MATH::Matrix4 transform;
         glToClipTransform(&transform);

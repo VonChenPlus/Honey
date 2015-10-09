@@ -23,6 +23,7 @@ namespace UTILS
         #endif
 
         long UTF8StringLength(const std::string& utf8);
+        long GetWordLen(const std::u16string& utf16Text, int startIndex, int textLen);
 
         void TrimUTF16Vector(std::vector<char16_t>& str);
 

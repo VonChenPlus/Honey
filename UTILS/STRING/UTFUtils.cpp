@@ -684,6 +684,24 @@ namespace UTILS
             return getUTF8StringLength((const UTF8*)utf8.c_str());
         }
 
+        long GetWordLen(const std::u16string& utf16Text, int startIndex, int textLen) {
+            auto character = utf16Text[startIndex];
+            if (IsCJKUnicode(character) || IsUnicodeSpace(character) || character == '\n') {
+                return 1;
+            }
+
+            int len = 1;
+            for (int index = startIndex + 1; index < textLen; ++index) {
+                character = utf16Text[index];
+                if (character == '\n' || IsUnicodeSpace(character) || IsCJKUnicode(character)) {
+                    break;
+                }
+                len++;
+            }
+
+            return len;
+        }
+
         static void TrimUTF16VectorFromIndex(std::vector<char16_t>& str, int index)
         {
             int size = static_cast<int>(str.size());

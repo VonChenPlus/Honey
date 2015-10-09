@@ -80,9 +80,11 @@ namespace GRAPH
         void resetMatrixStack();
 
         const MATH::Sizef& getWinSize() const;
-        float getZEye(void) const {
-            return (getWinSize().height / 1.1566f);
-        }
+        float getZEye(void) const;
+
+        void runWithScene(Scene *scene);
+        void pushScene(Scene *scene);
+        void popScene();
 
         MATH::Vector2f convertToGL(const MATH::Vector2f& point);
         MATH::Vector2f convertToUI(const MATH::Vector2f& point);
@@ -106,6 +108,7 @@ namespace GRAPH
 
         Scene *runningScene_;
         Scene *nextScene_;
+        HObjectVector<Scene*> scenesStack_;
 
         Projection projection_;
 
