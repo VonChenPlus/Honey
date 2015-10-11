@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <functional>
 #include "BASE/HObject.h"
+#include "BASE/HData.h"
 #include "GRAPH/Types.h"
 #include "GRAPH/RENDERER/GLCommon.h"
 #include "MATH/Vector.h"
@@ -44,6 +45,8 @@ namespace GRAPH
     public:
         static void setDefaultAlphaPixelFormat(IMAGE::PixelFormat format);
         static IMAGE::PixelFormat getDefaultAlphaPixelFormat();
+        typedef HData (*TextToTextureDataDef)(const char * text, const FontDefinition& textDefinition, TextAlign align, int &width, int &height, bool& hasPremultipliedAlpha);
+        static TextToTextureDataDef getTextureDataForText;
 
     public:
         Texture2D();

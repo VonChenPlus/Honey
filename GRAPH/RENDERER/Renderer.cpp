@@ -128,7 +128,7 @@ namespace GRAPH
             object.u2.indexCapacity = INDEX_VBO_SIZE;
         }
 
-        clearColor_ = Color4F::BLACK;
+        clearColor_ = Color4F::BLUE;
     }
 
     Renderer::~Renderer() {
@@ -143,6 +143,16 @@ namespace GRAPH
     }
 
     void Renderer::initGLView() {
+        for (int i = 0; i < VBO_SIZE / 4; i++)
+        {
+            vboArray_[1].u2.indexData[i * 6 + 0] = (GLushort) (i * 4 + 0);
+            vboArray_[1].u2.indexData[i * 6 + 1] = (GLushort) (i * 4 + 1);
+            vboArray_[1].u2.indexData[i * 6 + 2] = (GLushort) (i * 4 + 2);
+            vboArray_[1].u2.indexData[i * 6 + 3] = (GLushort) (i * 4 + 3);
+            vboArray_[1].u2.indexData[i * 6 + 4] = (GLushort) (i * 4 + 2);
+            vboArray_[1].u2.indexData[i * 6 + 5] = (GLushort) (i * 4 + 1);
+        }
+
         setupBuffer();
         glViewAssigned_ = true;
     }

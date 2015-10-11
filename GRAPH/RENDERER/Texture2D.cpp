@@ -9,6 +9,7 @@
 namespace GRAPH
 {
     static IMAGE::PixelFormat g_defaultAlphaPixelFormat = IMAGE::PixelFormat::DEFAULT;
+    Texture2D::TextToTextureDataDef Texture2D::getTextureDataForText = nullptr;
 
     Texture2D::Texture2D()
         : pixelFormat_(IMAGE::PixelFormat::DEFAULT)
@@ -291,11 +292,10 @@ namespace GRAPH
         auto textDef = textDefinition;
         textDef.shadow.shadowEnabled = false;
 
-        bool hasPremultipliedAlpha;
-        // TODO
-        throw _HException_Normal("UnImpl getTextureDataForText");
-        //HData outData = getTextureDataForText(text, textDef, align, imageWidth, imageHeight, hasPremultipliedAlpha);
-        HData outData = HData::Null;
+        bool hasPremultipliedAlpha = false;
+        if (getTextureDataForText == nullptr)
+            throw _HException_Normal("UnImpl getTextureDataForText");
+        HData outData = getTextureDataForText(text, textDef, align, imageWidth, imageHeight, hasPremultipliedAlpha);
         if(outData.isNull()) {
             return false;
         }

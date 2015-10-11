@@ -33,12 +33,18 @@ namespace GRAPH
         eventDispatcher_ = new (std::nothrow) EventDispatcher;
         textureCache_ = new (std::nothrow) TextureCache();
         renderer_ = new (std::nothrow) Renderer;
-        projection_ = Projection::_2D;
+        projection_ = Projection::_3D;
 
         return true;
     }
 
     Director::~Director(void) {
+        SAFE_DELETE(scheduler_);
+        SAFE_DELETE(actionManager_);
+        SAFE_DELETE(eventDispatcher_);
+        SAFE_DELETE(renderer_);
+        SAFE_DELETE(camera_);
+
         if (textureCache_) {
             textureCache_->waitForQuit();
             SAFE_RELEASE_NULL(textureCache_);
@@ -70,6 +76,7 @@ namespace GRAPH
 
     void Director::setProjection(Projection projection) {
         MATH::Sizef size = getWinSize();
+        setViewPort();
 
         switch (projection) {
             case Projection::_2D: {
@@ -105,6 +112,11 @@ namespace GRAPH
         }
 
         projection_ = projection;
+    }
+
+    void Director::setViewPort() {
+        auto winSize = getWinSize();
+        camera_->setViewport(Viewport(0, 0, winSize.width, winSize.height));
     }
 
     void Director::setAlphaBlending(bool on) {
@@ -343,7 +355,19 @@ namespace GRAPH
     }
 
     void Director::setNextScene() {
+        if (runningScene_) {
+            runningScene_->onExitTransitionDidStart();
+            runningScene_->onExit();
+            runningScene_->cleanup();
+            runningScene_->release();
+        }
+
+        runningScene_ = nextScene_;
+        nextScene_->retain();
+        nextScene_ = nullptr;
+        if (runningScene_) {
+            runningScene_->onEnter();
+            runningScene_->onEnterTransitionDidFinish();
+        }
     }
-
-
 }

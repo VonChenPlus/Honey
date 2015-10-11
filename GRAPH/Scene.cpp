@@ -50,17 +50,20 @@ namespace GRAPH
     }
 
     void Scene::render(Renderer* renderer) {
-        auto director = &Director::getInstance();
+        auto &director = Director::getInstance();
         const auto& transform = getNodeToParentTransform();
 
-        director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
-        director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, Director::getInstance().getCamera()->getViewProjectionMatrix());
+        director.pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+        director.loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, Director::getInstance().getCamera()->getViewProjectionMatrix());
+        
+        director.getCamera()->apply();
+        
         //visit the scene
         visit(renderer, transform, 0);
 
         renderer->render();
 
-        director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+        director.popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
     }
 
     void Scene::removeAllChildren() {
