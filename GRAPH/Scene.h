@@ -29,6 +29,9 @@ namespace GRAPH
         bool initWithSize(const MATH::Sizef& size);
 
     private:
+        Camera* defaultCamera_;
+
+    private:
         DISALLOW_COPY_AND_ASSIGN(Scene)
 
         friend class Camera;

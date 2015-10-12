@@ -5,6 +5,7 @@ namespace GRAPH
 {
     Camera* Camera::create() {
         Camera* camera = new (std::nothrow) Camera();
+        camera->retain();
         camera->initDefault();
         return camera;
     }

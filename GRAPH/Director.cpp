@@ -43,7 +43,7 @@ namespace GRAPH
         SAFE_DELETE(actionManager_);
         SAFE_DELETE(eventDispatcher_);
         SAFE_DELETE(renderer_);
-        SAFE_DELETE(camera_);
+        SAFE_RELEASE(camera_);
 
         if (textureCache_) {
             textureCache_->waitForQuit();
@@ -57,6 +57,7 @@ namespace GRAPH
             renderView_->retain();
 
             camera_ = Camera::create();
+            camera_->retain();
 
             setGLDefaultValues();
 

@@ -10,6 +10,9 @@ namespace GRAPH
     Scene::Scene() {
         _ignoreAnchorPointForPosition = true;
         setAnchorPoint(MATH::Vector2f(0.5f, 0.5f));
+        defaultCamera_ = Director::getInstance().getCamera();
+        defaultCamera_->retain();
+        addChild(defaultCamera_);
     }
 
     Scene::~Scene() {
@@ -54,9 +57,9 @@ namespace GRAPH
         const auto& transform = getNodeToParentTransform();
 
         director.pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
-        director.loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, Director::getInstance().getCamera()->getViewProjectionMatrix());
+        director.loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, defaultCamera_->getViewProjectionMatrix());
         
-        director.getCamera()->apply();
+        defaultCamera_->apply();
         
         //visit the scene
         visit(renderer, transform, 0);
@@ -67,6 +70,14 @@ namespace GRAPH
     }
 
     void Scene::removeAllChildren() {
+        if (defaultCamera_)
+            defaultCamera_->retain();
+
         Node::removeAllChildren();
+
+        if (defaultCamera_) {
+            addChild(defaultCamera_);
+            defaultCamera_->release();
+        }
     }
 }

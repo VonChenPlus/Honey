@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-
+#include "EXTERNALS/libpng17/pngpriv.h"
 #include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
 
@@ -22,7 +22,7 @@ namespace IMAGE
         }
         *pwidth = png.width;
         *pheight = png.height;
-        *pcolor = png.colormap_entries;
+        *pcolor = png.opaque->png_ptr->color_type;
 
         int stride = PNG_IMAGE_ROW_STRIDE(png);
         *datalen = PNG_IMAGE_SIZE(png);
@@ -42,7 +42,7 @@ namespace IMAGE
         }
         *pwidth = png.width;
         *pheight = png.height;
-        *pcolor = png.colormap_entries;
+        *pcolor = png.opaque->png_ptr->color_type;
 
         int stride = PNG_IMAGE_ROW_STRIDE(png);
         *datalen = PNG_IMAGE_SIZE(png);
