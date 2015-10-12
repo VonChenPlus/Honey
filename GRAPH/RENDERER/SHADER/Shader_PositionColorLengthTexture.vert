@@ -45,6 +45,6 @@ void main()
     v_color = vec4(a_color.rgb * a_color.a, a_color.a);
     v_texcoord = a_texcoord;
 
-    gl_Position = CC_MVPMatrix * a_position;
+    gl_Position = _MVPMatrix * a_position;
 }
 );

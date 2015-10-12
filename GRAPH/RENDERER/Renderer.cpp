@@ -128,7 +128,7 @@ namespace GRAPH
             object.u2.indexCapacity = INDEX_VBO_SIZE;
         }
 
-        clearColor_ = Color4F::BLUE;
+        clearColor_ = Color4F::BLACK;
     }
 
     Renderer::~Renderer() {

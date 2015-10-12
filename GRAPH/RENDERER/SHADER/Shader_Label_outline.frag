@@ -12,7 +12,7 @@ uniform vec4 u_textColor;
  
 void main()
 {
-    vec4 sample = texture2D(CC_Texture0, v_texCoord);
+    vec4 sample = texture2D(_Texture0, v_texCoord);
     float fontAlpha = sample.a; 
     float outlineAlpha = sample.r; 
     if ((fontAlpha + outlineAlpha) > 0.0){

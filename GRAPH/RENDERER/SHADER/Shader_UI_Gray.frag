@@ -10,7 +10,7 @@ const char* PositionTexture_GrayScale_frag = STRINGIFY(
 \n\n
 \nvoid main(void)\n
 \n{\n
-	\nvec4 c = texture2D(CC_Texture0, v_texCoord);\n
+	\nvec4 c = texture2D(_Texture0, v_texCoord);\n
 	\ngl_FragColor.xyz = vec3(0.2126*c.r + 0.7152*c.g + 0.0722*c.b);\n
 	\ngl_FragColor.w = c.w;\n
 \n}\n

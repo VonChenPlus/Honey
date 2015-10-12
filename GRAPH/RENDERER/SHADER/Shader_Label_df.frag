@@ -11,7 +11,7 @@ uniform vec4 u_textColor;
  
 void main() 
 {
-    vec4 color = texture2D(CC_Texture0, v_texCoord);
+    vec4 color = texture2D(_Texture0, v_texCoord);
     //the texture use dual channel 16-bit output for distance_map \n
     //float dist = color.b+color.g/256.0; \n
     // the texture use single channel 8-bit output for distance_map \n

@@ -43,20 +43,20 @@ namespace GRAPH
     const char* GLProgram::SHADER_CAMERA_CLEAR = "ShaderCameraClear";
 
     // uniform names
-    const char* GLProgram::UNIFORM_NAME_AMBIENT_COLOR = "AmbientColor";
-    const char* GLProgram::UNIFORM_NAME_P_MATRIX = "PMatrix";
-    const char* GLProgram::UNIFORM_NAME_MV_MATRIX = "MVMatrix";
-    const char* GLProgram::UNIFORM_NAME_MVP_MATRIX  = "MVPMatrix";
-    const char* GLProgram::UNIFORM_NAME_NORMAL_MATRIX = "NormalMatrix";
-    const char* GLProgram::UNIFORM_NAME_TIME = "Time";
-    const char* GLProgram::UNIFORM_NAME_SIN_TIME = "SinTime";
-    const char* GLProgram::UNIFORM_NAME_COS_TIME = "CosTime";
-    const char* GLProgram::UNIFORM_NAME_RANDOM01 = "Random01";
-    const char* GLProgram::UNIFORM_NAME_SAMPLER0 = "Texture0";
-    const char* GLProgram::UNIFORM_NAME_SAMPLER1 = "Texture1";
-    const char* GLProgram::UNIFORM_NAME_SAMPLER2 = "Texture2";
-    const char* GLProgram::UNIFORM_NAME_SAMPLER3 = "Texture3";
-    const char* GLProgram::UNIFORM_NAME_ALPHA_TEST_VALUE = "alpha_value";
+    const char* GLProgram::UNIFORM_NAME_AMBIENT_COLOR = "_AmbientColor";
+    const char* GLProgram::UNIFORM_NAME_P_MATRIX = "_PMatrix";
+    const char* GLProgram::UNIFORM_NAME_MV_MATRIX = "_MVMatrix";
+    const char* GLProgram::UNIFORM_NAME_MVP_MATRIX = "_MVPMatrix";
+    const char* GLProgram::UNIFORM_NAME_NORMAL_MATRIX = "_NormalMatrix";
+    const char* GLProgram::UNIFORM_NAME_TIME = "_Time";
+    const char* GLProgram::UNIFORM_NAME_SIN_TIME = "_SinTime";
+    const char* GLProgram::UNIFORM_NAME_COS_TIME = "_CosTime";
+    const char* GLProgram::UNIFORM_NAME_RANDOM01 = "_Random01";
+    const char* GLProgram::UNIFORM_NAME_SAMPLER0 = "_Texture0";
+    const char* GLProgram::UNIFORM_NAME_SAMPLER1 = "_Texture1";
+    const char* GLProgram::UNIFORM_NAME_SAMPLER2 = "_Texture2";
+    const char* GLProgram::UNIFORM_NAME_SAMPLER3 = "_Texture3";
+    const char* GLProgram::UNIFORM_NAME_ALPHA_TEST_VALUE = "_alpha_value";
 
     // Attribute names
     const char* GLProgram::ATTRIBUTE_NAME_COLOR = "a_color";
@@ -70,19 +70,19 @@ namespace GRAPH
     const char* GLProgram::ATTRIBUTE_NAME_BLEND_INDEX = "a_blendIndex";
 
     static const char * SHADER_UNIFORMS =
-            "uniform mat4 PMatrix;\n"
-            "uniform mat4 MVMatrix;\n"
-            "uniform mat4 MVPMatrix;\n"
-            "uniform mat3 NormalMatrix;\n"
-            "uniform vec4 Time;\n"
-            "uniform vec4 SinTime;\n"
-            "uniform vec4 CosTime;\n"
-            "uniform vec4 Random01;\n"
-            "uniform sampler2D Texture0;\n"
-            "uniform sampler2D Texture1;\n"
-            "uniform sampler2D Texture2;\n"
-            "uniform sampler2D Texture3;\n"
-            "//INCLUDES END\n\n";
+        "uniform mat4 _PMatrix;\n"
+        "uniform mat4 _MVMatrix;\n"
+        "uniform mat4 _MVPMatrix;\n"
+        "uniform mat3 _NormalMatrix;\n"
+        "uniform vec4 _Time;\n"
+        "uniform vec4 _SinTime;\n"
+        "uniform vec4 _CosTime;\n"
+        "uniform vec4 _Random01;\n"
+        "uniform sampler2D _Texture0;\n"
+        "uniform sampler2D _Texture1;\n"
+        "uniform sampler2D _Texture2;\n"
+        "uniform sampler2D _Texture3;\n"
+        "//INCLUDES END\n\n";
 
     static const std::string EMPTY_DEFINE;
 
@@ -270,7 +270,7 @@ namespace GRAPH
 
                     // Only add uniforms that are not built-in.
                     // The ones that start with '' are built-ins
-                    if(strncmp("", uniformName, 3) != 0) {
+                    if(strncmp("_", uniformName, 1) != 0) {
                         // remove possible array '[]' from uniform name
                         if(length > 3)
                         {
@@ -1195,7 +1195,7 @@ namespace GRAPH
 
     GLProgramState::GLProgramState()
         : uniformAttributeValueDirty_(true)
-        , textureUnitIndex_(4)  // first 4 textures unites are reserved for CC_Texture0-3
+        , textureUnitIndex_(4)  // first 4 textures unites are reserved for _Texture0-3
         , vertexAttribsFlags_(0)
         , glProgram_(nullptr) {
     }
