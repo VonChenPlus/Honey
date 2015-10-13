@@ -187,7 +187,7 @@ namespace GRAPH
         hasMipmaps_ = mipmapsNum > 1;
 
         // shader
-        setGLProgram(GLProgramCache::getInstance()->getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE));
+        setGLProgram(GLProgramCache::getInstance().getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE));
         return true;
     }
 

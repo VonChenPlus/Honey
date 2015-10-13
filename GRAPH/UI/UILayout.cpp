@@ -334,7 +334,7 @@ namespace GRAPH
                 MATH::Vector2f(-1, 1)
             };
 
-            auto glProgram = GLProgramCache::getInstance()->getGLProgram(GLProgram::SHADER_NAME_POSITION_U_COLOR);
+            auto glProgram = GLProgramCache::getInstance().getGLProgram(GLProgram::SHADER_NAME_POSITION_U_COLOR);
 
             int colorLocation = glProgram->getUniformLocation("u_color");
 

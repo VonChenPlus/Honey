@@ -104,7 +104,7 @@ namespace GRAPH
     }
 
     void DrawNode::onDrawGLLine(const MATH::Matrix4 &transform, uint32_t) {
-        auto glProgram = GLProgramCache::getInstance()->getGLProgram(GLProgram::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR);
+        auto glProgram = GLProgramCache::getInstance().getGLProgram(GLProgram::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR);
         glProgram->use();
         glProgram->setUniformsForBuiltins(transform);
 
@@ -130,7 +130,7 @@ namespace GRAPH
     }
 
     void DrawNode::onDrawGLPoint(const MATH::Matrix4 &transform, uint32_t) {
-        auto glProgram = GLProgramCache::getInstance()->getGLProgram(GLProgram::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE);
+        auto glProgram = GLProgramCache::getInstance().getGLProgram(GLProgram::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE);
         glProgram->use();
         glProgram->setUniformsForBuiltins(transform);
 

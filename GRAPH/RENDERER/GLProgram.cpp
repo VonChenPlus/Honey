@@ -692,28 +692,14 @@ namespace GRAPH
         kShaderType_MAX,
     };
 
-    static GLProgramCache *_sharedGLProgramCache = 0;
-
-    GLProgramCache* GLProgramCache::getInstance()
-    {
-        if (!_sharedGLProgramCache) {
-            _sharedGLProgramCache = new (std::nothrow) GLProgramCache();
-            if (!_sharedGLProgramCache->init())
-            {
-                SAFE_DELETE(_sharedGLProgramCache);
-            }
-        }
-        return _sharedGLProgramCache;
-    }
-
-    void GLProgramCache::destroyInstance()
-    {
-        SAFE_RELEASE_NULL(_sharedGLProgramCache);
+    GLProgramCache& GLProgramCache::getInstance() {
+        static GLProgramCache instance;
+        return instance;
     }
 
     GLProgramCache::GLProgramCache()
         : programs_() {
-
+        init();
     }
 
     GLProgramCache::~GLProgramCache() {
@@ -1168,7 +1154,7 @@ namespace GRAPH
     }
 
     GLProgramState* GLProgramState::getOrCreateWithGLProgramName(const std::string& glProgramName ) {
-        GLProgram *glProgram = GLProgramCache::getInstance()->getGLProgram(glProgramName);
+        GLProgram *glProgram = GLProgramCache::getInstance().getGLProgram(glProgramName);
         if( glProgram )
             return getOrCreateWithGLProgram(glProgram);
 
@@ -1181,13 +1167,12 @@ namespace GRAPH
     }
 
     GLProgramState* GLProgramState::getOrCreateWithShaders(const std::string& vertexShader, const std::string& fragShader, const std::string& compileTimeDefines) {
-        auto glprogramcache = GLProgramCache::getInstance();
         const std::string key = vertexShader + "+" + fragShader + "+" + compileTimeDefines;
-        auto glprogram = glprogramcache->getGLProgram(key);
+        auto glprogram = GLProgramCache::getInstance().getGLProgram(key);
 
         if (!glprogram) {
             glprogram = GLProgram::createWithFilenames(vertexShader, fragShader, compileTimeDefines);
-            glprogramcache->addGLProgram(glprogram, key);
+            GLProgramCache::getInstance().addGLProgram(glprogram, key);
         }
 
         return create(glprogram);

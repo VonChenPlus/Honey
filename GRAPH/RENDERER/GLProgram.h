@@ -231,8 +231,7 @@ namespace GRAPH
         GLProgramCache();
         ~GLProgramCache();
 
-        static GLProgramCache* getInstance();
-        static void destroyInstance();
+        static GLProgramCache& getInstance();
 
         void loadDefaultGLPrograms();
         void reloadDefaultGLPrograms();
