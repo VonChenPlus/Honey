@@ -3,6 +3,7 @@
 #include "GRAPH/Sprite.h"
 #include "GRAPH/EventDispatcher.h"
 #include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/Texture2D.h"

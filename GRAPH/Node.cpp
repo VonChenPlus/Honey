@@ -10,6 +10,7 @@
 #include "GRAPH/Component.h"
 #include "GRAPH/Camera.h"
 #include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/GLShaderState.h"
 
 namespace GRAPH
 {

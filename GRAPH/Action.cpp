@@ -77,7 +77,7 @@ namespace GRAPH
                      );
     }
 
-    void ActionInterval::setAmplitudeRate(float amp)
+    void ActionInterval::setAmplitudeRate(float)
     {
     }
 

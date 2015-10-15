@@ -1,6 +1,7 @@
 #include <vector>
 #include "GRAPH/DrawNode.h"
 #include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 
