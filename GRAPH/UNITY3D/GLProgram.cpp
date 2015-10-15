@@ -1,8 +1,8 @@
-#include "GRAPH/RENDERER/GLProgram.h"
+#include "GRAPH/UNITY3D/GLProgram.h"
 #include "GRAPH/Director.h"
-#include "GRAPH/RENDERER/GLStateCache.h"
-#include "GRAPH/RENDERER/Shaders.h"
-#include "GRAPH/RENDERER/Texture2D.h"
+#include "GRAPH/UNITY3D/GLStateCache.h"
+#include "GRAPH/UNITY3D/Shaders.h"
+#include "GRAPH/UNITY3D/Texture2D.h"
 #include "IO/FileUtils.h"
 #include "UTILS/RANDOM/RandomUtils.h"
 

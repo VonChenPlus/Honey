@@ -1,9 +1,9 @@
 #include <algorithm>
-#include "GRAPH/RENDERER/Renderer.h"
-#include "GRAPH/RENDERER/RenderState.h"
-#include "GRAPH/RENDERER/GLStateCache.h"
-#include "GRAPH/RENDERER/GLProgram.h"
-#include "GRAPH/RENDERER/RenderCommand.h"
+#include "GRAPH/UNITY3D/Renderer.h"
+#include "GRAPH/UNITY3D/RenderState.h"
+#include "GRAPH/UNITY3D/GLStateCache.h"
+#include "GRAPH/UNITY3D/GLProgram.h"
+#include "GRAPH/UNITY3D/RenderCommand.h"
 #include "MATH/Rectangle.h"
 
 namespace GRAPH

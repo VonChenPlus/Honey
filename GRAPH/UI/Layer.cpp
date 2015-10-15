@@ -1,9 +1,9 @@
 #include <stdarg.h>
 #include "GRAPH/UI/Layer.h"
 #include "GRAPH/Director.h"
-#include "GRAPH/RENDERER/GLProgram.h"
-#include "GRAPH/RENDERER/GLStateCache.h"
-#include "GRAPH/RENDERER/Renderer.h"
+#include "GRAPH/UNITY3D/GLProgram.h"
+#include "GRAPH/UNITY3D/GLStateCache.h"
+#include "GRAPH/UNITY3D/Renderer.h"
 
 namespace GRAPH
 {

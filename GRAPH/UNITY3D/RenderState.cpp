@@ -1,6 +1,6 @@
 #include <string>
-#include "GRAPH/RENDERER/RenderState.h"
-#include "GRAPH/RENDERER/GLStateCache.h"
+#include "GRAPH/UNITY3D/RenderState.h"
+#include "GRAPH/UNITY3D/GLStateCache.h"
 #include "UTILS/STRING/StringUtils.h"
 
 namespace GRAPH

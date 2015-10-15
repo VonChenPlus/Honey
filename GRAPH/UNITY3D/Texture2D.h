@@ -12,7 +12,7 @@
 #include "BASE/HObject.h"
 #include "BASE/HData.h"
 #include "GRAPH/Types.h"
-#include "GRAPH/RENDERER/GLCommon.h"
+#include "GRAPH/UNITY3D/GLCommon.h"
 #include "MATH/Vector.h"
 #include "MATH/Rectangle.h"
 #include "MATH/Size.h"

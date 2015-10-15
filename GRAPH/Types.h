@@ -4,7 +4,7 @@
 #include "MATH/Vector.h"
 #include "MATH/Size.h"
 #include "GRAPH/Color.h"
-#include "GRAPH/RENDERER/GLCommon.h"
+#include "GRAPH/UNITY3D/GLCommon.h"
 
 namespace GRAPH
 {

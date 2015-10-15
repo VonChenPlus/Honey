@@ -2,7 +2,7 @@
 #include "GRAPH/Fonts.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/EventDispatcher.h"
-#include "GRAPH/RENDERER/Texture2D.h"
+#include "GRAPH/UNITY3D/Texture2D.h"
 #include "IO/FileUtils.h"
 #include "UTILS/STRING/StringUtils.h"
 #include "UTILS/STRING/UTFUtils.h"

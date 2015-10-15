@@ -14,8 +14,8 @@ INCLUDEPATH += $$P
 SOURCES += \
     $$P/BASE/*.cpp \
     $$P/GRAPH/*.cpp \
-    $$P/GRAPH/RENDERER/*.cpp \
-    $$P/GRAPH/RENDERER/SHADER/*.* \
+    $$P/GRAPH/UNITY3D/*.cpp \
+    $$P/GRAPH/UNITY3D/SHADER/*.* \
     $$P/GRAPH/UI/*.cpp \
     $$P/GRAPH/UI/CONTROLS/*.cpp \
     $$P/IMAGE/*.cpp \
@@ -28,7 +28,7 @@ SOURCES += \
 HEADERS += \
     $$P/BASE/*.h \
     $$P/GRAPH/*.h \
-    $$P/GRAPH/RENDERER/*.h \
+    $$P/GRAPH/UNITY3D/*.h \
     $$P/GRAPH/UI/*.h \
     $$P/GRAPH/UI/CONTROLS/*.h \
     $$P/IMAGE/*.h \

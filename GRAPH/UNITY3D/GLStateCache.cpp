@@ -1,5 +1,5 @@
-#include "GRAPH/RENDERER/GLStateCache.h"
-#include "GRAPH/RENDERER/RenderState.h"
+#include "GRAPH/UNITY3D/GLStateCache.h"
+#include "GRAPH/UNITY3D/RenderState.h"
 
 namespace GRAPH
 {

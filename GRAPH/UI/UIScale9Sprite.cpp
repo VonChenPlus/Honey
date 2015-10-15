@@ -2,8 +2,8 @@
 #include "MATH/AffineTransform.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/SpriteFrame.h"
-#include "GRAPH/RENDERER/GLProgram.h"
-#include "GRAPH/RENDERER/Texture2D.h"
+#include "GRAPH/UNITY3D/GLProgram.h"
+#include "GRAPH/UNITY3D/Texture2D.h"
 
 namespace GRAPH
 {

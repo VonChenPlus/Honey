@@ -1,7 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "GRAPH/RENDERER/GLCommon.h"
+#include "GRAPH/UNITY3D/GLCommon.h"
 
 namespace GRAPH
 {

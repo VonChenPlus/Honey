@@ -3,7 +3,7 @@
 #include "GRAPH/EventListener.h"
 #include "GRAPH/EventDispatcher.h"
 #include "GRAPH/EventDispatcher.h"
-#include "GRAPH/RENDERER/GLProgram.h"
+#include "GRAPH/UNITY3D/GLProgram.h"
 #include "GRAPH/UI/UILayout.h"
 
 namespace GRAPH

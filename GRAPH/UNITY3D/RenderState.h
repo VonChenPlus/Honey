@@ -5,7 +5,7 @@
 #include <functional>
 #include <cstdint>
 #include "BASE/HObject.h"
-#include "GRAPH/RENDERER/GLCommon.h"
+#include "GRAPH/UNITY3D/GLCommon.h"
 #include "GRAPH/Types.h"
 
 namespace GRAPH

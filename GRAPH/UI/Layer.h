@@ -3,7 +3,7 @@
 
 #include "GRAPH/Node.h"
 #include "GRAPH/Protocols.h"
-#include "GRAPH/RENDERER/RenderCommand.h"
+#include "GRAPH/UNITY3D/RenderCommand.h"
 #include "GRAPH/Event.h"
 
 namespace GRAPH

@@ -1,9 +1,9 @@
 #include "BASE/HData.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/Scheduler.h"
-#include "GRAPH/RENDERER/Texture2D.h"
-#include "GRAPH/RENDERER/GLProgram.h"
-#include "GRAPH/RENDERER/GLStateCache.h"
+#include "GRAPH/UNITY3D/Texture2D.h"
+#include "GRAPH/UNITY3D/GLProgram.h"
+#include "GRAPH/UNITY3D/GLStateCache.h"
 #include "IO/FileUtils.h"
 
 namespace GRAPH

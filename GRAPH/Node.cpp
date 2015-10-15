@@ -9,7 +9,7 @@
 #include "GRAPH/EventDispatcher.h"
 #include "GRAPH/Component.h"
 #include "GRAPH/Camera.h"
-#include "GRAPH/RENDERER/GLProgram.h"
+#include "GRAPH/UNITY3D/GLProgram.h"
 
 namespace GRAPH
 {
