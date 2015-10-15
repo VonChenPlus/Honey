@@ -1,5 +1,5 @@
-#ifndef SHADER_H
-#define SHADER_H
+#ifndef GLSL_H
+#define GLSL_H
 
 #include "GRAPH/UNITY3D/GLCommon.h"
 
@@ -46,4 +46,4 @@ namespace GRAPH
     extern  const GLchar * CameraClearFrag;
 }
 
-#endif // SHADER_H
+#endif // GLSL_H

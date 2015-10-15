@@ -15,7 +15,7 @@ SOURCES += \
     $$P/BASE/*.cpp \
     $$P/GRAPH/*.cpp \
     $$P/GRAPH/UNITY3D/*.cpp \
-    $$P/GRAPH/UNITY3D/SHADER/*.* \
+    $$P/GRAPH/UNITY3D/GLSL/*.* \
     $$P/GRAPH/UI/*.cpp \
     $$P/GRAPH/UI/CONTROLS/*.cpp \
     $$P/IMAGE/*.cpp \
