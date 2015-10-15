@@ -2,7 +2,7 @@
 #include "GRAPH/Director.h"
 #include "GRAPH/Scheduler.h"
 #include "GRAPH/UNITY3D/Texture2D.h"
-#include "GRAPH/UNITY3D/GLProgram.h"
+#include "GRAPH/UNITY3D/GLShader.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "IO/FileUtils.h"
 
@@ -80,11 +80,11 @@ namespace GRAPH
         maxT_ = maxT;
     }
 
-    GLProgram* Texture2D::getGLProgram() const {
+    GLShader* Texture2D::getGLShader() const {
         return shaderProgram_;
     }
 
-    void Texture2D::setGLProgram(GLProgram* shaderProgram) {
+    void Texture2D::setGLShader(GLShader* shaderProgram) {
         SAFE_RETAIN(shaderProgram);
         SAFE_RELEASE(shaderProgram_);
         shaderProgram_ = shaderProgram;
@@ -187,7 +187,7 @@ namespace GRAPH
         hasMipmaps_ = mipmapsNum > 1;
 
         // shader
-        setGLProgram(GLProgramCache::getInstance().getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE));
+        setGLShader(GLShaderCache::getInstance().getGLShader(GLShader::SHADER_NAME_POSITION_TEXTURE));
         return true;
     }
 
@@ -335,8 +335,8 @@ namespace GRAPH
 
         GLStateCache::BindTexture2D( name_ );
 
-        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, vertices);
-        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, 0, coordinates);
+        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, vertices);
+        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, 0, coordinates);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
@@ -359,8 +359,8 @@ namespace GRAPH
 
         GLStateCache::BindTexture2D( name_ );
 
-        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, vertices);
-        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, 0, coordinates);
+        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, vertices);
+        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, 0, coordinates);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
@@ -1208,13 +1208,13 @@ namespace GRAPH
         GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
 
         // vertices
-        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
+        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
 
         // colors
-        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, colors));
+        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, colors));
 
         // tex coords
-        glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
+        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_.u2.objectID[1]);
 

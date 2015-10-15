@@ -20,8 +20,8 @@ namespace GRAPH
     class Scene;
     class Renderer;
     class Director;
-    class GLProgram;
-    class GLProgramState;
+    class GLShader;
+    class GLShaderState;
     class Component;
     class ComponentContainer;
     class Camera;
@@ -157,11 +157,11 @@ namespace GRAPH
         virtual const HObject* getUserObject() const { return _userObject; }
         virtual void setUserObject(HObject *userObject);
 
-        GLProgram* getGLProgram() const;
-        virtual void setGLProgram(GLProgram *glprogram);
+        GLShader* getGLShader() const;
+        virtual void setGLShader(GLShader *glShader);
 
-        GLProgramState *getGLProgramState() const;
-        virtual void setGLProgramState(GLProgramState *glProgramState);
+        GLShaderState *getGLShaderState() const;
+        virtual void setGLShaderState(GLShaderState *glShaderState);
 
         virtual bool isRunning() const;
 
@@ -363,7 +363,7 @@ namespace GRAPH
         void *_userData;
         HObject *_userObject;
 
-        GLProgramState *_glProgramState;
+        GLShaderState *_glShaderState;
 
         int _orderOfArrival;
 

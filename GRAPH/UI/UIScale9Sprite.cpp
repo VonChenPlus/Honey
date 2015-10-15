@@ -2,7 +2,7 @@
 #include "MATH/AffineTransform.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/SpriteFrame.h"
-#include "GRAPH/UNITY3D/GLProgram.h"
+#include "GRAPH/UNITY3D/GLShader.h"
 #include "GRAPH/UNITY3D/Texture2D.h"
 
 namespace GRAPH
@@ -919,17 +919,17 @@ namespace GRAPH
 
         void Scale9Sprite::setState(Scale9Sprite::State state)
         {
-            GLProgramState *glState = nullptr;
+            GLShaderState *glState = nullptr;
             switch (state)
             {
             case State::NORMAL:
             {
-                glState = GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
+                glState = GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
             }
             break;
             case State::GRAY:
             {
-                glState = GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_GRAYSCALE);
+                glState = GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_POSITION_GRAYSCALE);
             }
             default:
                 break;
@@ -937,14 +937,14 @@ namespace GRAPH
 
             if (nullptr != _scale9Image)
             {
-                _scale9Image->setGLProgramState(glState);
+                _scale9Image->setGLShaderState(glState);
             }
 
             if (_scale9Enabled)
             {
                 for (auto& sp : _protectedChildren)
                 {
-                    sp->setGLProgramState(glState);
+                    sp->setGLShaderState(glState);
                 }
             }
         }

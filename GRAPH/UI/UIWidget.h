@@ -641,8 +641,8 @@ namespace GRAPH
             void  dispatchFocusEvent(Widget* widgetLoseFocus, Widget* widgetGetFocus);
 
         protected:
-            GLProgramState* getNormalGLProgramState()const;
-            GLProgramState* getGrayGLProgramState()const;
+            GLShaderState* getNormalGLShaderState()const;
+            GLShaderState* getGrayGLShaderState()const;
 
 
             //call back function called when size changed.

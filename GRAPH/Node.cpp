@@ -9,7 +9,7 @@
 #include "GRAPH/EventDispatcher.h"
 #include "GRAPH/Component.h"
 #include "GRAPH/Camera.h"
-#include "GRAPH/UNITY3D/GLProgram.h"
+#include "GRAPH/UNITY3D/GLShader.h"
 
 namespace GRAPH
 {
@@ -117,7 +117,7 @@ namespace GRAPH
         , _hashOfName(0)
         , _userData(nullptr)
         , _userObject(nullptr)
-        , _glProgramState(nullptr)
+        , _glShaderState(nullptr)
         , _orderOfArrival(0)
         , _running(false)
         , _visible(true)
@@ -154,7 +154,7 @@ namespace GRAPH
 
     Node::~Node() {
         SAFE_RELEASE_NULL(_userObject);
-        SAFE_RELEASE_NULL(_glProgramState);
+        SAFE_RELEASE_NULL(_glShaderState);
 
         for (auto& child : _children) {
             child->_parent = nullptr;
@@ -619,34 +619,34 @@ namespace GRAPH
         _userObject = userObject;
     }
 
-    GLProgramState* Node::getGLProgramState() const
+    GLShaderState* Node::getGLShaderState() const
     {
-        return _glProgramState;
+        return _glShaderState;
     }
 
-    void Node::setGLProgramState(GLProgramState* glProgramState)
+    void Node::setGLShaderState(GLShaderState* glShaderState)
     {
-        if (glProgramState != _glProgramState)
+        if (glShaderState != _glShaderState)
         {
-            SAFE_RELEASE(_glProgramState);
-            _glProgramState = glProgramState;
-            SAFE_RETAIN(_glProgramState);
+            SAFE_RELEASE(_glShaderState);
+            _glShaderState = glShaderState;
+            SAFE_RETAIN(_glShaderState);
         }
     }
 
-    void Node::setGLProgram(GLProgram* glProgram)
+    void Node::setGLShader(GLShader* glShader)
     {
-        if (_glProgramState == nullptr || (_glProgramState && _glProgramState->getGLProgram() != glProgram))
+        if (_glShaderState == nullptr || (_glShaderState && _glShaderState->getGLShader() != glShader))
         {
-            SAFE_RELEASE(_glProgramState);
-            _glProgramState = GLProgramState::getOrCreateWithGLProgram(glProgram);
-            _glProgramState->retain();
+            SAFE_RELEASE(_glShaderState);
+            _glShaderState = GLShaderState::getOrCreateWithGLShader(glShader);
+            _glShaderState->retain();
         }
     }
 
-    GLProgram * Node::getGLProgram() const
+    GLShader * Node::getGLShader() const
     {
-        return _glProgramState ? _glProgramState->getGLProgram() : nullptr;
+        return _glShaderState ? _glShaderState->getGLShader() : nullptr;
     }
 
     MATH::Rectf Node::getBoundingBox() const

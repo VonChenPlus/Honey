@@ -3,7 +3,7 @@
 #include "GRAPH/SpriteFrame.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/UNITY3D/Texture2D.h"
-#include "GRAPH/UNITY3D/GLProgram.h"
+#include "GRAPH/UNITY3D/GLShader.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 
 namespace GRAPH
@@ -241,7 +241,7 @@ namespace GRAPH
             quad_.tl.colors = Color4B::WHITE;
             quad_.tr.colors = Color4B::WHITE;
             // shader state
-            setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
+            setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
             // update texture (calls updateBlendFunc)
             setTexture(texture);
             setTextureRect(rect, rotated, rect.size);
@@ -525,7 +525,7 @@ namespace GRAPH
     }
 
     void Sprite::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags) {
-        trianglesCommand_.init(_globalZOrder, texture_->getName(), getGLProgramState(), blendFunc_, polyInfo_.triangles, transform, flags);
+        trianglesCommand_.init(_globalZOrder, texture_->getName(), getGLShaderState(), blendFunc_, polyInfo_.triangles, transform, flags);
         renderer->addCommand(&trianglesCommand_);
     }
 
@@ -835,7 +835,7 @@ namespace GRAPH
 
         descendants_.reserve(capacity);
 
-        setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR));
+        setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR));
         return true;
     }
 
@@ -1034,7 +1034,7 @@ namespace GRAPH
             child->updateTransform();
         }
 
-        batchCommand_.init(_globalZOrder, getGLProgram(), blendFunc_, textureAtlas_, transform, flags);
+        batchCommand_.init(_globalZOrder, getGLShader(), blendFunc_, textureAtlas_, transform, flags);
         renderer->addCommand(&batchCommand_);
     }
 

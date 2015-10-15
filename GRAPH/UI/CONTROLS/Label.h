@@ -134,7 +134,7 @@ namespace GRAPH
         void computeStringNumLines();
 
         void onDraw(const MATH::Matrix4& transform, bool transformUpdated);
-        void onDrawShadow(GLProgram* glProgram);
+        void onDrawShadow(GLShader* glShader);
         void drawSelf(Renderer* renderer, uint32_t flags);
 
         bool multilineTextWrapByChar();

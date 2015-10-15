@@ -20,7 +20,7 @@
 
 namespace GRAPH
 {
-    class GLProgram;
+    class GLShader;
 
     struct MipmapInfo
     {
@@ -95,8 +95,8 @@ namespace GRAPH
 
         MATH::Sizef getContentSize() const;
 
-        void setGLProgram(GLProgram* program);
-        GLProgram* getGLProgram() const;
+        void setGLShader(GLShader* program);
+        GLShader* getGLShader() const;
 
     protected:
         IMAGE::PixelFormat pixelFormat_;
@@ -108,7 +108,7 @@ namespace GRAPH
         MATH::Sizef contentSize_;
         bool hasPremultipliedAlpha_;
         bool hasMipmaps_;
-        GLProgram* shaderProgram_;
+        GLShader* shaderProgram_;
         bool antialiasEnabled_;
     };
 

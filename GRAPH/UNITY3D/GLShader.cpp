@@ -1,4 +1,4 @@
-#include "GRAPH/UNITY3D/GLProgram.h"
+#include "GRAPH/UNITY3D/GLShader.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Shaders.h"
@@ -22,52 +22,52 @@ namespace GRAPH
         }
     }
 
-    const char* GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR = "ShaderPositionTextureColor";
-    const char* GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP = "ShaderPositionTextureColor_noMVP";
-    const char* GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST = "ShaderPositionTextureColorAlphaTest";
-    const char* GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV = "ShaderPositionTextureColorAlphaTest_NoMV";
-    const char* GLProgram::SHADER_NAME_POSITION_COLOR = "ShaderPositionColor";
-    const char* GLProgram::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE = "ShaderPositionColorTexAsPointsize";
-    const char* GLProgram::SHADER_NAME_POSITION_COLOR_NO_MVP = "ShaderPositionColor_noMVP";
+    const char* GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR = "ShaderPositionTextureColor";
+    const char* GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP = "ShaderPositionTextureColor_noMVP";
+    const char* GLShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST = "ShaderPositionTextureColorAlphaTest";
+    const char* GLShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV = "ShaderPositionTextureColorAlphaTest_NoMV";
+    const char* GLShader::SHADER_NAME_POSITION_COLOR = "ShaderPositionColor";
+    const char* GLShader::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE = "ShaderPositionColorTexAsPointsize";
+    const char* GLShader::SHADER_NAME_POSITION_COLOR_NO_MVP = "ShaderPositionColor_noMVP";
 
-    const char* GLProgram::SHADER_NAME_POSITION_TEXTURE = "ShaderPositionTexture";
-    const char* GLProgram::SHADER_NAME_POSITION_TEXTURE_U_COLOR = "ShaderPositionTexture_uColor";
-    const char* GLProgram::SHADER_NAME_POSITION_TEXTURE_A8_COLOR = "ShaderPositionTextureA8Color";
-    const char* GLProgram::SHADER_NAME_POSITION_U_COLOR = "ShaderPosition_uColor";
-    const char* GLProgram::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR = "ShaderPositionLengthTextureColor";
-    const char* GLProgram::SHADER_NAME_POSITION_GRAYSCALE = "ShaderUIGrayScale";
-    const char* GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL = "ShaderLabelDFNormal";
-    const char* GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW = "ShaderLabelDFGlow";
-    const char* GLProgram::SHADER_NAME_LABEL_NORMAL = "ShaderLabelNormal";
-    const char* GLProgram::SHADER_NAME_LABEL_OUTLINE = "ShaderLabelOutline";
-    const char* GLProgram::SHADER_CAMERA_CLEAR = "ShaderCameraClear";
+    const char* GLShader::SHADER_NAME_POSITION_TEXTURE = "ShaderPositionTexture";
+    const char* GLShader::SHADER_NAME_POSITION_TEXTURE_U_COLOR = "ShaderPositionTexture_uColor";
+    const char* GLShader::SHADER_NAME_POSITION_TEXTURE_A8_COLOR = "ShaderPositionTextureA8Color";
+    const char* GLShader::SHADER_NAME_POSITION_U_COLOR = "ShaderPosition_uColor";
+    const char* GLShader::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR = "ShaderPositionLengthTextureColor";
+    const char* GLShader::SHADER_NAME_POSITION_GRAYSCALE = "ShaderUIGrayScale";
+    const char* GLShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL = "ShaderLabelDFNormal";
+    const char* GLShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW = "ShaderLabelDFGlow";
+    const char* GLShader::SHADER_NAME_LABEL_NORMAL = "ShaderLabelNormal";
+    const char* GLShader::SHADER_NAME_LABEL_OUTLINE = "ShaderLabelOutline";
+    const char* GLShader::SHADER_CAMERA_CLEAR = "ShaderCameraClear";
 
     // uniform names
-    const char* GLProgram::UNIFORM_NAME_AMBIENT_COLOR = "_AmbientColor";
-    const char* GLProgram::UNIFORM_NAME_P_MATRIX = "_PMatrix";
-    const char* GLProgram::UNIFORM_NAME_MV_MATRIX = "_MVMatrix";
-    const char* GLProgram::UNIFORM_NAME_MVP_MATRIX = "_MVPMatrix";
-    const char* GLProgram::UNIFORM_NAME_NORMAL_MATRIX = "_NormalMatrix";
-    const char* GLProgram::UNIFORM_NAME_TIME = "_Time";
-    const char* GLProgram::UNIFORM_NAME_SIN_TIME = "_SinTime";
-    const char* GLProgram::UNIFORM_NAME_COS_TIME = "_CosTime";
-    const char* GLProgram::UNIFORM_NAME_RANDOM01 = "_Random01";
-    const char* GLProgram::UNIFORM_NAME_SAMPLER0 = "_Texture0";
-    const char* GLProgram::UNIFORM_NAME_SAMPLER1 = "_Texture1";
-    const char* GLProgram::UNIFORM_NAME_SAMPLER2 = "_Texture2";
-    const char* GLProgram::UNIFORM_NAME_SAMPLER3 = "_Texture3";
-    const char* GLProgram::UNIFORM_NAME_ALPHA_TEST_VALUE = "_alpha_value";
+    const char* GLShader::UNIFORM_NAME_AMBIENT_COLOR = "_AmbientColor";
+    const char* GLShader::UNIFORM_NAME_P_MATRIX = "_PMatrix";
+    const char* GLShader::UNIFORM_NAME_MV_MATRIX = "_MVMatrix";
+    const char* GLShader::UNIFORM_NAME_MVP_MATRIX = "_MVPMatrix";
+    const char* GLShader::UNIFORM_NAME_NORMAL_MATRIX = "_NormalMatrix";
+    const char* GLShader::UNIFORM_NAME_TIME = "_Time";
+    const char* GLShader::UNIFORM_NAME_SIN_TIME = "_SinTime";
+    const char* GLShader::UNIFORM_NAME_COS_TIME = "_CosTime";
+    const char* GLShader::UNIFORM_NAME_RANDOM01 = "_Random01";
+    const char* GLShader::UNIFORM_NAME_SAMPLER0 = "_Texture0";
+    const char* GLShader::UNIFORM_NAME_SAMPLER1 = "_Texture1";
+    const char* GLShader::UNIFORM_NAME_SAMPLER2 = "_Texture2";
+    const char* GLShader::UNIFORM_NAME_SAMPLER3 = "_Texture3";
+    const char* GLShader::UNIFORM_NAME_ALPHA_TEST_VALUE = "_alpha_value";
 
     // Attribute names
-    const char* GLProgram::ATTRIBUTE_NAME_COLOR = "a_color";
-    const char* GLProgram::ATTRIBUTE_NAME_POSITION = "a_position";
-    const char* GLProgram::ATTRIBUTE_NAME_TEX_COORD = "a_texCoord";
-    const char* GLProgram::ATTRIBUTE_NAME_TEX_COORD1 = "a_texCoord1";
-    const char* GLProgram::ATTRIBUTE_NAME_TEX_COORD2 = "a_texCoord2";
-    const char* GLProgram::ATTRIBUTE_NAME_TEX_COORD3 = "a_texCoord3";
-    const char* GLProgram::ATTRIBUTE_NAME_NORMAL = "a_normal";
-    const char* GLProgram::ATTRIBUTE_NAME_BLEND_WEIGHT = "a_blendWeight";
-    const char* GLProgram::ATTRIBUTE_NAME_BLEND_INDEX = "a_blendIndex";
+    const char* GLShader::ATTRIBUTE_NAME_COLOR = "a_color";
+    const char* GLShader::ATTRIBUTE_NAME_POSITION = "a_position";
+    const char* GLShader::ATTRIBUTE_NAME_TEX_COORD = "a_texCoord";
+    const char* GLShader::ATTRIBUTE_NAME_TEX_COORD1 = "a_texCoord1";
+    const char* GLShader::ATTRIBUTE_NAME_TEX_COORD2 = "a_texCoord2";
+    const char* GLShader::ATTRIBUTE_NAME_TEX_COORD3 = "a_texCoord3";
+    const char* GLShader::ATTRIBUTE_NAME_NORMAL = "a_normal";
+    const char* GLShader::ATTRIBUTE_NAME_BLEND_WEIGHT = "a_blendWeight";
+    const char* GLShader::ATTRIBUTE_NAME_BLEND_INDEX = "a_blendIndex";
 
     static const char * SHADER_UNIFORMS =
         "uniform mat4 _PMatrix;\n"
@@ -86,12 +86,12 @@ namespace GRAPH
 
     static const std::string EMPTY_DEFINE;
 
-    GLProgram* GLProgram::createWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray) {
+    GLShader* GLShader::createWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray) {
         return createWithByteArrays(vShaderByteArray, fShaderByteArray, EMPTY_DEFINE);
     }
 
-    GLProgram* GLProgram::createWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray, const std::string& compileTimeDefines) {
-        auto ret = new (std::nothrow) GLProgram();
+    GLShader* GLShader::createWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray, const std::string& compileTimeDefines) {
+        auto ret = new (std::nothrow) GLShader();
         if(ret && ret->initWithByteArrays(vShaderByteArray, fShaderByteArray, compileTimeDefines)) {
             ret->link();
             ret->updateUniforms();
@@ -104,12 +104,12 @@ namespace GRAPH
     }
 
 
-    GLProgram* GLProgram::createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename) {
+    GLShader* GLShader::createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename) {
         return createWithFilenames(vShaderFilename, fShaderFilename, EMPTY_DEFINE);
     }
 
-    GLProgram* GLProgram::createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines) {
-        auto ret = new (std::nothrow) GLProgram();
+    GLShader* GLShader::createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines) {
+        auto ret = new (std::nothrow) GLShader();
         if(ret && ret->initWithFilenames(vShaderFilename, fShaderFilename, compileTimeDefines)) {
             ret->link();
             ret->updateUniforms();
@@ -122,7 +122,7 @@ namespace GRAPH
     }
 
 
-    GLProgram::GLProgram()
+    GLShader::GLShader()
         : program_(0)
         , vertShader_(0)
         , fragShader_(0)
@@ -130,7 +130,7 @@ namespace GRAPH
         memset(builtInUniforms_, 0, sizeof(builtInUniforms_));
     }
 
-    GLProgram::~GLProgram() {
+    GLShader::~GLShader() {
         if (vertShader_) {
             glDeleteShader(vertShader_);
         }
@@ -151,11 +151,11 @@ namespace GRAPH
         hashForUniforms_.clear();
     }
 
-    bool GLProgram::initWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray) {
+    bool GLShader::initWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray) {
         return initWithByteArrays(vShaderByteArray, fShaderByteArray, EMPTY_DEFINE);
     }
 
-    bool GLProgram::initWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray, const std::string& compileTimeDefines) {
+    bool GLShader::initWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray, const std::string& compileTimeDefines) {
         program_ = glCreateProgram();
 
         std::string replacedDefines = "";
@@ -188,30 +188,30 @@ namespace GRAPH
         return true;
     }
 
-    bool GLProgram::initWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename) {
+    bool GLShader::initWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename) {
         return initWithFilenames(vShaderFilename, fShaderFilename, EMPTY_DEFINE);
     }
 
-    bool GLProgram::initWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines) {
+    bool GLShader::initWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines) {
         std::string vertexSource = IO::FileUtils::getInstance().getStringFromFile(IO::FileUtils::getInstance().fullPathForFilename(vShaderFilename));
         std::string fragmentSource = IO::FileUtils::getInstance().getStringFromFile(IO::FileUtils::getInstance().fullPathForFilename(fShaderFilename));
 
         return initWithByteArrays(vertexSource.c_str(), fragmentSource.c_str(), compileTimeDefines);
     }
 
-    void GLProgram::bindPredefinedVertexAttribs() {
+    void GLShader::bindPredefinedVertexAttribs() {
         static const struct {
             const char *attributeName;
             int location;
         } attribute_locations[] =
         {
-            {GLProgram::ATTRIBUTE_NAME_POSITION, GLProgram::VERTEX_ATTRIB_POSITION},
-            {GLProgram::ATTRIBUTE_NAME_COLOR, GLProgram::VERTEX_ATTRIB_COLOR},
-            {GLProgram::ATTRIBUTE_NAME_TEX_COORD, GLProgram::VERTEX_ATTRIB_TEX_COORD},
-            {GLProgram::ATTRIBUTE_NAME_TEX_COORD1, GLProgram::VERTEX_ATTRIB_TEX_COORD1},
-            {GLProgram::ATTRIBUTE_NAME_TEX_COORD2, GLProgram::VERTEX_ATTRIB_TEX_COORD2},
-            {GLProgram::ATTRIBUTE_NAME_TEX_COORD3, GLProgram::VERTEX_ATTRIB_TEX_COORD3},
-            {GLProgram::ATTRIBUTE_NAME_NORMAL, GLProgram::VERTEX_ATTRIB_NORMAL},
+            {GLShader::ATTRIBUTE_NAME_POSITION, GLShader::VERTEX_ATTRIB_POSITION},
+            {GLShader::ATTRIBUTE_NAME_COLOR, GLShader::VERTEX_ATTRIB_COLOR},
+            {GLShader::ATTRIBUTE_NAME_TEX_COORD, GLShader::VERTEX_ATTRIB_TEX_COORD},
+            {GLShader::ATTRIBUTE_NAME_TEX_COORD1, GLShader::VERTEX_ATTRIB_TEX_COORD1},
+            {GLShader::ATTRIBUTE_NAME_TEX_COORD2, GLShader::VERTEX_ATTRIB_TEX_COORD2},
+            {GLShader::ATTRIBUTE_NAME_TEX_COORD3, GLShader::VERTEX_ATTRIB_TEX_COORD3},
+            {GLShader::ATTRIBUTE_NAME_NORMAL, GLShader::VERTEX_ATTRIB_NORMAL},
         };
 
         const int size = sizeof(attribute_locations) / sizeof(attribute_locations[0]);
@@ -221,7 +221,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::parseVertexAttribs() {
+    void GLShader::parseVertexAttribs() {
         // Query and store vertex attribute meta-data from the program.
         GLint activeAttributes;
         GLint length;
@@ -251,7 +251,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::parseUniforms() {
+    void GLShader::parseUniforms() {
         // Query and store uniforms from the program.
         GLint activeUniforms;
         glGetProgramiv(program_, GL_ACTIVE_UNIFORMS, &activeUniforms);
@@ -294,25 +294,25 @@ namespace GRAPH
 
     }
 
-    Uniform* GLProgram::getUniform(const std::string &name) {
+    Uniform* GLShader::getUniform(const std::string &name) {
         const auto itr = userUniforms_.find(name);
         if( itr != userUniforms_.end())
             return &itr->second;
         return nullptr;
     }
 
-    VertexAttrib* GLProgram::getVertexAttrib(const std::string &name) {
+    VertexAttrib* GLShader::getVertexAttrib(const std::string &name) {
         const auto itr = vertexAttribs_.find(name);
         if( itr != vertexAttribs_.end())
             return &itr->second;
         return nullptr;
     }
 
-    bool GLProgram::compileShader(GLuint * shader, GLenum type, const GLchar* source) {
+    bool GLShader::compileShader(GLuint * shader, GLenum type, const GLchar* source) {
         return compileShader(shader, type, source, "");
     }
 
-    bool GLProgram::compileShader(GLuint* shader, GLenum type, const GLchar* source, const std::string& convertedDefines) {
+    bool GLShader::compileShader(GLuint* shader, GLenum type, const GLchar* source, const std::string& convertedDefines) {
         GLint status;
 
         if (!source) {
@@ -344,19 +344,19 @@ namespace GRAPH
         return (status == GL_TRUE);
     }
 
-    GLint GLProgram::getAttribLocation(const std::string &attributeName) const {
+    GLint GLShader::getAttribLocation(const std::string &attributeName) const {
         return glGetAttribLocation(program_, attributeName.c_str());
     }
 
-    GLint GLProgram::getUniformLocation(const std::string &attributeName) const {
+    GLint GLShader::getUniformLocation(const std::string &attributeName) const {
         return glGetUniformLocation(program_, attributeName.c_str());
     }
 
-    void GLProgram::bindAttribLocation(const std::string &attributeName, GLuint index) const {
+    void GLShader::bindAttribLocation(const std::string &attributeName, GLuint index) const {
         glBindAttribLocation(program_, index, attributeName.c_str());
     }
 
-    void GLProgram::updateUniforms() {
+    void GLShader::updateUniforms() {
         builtInUniforms_[UNIFORM_AMBIENT_COLOR] = glGetUniformLocation(program_, UNIFORM_NAME_AMBIENT_COLOR);
         builtInUniforms_[UNIFORM_P_MATRIX] = glGetUniformLocation(program_, UNIFORM_NAME_P_MATRIX);
         builtInUniforms_[UNIFORM_MV_MATRIX] = glGetUniformLocation(program_, UNIFORM_NAME_MV_MATRIX);
@@ -398,7 +398,7 @@ namespace GRAPH
             setUniformLocationWith1i(builtInUniforms_[UNIFORM_SAMPLER3], 3);
     }
 
-    bool GLProgram::link() {
+    bool GLShader::link() {
         GLint status = GL_TRUE;
 
         bindPredefinedVertexAttribs();
@@ -421,12 +421,12 @@ namespace GRAPH
         return (status == GL_TRUE);
     }
 
-    void GLProgram::use() {
+    void GLShader::use() {
         GLStateCache::UseProgram(program_);
     }
 
     // Uniform cache
-    bool GLProgram::updateUniformLocation(GLint location, const GLvoid* data, unsigned int bytes) {
+    bool GLShader::updateUniformLocation(GLint location, const GLvoid* data, unsigned int bytes) {
         if (location < 0) {
             return false;
         }
@@ -457,11 +457,11 @@ namespace GRAPH
         return updated;
     }
 
-    GLint GLProgram::getUniformLocationForName(const char* name) const {
+    GLint GLShader::getUniformLocationForName(const char* name) const {
         return glGetUniformLocation(program_, name);
     }
 
-    void GLProgram::setUniformLocationWith1i(GLint location, GLint i1) {
+    void GLShader::setUniformLocationWith1i(GLint location, GLint i1) {
         bool updated = updateUniformLocation(location, &i1, sizeof(i1)*1);
 
         if (updated)
@@ -470,7 +470,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWith2i(GLint location, GLint i1, GLint i2) {
+    void GLShader::setUniformLocationWith2i(GLint location, GLint i1, GLint i2) {
         GLint ints[2] = {i1,i2};
         bool updated = updateUniformLocation(location, ints, sizeof(ints));
 
@@ -479,7 +479,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWith3i(GLint location, GLint i1, GLint i2, GLint i3) {
+    void GLShader::setUniformLocationWith3i(GLint location, GLint i1, GLint i2, GLint i3) {
         GLint ints[3] = {i1,i2,i3};
         bool updated = updateUniformLocation(location, ints, sizeof(ints));
 
@@ -488,7 +488,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWith4i(GLint location, GLint i1, GLint i2, GLint i3, GLint i4) {
+    void GLShader::setUniformLocationWith4i(GLint location, GLint i1, GLint i2, GLint i3, GLint i4) {
         GLint ints[4] = {i1,i2,i3,i4};
         bool updated = updateUniformLocation(location, ints, sizeof(ints));
 
@@ -497,7 +497,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWith2iv(GLint location, GLint* ints, unsigned int numberOfArrays) {
+    void GLShader::setUniformLocationWith2iv(GLint location, GLint* ints, unsigned int numberOfArrays) {
         bool updated = updateUniformLocation(location, ints, sizeof(int)*2*numberOfArrays);
 
         if (updated) {
@@ -505,7 +505,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWith3iv(GLint location, GLint* ints, unsigned int numberOfArrays) {
+    void GLShader::setUniformLocationWith3iv(GLint location, GLint* ints, unsigned int numberOfArrays) {
         bool updated = updateUniformLocation(location, ints, sizeof(int)*3*numberOfArrays);
 
         if (updated) {
@@ -513,7 +513,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWith4iv(GLint location, GLint* ints, unsigned int numberOfArrays) {
+    void GLShader::setUniformLocationWith4iv(GLint location, GLint* ints, unsigned int numberOfArrays) {
         bool updated = updateUniformLocation(location, ints, sizeof(int)*4*numberOfArrays);
 
         if (updated) {
@@ -521,7 +521,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWith1f(GLint location, GLfloat f1) {
+    void GLShader::setUniformLocationWith1f(GLint location, GLfloat f1) {
         bool updated = updateUniformLocation(location, &f1, sizeof(f1)*1);
 
         if (updated) {
@@ -529,7 +529,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWith2f(GLint location, GLfloat f1, GLfloat f2) {
+    void GLShader::setUniformLocationWith2f(GLint location, GLfloat f1, GLfloat f2) {
         GLfloat floats[2] = {f1,f2};
         bool updated =  updateUniformLocation(location, floats, sizeof(floats));
 
@@ -538,7 +538,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWith3f(GLint location, GLfloat f1, GLfloat f2, GLfloat f3) {
+    void GLShader::setUniformLocationWith3f(GLint location, GLfloat f1, GLfloat f2, GLfloat f3) {
         GLfloat floats[3] = {f1,f2,f3};
         bool updated = updateUniformLocation(location, floats, sizeof(floats));
 
@@ -547,7 +547,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWith4f(GLint location, GLfloat f1, GLfloat f2, GLfloat f3, GLfloat f4) {
+    void GLShader::setUniformLocationWith4f(GLint location, GLfloat f1, GLfloat f2, GLfloat f3, GLfloat f4) {
         GLfloat floats[4] = {f1,f2,f3,f4};
         bool updated = updateUniformLocation(location, floats, sizeof(floats));
 
@@ -557,7 +557,7 @@ namespace GRAPH
     }
 
 
-    void GLProgram::setUniformLocationWith1fv( GLint location, const GLfloat* floats, unsigned int numberOfArrays ) {
+    void GLShader::setUniformLocationWith1fv( GLint location, const GLfloat* floats, unsigned int numberOfArrays ) {
         bool updated = updateUniformLocation(location, floats, sizeof(float)*numberOfArrays);
 
         if (updated) {
@@ -565,7 +565,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWith2fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays) {
+    void GLShader::setUniformLocationWith2fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays) {
         bool updated = updateUniformLocation(location, floats, sizeof(float)*2*numberOfArrays);
 
         if (updated) {
@@ -573,7 +573,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWith3fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays) {
+    void GLShader::setUniformLocationWith3fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays) {
         bool updated = updateUniformLocation(location, floats, sizeof(float)*3*numberOfArrays);
 
         if (updated) {
@@ -581,7 +581,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWith4fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays) {
+    void GLShader::setUniformLocationWith4fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays) {
         bool updated = updateUniformLocation(location, floats, sizeof(float)*4*numberOfArrays);
 
         if (updated) {
@@ -589,7 +589,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWithMatrix2fv(GLint location, const GLfloat* matrixArray, unsigned int numberOfMatrices) {
+    void GLShader::setUniformLocationWithMatrix2fv(GLint location, const GLfloat* matrixArray, unsigned int numberOfMatrices) {
         bool updated = updateUniformLocation(location, matrixArray, sizeof(float)*4*numberOfMatrices);
 
         if (updated) {
@@ -597,7 +597,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformLocationWithMatrix3fv(GLint location, const GLfloat* matrixArray, unsigned int numberOfMatrices) {
+    void GLShader::setUniformLocationWithMatrix3fv(GLint location, const GLfloat* matrixArray, unsigned int numberOfMatrices) {
         bool updated = updateUniformLocation(location, matrixArray, sizeof(float)*9*numberOfMatrices);
 
         if (updated) {
@@ -606,7 +606,7 @@ namespace GRAPH
     }
 
 
-    void GLProgram::setUniformLocationWithMatrix4fv(GLint location, const GLfloat* matrixArray, unsigned int numberOfMatrices) {
+    void GLShader::setUniformLocationWithMatrix4fv(GLint location, const GLfloat* matrixArray, unsigned int numberOfMatrices) {
         bool updated = updateUniformLocation(location, matrixArray, sizeof(float)*16*numberOfMatrices);
 
         if (updated) {
@@ -614,11 +614,11 @@ namespace GRAPH
         }
     }
 
-    void GLProgram::setUniformsForBuiltins() {
+    void GLShader::setUniformsForBuiltins() {
         setUniformsForBuiltins(Director::getInstance().getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW));
     }
 
-    void GLProgram::setUniformsForBuiltins(const MATH::Matrix4 &matrixMV) {
+    void GLShader::setUniformsForBuiltins(const MATH::Matrix4 &matrixMV) {
         auto& matrixP = Director::getInstance().getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
 
         if (uniformsFlags_.usesP)
@@ -645,18 +645,18 @@ namespace GRAPH
         }
 
         if (uniformsFlags_.usesTime) {
-            throw _HException_Normal("Unsupport GlProgram the most accurate global time value.");
+            throw _HException_Normal("Unsupport GLShader the most accurate global time value.");
             float time = 0.0f;
-            setUniformLocationWith4f(builtInUniforms_[GLProgram::UNIFORM_TIME], time/10.0, time, time*2, time*4);
-            setUniformLocationWith4f(builtInUniforms_[GLProgram::UNIFORM_SIN_TIME], time/8.0, time/4.0, time/2.0, sinf(time));
-            setUniformLocationWith4f(builtInUniforms_[GLProgram::UNIFORM_COS_TIME], time/8.0, time/4.0, time/2.0, cosf(time));
+            setUniformLocationWith4f(builtInUniforms_[GLShader::UNIFORM_TIME], time/10.0, time, time*2, time*4);
+            setUniformLocationWith4f(builtInUniforms_[GLShader::UNIFORM_SIN_TIME], time/8.0, time/4.0, time/2.0, sinf(time));
+            setUniformLocationWith4f(builtInUniforms_[GLShader::UNIFORM_COS_TIME], time/8.0, time/4.0, time/2.0, cosf(time));
         }
 
         if (uniformsFlags_.usesRandom)
-            setUniformLocationWith4f(builtInUniforms_[GLProgram::UNIFORM_RANDOM01], UTILS::RANDOM::RANDOM_0_1(), UTILS::RANDOM::RANDOM_0_1(), UTILS::RANDOM::RANDOM_0_1(), UTILS::RANDOM::RANDOM_0_1());
+            setUniformLocationWith4f(builtInUniforms_[GLShader::UNIFORM_RANDOM01], UTILS::RANDOM::RANDOM_0_1(), UTILS::RANDOM::RANDOM_0_1(), UTILS::RANDOM::RANDOM_0_1(), UTILS::RANDOM::RANDOM_0_1());
     }
 
-    void GLProgram::reset() {
+    void GLShader::reset() {
         vertShader_ = fragShader_ = 0;
         memset(builtInUniforms_, 0, sizeof(builtInUniforms_));
 
@@ -692,167 +692,167 @@ namespace GRAPH
         kShaderType_MAX,
     };
 
-    GLProgramCache& GLProgramCache::getInstance() {
-        static GLProgramCache instance;
+    GLShaderCache& GLShaderCache::getInstance() {
+        static GLShaderCache instance;
         return instance;
     }
 
-    GLProgramCache::GLProgramCache()
+    GLShaderCache::GLShaderCache()
         : programs_() {
         init();
     }
 
-    GLProgramCache::~GLProgramCache() {
+    GLShaderCache::~GLShaderCache() {
         for( auto it = programs_.begin(); it != programs_.end(); ++it ) {
             (it->second)->release();
         }
     }
 
-    bool GLProgramCache::init() {
-        loadDefaultGLPrograms();
+    bool GLShaderCache::init() {
+        loadDefaultGLShaders();
         return true;
     }
 
-    void GLProgramCache::loadDefaultGLPrograms() {
-        GLProgram *p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_PositionTextureColor);
-        programs_.insert( std::make_pair( GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR, p ) );
+    void GLShaderCache::loadDefaultGLShaders() {
+        GLShader *p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_PositionTextureColor);
+        programs_.insert( std::make_pair( GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR, p ) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_PositionTextureColor_noMVP);
-        programs_.insert( std::make_pair( GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, p ) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_PositionTextureColor_noMVP);
+        programs_.insert( std::make_pair( GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, p ) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_PositionTextureColorAlphaTest);
-        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_PositionTextureColorAlphaTest);
+        programs_.insert( std::make_pair(GLShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST, p) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_PositionTextureColorAlphaTestNoMV);
-        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_PositionTextureColorAlphaTestNoMV);
+        programs_.insert( std::make_pair(GLShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV, p) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_PositionColor);
-        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_COLOR, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_PositionColor);
+        programs_.insert( std::make_pair(GLShader::SHADER_NAME_POSITION_COLOR, p) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_PositionColorTextureAsPointsize);
-        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_PositionColorTextureAsPointsize);
+        programs_.insert( std::make_pair(GLShader::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE, p) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_PositionColor_noMVP);
-        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_COLOR_NO_MVP, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_PositionColor_noMVP);
+        programs_.insert( std::make_pair(GLShader::SHADER_NAME_POSITION_COLOR_NO_MVP, p) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_PositionTexture);
-        programs_.insert( std::make_pair( GLProgram::SHADER_NAME_POSITION_TEXTURE, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_PositionTexture);
+        programs_.insert( std::make_pair( GLShader::SHADER_NAME_POSITION_TEXTURE, p) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_PositionTexture_uColor);
-        programs_.insert( std::make_pair( GLProgram::SHADER_NAME_POSITION_TEXTURE_U_COLOR, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_PositionTexture_uColor);
+        programs_.insert( std::make_pair( GLShader::SHADER_NAME_POSITION_TEXTURE_U_COLOR, p) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_PositionTextureA8Color);
-        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_TEXTURE_A8_COLOR, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_PositionTextureA8Color);
+        programs_.insert( std::make_pair(GLShader::SHADER_NAME_POSITION_TEXTURE_A8_COLOR, p) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_Position_uColor);
-        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_U_COLOR, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_Position_uColor);
+        programs_.insert( std::make_pair(GLShader::SHADER_NAME_POSITION_U_COLOR, p) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_PositionLengthTexureColor);
-        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_PositionLengthTexureColor);
+        programs_.insert( std::make_pair(GLShader::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR, p) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_LabelDistanceFieldNormal);
-        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_LabelDistanceFieldNormal);
+        programs_.insert( std::make_pair(GLShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL, p) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_LabelDistanceFieldGlow);
-        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_LabelDistanceFieldGlow);
+        programs_.insert( std::make_pair(GLShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW, p) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_UIGrayScale);
-        programs_.insert(std::make_pair(GLProgram::SHADER_NAME_POSITION_GRAYSCALE, p));
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_UIGrayScale);
+        programs_.insert(std::make_pair(GLShader::SHADER_NAME_POSITION_GRAYSCALE, p));
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_LabelNormal);
-        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_LABEL_NORMAL, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_LabelNormal);
+        programs_.insert( std::make_pair(GLShader::SHADER_NAME_LABEL_NORMAL, p) );
 
-        p = new (std::nothrow) GLProgram();
-        loadDefaultGLProgram(p, kShaderType_LabelOutline);
-        programs_.insert( std::make_pair(GLProgram::SHADER_NAME_LABEL_OUTLINE, p) );
+        p = new (std::nothrow) GLShader();
+        loadDefaultGLShader(p, kShaderType_LabelOutline);
+        programs_.insert( std::make_pair(GLShader::SHADER_NAME_LABEL_OUTLINE, p) );
 
-        p = new GLProgram();
-        loadDefaultGLProgram(p, kShaderType_CameraClear);
-        programs_.insert( std::make_pair(GLProgram::SHADER_CAMERA_CLEAR, p));
+        p = new GLShader();
+        loadDefaultGLShader(p, kShaderType_CameraClear);
+        programs_.insert( std::make_pair(GLShader::SHADER_CAMERA_CLEAR, p));
     }
 
-    void GLProgramCache::reloadDefaultGLPrograms() {
-        GLProgram *p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR);
+    void GLShaderCache::reloadDefaultGLShaders() {
+        GLShader *p = getGLShader(GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_PositionTextureColor);
+        loadDefaultGLShader(p, kShaderType_PositionTextureColor);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
+        p = getGLShader(GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_PositionTextureColor_noMVP);
+        loadDefaultGLShader(p, kShaderType_PositionTextureColor_noMVP);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST);
+        p = getGLShader(GLShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_PositionTextureColorAlphaTest);
+        loadDefaultGLShader(p, kShaderType_PositionTextureColorAlphaTest);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV);
+        p = getGLShader(GLShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_PositionTextureColorAlphaTestNoMV);
+        loadDefaultGLShader(p, kShaderType_PositionTextureColorAlphaTestNoMV);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_COLOR);
+        p = getGLShader(GLShader::SHADER_NAME_POSITION_COLOR);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_PositionColor);
+        loadDefaultGLShader(p, kShaderType_PositionColor);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE);
+        p = getGLShader(GLShader::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_PositionColorTextureAsPointsize);
+        loadDefaultGLShader(p, kShaderType_PositionColorTextureAsPointsize);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_COLOR_NO_MVP);
-        loadDefaultGLProgram(p, kShaderType_PositionColor_noMVP);
+        p = getGLShader(GLShader::SHADER_NAME_POSITION_COLOR_NO_MVP);
+        loadDefaultGLShader(p, kShaderType_PositionColor_noMVP);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE);
+        p = getGLShader(GLShader::SHADER_NAME_POSITION_TEXTURE);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_PositionTexture);
+        loadDefaultGLShader(p, kShaderType_PositionTexture);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_U_COLOR);
+        p = getGLShader(GLShader::SHADER_NAME_POSITION_TEXTURE_U_COLOR);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_PositionTexture_uColor);
+        loadDefaultGLShader(p, kShaderType_PositionTexture_uColor);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_A8_COLOR);
+        p = getGLShader(GLShader::SHADER_NAME_POSITION_TEXTURE_A8_COLOR);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_PositionTextureA8Color);
+        loadDefaultGLShader(p, kShaderType_PositionTextureA8Color);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_U_COLOR);
+        p = getGLShader(GLShader::SHADER_NAME_POSITION_U_COLOR);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_Position_uColor);
+        loadDefaultGLShader(p, kShaderType_Position_uColor);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR);
+        p = getGLShader(GLShader::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_PositionLengthTexureColor);
+        loadDefaultGLShader(p, kShaderType_PositionLengthTexureColor);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL);
+        p = getGLShader(GLShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_LabelDistanceFieldNormal);
+        loadDefaultGLShader(p, kShaderType_LabelDistanceFieldNormal);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW);
+        p = getGLShader(GLShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_LabelDistanceFieldGlow);
+        loadDefaultGLShader(p, kShaderType_LabelDistanceFieldGlow);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_LABEL_NORMAL);
+        p = getGLShader(GLShader::SHADER_NAME_LABEL_NORMAL);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_LabelNormal);
+        loadDefaultGLShader(p, kShaderType_LabelNormal);
 
-        p = getGLProgram(GLProgram::SHADER_NAME_LABEL_OUTLINE);
+        p = getGLShader(GLShader::SHADER_NAME_LABEL_OUTLINE);
         p->reset();
-        loadDefaultGLProgram(p, kShaderType_LabelOutline);
+        loadDefaultGLShader(p, kShaderType_LabelOutline);
     }
 
-    void GLProgramCache::loadDefaultGLProgram(GLProgram *p, int type) {
+    void GLShaderCache::loadDefaultGLShader(GLShader *p, int type) {
         switch (type) {
             case kShaderType_PositionTextureColor:
                 p->initWithByteArrays(PositionTextureColor_vert, PositionTextureColor_frag);
@@ -886,7 +886,7 @@ namespace GRAPH
                 break;
             case kShaderType_Position_uColor:
                 p->initWithByteArrays(Position_uColor_vert, Position_uColor_frag);
-                p->bindAttribLocation("aVertex", GLProgram::VERTEX_ATTRIB_POSITION);
+                p->bindAttribLocation("aVertex", GLShader::VERTEX_ATTRIB_POSITION);
                 break;
             case kShaderType_PositionLengthTexureColor:
                 p->initWithByteArrays(PositionColorLengthTexture_vert, PositionColorLengthTexture_frag);
@@ -915,15 +915,15 @@ namespace GRAPH
         p->updateUniforms();
     }
 
-    GLProgram* GLProgramCache::getGLProgram(const std::string &key) {
+    GLShader* GLShaderCache::getGLShader(const std::string &key) {
         auto it = programs_.find(key);
         if( it != programs_.end() )
             return it->second;
         return nullptr;
     }
 
-    void GLProgramCache::addGLProgram(GLProgram* program, const std::string &key) {
-        auto prev = getGLProgram(key);
+    void GLShaderCache::addGLShader(GLShader* program, const std::string &key) {
+        auto prev = getGLShader(key);
         if( prev == program )
             return;
 
@@ -937,13 +937,13 @@ namespace GRAPH
 
     UniformValue::UniformValue()
         : uniform_(nullptr)
-        , glProgram_(nullptr)
+        , glShader_(nullptr)
         , type_(Type::VALUE) {
     }
 
-    UniformValue::UniformValue(Uniform *uniform, GLProgram* glprogram)
+    UniformValue::UniformValue(Uniform *uniform, GLShader* glShader)
         : uniform_(uniform)
-        , glProgram_(glprogram)
+        , glShader_(glShader)
         , type_(Type::VALUE) {
     }
 
@@ -954,24 +954,24 @@ namespace GRAPH
 
     void UniformValue::apply() {
         if (type_ == Type::CALLBACK_FN) {
-            (*value_.callback)(glProgram_, uniform_);
+            (*value_.callback)(glShader_, uniform_);
         }
         else if (type_ == Type::POINTER) {
             switch (uniform_->type) {
                 case GL_FLOAT:
-                    glProgram_->setUniformLocationWith1fv(uniform_->location, value_.floatv.pointer, value_.floatv.size);
+                    glShader_->setUniformLocationWith1fv(uniform_->location, value_.floatv.pointer, value_.floatv.size);
                     break;
 
                 case GL_FLOAT_VEC2:
-                    glProgram_->setUniformLocationWith2fv(uniform_->location, value_.v2f.pointer, value_.v2f.size);
+                    glShader_->setUniformLocationWith2fv(uniform_->location, value_.v2f.pointer, value_.v2f.size);
                     break;
 
                 case GL_FLOAT_VEC3:
-                    glProgram_->setUniformLocationWith3fv(uniform_->location, value_.v3f.pointer, value_.v3f.size);
+                    glShader_->setUniformLocationWith3fv(uniform_->location, value_.v3f.pointer, value_.v3f.size);
                     break;
 
                 case GL_FLOAT_VEC4:
-                    glProgram_->setUniformLocationWith4fv(uniform_->location, value_.v4f.pointer, value_.v4f.size);
+                    glShader_->setUniformLocationWith4fv(uniform_->location, value_.v4f.pointer, value_.v4f.size);
                     break;
 
                 default:
@@ -981,37 +981,37 @@ namespace GRAPH
         else{
             switch (uniform_->type) {
                 case GL_SAMPLER_2D:
-                    glProgram_->setUniformLocationWith1i(uniform_->location, value_.tex.textureUnit);
+                    glShader_->setUniformLocationWith1i(uniform_->location, value_.tex.textureUnit);
                     GLStateCache::BindTexture2DN(value_.tex.textureUnit, value_.tex.textureId);
                     break;
 
                 case GL_SAMPLER_CUBE:
-                    glProgram_->setUniformLocationWith1i(uniform_->location, value_.tex.textureUnit);
+                    glShader_->setUniformLocationWith1i(uniform_->location, value_.tex.textureUnit);
                     GLStateCache::BindTextureN(value_.tex.textureUnit, value_.tex.textureId, GL_TEXTURE_CUBE_MAP);
                     break;
 
                 case GL_INT:
-                    glProgram_->setUniformLocationWith1i(uniform_->location, value_.intValue);
+                    glShader_->setUniformLocationWith1i(uniform_->location, value_.intValue);
                     break;
 
                 case GL_FLOAT:
-                    glProgram_->setUniformLocationWith1f(uniform_->location, value_.floatValue);
+                    glShader_->setUniformLocationWith1f(uniform_->location, value_.floatValue);
                     break;
 
                 case GL_FLOAT_VEC2:
-                    glProgram_->setUniformLocationWith2f(uniform_->location, value_.v2Value[0], value_.v2Value[1]);
+                    glShader_->setUniformLocationWith2f(uniform_->location, value_.v2Value[0], value_.v2Value[1]);
                     break;
 
                 case GL_FLOAT_VEC3:
-                    glProgram_->setUniformLocationWith3f(uniform_->location, value_.v3Value[0], value_.v3Value[1], value_.v3Value[2]);
+                    glShader_->setUniformLocationWith3f(uniform_->location, value_.v3Value[0], value_.v3Value[1], value_.v3Value[2]);
                     break;
 
                 case GL_FLOAT_VEC4:
-                    glProgram_->setUniformLocationWith4f(uniform_->location, value_.v4Value[0], value_.v4Value[1], value_.v4Value[2], value_.v4Value[3]);
+                    glShader_->setUniformLocationWith4f(uniform_->location, value_.v4Value[0], value_.v4Value[1], value_.v4Value[2], value_.v4Value[3]);
                     break;
 
                 case GL_FLOAT_MAT4:
-                    glProgram_->setUniformLocationWithMatrix4fv(uniform_->location, (GLfloat*)&value_.matrixValue, 1);
+                    glShader_->setUniformLocationWithMatrix4fv(uniform_->location, (GLfloat*)&value_.matrixValue, 1);
                     break;
 
                 default:
@@ -1020,11 +1020,11 @@ namespace GRAPH
         }
     }
 
-    void UniformValue::setCallback(const std::function<void(GLProgram*, Uniform*)> &callback) {
+    void UniformValue::setCallback(const std::function<void(GLShader*, Uniform*)> &callback) {
         if (type_ == Type::CALLBACK_FN)
             delete value_.callback;
 
-        value_.callback = new std::function<void(GLProgram*, Uniform*)>();
+        value_.callback = new std::function<void(GLShader*, Uniform*)>();
         *value_.callback = callback;
 
         type_ = Type::CALLBACK_FN;
@@ -1141,10 +1141,10 @@ namespace GRAPH
         enabled_ = true;
     }
 
-    GLProgramState* GLProgramState::create(GLProgram *glprogram) {
-        GLProgramState* ret = nullptr;
-        ret = new (std::nothrow) GLProgramState();
-        if(ret && ret->init(glprogram))
+    GLShaderState* GLShaderState::create(GLShader *glShader) {
+        GLShaderState* ret = nullptr;
+        ret = new (std::nothrow) GLShaderState();
+        if(ret && ret->init(glShader))
         {
             ret->autorelease();
             return ret;
@@ -1153,53 +1153,53 @@ namespace GRAPH
         return nullptr;
     }
 
-    GLProgramState* GLProgramState::getOrCreateWithGLProgramName(const std::string& glProgramName ) {
-        GLProgram *glProgram = GLProgramCache::getInstance().getGLProgram(glProgramName);
-        if( glProgram )
-            return getOrCreateWithGLProgram(glProgram);
+    GLShaderState* GLShaderState::getOrCreateWithGLShaderName(const std::string& glShaderName ) {
+        GLShader *glShader = GLShaderCache::getInstance().getGLShader(glShaderName);
+        if( glShader )
+            return getOrCreateWithGLShader(glShader);
 
         return nullptr;
     }
 
-    GLProgramState* GLProgramState::getOrCreateWithGLProgram(GLProgram *glprogram) {
-        GLProgramState* ret = GLProgramStateCache::getInstance().getGLProgramState(glprogram);
+    GLShaderState* GLShaderState::getOrCreateWithGLShader(GLShader *glShader) {
+        GLShaderState* ret = GLShaderStateCache::getInstance().getGLShaderState(glShader);
         return ret;
     }
 
-    GLProgramState* GLProgramState::getOrCreateWithShaders(const std::string& vertexShader, const std::string& fragShader, const std::string& compileTimeDefines) {
+    GLShaderState* GLShaderState::getOrCreateWithShaders(const std::string& vertexShader, const std::string& fragShader, const std::string& compileTimeDefines) {
         const std::string key = vertexShader + "+" + fragShader + "+" + compileTimeDefines;
-        auto glprogram = GLProgramCache::getInstance().getGLProgram(key);
+        auto glShader = GLShaderCache::getInstance().getGLShader(key);
 
-        if (!glprogram) {
-            glprogram = GLProgram::createWithFilenames(vertexShader, fragShader, compileTimeDefines);
-            GLProgramCache::getInstance().addGLProgram(glprogram, key);
+        if (!glShader) {
+            glShader = GLShader::createWithFilenames(vertexShader, fragShader, compileTimeDefines);
+            GLShaderCache::getInstance().addGLShader(glShader, key);
         }
 
-        return create(glprogram);
+        return create(glShader);
     }
 
-    GLProgramState::GLProgramState()
+    GLShaderState::GLShaderState()
         : uniformAttributeValueDirty_(true)
         , textureUnitIndex_(4)  // first 4 textures unites are reserved for _Texture0-3
         , vertexAttribsFlags_(0)
-        , glProgram_(nullptr) {
+        , glShader_(nullptr) {
     }
 
-    GLProgramState::~GLProgramState() {
-        SAFE_RELEASE(glProgram_);
+    GLShaderState::~GLShaderState() {
+        SAFE_RELEASE(glShader_);
     }
 
-    bool GLProgramState::init(GLProgram* glprogram) {
-        glProgram_ = glprogram;
-        glProgram_->retain();
+    bool GLShaderState::init(GLShader* glShader) {
+        glShader_ = glShader;
+        glShader_->retain();
 
-        for(auto &attrib : glProgram_->vertexAttribs_) {
+        for(auto &attrib : glShader_->vertexAttribs_) {
             VertexAttribValue value(&attrib.second);
             attributes_[attrib.first] = value;
         }
 
-        for(auto &uniform : glProgram_->userUniforms_) {
-            UniformValue value(&uniform.second, glProgram_);
+        for(auto &uniform : glShader_->userUniforms_) {
+            UniformValue value(&uniform.second, glShader_);
             uniforms_[uniform.second.location] = value;
             uniformsByName_[uniform.first] = uniform.second.location;
         }
@@ -1207,29 +1207,29 @@ namespace GRAPH
         return true;
     }
 
-    void GLProgramState::resetGLProgram() {
-        SAFE_RELEASE(glProgram_);
-        glProgram_ = nullptr;
+    void GLShaderState::resetGLShader() {
+        SAFE_RELEASE(glShader_);
+        glShader_ = nullptr;
         uniforms_.clear();
         attributes_.clear();
         textureUnitIndex_ = 1;
     }
 
-    void GLProgramState::apply(const MATH::Matrix4& modelView) {
-        applyGLProgram(modelView);
+    void GLShaderState::apply(const MATH::Matrix4& modelView) {
+        applyGLShader(modelView);
         applyAttributes();
         applyUniforms();
     }
 
-    void GLProgramState::updateUniformsAndAttributes() {
+    void GLShaderState::updateUniformsAndAttributes() {
         if(uniformAttributeValueDirty_) {
             for(auto& uniformLocation : uniformsByName_) {
-                uniforms_[uniformLocation.second].uniform_ = glProgram_->getUniform(uniformLocation.first);
+                uniforms_[uniformLocation.second].uniform_ = glShader_->getUniform(uniformLocation.first);
             }
 
             vertexAttribsFlags_ = 0;
             for(auto& attributeValue : attributes_) {
-                attributeValue.second.vertexAttrib_ = glProgram_->getVertexAttrib(attributeValue.first);;
+                attributeValue.second.vertexAttrib_ = glShader_->getVertexAttrib(attributeValue.first);;
                 if(attributeValue.second.enabled_)
                     vertexAttribsFlags_ |= 1 << attributeValue.second.vertexAttrib_->index;
             }
@@ -1239,13 +1239,13 @@ namespace GRAPH
         }
     }
 
-    void GLProgramState::applyGLProgram(const MATH::Matrix4& modelView) {
+    void GLShaderState::applyGLShader(const MATH::Matrix4& modelView) {
         updateUniformsAndAttributes();
-        glProgram_->use();
-        glProgram_->setUniformsForBuiltins(modelView);
+        glShader_->use();
+        glShader_->setUniformsForBuiltins(modelView);
     }
 
-    void GLProgramState::applyAttributes(bool applyAttribFlags) {
+    void GLShaderState::applyAttributes(bool applyAttribFlags) {
         updateUniformsAndAttributes();
         if(vertexAttribsFlags_) {
             if (applyAttribFlags)
@@ -1255,29 +1255,29 @@ namespace GRAPH
             }
         }
     }
-    void GLProgramState::applyUniforms() {
+    void GLShaderState::applyUniforms() {
         updateUniformsAndAttributes();
         for(auto& uniform : uniforms_) {
             uniform.second.apply();
         }
     }
 
-    void GLProgramState::setGLProgram(GLProgram *glprogram) {
-        if( glProgram_ != glprogram) {
-            resetGLProgram();
-            init(glprogram);
+    void GLShaderState::setGLShader(GLShader *glShader) {
+        if( glShader_ != glShader) {
+            resetGLShader();
+            init(glShader);
         }
     }
 
-    uint32_t GLProgramState::getVertexAttribsFlags() const {
+    uint32_t GLShaderState::getVertexAttribsFlags() const {
         return vertexAttribsFlags_;
     }
 
-    int64 GLProgramState::getVertexAttribCount() const {
+    int64 GLShaderState::getVertexAttribCount() const {
         return attributes_.size();
     }
 
-    UniformValue* GLProgramState::getUniformValue(GLint uniformLocation) {
+    UniformValue* GLShaderState::getUniformValue(GLint uniformLocation) {
         updateUniformsAndAttributes();
         const auto itr = uniforms_.find(uniformLocation);
         if (itr != uniforms_.end())
@@ -1285,7 +1285,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    UniformValue* GLProgramState::getUniformValue(const std::string& name) {
+    UniformValue* GLShaderState::getUniformValue(const std::string& name) {
         updateUniformsAndAttributes();
         const auto itr = uniformsByName_.find(name);
         if (itr != uniformsByName_.end())
@@ -1293,7 +1293,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    VertexAttribValue* GLProgramState::getVertexAttribValue(const std::string& name) {
+    VertexAttribValue* GLShaderState::getVertexAttribValue(const std::string& name) {
         updateUniformsAndAttributes();
         const auto itr = attributes_.find(name);
         if( itr != attributes_.end())
@@ -1301,7 +1301,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    void GLProgramState::setVertexAttribCallback(const std::string& name, const std::function<void(VertexAttrib*)> &callback) {
+    void GLShaderState::setVertexAttribCallback(const std::string& name, const std::function<void(VertexAttrib*)> &callback) {
         VertexAttribValue *v = getVertexAttribValue(name);
         if(v) {
             v->setCallback(callback);
@@ -1309,7 +1309,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgramState::setVertexAttribPointer(const std::string& name, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid *pointer) {
+    void GLShaderState::setVertexAttribPointer(const std::string& name, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid *pointer) {
         auto v = getVertexAttribValue(name);
         if(v) {
             v->setPointer(size, type, normalized, stride, pointer);
@@ -1317,149 +1317,149 @@ namespace GRAPH
         }
     }
 
-    void GLProgramState::setUniformCallback(const std::string& uniformName, const std::function<void(GLProgram*, Uniform*)> &callback) {
+    void GLShaderState::setUniformCallback(const std::string& uniformName, const std::function<void(GLShader*, Uniform*)> &callback) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setCallback(callback);
     }
 
-    void GLProgramState::setUniformCallback(GLint uniformLocation, const std::function<void(GLProgram*, Uniform*)> &callback) {
+    void GLShaderState::setUniformCallback(GLint uniformLocation, const std::function<void(GLShader*, Uniform*)> &callback) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setCallback(callback);
     }
 
-    void GLProgramState::setUniformFloat(const std::string& uniformName, float value) {
+    void GLShaderState::setUniformFloat(const std::string& uniformName, float value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setFloat(value);
     }
 
-    void GLProgramState::setUniformFloat(GLint uniformLocation, float value) {
+    void GLShaderState::setUniformFloat(GLint uniformLocation, float value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setFloat(value);
     }
 
-    void GLProgramState::setUniformInt(const std::string& uniformName, int value) {
+    void GLShaderState::setUniformInt(const std::string& uniformName, int value) {
         auto v = getUniformValue(uniformName);
         if(v)
             v->setInt(value);
     }
 
-    void GLProgramState::setUniformInt(GLint uniformLocation, int value) {
+    void GLShaderState::setUniformInt(GLint uniformLocation, int value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setInt(value);
 
     }
 
-    void GLProgramState::setUniformFloatv(const std::string& uniformName, int64 size, const float* pointer) {
+    void GLShaderState::setUniformFloatv(const std::string& uniformName, int64 size, const float* pointer) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setFloatv(size, pointer);
     }
 
-    void GLProgramState::setUniformFloatv(GLint uniformLocation, int64 size, const float* pointer) {
+    void GLShaderState::setUniformFloatv(GLint uniformLocation, int64 size, const float* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setFloatv(size, pointer);
     }
 
-    void GLProgramState::setUniformVec2(const std::string& uniformName, const MATH::Vector2f& value) {
+    void GLShaderState::setUniformVec2(const std::string& uniformName, const MATH::Vector2f& value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec2(value);
     }
 
-    void GLProgramState::setUniformVec2(GLint uniformLocation, const MATH::Vector2f& value) {
+    void GLShaderState::setUniformVec2(GLint uniformLocation, const MATH::Vector2f& value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec2(value);
     }
 
-    void GLProgramState::setUniformVec2v(const std::string& uniformName, int64 size, const MATH::Vector2f* pointer) {
+    void GLShaderState::setUniformVec2v(const std::string& uniformName, int64 size, const MATH::Vector2f* pointer) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec2v(size, pointer);
     }
 
-    void GLProgramState::setUniformVec2v(GLint uniformLocation, int64 size, const MATH::Vector2f* pointer) {
+    void GLShaderState::setUniformVec2v(GLint uniformLocation, int64 size, const MATH::Vector2f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec2v(size, pointer);
     }
 
-    void GLProgramState::setUniformVec3(const std::string& uniformName, const MATH::Vector3f& value) {
+    void GLShaderState::setUniformVec3(const std::string& uniformName, const MATH::Vector3f& value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec3(value);
     }
 
-    void GLProgramState::setUniformVec3(GLint uniformLocation, const MATH::Vector3f& value) {
+    void GLShaderState::setUniformVec3(GLint uniformLocation, const MATH::Vector3f& value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec3(value);
     }
 
-    void GLProgramState::setUniformVec3v(const std::string& uniformName, int64 size, const MATH::Vector3f* pointer) {
+    void GLShaderState::setUniformVec3v(const std::string& uniformName, int64 size, const MATH::Vector3f* pointer) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec3v(size, pointer);
     }
 
-    void GLProgramState::setUniformVec3v(GLint uniformLocation, int64 size, const MATH::Vector3f* pointer) {
+    void GLShaderState::setUniformVec3v(GLint uniformLocation, int64 size, const MATH::Vector3f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec3v(size, pointer);
     }
 
-    void GLProgramState::setUniformVec4(const std::string& uniformName, const MATH::Vector4f& value) {
+    void GLShaderState::setUniformVec4(const std::string& uniformName, const MATH::Vector4f& value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec4(value);
     }
 
-    void GLProgramState::setUniformVec4(GLint uniformLocation, const MATH::Vector4f& value) {
+    void GLShaderState::setUniformVec4(GLint uniformLocation, const MATH::Vector4f& value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec4(value);
     }
 
-    void GLProgramState::setUniformVec4v(const std::string& uniformName, int64 size, const MATH::Vector4f* value) {
+    void GLShaderState::setUniformVec4v(const std::string& uniformName, int64 size, const MATH::Vector4f* value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec4v(size, value);
     }
 
-    void GLProgramState::setUniformVec4v(GLint uniformLocation, int64 size, const MATH::Vector4f* pointer) {
+    void GLShaderState::setUniformVec4v(GLint uniformLocation, int64 size, const MATH::Vector4f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec4v(size, pointer);
     }
 
-    void GLProgramState::setUniformMat4(const std::string& uniformName, const MATH::Matrix4& value) {
+    void GLShaderState::setUniformMat4(const std::string& uniformName, const MATH::Matrix4& value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setMat4(value);
     }
 
-    void GLProgramState::setUniformMat4(GLint uniformLocation, const MATH::Matrix4& value) {
+    void GLShaderState::setUniformMat4(GLint uniformLocation, const MATH::Matrix4& value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setMat4(value);
     }
 
     // Textures
-    void GLProgramState::setUniformTexture(const std::string& uniformName, Texture2D *texture) {
+    void GLShaderState::setUniformTexture(const std::string& uniformName, Texture2D *texture) {
         setUniformTexture(uniformName, texture->getName());
     }
 
-    void GLProgramState::setUniformTexture(GLint uniformLocation, Texture2D *texture) {
+    void GLShaderState::setUniformTexture(GLint uniformLocation, Texture2D *texture) {
         setUniformTexture(uniformLocation, texture->getName());
     }
 
-    void GLProgramState::setUniformTexture(const std::string& uniformName, GLuint textureId) {
+    void GLShaderState::setUniformTexture(const std::string& uniformName, GLuint textureId) {
         auto v = getUniformValue(uniformName);
         if (v) {
             if (boundTextureUnits_.find(uniformName) != boundTextureUnits_.end()) {
@@ -1472,7 +1472,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgramState::setUniformTexture(GLint uniformLocation, GLuint textureId) {
+    void GLShaderState::setUniformTexture(GLint uniformLocation, GLuint textureId) {
         auto v = getUniformValue(uniformLocation);
         if (v) {
             if (boundTextureUnits_.find(v->uniform_->name) != boundTextureUnits_.end()) {
@@ -1485,27 +1485,27 @@ namespace GRAPH
         }
     }
 
-    GLProgramStateCache::GLProgramStateCache() {
+    GLShaderStateCache::GLShaderStateCache() {
     }
 
-    GLProgramStateCache::~GLProgramStateCache() {
-        glProgramStates_.clear();
+    GLShaderStateCache::~GLShaderStateCache() {
+        glShaderStates_.clear();
     }
 
-    GLProgramStateCache& GLProgramStateCache::getInstance() {
-        static GLProgramStateCache instance;
+    GLShaderStateCache& GLShaderStateCache::getInstance() {
+        static GLShaderStateCache instance;
         return instance;
     }
 
-    GLProgramState* GLProgramStateCache::getGLProgramState(GLProgram* glprogram) {
-        const auto& itr = glProgramStates_.find(glprogram);
-        if (itr != glProgramStates_.end()) {
+    GLShaderState* GLShaderStateCache::getGLShaderState(GLShader* glShader) {
+        const auto& itr = glShaderStates_.find(glShader);
+        if (itr != glShaderStates_.end()) {
             return itr->second;
         }
 
-        auto ret = new (std::nothrow) GLProgramState;
-        if(ret && ret->init(glprogram)) {
-            glProgramStates_.insert(glprogram, ret);
+        auto ret = new (std::nothrow) GLShaderState;
+        if(ret && ret->init(glShader)) {
+            glShaderStates_.insert(glShader, ret);
             ret->release();
             return ret;
         }
@@ -1514,11 +1514,11 @@ namespace GRAPH
         return ret;
     }
 
-    void GLProgramStateCache::removeUnusedGLProgramState() {
-        for( auto it=glProgramStates_.cbegin(); it!=glProgramStates_.cend(); /* nothing */) {
+    void GLShaderStateCache::removeUnusedGLShaderState() {
+        for( auto it=glShaderStates_.cbegin(); it != glShaderStates_.cend(); /* nothing */) {
             auto value = it->second;
             if( value->getReferenceCount() == 1 ) {
-                glProgramStates_.erase(it++);
+                glShaderStates_.erase(it++);
             }
             else {
                 ++it;
@@ -1526,7 +1526,7 @@ namespace GRAPH
         }
     }
 
-    void GLProgramStateCache::removeAllGLProgramState() {
-        glProgramStates_.clear();
+    void GLShaderStateCache::removeAllGLShaderState() {
+        glShaderStates_.clear();
     }
 }

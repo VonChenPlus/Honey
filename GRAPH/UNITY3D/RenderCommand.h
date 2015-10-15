@@ -88,7 +88,7 @@ namespace GRAPH
         Renderer *renderer_;
     };
 
-    class GLProgramState;
+    class GLShaderState;
 
     class QuadCommand : public RenderCommand
     {
@@ -96,7 +96,7 @@ namespace GRAPH
         QuadCommand();
         ~QuadCommand();
 
-        void init(float globalOrder, GLuint textureID, GLProgramState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, int64 quadCount,
+        void init(float globalOrder, GLuint textureID, GLShaderState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, int64 quadCount,
                   const MATH::Matrix4& mv, uint32_t flags);
 
         void useMaterial() const;
@@ -104,7 +104,7 @@ namespace GRAPH
         inline GLuint getTextureID() const { return textureID_; }
         inline V3F_C4B_T2F_Quad* getQuads() const { return quads_; }
         inline int64 getQuadCount() const { return quadsCount_; }
-        inline GLProgramState* getGLProgramState() const { return glProgramState_; }
+        inline GLShaderState* getGLShaderState() const { return glShaderState_; }
         inline BlendFunc getBlendType() const { return blendType_; }
         inline const MATH::Matrix4& getModelView() const { return matrix4_; }
 
@@ -113,7 +113,7 @@ namespace GRAPH
 
         uint32_t materialID_;
         GLuint textureID_;
-        GLProgramState* glProgramState_;
+        GLShaderState* glShaderState_;
         BlendFunc blendType_;
         V3F_C4B_T2F_Quad* quads_;
         int64 quadsCount_;
@@ -134,7 +134,7 @@ namespace GRAPH
         TrianglesCommand();
         ~TrianglesCommand();
 
-        void init(float globalOrder, GLuint textureID, GLProgramState* glProgramState, BlendFunc blendType, const Triangles& triangles,const MATH::Matrix4& mv, uint32_t flags);
+        void init(float globalOrder, GLuint textureID, GLShaderState* glProgramState, BlendFunc blendType, const Triangles& triangles,const MATH::Matrix4& mv, uint32_t flags);
         void useMaterial() const;
         inline uint32_t getMaterialID() const { return materialID_; }
         inline GLuint getTextureID() const { return textureID_; }
@@ -143,7 +143,7 @@ namespace GRAPH
         inline int64 getIndexCount() const { return _triangles.indexCount; }
         inline const V3F_C4B_T2F* getVertices() const { return _triangles.verts; }
         inline const unsigned short* getIndices() const { return _triangles.indices; }
-        inline GLProgramState* getGLProgramState() const { return glProgramState_; }
+        inline GLShaderState* getGLShaderState() const { return glShaderState_; }
         inline BlendFunc getBlendType() const { return blendType_; }
         inline const MATH::Matrix4& getModelView() const { return matrix4_; }
 
@@ -152,7 +152,7 @@ namespace GRAPH
 
         uint32_t materialID_;
         GLuint textureID_;
-        GLProgramState* glProgramState_;
+        GLShaderState* glShaderState_;
         BlendFunc blendType_;
         Triangles _triangles;
         MATH::Matrix4 matrix4_;
@@ -173,7 +173,7 @@ namespace GRAPH
     };
 
     class TextureAtlas;
-    class GLProgram;
+    class GLShader;
 
     class BatchCommand : public RenderCommand
     {
@@ -181,12 +181,12 @@ namespace GRAPH
         BatchCommand();
         ~BatchCommand();
 
-        void init(float globalZOrder, GLProgram* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const MATH::Matrix4& modelViewTransform, uint32_t flags);
+        void init(float globalZOrder, GLShader* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const MATH::Matrix4& modelViewTransform, uint32_t flags);
         void execute();
 
     protected:
         GLuint textureID_;
-        GLProgram* shader_;
+        GLShader* shader_;
         BlendFunc blendType_;
         TextureAtlas *textureAtlas_;
         MATH::Matrix4 matrix4_;

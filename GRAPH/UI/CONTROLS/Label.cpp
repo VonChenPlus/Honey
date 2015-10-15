@@ -2,7 +2,7 @@
 #include "GRAPH/Director.h"
 #include "GRAPH/Sprite.h"
 #include "GRAPH/EventDispatcher.h"
-#include "GRAPH/UNITY3D/GLProgram.h"
+#include "GRAPH/UNITY3D/GLShader.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/Texture2D.h"
@@ -261,31 +261,31 @@ namespace GRAPH
         {
         case LabelEffect::NORMAL:
             if (_useDistanceField)
-                setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL));
+                setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL));
             else if (_useA8Shader)
-                setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_LABEL_NORMAL));
+                setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_LABEL_NORMAL));
             else if (_shadowEnabled)
-                setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR));
+                setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR));
             else
-                setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
+                setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
 
             break;
         case LabelEffect::OUTLINE:
-            setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_LABEL_OUTLINE));
-            _uniformEffectColor = glGetUniformLocation(getGLProgram()->getProgram(), "u_effectColor");
+            setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_LABEL_OUTLINE));
+            _uniformEffectColor = glGetUniformLocation(getGLShader()->getProgram(), "u_effectColor");
             break;
         case LabelEffect::GLOW:
             if (_useDistanceField)
             {
-                setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW));
-                _uniformEffectColor = glGetUniformLocation(getGLProgram()->getProgram(), "u_effectColor");
+                setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW));
+                _uniformEffectColor = glGetUniformLocation(getGLShader()->getProgram(), "u_effectColor");
             }
             break;
         default:
             return;
         }
 
-        _uniformTextColor = glGetUniformLocation(getGLProgram()->getProgram(), "u_textColor");
+        _uniformTextColor = glGetUniformLocation(getGLShader()->getProgram(), "u_textColor");
     }
 
     void Label::setFontAtlas(FontAtlas* atlas,bool distanceFieldEnabled /* = false */, bool useA8Shader /* = false */)
@@ -1032,14 +1032,14 @@ namespace GRAPH
         _contentDirty = false;
     }
 
-    void Label::onDrawShadow(GLProgram* glProgram)
+    void Label::onDrawShadow(GLShader* glShader)
     {
         Color3B oldColor = _realColor;
         GLubyte oldOPacity = _displayedOpacity;
         _displayedOpacity = _shadowOpacity;
         setColor(_shadowColor3B);
 
-        glProgram->setUniformsForBuiltins(_shadowTransform);
+        glShader->setUniformsForBuiltins(_shadowTransform);
         for (auto&& it : _letters)
         {
             it.second->updateTransform();
@@ -1055,16 +1055,16 @@ namespace GRAPH
 
     void Label::onDraw(const MATH::Matrix4& transform, bool)
     {
-        auto glprogram = getGLProgram();
-        glprogram->use();
+        auto glShader = getGLShader();
+        glShader->use();
         GLStateCache::BlendFunc(_blendFunc.src, _blendFunc.dst);
 
         if (_shadowEnabled)
         {
-            onDrawShadow(glprogram);
+            onDrawShadow(glShader);
         }
 
-        glprogram->setUniformsForBuiltins(transform);
+        glShader->setUniformsForBuiltins(transform);
         for (auto&& it : _letters)
         {
             it.second->updateTransform();

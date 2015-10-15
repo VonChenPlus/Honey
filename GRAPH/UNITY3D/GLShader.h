@@ -1,5 +1,5 @@
-#ifndef GLPROGRAM_H
-#define GLPROGRAM_H
+#ifndef GLSHADER_H
+#define GLSHADER_H
 
 #include <unordered_map>
 #include <string>
@@ -27,7 +27,7 @@ namespace GRAPH
         std::string name;
     };
 
-    class GLProgram : public HObject
+    class GLShader : public HObject
     {
     public:
         enum
@@ -141,18 +141,18 @@ namespace GRAPH
         /**Attribute blend index.*/
         static const char* ATTRIBUTE_NAME_BLEND_INDEX;
 
-        GLProgram();
-        virtual ~GLProgram();
+        GLShader();
+        virtual ~GLShader();
 
-        static GLProgram* createWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray);
+        static GLShader* createWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray);
         bool initWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray);
-        static GLProgram* createWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray, const std::string& compileTimeDefines);
+        static GLShader* createWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray, const std::string& compileTimeDefines);
         bool initWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray, const std::string& compileTimeDefines);
 
-        static GLProgram* createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename);
+        static GLShader* createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename);
         bool initWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename);
 
-        static GLProgram* createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines);
+        static GLShader* createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines);
         bool initWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines);
 
         Uniform* getUniform(const std::string& name);
@@ -222,40 +222,40 @@ namespace GRAPH
         std::unordered_map<std::string, VertexAttrib> vertexAttribs_;
         std::unordered_map<GLint, std::pair<GLvoid*, unsigned int> > hashForUniforms_;
 
-        friend class GLProgramState;
+        friend class GLShaderState;
     };
 
-    class GLProgramCache : public HObject
+    class GLShaderCache : public HObject
     {
     public:
-        GLProgramCache();
-        ~GLProgramCache();
+        GLShaderCache();
+        ~GLShaderCache();
 
-        static GLProgramCache& getInstance();
+        static GLShaderCache& getInstance();
 
-        void loadDefaultGLPrograms();
-        void reloadDefaultGLPrograms();
+        void loadDefaultGLShaders();
+        void reloadDefaultGLShaders();
 
-        GLProgram * getGLProgram(const std::string &key);
+        GLShader * getGLShader(const std::string &key);
 
-        void addGLProgram(GLProgram* program, const std::string &key);
+        void addGLShader(GLShader* program, const std::string &key);
 
     private:
         bool init();
-        void loadDefaultGLProgram(GLProgram *program, int type);
+        void loadDefaultGLShader(GLShader *program, int type);
 
     private:
-        std::unordered_map<std::string, GLProgram*> programs_;
+        std::unordered_map<std::string, GLShader*> programs_;
     };
 
     class UniformValue
     {
-        friend class GLProgram;
-        friend class GLProgramState;
+        friend class GLShader;
+        friend class GLShaderState;
 
     public:
         UniformValue();
-        UniformValue(Uniform *uniform, GLProgram* glprogram);
+        UniformValue(Uniform *uniform, GLShader* glShader);
         ~UniformValue();
 
         void setFloat(float value);
@@ -269,7 +269,7 @@ namespace GRAPH
         void setVec4v(int64 size, const MATH::Vector4f* pointer);
         void setMat4(const MATH::Matrix4& value);
 
-        void setCallback(const std::function<void(GLProgram*, Uniform*)> &callback);
+        void setCallback(const std::function<void(GLShader*, Uniform*)> &callback);
         void setTexture(GLuint textureId, GLuint textureUnit);
 
         void apply();
@@ -282,7 +282,7 @@ namespace GRAPH
         };
 
         Uniform* uniform_;
-        GLProgram* glProgram_;
+        GLShader* glShader_;
         Type type_;
 
         union U{
@@ -312,7 +312,7 @@ namespace GRAPH
                 const float* pointer;
                 GLsizei size;
             } v4f;
-            std::function<void(GLProgram*, Uniform*)> *callback;
+            std::function<void(GLShader*, Uniform*)> *callback;
 
             U() { memset( this, 0, sizeof(*this) ); }
             ~U(){}
@@ -325,8 +325,8 @@ namespace GRAPH
 
     class VertexAttribValue
     {
-        friend class GLProgram;
-        friend class GLProgramState;
+        friend class GLShader;
+        friend class GLShaderState;
 
     public:
         VertexAttribValue(VertexAttrib *vertexAttrib);
@@ -363,22 +363,22 @@ namespace GRAPH
 
     class Texture2D;
 
-    class GLProgramState : public HObject
+    class GLShaderState : public HObject
     {
-        friend class GLProgramStateCache;
+        friend class GLShaderStateCache;
     public:
-        static GLProgramState* create(GLProgram* glprogram);
-        static GLProgramState* getOrCreateWithGLProgram(GLProgram* glprogram);
-        static GLProgramState* getOrCreateWithGLProgramName(const std::string& glProgramName );
-        static GLProgramState* getOrCreateWithShaders(const std::string& vertexShader, const std::string& fragShader, const std::string& compileTimeDefines);
+        static GLShaderState* create(GLShader* glShader);
+        static GLShaderState* getOrCreateWithGLShader(GLShader* glShader);
+        static GLShaderState* getOrCreateWithGLShaderName(const std::string& glShaderName );
+        static GLShaderState* getOrCreateWithShaders(const std::string& vertexShader, const std::string& fragShader, const std::string& compileTimeDefines);
 
         void apply(const MATH::Matrix4& modelView);
-        void applyGLProgram(const MATH::Matrix4& modelView);
+        void applyGLShader(const MATH::Matrix4& modelView);
         void applyAttributes(bool applyAttribFlags = true);
         void applyUniforms();
 
-        void setGLProgram(GLProgram* glprogram);
-        GLProgram* getGLProgram() const { return glProgram_; }
+        void setGLShader(GLShader* glShader);
+        GLShader* getGLShader() const { return glShader_; }
         uint32_t getVertexAttribsFlags() const;
         int64 getVertexAttribCount() const;
         void setVertexAttribCallback(const std::string& name, const std::function<void(VertexAttrib*)> &callback);
@@ -395,7 +395,7 @@ namespace GRAPH
         void setUniformVec4(const std::string& uniformName, const MATH::Vector4f& value);
         void setUniformVec4v(const std::string& uniformName, int64 size, const MATH::Vector4f* pointer);
         void setUniformMat4(const std::string& uniformName, const MATH::Matrix4& value);
-        void setUniformCallback(const std::string& uniformName, const std::function<void(GLProgram*, Uniform*)> &callback);
+        void setUniformCallback(const std::string& uniformName, const std::function<void(GLShader*, Uniform*)> &callback);
         void setUniformTexture(const std::string& uniformName, Texture2D *texture);
         void setUniformTexture(const std::string& uniformName, GLuint textureId);
 
@@ -409,15 +409,15 @@ namespace GRAPH
         void setUniformVec4(GLint uniformLocation, const MATH::Vector4f& value);
         void setUniformVec4v(GLint uniformLocation, int64 size, const MATH::Vector4f* pointer);
         void setUniformMat4(GLint uniformLocation, const MATH::Matrix4& value);
-        void setUniformCallback(GLint uniformLocation, const std::function<void(GLProgram*, Uniform*)> &callback);
+        void setUniformCallback(GLint uniformLocation, const std::function<void(GLShader*, Uniform*)> &callback);
         void setUniformTexture(GLint uniformLocation, Texture2D *texture);
         void setUniformTexture(GLint uniformLocation, GLuint textureId);
 
     protected:
-        GLProgramState();
-        ~GLProgramState();
-        bool init(GLProgram* program);
-        void resetGLProgram();
+        GLShaderState();
+        ~GLShaderState();
+        bool init(GLShader* program);
+        void resetGLShader();
         void updateUniformsAndAttributes();
         VertexAttribValue* getVertexAttribValue(const std::string& attributeName);
         UniformValue* getUniformValue(const std::string& uniformName);
@@ -431,25 +431,25 @@ namespace GRAPH
         std::unordered_map<std::string, int> boundTextureUnits_;
         int textureUnitIndex_;
         uint32_t vertexAttribsFlags_;
-        GLProgram* glProgram_;
+        GLShader* glShader_;
     };
 
-    class GLProgramStateCache
+    class GLShaderStateCache
     {
     public:
-        static GLProgramStateCache& getInstance();
+        static GLShaderStateCache& getInstance();
 
-        GLProgramState* getGLProgramState(GLProgram* program);
-        void removeAllGLProgramState();
-        void removeUnusedGLProgramState();
+        GLShaderState* getGLShaderState(GLShader* program);
+        void removeAllGLShaderState();
+        void removeUnusedGLShaderState();
 
     protected:
-        GLProgramStateCache();
-        ~GLProgramStateCache();
+        GLShaderStateCache();
+        ~GLShaderStateCache();
 
     private:
-        HObjectMap<GLProgram*, GLProgramState*> glProgramStates_;
+        HObjectMap<GLShader*, GLShaderState*> glShaderStates_;
     };
 }
 
-#endif // GLPROGRAM_H
+#endif // GLSHADER_H
