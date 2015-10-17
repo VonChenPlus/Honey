@@ -4,7 +4,7 @@
 #include "GRAPH/SpriteFrame.h"
 #include "GRAPH/UNITY3D/GLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
-#include "GRAPH/UNITY3D/Texture2D.h"
+#include "GRAPH/UNITY3D/GLTexture.h"
 
 namespace GRAPH
 {
@@ -277,7 +277,7 @@ namespace GRAPH
             return _blendFunc;
         }
 
-        void Scale9Sprite::updateBlendFunc(Texture2D *texture)
+        void Scale9Sprite::updateBlendFunc(GLTexture *texture)
         {
 
             // it is possible to have an untextured sprite

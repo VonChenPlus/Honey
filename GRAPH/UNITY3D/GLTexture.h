@@ -31,7 +31,7 @@ namespace GRAPH
             , len(0){}
     };
 
-    class Texture2D : public HObject
+    class GLTexture : public HObject
     {
     public:
         struct TexParams
@@ -49,12 +49,12 @@ namespace GRAPH
         static TextToTextureDataDef getTextureDataForText;
 
     public:
-        Texture2D();
-        virtual ~Texture2D();
+        GLTexture();
+        virtual ~GLTexture();
 
         void releaseGLTexture();
 
-        bool initWithData(const void *data, int64 dataLen, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef& contentSize);
+        bool initWithData(const void *data, uint64 dataLen, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef& contentSize);
         bool initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh);
 
         bool updateWithData(const void *data,int offsetX,int offsetY,int width,int height);
@@ -118,9 +118,9 @@ namespace GRAPH
         TextureCache();
         virtual ~TextureCache();
 
-        Texture2D* addImage(const std::string &filepath);
-        Texture2D* addImage(IMAGE::TinyImage *image, const std::string &key);
-        virtual void addImageAsync(const std::string &filepath, const std::function<void(Texture2D*)>& callback);
+        GLTexture* addImage(const std::string &filepath);
+        GLTexture* addImage(IMAGE::TinyImage *image, const std::string &key);
+        virtual void addImageAsync(const std::string &filepath, const std::function<void(GLTexture*)>& callback);
 
         virtual void unbindImageAsync(const std::string &filename);
         virtual void unbindAllImageAsync();
@@ -129,11 +129,11 @@ namespace GRAPH
 
         void removeAllTextures();
         void removeUnusedTextures();
-        void removeTexture(Texture2D* texture);
+        void removeTexture(GLTexture* texture);
         void removeTextureForKey(const std::string &key);
 
-        Texture2D* getTextureForKey(const std::string& key) const;
-        const std::string getTextureFilePath(Texture2D* texture)const;
+        GLTexture* getTextureForKey(const std::string& key) const;
+        const std::string getTextureFilePath(GLTexture* texture)const;
 
         void waitForQuit();
 
@@ -145,10 +145,10 @@ namespace GRAPH
         struct AsyncStruct
         {
         public:
-            AsyncStruct(const std::string& fn, std::function<void(Texture2D*)> f) : filename(fn), callback(f) {}
+            AsyncStruct(const std::string& fn, std::function<void(GLTexture*)> f) : filename(fn), callback(f) {}
 
             std::string filename;
-            std::function<void(Texture2D*)> callback;
+            std::function<void(GLTexture*)> callback;
         };
 
         struct ImageInfo
@@ -165,49 +165,49 @@ namespace GRAPH
         std::condition_variable sleepCondition_;
         bool needQuit_;
         int asyncRefCount_;
-        std::unordered_map<std::string, Texture2D*> textures_;
+        std::unordered_map<std::string, GLTexture*> textures_;
     };
 
     class TextureAtlas : public HObject
     {
     public:
-        static TextureAtlas* create(const std::string& file , int64 capacity);
-        static TextureAtlas* createWithTexture(Texture2D *texture, int64 capacity);
+        static TextureAtlas* create(const std::string& file , uint64 capacity);
+        static TextureAtlas* createWithTexture(GLTexture *texture, uint64 capacity);
 
         TextureAtlas();
         virtual ~TextureAtlas();
 
-        bool initWithFile(const std::string& file, int64 capacity);
-        bool initWithTexture(Texture2D *texture, int64 capacity);
+        bool initWithFile(const std::string& file, uint64 capacity);
+        bool initWithTexture(GLTexture *texture, uint64 capacity);
 
-        void updateQuad(V3F_C4B_T2F_Quad* quad, int64 index);
-        void insertQuad(V3F_C4B_T2F_Quad* quad, int64 index);
-        void insertQuads(V3F_C4B_T2F_Quad* quads, int64 index, int64 amount);
-        void insertQuadFromIndex(int64 fromIndex, int64 newIndex);
+        void updateQuad(V3F_C4B_T2F_Quad* quad, uint64 index);
+        void insertQuad(V3F_C4B_T2F_Quad* quad, uint64 index);
+        void insertQuads(V3F_C4B_T2F_Quad* quads, uint64 index, uint64 amount);
+        void insertQuadFromIndex(uint64 fromIndex, uint64 newIndex);
 
-        void removeQuadAtIndex(int64 index);
-        void removeQuadsAtIndex(int64 index, int64 amount);
+        void removeQuadAtIndex(uint64 index);
+        void removeQuadsAtIndex(uint64 index, uint64 amount);
         void removeAllQuads();
 
-        bool resizeCapacity(int64 capacity);
+        bool resizeCapacity(uint64 capacity);
 
-        void increaseTotalQuadsWith(int64 amount);
-        void moveQuadsFromIndex(int64 oldIndex, int64 amount, int64 newIndex);
-        void moveQuadsFromIndex(int64 index, int64 newIndex);
-        void fillWithEmptyQuadsFromIndex(int64 index, int64 amount);
+        void increaseTotalQuadsWith(uint64 amount);
+        void moveQuadsFromIndex(uint64 oldIndex, uint64 amount, uint64 newIndex);
+        void moveQuadsFromIndex(uint64 index, uint64 newIndex);
+        void fillWithEmptyQuadsFromIndex(uint64 index, uint64 amount);
 
-        void drawNumberOfQuads(int64 n);
-        void drawNumberOfQuads(int64 numberOfQuads, int64 start);
+        void drawNumberOfQuads(uint64 n);
+        void drawNumberOfQuads(uint64 numberOfQuads, uint64 start);
         void drawQuads();
 
         inline bool isDirty(void) { return dirty_; }
         inline void setDirty(bool bDirty) { dirty_ = bDirty; }
 
-        int64 getTotalQuads() const;
-        int64 getCapacity() const;
+        uint64 getTotalQuads() const;
+        uint64 getCapacity() const;
 
-        Texture2D* getTexture() const;
-        void setTexture(Texture2D* texture);
+        GLTexture* getTexture() const;
+        void setTexture(GLTexture* texture);
 
         V3F_C4B_T2F_Quad* getQuads();
         void setQuads(V3F_C4B_T2F_Quad* quads);
@@ -222,7 +222,7 @@ namespace GRAPH
     protected:
         VertexBufferObject<V3F_C4B_T2F_Quad> vbo_;
         bool    dirty_;
-        Texture2D* texture_;
+        GLTexture* texture_;
     };
 }
 

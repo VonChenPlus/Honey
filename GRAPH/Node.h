@@ -130,7 +130,7 @@ namespace GRAPH
         virtual void enumerateChildren(const std::string &name, std::function<bool(Node* node)> callback) const;
         virtual HObjectVector<Node*>& getChildren() { return _children; }
         virtual const HObjectVector<Node*>& getChildren() const { return _children; }
-        virtual int64 getChildrenCount() const;
+        virtual uint64 getChildrenCount() const;
         virtual void setParent(Node* parent);
         virtual Node* getParent() { return _parent; }
         virtual const Node* getParent() const { return _parent; }
@@ -197,7 +197,7 @@ namespace GRAPH
         void stopActionByTag(int tag);
         void stopAllActionsByTag(int tag);
         Action* getActionByTag(int tag);
-        int64 getNumberOfRunningActions() const;
+        uint64 getNumberOfRunningActions() const;
 
         virtual void setScheduler(Scheduler* scheduler);
         virtual Scheduler* getScheduler() { return _scheduler; }
@@ -288,7 +288,7 @@ namespace GRAPH
     protected:
         void childrenAlloc(void);
         void insertChild(Node* child, int z);
-        void detachChild(Node *child, int64 index, bool doCleanup);
+        void detachChild(Node *child, uint64 index, bool doCleanup);
 
         MATH::Vector2f convertToWindowSpace(const MATH::Vector2f& nodePoint) const;
 

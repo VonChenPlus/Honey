@@ -3,7 +3,7 @@
 #include "GRAPH/UNITY3D/GLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
-#include "GRAPH/UNITY3D/Texture2D.h"
+#include "GRAPH/UNITY3D/GLTexture.h"
 #include "UTILS/HASH/HashUtils.h"
 
 namespace GRAPH
@@ -85,7 +85,7 @@ namespace GRAPH
         commandType_ = RenderCommand::Type::QUAD_COMMAND;
     }
 
-    void QuadCommand::init(float globalOrder, GLuint textureID, GLShaderState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, int64 quadCount,
+    void QuadCommand::init(float globalOrder, GLuint textureID, GLShaderState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, uint64 quadCount,
                            const MATH::Matrix4& mv, uint32_t flags) {
         RenderCommand::init(globalOrder, mv, flags);
 
@@ -144,7 +144,7 @@ namespace GRAPH
 
         _triangles = triangles;
         if(_triangles.indexCount % 3 != 0) {
-            int64 count = _triangles.indexCount;
+            uint64 count = _triangles.indexCount;
             _triangles.indexCount = count / 3 * 3;
         }
         matrix4_ = mv;

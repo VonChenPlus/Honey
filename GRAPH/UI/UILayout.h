@@ -186,14 +186,14 @@ namespace GRAPH
 
             int findFirstFocusEnabledWidgetIndex();
 
-            Widget* findFocusEnabledChildWidgetByIndex(int64 index);
+            Widget* findFocusEnabledChildWidgetByIndex(uint64 index);
 
             MATH::Vector2f getWorldCenterPoint(Widget* node)const;
 
             Widget* getNextFocusedWidget(FocusDirection direction,Widget *current);
             Widget* getPreviousFocusedWidget(FocusDirection direction, Widget *current);
 
-            Widget* getChildWidgetByIndex(int64 index)const;
+            Widget* getChildWidgetByIndex(uint64 index)const;
             bool  isLastWidgetInContainer(Widget* widget, FocusDirection direction)const;
             bool  isWidgetAncestorSupportLoopFocus(Widget* widget, FocusDirection direction)const;
 
@@ -355,7 +355,7 @@ namespace GRAPH
             bool caculateFinalPositionWithRelativeWidget(LayoutProtocol *layout);
             void caculateFinalPositionWithRelativeAlign();
 
-            int64 _unlayoutChildCount;
+            uint64 _unlayoutChildCount;
             HObjectVector<Widget*> _widgetChildren;
             Widget* _widget;
             float _finalPositionX;

@@ -2,7 +2,7 @@
 #include "GRAPH/Sprite.h"
 #include "GRAPH/SpriteFrame.h"
 #include "GRAPH/Director.h"
-#include "GRAPH/UNITY3D/Texture2D.h"
+#include "GRAPH/UNITY3D/GLTexture.h"
 #include "GRAPH/UNITY3D/GLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/Renderer.h"
@@ -93,7 +93,7 @@ namespace GRAPH
         return area;
     }
 
-    Sprite* Sprite::createWithTexture(Texture2D *texture) {
+    Sprite* Sprite::createWithTexture(GLTexture *texture) {
         Sprite *sprite = new (std::nothrow) Sprite();
         if (sprite && sprite->initWithTexture(texture)) {
             sprite->autorelease();
@@ -103,7 +103,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    Sprite* Sprite::createWithTexture(Texture2D *texture, const MATH::Rectf& rect, bool rotated) {
+    Sprite* Sprite::createWithTexture(GLTexture *texture, const MATH::Rectf& rect, bool rotated) {
         Sprite *sprite = new (std::nothrow) Sprite();
         if (sprite && sprite->initWithTexture(texture, rect, rotated)) {
             sprite->autorelease();
@@ -172,14 +172,14 @@ namespace GRAPH
         return initWithTexture(nullptr, MATH::RectfZERO );
     }
 
-    bool Sprite::initWithTexture(Texture2D *texture) {
+    bool Sprite::initWithTexture(GLTexture *texture) {
         MATH::Rectf rect = MATH::RectfZERO;
         rect.size = texture->getContentSize();
 
         return initWithTexture(texture, rect);
     }
 
-    bool Sprite::initWithTexture(Texture2D *texture, const MATH::Rectf& rect) {
+    bool Sprite::initWithTexture(GLTexture *texture, const MATH::Rectf& rect) {
         return initWithTexture(texture, rect, false);
     }
 
@@ -196,7 +196,7 @@ namespace GRAPH
     }
 
     bool Sprite::initWithFile(const std::string& filename) {
-        Texture2D *texture = Director::getInstance().getTextureCache()->addImage(filename);
+        GLTexture *texture = Director::getInstance().getTextureCache()->addImage(filename);
         if (texture) {
             MATH::Rectf rect = MATH::RectfZERO;
             rect.size = texture->getContentSize();
@@ -207,7 +207,7 @@ namespace GRAPH
     }
 
     bool Sprite::initWithFile(const std::string &filename, const MATH::Rectf& rect) {
-        Texture2D *texture = Director::getInstance().getTextureCache()->addImage(filename);
+        GLTexture *texture = Director::getInstance().getTextureCache()->addImage(filename);
         if (texture) {
             return initWithTexture(texture, rect);
         }
@@ -221,7 +221,7 @@ namespace GRAPH
         return true;
     }
 
-    bool Sprite::initWithTexture(Texture2D *texture, const MATH::Rectf& rect, bool rotated) {
+    bool Sprite::initWithTexture(GLTexture *texture, const MATH::Rectf& rect, bool rotated) {
         bool result;
         if (Node::init()) {
             batchNode_ = nullptr;
@@ -282,7 +282,7 @@ namespace GRAPH
     #define _2x2_WHITE_IMAGE_KEY  "/_2x2_white_image"
 
     void Sprite::setTexture(const std::string &filename) {
-        Texture2D *texture = Director::getInstance().getTextureCache()->addImage(filename);
+        GLTexture *texture = Director::getInstance().getTextureCache()->addImage(filename);
         setTexture(texture);
 
         MATH::Rectf rect = MATH::RectfZERO;
@@ -291,7 +291,7 @@ namespace GRAPH
         setTextureRect(rect);
     }
 
-    void Sprite::setTexture(Texture2D *texture) {
+    void Sprite::setTexture(GLTexture *texture) {
         if (texture == nullptr) {
             texture = Director::getInstance().getTextureCache()->getTextureForKey(_2x2_WHITE_IMAGE_KEY);
 
@@ -311,7 +311,7 @@ namespace GRAPH
         }
     }
 
-    Texture2D* Sprite::getTexture() const {
+    GLTexture* Sprite::getTexture() const {
         return texture_;
     }
 
@@ -373,7 +373,7 @@ namespace GRAPH
 
         unflippedOffsetPositionFromCenter_ = spriteFrame->getOffset();
 
-        Texture2D *texture = spriteFrame->getTexture();
+        GLTexture *texture = spriteFrame->getTexture();
         if (texture != texture_) {
             setTexture(texture);
         }
@@ -403,7 +403,7 @@ namespace GRAPH
     }
 
     void Sprite::setTextureCoords(MATH::Rectf rect) {
-        Texture2D *tex = batchNode_ ? textureAtlas_->getTexture() : texture_;
+        GLTexture *tex = batchNode_ ? textureAtlas_->getTexture() : texture_;
         if (! tex) {
             return;
         }
@@ -802,7 +802,7 @@ namespace GRAPH
         polyInfo_ = info;
     }
 
-    SpriteBatchNode* SpriteBatchNode::createWithTexture(Texture2D* tex, int64 capacity/* = DEFAULT_CAPACITY*/) {
+    SpriteBatchNode* SpriteBatchNode::createWithTexture(GLTexture* tex, uint64 capacity/* = DEFAULT_CAPACITY*/) {
         SpriteBatchNode *batchNode = new (std::nothrow) SpriteBatchNode();
         batchNode->initWithTexture(tex, capacity);
         batchNode->autorelease();
@@ -810,14 +810,14 @@ namespace GRAPH
         return batchNode;
     }
 
-    SpriteBatchNode* SpriteBatchNode::create(const std::string& fileImage, int64 capacity/* = DEFAULT_CAPACITY*/) {
+    SpriteBatchNode* SpriteBatchNode::create(const std::string& fileImage, uint64 capacity/* = DEFAULT_CAPACITY*/) {
         SpriteBatchNode *batchNode = new (std::nothrow) SpriteBatchNode();
         batchNode->initWithFile(fileImage, capacity);
         batchNode->autorelease();
         return batchNode;
     }
 
-    bool SpriteBatchNode::initWithTexture(Texture2D *tex, int64 capacity/* = DEFAULT_CAPACITY*/) {
+    bool SpriteBatchNode::initWithTexture(GLTexture *tex, uint64 capacity/* = DEFAULT_CAPACITY*/) {
         blendFunc_ = BlendFunc::ALPHA_PREMULTIPLIED;
         if (!tex->hasPremultipliedAlpha()) {
             blendFunc_ = BlendFunc::ALPHA_NON_PREMULTIPLIED;
@@ -841,13 +841,13 @@ namespace GRAPH
     }
 
     bool SpriteBatchNode::init() {
-        Texture2D * texture = new (std::nothrow) Texture2D();
+        GLTexture * texture = new (std::nothrow) GLTexture();
         texture->autorelease();
         return this->initWithTexture(texture, 0);
     }
 
-    bool SpriteBatchNode::initWithFile(const std::string& fileImage, int64 capacity/* = DEFAULT_CAPACITY*/) {
-        Texture2D *texture2D = Director::getInstance().getTextureCache()->addImage(fileImage);
+    bool SpriteBatchNode::initWithFile(const std::string& fileImage, uint64 capacity/* = DEFAULT_CAPACITY*/) {
+        GLTexture *texture2D = Director::getInstance().getTextureCache()->addImage(fileImage);
         return initWithTexture(texture2D, capacity);
     }
 
@@ -921,7 +921,7 @@ namespace GRAPH
         }
     }
 
-    void SpriteBatchNode::removeChildAtIndex(int64 index, bool doCleanup) {
+    void SpriteBatchNode::removeChildAtIndex(uint64 index, bool doCleanup) {
         removeChild(_children.at(index), doCleanup);
     }
 
@@ -945,7 +945,7 @@ namespace GRAPH
                     child->sortAllChildren();
                 }
 
-                int64 index = 0;
+                uint64 index = 0;
                 for (const auto &child : _children) {
                     Sprite* sp = static_cast<Sprite*>(child);
                     updateAtlasIndex(sp, &index);
@@ -956,11 +956,11 @@ namespace GRAPH
         }
     }
 
-    void SpriteBatchNode::updateAtlasIndex(Sprite* sprite, int64* curIndex) {
+    void SpriteBatchNode::updateAtlasIndex(Sprite* sprite, uint64* curIndex) {
         auto& array = sprite->getChildren();
         auto count = array.size();
 
-        int64 oldIndex = 0;
+        uint64 oldIndex = 0;
 
         if (count == 0) {
             oldIndex = sprite->getAtlasIndex();
@@ -1010,7 +1010,7 @@ namespace GRAPH
         }
     }
 
-    void SpriteBatchNode::swap(int64 oldIndex, int64 newIndex) {
+    void SpriteBatchNode::swap(uint64 oldIndex, uint64 newIndex) {
         V3F_C4B_T2F_Quad* quads = textureAtlas_->getQuads();
         std::swap(quads[oldIndex], quads[newIndex]);
 
@@ -1040,13 +1040,13 @@ namespace GRAPH
     }
 
     void SpriteBatchNode::increaseAtlasCapacity() {
-        int64 quantity = (textureAtlas_->getCapacity() + 1) * 4 / 3;
+        uint64 quantity = (textureAtlas_->getCapacity() + 1) * 4 / 3;
 
         if (!textureAtlas_->resizeCapacity(quantity)) {
         }
     }
 
-    int64 SpriteBatchNode::rebuildIndexInOrder(Sprite *parent, int64 index) {
+    uint64 SpriteBatchNode::rebuildIndexInOrder(Sprite *parent, uint64 index) {
         auto& children = parent->getChildren();
         for (const auto &child : children) {
             Sprite* sp = static_cast<Sprite*>(child);
@@ -1070,7 +1070,7 @@ namespace GRAPH
         return index;
     }
 
-    int64 SpriteBatchNode::highestAtlasIndexInChild(Sprite *sprite) {
+    uint64 SpriteBatchNode::highestAtlasIndexInChild(Sprite *sprite) {
         auto& children = sprite->getChildren();
 
         if (children.size() == 0) {
@@ -1081,7 +1081,7 @@ namespace GRAPH
         }
     }
 
-    int64 SpriteBatchNode::lowestAtlasIndexInChild(Sprite *sprite) {
+    uint64 SpriteBatchNode::lowestAtlasIndexInChild(Sprite *sprite) {
         auto& children = sprite->getChildren();
 
         if (children.size() == 0) {
@@ -1092,7 +1092,7 @@ namespace GRAPH
         }
     }
 
-    int64 SpriteBatchNode::atlasIndexForChild(Sprite *sprite, int nZ) {
+    uint64 SpriteBatchNode::atlasIndexForChild(Sprite *sprite, int nZ) {
         auto& siblings = sprite->getParent()->getChildren();
         auto childIndex = siblings.getIndex(sprite);
 
@@ -1200,16 +1200,16 @@ namespace GRAPH
         return blendFunc_;
     }
 
-    Texture2D* SpriteBatchNode::getTexture() const {
+    GLTexture* SpriteBatchNode::getTexture() const {
         return textureAtlas_->getTexture();
     }
 
-    void SpriteBatchNode::setTexture(Texture2D *texture) {
+    void SpriteBatchNode::setTexture(GLTexture *texture) {
         textureAtlas_->setTexture(texture);
         updateBlendFunc();
     }
 
-    void SpriteBatchNode::insertQuadFromSprite(Sprite *sprite, int64 index) {
+    void SpriteBatchNode::insertQuadFromSprite(Sprite *sprite, uint64 index) {
         while (index >= textureAtlas_->getCapacity() || textureAtlas_->getCapacity() == textureAtlas_->getTotalQuads()) {
             this->increaseAtlasCapacity();
         }
@@ -1224,7 +1224,7 @@ namespace GRAPH
         sprite->updateTransform();
     }
 
-    void SpriteBatchNode::updateQuadFromSprite(Sprite *sprite, int64 index) {
+    void SpriteBatchNode::updateQuadFromSprite(Sprite *sprite, uint64 index) {
         while (index >= textureAtlas_->getCapacity() || textureAtlas_->getCapacity() == textureAtlas_->getTotalQuads()) {
             this->increaseAtlasCapacity();
         }

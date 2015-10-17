@@ -60,12 +60,12 @@ namespace GRAPH
 
             inline std::vector<EventListener*>* getFixedPriorityListeners() const { return _fixedListeners; }
             inline std::vector<EventListener*>* getSceneGraphPriorityListeners() const { return _sceneGraphListeners; }
-            inline int64 getGt0Index() const { return _gt0Index; }
-            inline void setGt0Index(int64 index) { _gt0Index = index; }
+            inline uint64 getGt0Index() const { return _gt0Index; }
+            inline void setGt0Index(uint64 index) { _gt0Index = index; }
         private:
             std::vector<EventListener*>* _fixedListeners;
             std::vector<EventListener*>* _sceneGraphListeners;
-            int64 _gt0Index;
+            uint64 _gt0Index;
         };
 
         void addEventListener(EventListener* listener);

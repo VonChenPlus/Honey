@@ -2,7 +2,7 @@
 #include "GRAPH/Fonts.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/EventDispatcher.h"
-#include "GRAPH/UNITY3D/Texture2D.h"
+#include "GRAPH/UNITY3D/GLTexture.h"
 #include "IO/FileUtils.h"
 #include "UTILS/STRING/StringUtils.h"
 #include "UTILS/STRING/UTFUtils.h"
@@ -56,7 +56,7 @@ namespace GRAPH
         Font* fontTTf = _font;
         if (fontTTf) {
             _commonLineHeight = _font->getFontMaxHeight();
-            auto texture = new (std::nothrow) Texture2D;
+            auto texture = new (std::nothrow) GLTexture;
             _currentPage = 0;
             _currentPageOrigX = 0;
             _currentPageOrigY = 0;
@@ -180,7 +180,7 @@ namespace GRAPH
                             _currentPageOrigY = 0;
                             memset(_currentPageData, 0, _currentPageDataSize);
                             _currentPage++;
-                            auto tex = new (std::nothrow) Texture2D;
+                            auto tex = new (std::nothrow) GLTexture;
                             if (_antialiasEnabled)
                             {
                                 tex->setAntiAliasTexParameters();
@@ -254,12 +254,12 @@ namespace GRAPH
         }
     }
 
-    void FontAtlas::addTexture(Texture2D *texture, int slot) {
+    void FontAtlas::addTexture(GLTexture *texture, int slot) {
         texture->retain();
         _atlasTextures[slot] = texture;
     }
 
-    Texture2D* FontAtlas::getTexture(int slot) {
+    GLTexture* FontAtlas::getTexture(int slot) {
         return _atlasTextures[slot];
     }
 

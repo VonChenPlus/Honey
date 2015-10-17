@@ -45,8 +45,8 @@ namespace GRAPH
         static Sprite* create(const std::string& filename);
         static Sprite* create(const PolygonInfo& info);
         static Sprite* create(const std::string& filename, const MATH::Rectf& rect);
-        static Sprite* createWithTexture(Texture2D *texture);
-        static Sprite* createWithTexture(Texture2D *texture, const MATH::Rectf& rect, bool rotated=false);
+        static Sprite* createWithTexture(GLTexture *texture);
+        static Sprite* createWithTexture(GLTexture *texture, const MATH::Rectf& rect, bool rotated=false);
         static Sprite* createWithSpriteFrame(SpriteFrame *spriteFrame);
         static Sprite* createWithSpriteFrameName(const std::string& spriteFrameName);
 
@@ -56,8 +56,8 @@ namespace GRAPH
         virtual void setBatchNode(SpriteBatchNode *spriteBatchNode);
 
         virtual void setTexture(const std::string &filename );
-        virtual void setTexture(Texture2D *texture) override;
-        virtual Texture2D* getTexture() const override;
+        virtual void setTexture(GLTexture *texture) override;
+        virtual GLTexture* getTexture() const override;
 
         virtual void setTextureRect(const MATH::Rectf& rect);
         virtual void setTextureRect(const MATH::Rectf& rect, bool rotated, const MATH::Sizef& untrimmedSize);
@@ -76,8 +76,8 @@ namespace GRAPH
 
         inline bool isTextureRectRotated() const { return rectRotated_; }
 
-        inline int64 getAtlasIndex() const { return atlasIndex_; }
-        inline void setAtlasIndex(int64 atlasIndex) { atlasIndex_ = atlasIndex; }
+        inline uint64 getAtlasIndex() const { return atlasIndex_; }
+        inline void setAtlasIndex(uint64 atlasIndex) { atlasIndex_ = atlasIndex; }
 
         inline const MATH::Rectf& getTextureRect() const { return rect_; }
 
@@ -125,10 +125,10 @@ namespace GRAPH
         virtual ~Sprite();
 
         virtual bool init() override;
-        virtual bool initWithTexture(Texture2D *texture);
+        virtual bool initWithTexture(GLTexture *texture);
         virtual bool initWithPolygon(const PolygonInfo& info);
-        virtual bool initWithTexture(Texture2D *texture, const MATH::Rectf& rect);
-        virtual bool initWithTexture(Texture2D *texture, const MATH::Rectf& rect, bool rotated);
+        virtual bool initWithTexture(GLTexture *texture, const MATH::Rectf& rect);
+        virtual bool initWithTexture(GLTexture *texture, const MATH::Rectf& rect, bool rotated);
         virtual bool initWithSpriteFrame(SpriteFrame *spriteFrame);
         virtual bool initWithSpriteFrameName(const std::string& spriteFrameName);
         virtual bool initWithFile(const std::string& filename);
@@ -145,14 +145,14 @@ namespace GRAPH
         virtual void setDirtyRecursively(bool value);
 
         TextureAtlas*       textureAtlas_;
-        int64             atlasIndex_;
+        uint64             atlasIndex_;
         SpriteBatchNode*    batchNode_;
         bool                dirty_;
         bool                recursiveDirty_;
         bool                shouldBeHidden_;
         MATH::Matrix4       transformToBatch_;
         BlendFunc        blendFunc_;
-        Texture2D*       texture_;
+        GLTexture*       texture_;
         SpriteFrame*     spriteFrame_;
         TrianglesCommand trianglesCommand_;
         MATH::Rectf rect_;
@@ -173,8 +173,8 @@ namespace GRAPH
         static const int DEFAULT_CAPACITY = 29;
 
     public:
-        static SpriteBatchNode* createWithTexture(Texture2D* tex, int64 capacity = DEFAULT_CAPACITY);
-        static SpriteBatchNode* create(const std::string& fileImage, int64 capacity = DEFAULT_CAPACITY);
+        static SpriteBatchNode* createWithTexture(GLTexture* tex, uint64 capacity = DEFAULT_CAPACITY);
+        static SpriteBatchNode* create(const std::string& fileImage, uint64 capacity = DEFAULT_CAPACITY);
 
         inline TextureAtlas* getTextureAtlas() { return textureAtlas_; }
         void setTextureAtlas(TextureAtlas* textureAtlas);
@@ -182,18 +182,18 @@ namespace GRAPH
         inline const std::vector<Sprite*>& getDescendants() const { return descendants_; }
 
         void increaseAtlasCapacity();
-        void removeChildAtIndex(int64 index, bool doCleanup);
+        void removeChildAtIndex(uint64 index, bool doCleanup);
         void appendChild(Sprite* sprite);
         void removeSpriteFromAtlas(Sprite *sprite);
 
-        int64 rebuildIndexInOrder(Sprite *parent, int64 index);
-        int64 highestAtlasIndexInChild(Sprite *sprite);
-        int64 lowestAtlasIndexInChild(Sprite *sprite);
-        int64 atlasIndexForChild(Sprite *sprite, int z);
+        uint64 rebuildIndexInOrder(Sprite *parent, uint64 index);
+        uint64 highestAtlasIndexInChild(Sprite *sprite);
+        uint64 lowestAtlasIndexInChild(Sprite *sprite);
+        uint64 atlasIndexForChild(Sprite *sprite, int z);
         void reorderBatch(bool reorder);
 
-        virtual Texture2D* getTexture() const override;
-        virtual void setTexture(Texture2D *texture) override;
+        virtual GLTexture* getTexture() const override;
+        virtual void setTexture(GLTexture *texture) override;
 
         virtual void setBlendFunc(const BlendFunc &blendFunc) override;
         virtual const BlendFunc& getBlendFunc() const override;
@@ -210,7 +210,7 @@ namespace GRAPH
 
         virtual void draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags) override;
 
-        void insertQuadFromSprite(Sprite *sprite, int64 index);
+        void insertQuadFromSprite(Sprite *sprite, uint64 index);
         SpriteBatchNode * addSpriteWithoutQuad(Sprite *child, int z, int aTag);
 
     public:
@@ -218,15 +218,15 @@ namespace GRAPH
         virtual ~SpriteBatchNode();
 
 
-        bool initWithTexture(Texture2D *tex, int64 capacity = DEFAULT_CAPACITY);
-        bool initWithFile(const std::string& fileImage, int64 capacity = DEFAULT_CAPACITY);
+        bool initWithTexture(GLTexture *tex, uint64 capacity = DEFAULT_CAPACITY);
+        bool initWithFile(const std::string& fileImage, uint64 capacity = DEFAULT_CAPACITY);
         bool init() override;
 
     protected:
-        void updateQuadFromSprite(Sprite *sprite, int64 index);
+        void updateQuadFromSprite(Sprite *sprite, uint64 index);
 
-        void updateAtlasIndex(Sprite* sprite, int64* curIndex);
-        void swap(int64 oldIndex, int64 newIndex);
+        void updateAtlasIndex(Sprite* sprite, uint64* curIndex);
+        void swap(uint64 oldIndex, uint64 newIndex);
         void updateBlendFunc();
 
         TextureAtlas *textureAtlas_;

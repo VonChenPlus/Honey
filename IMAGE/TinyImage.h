@@ -39,45 +39,45 @@ namespace IMAGE
     };
 
     /**convert functions*/
-    IMAGE::PixelFormat convertDataToFormat(const unsigned char* data, int64 dataLen, IMAGE::PixelFormat originFormat, IMAGE::PixelFormat format, unsigned char** outData, int64* outDataLen);
-    IMAGE::PixelFormat convertI8ToFormat(const unsigned char* data, int64 dataLen, IMAGE::PixelFormat format, unsigned char** outData, int64* outDataLen);
-    IMAGE::PixelFormat convertAI88ToFormat(const unsigned char* data, int64 dataLen, IMAGE::PixelFormat format, unsigned char** outData, int64* outDataLen);
-    IMAGE::PixelFormat convertRGB888ToFormat(const unsigned char* data, int64 dataLen, IMAGE::PixelFormat format, unsigned char** outData, int64* outDataLen);
-    IMAGE::PixelFormat convertRGBA8888ToFormat(const unsigned char* data, int64 dataLen, IMAGE::PixelFormat format, unsigned char** outData, int64* outDataLen);
+    IMAGE::PixelFormat convertDataToFormat(const unsigned char* data, uint64 dataLen, IMAGE::PixelFormat originFormat, IMAGE::PixelFormat format, unsigned char** outData, uint64* outDataLen);
+    IMAGE::PixelFormat convertI8ToFormat(const unsigned char* data, uint64 dataLen, IMAGE::PixelFormat format, unsigned char** outData, uint64* outDataLen);
+    IMAGE::PixelFormat convertAI88ToFormat(const unsigned char* data, uint64 dataLen, IMAGE::PixelFormat format, unsigned char** outData, uint64* outDataLen);
+    IMAGE::PixelFormat convertRGB888ToFormat(const unsigned char* data, uint64 dataLen, IMAGE::PixelFormat format, unsigned char** outData, uint64* outDataLen);
+    IMAGE::PixelFormat convertRGBA8888ToFormat(const unsigned char* data, uint64 dataLen, IMAGE::PixelFormat format, unsigned char** outData, uint64* outDataLen);
 
     //I8 to XXX
-    static void convertI8ToRGB888(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertI8ToRGBA8888(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertI8ToRGB565(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertI8ToRGBA4444(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertI8ToRGB5A1(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertI8ToAI88(const unsigned char* data, int64 dataLen, unsigned char* outData);
+    static void convertI8ToRGB888(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertI8ToRGBA8888(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertI8ToRGB565(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertI8ToRGBA4444(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertI8ToRGB5A1(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertI8ToAI88(const unsigned char* data, uint64 dataLen, unsigned char* outData);
 
     //AI88 to XXX
-    static void convertAI88ToRGB888(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertAI88ToRGBA8888(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertAI88ToRGB565(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertAI88ToRGBA4444(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertAI88ToRGB5A1(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertAI88ToA8(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertAI88ToI8(const unsigned char* data, int64 dataLen, unsigned char* outData);
+    static void convertAI88ToRGB888(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertAI88ToRGBA8888(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertAI88ToRGB565(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertAI88ToRGBA4444(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertAI88ToRGB5A1(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertAI88ToA8(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertAI88ToI8(const unsigned char* data, uint64 dataLen, unsigned char* outData);
 
     //RGB888 to XXX
-    static void convertRGB888ToRGBA8888(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertRGB888ToRGB565(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertRGB888ToI8(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertRGB888ToAI88(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertRGB888ToRGBA4444(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertRGB888ToRGB5A1(const unsigned char* data, int64 dataLen, unsigned char* outData);
+    static void convertRGB888ToRGBA8888(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertRGB888ToRGB565(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertRGB888ToI8(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertRGB888ToAI88(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertRGB888ToRGBA4444(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertRGB888ToRGB5A1(const unsigned char* data, uint64 dataLen, unsigned char* outData);
 
     //RGBA8888 to XXX
-    static void convertRGBA8888ToRGB888(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertRGBA8888ToRGB565(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertRGBA8888ToI8(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertRGBA8888ToA8(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertRGBA8888ToAI88(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertRGBA8888ToRGBA4444(const unsigned char* data, int64 dataLen, unsigned char* outData);
-    static void convertRGBA8888ToRGB5A1(const unsigned char* data, int64 dataLen, unsigned char* outData);
+    static void convertRGBA8888ToRGB888(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertRGBA8888ToRGB565(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertRGBA8888ToI8(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertRGBA8888ToA8(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertRGBA8888ToAI88(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertRGBA8888ToRGBA4444(const unsigned char* data, uint64 dataLen, unsigned char* outData);
+    static void convertRGBA8888ToRGB5A1(const unsigned char* data, uint64 dataLen, unsigned char* outData);
 
     struct PixelFormatInfo {
         PixelFormatInfo(uint32 anInternalFormat, uint32 aFormat, uint32 aType, int aBpp, bool aCompressed, bool anAlpha)
@@ -128,13 +128,13 @@ namespace IMAGE
         };
 
         bool initWithImageFile(const std::string& path);
-        bool initWithImageData(const unsigned char *data, int64 dataLen);
-        bool initWithRawData(const unsigned char *data, int64 dataLen, int width, int height, int bitsPerComponent, bool preMulti = false);
+        bool initWithImageData(const unsigned char *data, uint64 dataLen);
+        bool initWithRawData(const unsigned char *data, uint64 dataLen, int width, int height, int bitsPerComponent, bool preMulti = false);
         bool initWithImageFileThreadSafe(const std::string& fullpath);
 
         // Getters
         inline unsigned char *   getData()               { return data_; }
-        inline int64           getDataLen()            { return dataLen_; }
+        inline uint64           getDataLen()            { return dataLen_; }
         inline Format            getFileType()           {return fileType_; }
         inline PixelFormat       getRenderFormat()       { return renderFormat_; }
         inline int               getWidth()              { return width_; }
@@ -149,9 +149,9 @@ namespace IMAGE
         static const PixelFormatInfoMap& getPixelFormatInfoMap();
 
     protected:
-        bool initWithJpgData(const unsigned char *data, int64 dataLen);
-        bool initWithPngData(const unsigned char *data, int64 dataLen);
-        bool initWithETCData(const unsigned char *data, int64 dataLen);
+        bool initWithJpgData(const unsigned char *data, uint64 dataLen);
+        bool initWithPngData(const unsigned char *data, uint64 dataLen);
+        bool initWithETCData(const unsigned char *data, uint64 dataLen);
 
         void premultipliedAlpha();
 
@@ -160,14 +160,14 @@ namespace IMAGE
         TinyImage(const TinyImage&    rImg);
         TinyImage & operator=(const TinyImage&);
 
-        Format detectFormat(const unsigned char * data, int64 dataLen);
-        bool isPng(const unsigned char * data, int64 dataLen);
-        bool isJpg(const unsigned char * data, int64 dataLen);
-        bool isEtc(const unsigned char * data, int64 dataLen);
+        Format detectFormat(const unsigned char * data, uint64 dataLen);
+        bool isPng(const unsigned char * data, uint64 dataLen);
+        bool isJpg(const unsigned char * data, uint64 dataLen);
+        bool isEtc(const unsigned char * data, uint64 dataLen);
 
     protected:
         unsigned char *data_;
-        int64 dataLen_;
+        uint64 dataLen_;
         int width_;
         int height_;
         Format fileType_;

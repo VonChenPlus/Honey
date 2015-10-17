@@ -30,7 +30,7 @@ namespace GRAPH
             void setString(const std::string& text);
             const std::string& getString()const;
 
-            int64 getStringLength()const;
+            uint64 getStringLength()const;
 
             void setFontSize(int size);
             int getFontSize()const;

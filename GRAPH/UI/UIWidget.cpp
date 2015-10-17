@@ -141,7 +141,7 @@ namespace GRAPH
             this->removeKeyboardEventListener();
         }
 
-        void Widget::FocusNavigationController::onKeypadKeyPressed(EventKeyboard::KeyCode  keyCode, Event *event)
+        void Widget::FocusNavigationController::onKeypadKeyPressed(EventKeyboard::KeyCode  keyCode, Event *)
         {
             if (_enableFocusNavigation && _firstFocusedWidget)
             {
@@ -802,7 +802,7 @@ namespace GRAPH
             return false;
         }
 
-        bool Widget::onTouchBegan(Touch *touch, Event *unusedEvent)
+        bool Widget::onTouchBegan(Touch *touch, Event *)
         {
             _hitted = false;
             if (isVisible() && isEnabled() && isAncestorsEnabled() && isAncestorsVisible(this) )
@@ -844,7 +844,7 @@ namespace GRAPH
             }
         }
 
-        void Widget::onTouchMoved(Touch *touch, Event *unusedEvent)
+        void Widget::onTouchMoved(Touch *touch, Event *)
         {
             _touchMovePosition = touch->getLocation();
 
@@ -861,7 +861,7 @@ namespace GRAPH
             moveEvent();
         }
 
-        void Widget::onTouchEnded(Touch *touch, Event *unusedEvent)
+        void Widget::onTouchEnded(Touch *touch, Event *)
         {
             _touchEndPosition = touch->getLocation();
 
@@ -886,7 +886,7 @@ namespace GRAPH
             }
         }
 
-        void Widget::onTouchCancelled(Touch *touch, Event *unusedEvent)
+        void Widget::onTouchCancelled(Touch *, Event *)
         {
             setHighlighted(false);
             cancelUpEvent();
@@ -1213,7 +1213,7 @@ namespace GRAPH
             return glState;
         }
 
-        void Widget::copySpecialProperties(Widget* model)
+        void Widget::copySpecialProperties(Widget*)
         {
 
         }

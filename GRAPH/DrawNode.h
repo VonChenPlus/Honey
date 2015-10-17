@@ -49,7 +49,7 @@ namespace GRAPH
         virtual bool init() override;
 
     protected:
-        void ensureCapacity(int type, int64 count);
+        void ensureCapacity(int type, uint64 count);
 
     private:
         VertexBufferObject<V2F_C4B_T2F> vboArray_[3]; // default, point, line

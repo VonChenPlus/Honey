@@ -8,15 +8,15 @@
 
 namespace GRAPH
 {
-    class Texture2D;
+    class GLTexture;
 
     class SpriteFrame : public HObject
     {
     public:
         static SpriteFrame* create(const std::string& filename, const MATH::Rectf& rect);
         static SpriteFrame* create(const std::string& filename, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize);
-        static SpriteFrame* createWithTexture(Texture2D* pobTexture, const MATH::Rectf& rect);
-        static SpriteFrame* createWithTexture(Texture2D* pobTexture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize);
+        static SpriteFrame* createWithTexture(GLTexture* pobTexture, const MATH::Rectf& rect);
+        static SpriteFrame* createWithTexture(GLTexture* pobTexture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize);
 
         inline bool isRotated() const { return rotated_; }
         inline void setRotated(bool rotated) { rotated_ = rotated; }
@@ -27,8 +27,8 @@ namespace GRAPH
         inline const MATH::Sizef& getOriginalSize() const { return originalSize_; }
         inline void setOriginalSize(const MATH::Sizef& sizeInPixels) { originalSize_ = sizeInPixels; }
 
-        Texture2D* getTexture();
-        void setTexture(Texture2D* pobTexture);
+        GLTexture* getTexture();
+        void setTexture(GLTexture* pobTexture);
 
         const MATH::Vector2f& getOffset() const;
         void setOffset(const MATH::Vector2f& offsets);
@@ -37,9 +37,9 @@ namespace GRAPH
         SpriteFrame();
         virtual ~SpriteFrame();
 
-        bool initWithTexture(Texture2D* pobTexture, const MATH::Rectf& rect);
+        bool initWithTexture(GLTexture* pobTexture, const MATH::Rectf& rect);
         bool initWithTextureFilename(const std::string& filename, const MATH::Rectf& rect);
-        bool initWithTexture(Texture2D* pobTexture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize);
+        bool initWithTexture(GLTexture* pobTexture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize);
         bool initWithTextureFilename(const std::string& filename, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize);
 
     protected:
@@ -47,7 +47,7 @@ namespace GRAPH
         MATH::Sizef originalSize_;
         bool   rotated_;
         MATH::Rectf rect_;
-        Texture2D *texture_;
+        GLTexture *texture_;
         std::string  textureFilename_;
     };
 
@@ -62,8 +62,8 @@ namespace GRAPH
 
         void addSpriteFramesWithFile(const std::string& plist);
         void addSpriteFramesWithFile(const std::string& plist, const std::string& textureFileName);
-        void addSpriteFramesWithFile(const std::string&plist, Texture2D *texture);
-        void addSpriteFramesWithFileContent(const std::string& plist_content, Texture2D *texture);
+        void addSpriteFramesWithFile(const std::string&plist, GLTexture *texture);
+        void addSpriteFramesWithFileContent(const std::string& plist_content, GLTexture *texture);
         void addSpriteFrame(SpriteFrame *frame, const std::string& frameName);
 
         bool isSpriteFramesWithFileLoaded(const std::string& plist) const;
@@ -73,14 +73,14 @@ namespace GRAPH
         void removeSpriteFrameByName(const std::string& name);
         void removeSpriteFramesFromFile(const std::string& plist);
         void removeSpriteFramesFromFileContent(const std::string& plist_content);
-        void removeSpriteFramesFromTexture(Texture2D* texture);
+        void removeSpriteFramesFromTexture(GLTexture* texture);
 
         SpriteFrame* getSpriteFrameByName(const std::string& name);
 
     protected:
         SpriteFrameCache(){ init(); }
 
-        void addSpriteFramesWithDictionary(ValueMap& dictionary, Texture2D *texture);
+        void addSpriteFramesWithDictionary(ValueMap& dictionary, GLTexture *texture);
         void removeSpriteFramesFromDictionary(ValueMap& dictionary);
 
     private:

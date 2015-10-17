@@ -6,7 +6,7 @@
 #include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
-#include "GRAPH/UNITY3D/Texture2D.h"
+#include "GRAPH/UNITY3D/GLTexture.h"
 #include "IO/FileUtils.h"
 #include "UTILS/STRING/UTFUtils.h"
 
@@ -20,7 +20,7 @@ namespace GRAPH
             textureAtlas_ = nullptr;
         }
 
-        static LabelLetter* createWithTexture(Texture2D *texture, const MATH::Rectf& rect, bool rotated = false)
+        static LabelLetter* createWithTexture(GLTexture *texture, const MATH::Rectf& rect, bool rotated = false)
         {
             auto letter = new (std::nothrow) LabelLetter();
             if (letter && letter->initWithTexture(texture, rect, rotated))
@@ -919,7 +919,7 @@ namespace GRAPH
 
     void Label::createSpriteForSystemFont(const FontDefinition& fontDef)
     {
-        auto texture = new (std::nothrow) Texture2D;
+        auto texture = new (std::nothrow) GLTexture;
         texture->initWithString(_utf8Text.c_str(), fontDef);
 
         _textSprite = Sprite::createWithTexture(texture);
@@ -957,7 +957,7 @@ namespace GRAPH
             shadowFontDefinition.stroke.strokeColor = shadowFontDefinition.fontFillColor;
             shadowFontDefinition.stroke.strokeAlpha = shadowFontDefinition.fontAlpha;
 
-            auto texture = new (std::nothrow) Texture2D;
+            auto texture = new (std::nothrow) GLTexture;
             texture->initWithString(_utf8Text.c_str(), shadowFontDefinition);
             _shadowNode = Sprite::createWithTexture(texture);
             texture->release();

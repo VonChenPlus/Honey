@@ -7,7 +7,7 @@
 #include "GRAPH/EventDispatcher.h"
 #include "GRAPH/RenderView.h"
 #include "GRAPH/Scene.h"
-#include "GRAPH/UNITY3D/Texture2D.h"
+#include "GRAPH/UNITY3D/GLTexture.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 
@@ -248,7 +248,7 @@ namespace GRAPH
 
     void Director::popScene(void) {
         scenesStack_.popBack();
-        int64 size = scenesStack_.size();
+        uint64 size = scenesStack_.size();
         if (size != 0) {
             nextScene_ = scenesStack_.at(size - 1);
         }

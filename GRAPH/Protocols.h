@@ -8,7 +8,7 @@
 
 namespace GRAPH
 {
-    class Texture2D;
+    class GLTexture;
 
     class RGBAProtocol
     {
@@ -45,8 +45,8 @@ namespace GRAPH
     public:
         virtual ~TextureProtocol() {}
 
-        virtual Texture2D* getTexture() const = 0;
-        virtual void setTexture(Texture2D *texture) = 0;
+        virtual GLTexture* getTexture() const = 0;
+        virtual void setTexture(GLTexture *texture) = 0;
     };
 
     class LabelProtocol

@@ -495,7 +495,7 @@ namespace GRAPH
         _transformUpdated = _transformDirty = _inverseDirty = true;
     }
 
-    int64 Node::getChildrenCount() const
+    uint64 Node::getChildrenCount() const
     {
         return _children.size();
     }
@@ -864,7 +864,7 @@ namespace GRAPH
             return;
         }
 
-        int64 index = _children.getIndex(child);
+        uint64 index = _children.getIndex(child);
         if( index != -1 )
             this->detachChild( child, index, cleanup );
     }
@@ -915,7 +915,7 @@ namespace GRAPH
         _children.clear();
     }
 
-    void Node::detachChild(Node *child, int64 childIndex, bool doCleanup)
+    void Node::detachChild(Node *child, uint64 childIndex, bool doCleanup)
     {
         if (_running)
         {
@@ -1159,7 +1159,7 @@ namespace GRAPH
         return _actionManager->getActionByTag(tag, this);
     }
 
-    int64 Node::getNumberOfRunningActions() const
+    uint64 Node::getNumberOfRunningActions() const
     {
         return _actionManager->getNumberOfRunningActionsInTarget(this);
     }
@@ -1800,7 +1800,7 @@ namespace GRAPH
             return;
         }
 
-        int64 index = _protectedChildren.getIndex(child);
+        uint64 index = _protectedChildren.getIndex(child);
         if( index != -1 )
         {
             if (_running)

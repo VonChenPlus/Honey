@@ -10,7 +10,7 @@
 
 namespace GRAPH
 {
-    class Texture2D;
+    class GLTexture;
 
     struct FontLetterDefinition
     {
@@ -66,12 +66,12 @@ namespace GRAPH
 
         bool prepareLetterDefinitions(const std::u16string& utf16String);
 
-        inline const std::unordered_map<int64, Texture2D*>& getTextures() const{ return _atlasTextures;}
-        void  addTexture(Texture2D *texture, int slot);
+        inline const std::unordered_map<uint64, GLTexture*>& getTextures() const{ return _atlasTextures;}
+        void  addTexture(GLTexture *texture, int slot);
         float getCommonLineHeight() const;
         void  setCommonLineHeight(float newHeight);
 
-        Texture2D* getTexture(int slot);
+        GLTexture* getTexture(int slot);
         const Font* getFont() const;
 
         void listenRendererRecreated(EventCustom *event);
@@ -88,7 +88,7 @@ namespace GRAPH
         void relaseTextures();
 
     private:
-        std::unordered_map<int64, Texture2D*> _atlasTextures;
+        std::unordered_map<uint64, GLTexture*> _atlasTextures;
         std::unordered_map<unsigned short, FontLetterDefinition> _letterDefinitions;
         float _commonLineHeight;
         Font * _font;

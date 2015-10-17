@@ -45,8 +45,8 @@ namespace MATH
 
     inline int64 MATH_INT64_MAX()      { return std::numeric_limits<int64>::max(); }
     inline int64 MATH_INT64_MIN()      { return std::numeric_limits<int64>::min(); }
-    inline int64 MATH_UINT64_MAX()     { return std::numeric_limits<uint64>::max(); }
-    inline int64 MATH_UINT64_MIN()     { return std::numeric_limits<uint64>::min(); }
+    inline uint64 MATH_UINT64_MAX()     { return std::numeric_limits<uint64>::max(); }
+    inline uint64 MATH_UINT64_MIN()     { return std::numeric_limits<uint64>::min(); }
 
     inline float MATH_FLOAT_MAX()      { return std::numeric_limits<float>::max(); }
     inline float MATH_FLOAT_MIN()      { return std::numeric_limits<float>::min(); }

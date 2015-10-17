@@ -1,7 +1,7 @@
 #include "BASE/HData.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/Scheduler.h"
-#include "GRAPH/UNITY3D/Texture2D.h"
+#include "GRAPH/UNITY3D/GLTexture.h"
 #include "GRAPH/UNITY3D/GLShader.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "IO/FileUtils.h"
@@ -9,9 +9,9 @@
 namespace GRAPH
 {
     static IMAGE::PixelFormat g_defaultAlphaPixelFormat = IMAGE::PixelFormat::DEFAULT;
-    Texture2D::TextToTextureDataDef Texture2D::getTextureDataForText = nullptr;
+    GLTexture::TextToTextureDataDef GLTexture::getTextureDataForText = nullptr;
 
-    Texture2D::Texture2D()
+    GLTexture::GLTexture()
         : pixelFormat_(IMAGE::PixelFormat::DEFAULT)
         , pixelsWidth_(0)
         , pixelsHight_(0)
@@ -24,12 +24,12 @@ namespace GRAPH
         , antialiasEnabled_(true) {
     }
 
-    Texture2D::~Texture2D() {
+    GLTexture::~GLTexture() {
         SAFE_RELEASE(shaderProgram_);
         releaseGLTexture();
     }
 
-    void Texture2D::releaseGLTexture() {
+    void GLTexture::releaseGLTexture() {
         if(name_) {
             GLStateCache::DeleteTexture(name_);
         }
@@ -37,71 +37,71 @@ namespace GRAPH
     }
 
 
-    IMAGE::PixelFormat Texture2D::getPixelFormat() const {
+    IMAGE::PixelFormat GLTexture::getPixelFormat() const {
         return pixelFormat_;
     }
 
-    int Texture2D::getPixelsWidth() const {
+    int GLTexture::getPixelsWidth() const {
         return pixelsWidth_;
     }
 
-    int Texture2D::getPixelsHight() const {
+    int GLTexture::getPixelsHight() const {
         return pixelsHight_;
     }
 
-    GLuint Texture2D::getName() const {
+    GLuint GLTexture::getName() const {
         return name_;
     }
 
-    MATH::Sizef Texture2D::getContentSize() const {
+    MATH::Sizef GLTexture::getContentSize() const {
         MATH::Sizef ret;
         ret.width = contentSize_.width;
         ret.height = contentSize_.height;
         return ret;
     }
 
-    const MATH::Sizef& Texture2D::getContentSizeInPixels() {
+    const MATH::Sizef& GLTexture::getContentSizeInPixels() {
         return contentSize_;
     }
 
-    GLfloat Texture2D::getMaxS() const {
+    GLfloat GLTexture::getMaxS() const {
         return maxS_;
     }
 
-    void Texture2D::setMaxS(GLfloat maxS) {
+    void GLTexture::setMaxS(GLfloat maxS) {
         maxS_ = maxS;
     }
 
-    GLfloat Texture2D::getMaxT() const {
+    GLfloat GLTexture::getMaxT() const {
         return maxT_;
     }
 
-    void Texture2D::setMaxT(GLfloat maxT) {
+    void GLTexture::setMaxT(GLfloat maxT) {
         maxT_ = maxT;
     }
 
-    GLShader* Texture2D::getGLShader() const {
+    GLShader* GLTexture::getGLShader() const {
         return shaderProgram_;
     }
 
-    void Texture2D::setGLShader(GLShader* shaderProgram) {
+    void GLTexture::setGLShader(GLShader* shaderProgram) {
         SAFE_RETAIN(shaderProgram);
         SAFE_RELEASE(shaderProgram_);
         shaderProgram_ = shaderProgram;
     }
 
-    bool Texture2D::hasPremultipliedAlpha() const {
+    bool GLTexture::hasPremultipliedAlpha() const {
         return hasPremultipliedAlpha_;
     }
 
-    bool Texture2D::initWithData(const void *data, int64 dataLen, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef&) {
+    bool GLTexture::initWithData(const void *data, uint64 dataLen, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef&) {
         MipmapInfo mipmap;
         mipmap.address = (unsigned char*)data;
         mipmap.len = static_cast<int>(dataLen);
         return initWithMipmaps(&mipmap, 1, pixelFormat, pixelsWide, pixelsHigh);
     }
 
-    bool Texture2D::initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh)
+    bool GLTexture::initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh)
     {
         if (mipmapsNum <= 0) {
             return false;
@@ -191,7 +191,7 @@ namespace GRAPH
         return true;
     }
 
-    bool Texture2D::updateWithData(const void *data,int offsetX,int offsetY,int width,int height) {
+    bool GLTexture::updateWithData(const void *data,int offsetX,int offsetY,int width,int height) {
         if (name_) {
             GLStateCache::BindTexture2D(name_);
             const IMAGE::PixelFormatInfo& info = IMAGE::TinyImage::getPixelFormatInfoMap().at(pixelFormat_);
@@ -201,11 +201,11 @@ namespace GRAPH
         return false;
     }
 
-    bool Texture2D::initWithImage(IMAGE::TinyImage *image) {
+    bool GLTexture::initWithImage(IMAGE::TinyImage *image) {
         return initWithImage(image, g_defaultAlphaPixelFormat);
     }
 
-    bool Texture2D::initWithImage(IMAGE::TinyImage *image, IMAGE::PixelFormat format) {
+    bool GLTexture::initWithImage(IMAGE::TinyImage *image, IMAGE::PixelFormat format) {
         if (image == nullptr) {
             return false;
         }
@@ -226,7 +226,7 @@ namespace GRAPH
         }
         else {
             unsigned char* outTempData = nullptr;
-            int64 outTempDataLen = 0;
+            uint64 outTempDataLen = 0;
 
             pixelFormat = IMAGE::convertDataToFormat(tempData, tempDataLen, renderFormat, pixelFormat, &outTempData, &outTempDataLen);
 
@@ -243,8 +243,8 @@ namespace GRAPH
         }
     }
 
-    // implementation Texture2D (Text)
-    bool Texture2D::initWithString(const char *text, const std::string& fontName, float fontSize, const MATH::Sizef& dimensions/* = Size(0, 0)*/, TextHAlignment hAlignment/* =  TextHAlignment::CENTER */, TextVAlignment vAlignment/* =  TextVAlignment::TOP */) {
+    // implementation GLTexture (Text)
+    bool GLTexture::initWithString(const char *text, const std::string& fontName, float fontSize, const MATH::Sizef& dimensions/* = Size(0, 0)*/, TextHAlignment hAlignment/* =  TextHAlignment::CENTER */, TextVAlignment vAlignment/* =  TextVAlignment::TOP */) {
         FontDefinition tempDef;
 
         tempDef.shadow.shadowEnabled = false;
@@ -259,7 +259,7 @@ namespace GRAPH
         return initWithString(text, tempDef);
     }
 
-    bool Texture2D::initWithString(const char *text, const FontDefinition& textDefinition) {
+    bool GLTexture::initWithString(const char *text, const FontDefinition& textDefinition) {
         if(!text || 0 == strlen(text)) {
             return false;
         }
@@ -285,7 +285,7 @@ namespace GRAPH
 
         IMAGE::PixelFormat pixelFormat = g_defaultAlphaPixelFormat;
         HBYTE* outTempData = nullptr;
-        int64 outTempDataLen = 0;
+        uint64 outTempDataLen = 0;
 
         int imageWidth;
         int imageHeight;
@@ -312,7 +312,7 @@ namespace GRAPH
         return ret;
     }
 
-    void Texture2D::drawAtPoint(const MATH::Vector2f& point)
+    void GLTexture::drawAtPoint(const MATH::Vector2f& point)
     {
         GLfloat    coordinates[] = {
             0.0f,    maxT_,
@@ -341,7 +341,7 @@ namespace GRAPH
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
-    void Texture2D::drawInRect(const MATH::Rectf& rect) {
+    void GLTexture::drawInRect(const MATH::Rectf& rect) {
         GLfloat    coordinates[] = {
             0.0f,    maxT_,
             maxS_,maxT_,
@@ -364,17 +364,17 @@ namespace GRAPH
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
-    void Texture2D::generateMipmap() {
+    void GLTexture::generateMipmap() {
         GLStateCache::BindTexture2D(name_);
         glGenerateMipmap(GL_TEXTURE_2D);
         hasMipmaps_ = true;
     }
 
-    bool Texture2D::hasMipmaps() const {
+    bool GLTexture::hasMipmaps() const {
         return hasMipmaps_;
     }
 
-    void Texture2D::setTexParameters(const TexParams &texParams) {
+    void GLTexture::setTexParameters(const TexParams &texParams) {
         GLStateCache::BindTexture2D( name_ );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texParams.minFilter );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texParams.magFilter );
@@ -382,7 +382,7 @@ namespace GRAPH
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texParams.wrapT );
     }
 
-    void Texture2D::setAliasTexParameters() {
+    void GLTexture::setAliasTexParameters() {
         if (! antialiasEnabled_) {
             return;
         }
@@ -405,7 +405,7 @@ namespace GRAPH
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     }
 
-    void Texture2D::setAntiAliasTexParameters() {
+    void GLTexture::setAntiAliasTexParameters() {
         if ( antialiasEnabled_ ) {
             return;
         }
@@ -428,11 +428,11 @@ namespace GRAPH
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     }
 
-    void Texture2D::setDefaultAlphaPixelFormat(IMAGE::PixelFormat format) {
+    void GLTexture::setDefaultAlphaPixelFormat(IMAGE::PixelFormat format) {
         g_defaultAlphaPixelFormat = format;
     }
 
-    IMAGE::PixelFormat Texture2D::getDefaultAlphaPixelFormat() {
+    IMAGE::PixelFormat GLTexture::getDefaultAlphaPixelFormat() {
         return g_defaultAlphaPixelFormat;
     }
 
@@ -451,8 +451,8 @@ namespace GRAPH
         SAFE_DELETE(loadingThread_);
     }
 
-    void TextureCache::addImageAsync(const std::string &path, const std::function<void(Texture2D*)>& callback) {
-        Texture2D *texture = nullptr;
+    void TextureCache::addImageAsync(const std::string &path, const std::function<void(GLTexture*)>& callback) {
+        GLTexture *texture = nullptr;
 
         std::string fullpath = IO::FileUtils::getInstance().fullPathForFilename(path);
 
@@ -632,10 +632,10 @@ namespace GRAPH
 
             const std::string& filename = asyncStruct->filename;
 
-            Texture2D *texture = nullptr;
+            GLTexture *texture = nullptr;
             if (image) {
                 // generate texture in render thread
-                texture = new (std::nothrow) Texture2D();
+                texture = new (std::nothrow) GLTexture();
 
                 texture->initWithImage(image);
 
@@ -668,8 +668,8 @@ namespace GRAPH
         }
     }
 
-    Texture2D * TextureCache::addImage(const std::string &path) {
-        Texture2D * texture = nullptr;
+    GLTexture * TextureCache::addImage(const std::string &path) {
+        GLTexture * texture = nullptr;
         IMAGE::TinyImage* image = nullptr;
         // Split up directory and filename
         // MUTEX:
@@ -694,7 +694,7 @@ namespace GRAPH
                 bool bRet = image->initWithImageFile(fullpath);
                 if (!bRet) break;
 
-                texture = new (std::nothrow) Texture2D();
+                texture = new (std::nothrow) GLTexture();
 
                 if( texture && texture->initWithImage(image) )
                 {
@@ -709,8 +709,8 @@ namespace GRAPH
         return texture;
     }
 
-    Texture2D* TextureCache::addImage(IMAGE::TinyImage *image, const std::string &key) {
-        Texture2D * texture = nullptr;
+    GLTexture* TextureCache::addImage(IMAGE::TinyImage *image, const std::string &key) {
+        GLTexture * texture = nullptr;
 
         do {
             auto it = textures_.find(key);
@@ -720,7 +720,7 @@ namespace GRAPH
             }
 
             // prevents overloading the autorelease pool
-            texture = new (std::nothrow) Texture2D();
+            texture = new (std::nothrow) GLTexture();
             texture->initWithImage(image);
 
             if(texture) {
@@ -735,7 +735,7 @@ namespace GRAPH
     }
 
     bool TextureCache::reloadTexture(const std::string& fileName) {
-        Texture2D * texture = nullptr;
+        GLTexture * texture = nullptr;
         IMAGE::TinyImage * image = nullptr;
 
         std::string fullpath = IO::FileUtils::getInstance().fullPathForFilename(fileName);
@@ -780,7 +780,7 @@ namespace GRAPH
 
     void TextureCache::removeUnusedTextures() {
         for( auto it=textures_.cbegin(); it!=textures_.cend(); /* nothing */) {
-            Texture2D *tex = it->second;
+            GLTexture *tex = it->second;
             if( tex->getReferenceCount() == 1 ) {
                 tex->release();
                 textures_.erase(it++);
@@ -791,7 +791,7 @@ namespace GRAPH
         }
     }
 
-    void TextureCache::removeTexture(Texture2D* texture) {
+    void TextureCache::removeTexture(GLTexture* texture) {
         if( ! texture ) {
             return;
         }
@@ -822,7 +822,7 @@ namespace GRAPH
         }
     }
 
-    Texture2D* TextureCache::getTextureForKey(const std::string &textureKeyName) const {
+    GLTexture* TextureCache::getTextureForKey(const std::string &textureKeyName) const {
         std::string key = textureKeyName;
         auto it = textures_.find(key);
 
@@ -836,7 +836,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    const std::string TextureCache::getTextureFilePath( Texture2D *texture )const {
+    const std::string TextureCache::getTextureFilePath( GLTexture *texture )const {
         for(auto& item : textures_) {
             if(item.second == texture) {
                 return item.first;
@@ -864,19 +864,19 @@ namespace GRAPH
         SAFE_RELEASE(texture_);
     }
 
-    int64 TextureAtlas::getTotalQuads() const {
+    uint64 TextureAtlas::getTotalQuads() const {
         return vbo_.u2.bufferCount;
     }
 
-    int64 TextureAtlas::getCapacity() const {
+    uint64 TextureAtlas::getCapacity() const {
         return vbo_.u2.bufferCapacity;
     }
 
-    Texture2D* TextureAtlas::getTexture() const {
+    GLTexture* TextureAtlas::getTexture() const {
         return texture_;
     }
 
-    void TextureAtlas::setTexture(Texture2D * var) {
+    void TextureAtlas::setTexture(GLTexture * var) {
         SAFE_RETAIN(var);
         SAFE_RELEASE(texture_);
         texture_ = var;
@@ -892,7 +892,7 @@ namespace GRAPH
     }
 
     // TextureAtlas - alloc & init
-    TextureAtlas * TextureAtlas::create(const std::string& file, int64 capacity) {
+    TextureAtlas * TextureAtlas::create(const std::string& file, uint64 capacity) {
         TextureAtlas * textureAtlas = new (std::nothrow) TextureAtlas();
         if(textureAtlas && textureAtlas->initWithFile(file, capacity)) {
             textureAtlas->autorelease();
@@ -902,7 +902,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    TextureAtlas * TextureAtlas::createWithTexture(Texture2D *texture, int64 capacity) {
+    TextureAtlas * TextureAtlas::createWithTexture(GLTexture *texture, uint64 capacity) {
         TextureAtlas * textureAtlas = new (std::nothrow) TextureAtlas();
         if (textureAtlas && textureAtlas->initWithTexture(texture, capacity)) {
             textureAtlas->autorelease();
@@ -912,9 +912,9 @@ namespace GRAPH
         return nullptr;
     }
 
-    bool TextureAtlas::initWithFile(const std::string& file, int64 capacity) {
+    bool TextureAtlas::initWithFile(const std::string& file, uint64 capacity) {
         // retained in property
-        Texture2D *texture = Director::getInstance().getTextureCache()->addImage(file);
+        GLTexture *texture = Director::getInstance().getTextureCache()->addImage(file);
 
         if (texture) {
             return initWithTexture(texture, capacity);
@@ -923,7 +923,7 @@ namespace GRAPH
         return false;
     }
 
-    bool TextureAtlas::initWithTexture(Texture2D *texture, int64 capacity) {
+    bool TextureAtlas::initWithTexture(GLTexture *texture, uint64 capacity) {
         vbo_.u2.indexCapacity = vbo_.u2.bufferCapacity = capacity;
         vbo_.u2.indexCount = vbo_.u2.bufferCount = 0;
 
@@ -986,13 +986,13 @@ namespace GRAPH
     }
 
     // TextureAtlas - Update, Insert, Move & Remove
-    void TextureAtlas::updateQuad(V3F_C4B_T2F_Quad *quad, int64 index) {
+    void TextureAtlas::updateQuad(V3F_C4B_T2F_Quad *quad, uint64 index) {
         vbo_.u2.bufferCount = MATH::MATH_MAX( index+1, vbo_.u2.bufferCount);
         vbo_.u2.bufferData[index] = *quad;
         dirty_ = true;
     }
 
-    void TextureAtlas::insertQuad(V3F_C4B_T2F_Quad *quad, int64 index) {
+    void TextureAtlas::insertQuad(V3F_C4B_T2F_Quad *quad, uint64 index) {
         vbo_.u2.bufferCount++;
 
         // issue #575. index can be > totalQuads
@@ -1008,7 +1008,7 @@ namespace GRAPH
         dirty_ = true;
     }
 
-    void TextureAtlas::insertQuads(V3F_C4B_T2F_Quad* quads, int64 index, int64 amount) {
+    void TextureAtlas::insertQuads(V3F_C4B_T2F_Quad* quads, uint64 index, uint64 amount) {
         vbo_.u2.bufferCount += amount;
         auto remaining = (vbo_.u2.bufferCount-1) - index - amount;
 
@@ -1021,7 +1021,7 @@ namespace GRAPH
 
         auto max = index + amount;
         int j = 0;
-        for (int64 i = index; i < max ; i++) {
+        for (uint64 i = index; i < max ; i++) {
             vbo_.u2.bufferData[index] = quads[j];
             index++;
             j++;
@@ -1030,7 +1030,7 @@ namespace GRAPH
         dirty_ = true;
     }
 
-    void TextureAtlas::insertQuadFromIndex(int64 oldIndex, int64 newIndex) {
+    void TextureAtlas::insertQuadFromIndex(uint64 oldIndex, uint64 newIndex) {
         if( oldIndex == newIndex ) {
             return;
         }
@@ -1051,7 +1051,7 @@ namespace GRAPH
         dirty_ = true;
     }
 
-    void TextureAtlas::removeQuadAtIndex(int64 index) {
+    void TextureAtlas::removeQuadAtIndex(uint64 index) {
         auto remaining = (vbo_.u2.bufferCount-1) - index;
 
         // last object doesn't need to be moved
@@ -1063,7 +1063,7 @@ namespace GRAPH
         dirty_ = true;
     }
 
-    void TextureAtlas::removeQuadsAtIndex(int64 index, int64 amount) {
+    void TextureAtlas::removeQuadsAtIndex(uint64 index, uint64 amount) {
         auto remaining = (vbo_.u2.bufferCount) - (index + amount);
 
         vbo_.u2.bufferCount -= amount;
@@ -1080,7 +1080,7 @@ namespace GRAPH
     }
 
     // TextureAtlas - Resize
-    bool TextureAtlas::resizeCapacity(int64 newCapacity) {
+    bool TextureAtlas::resizeCapacity(uint64 newCapacity) {
         if( newCapacity == vbo_.u2.indexCapacity ) {
             return true;
         }
@@ -1142,11 +1142,11 @@ namespace GRAPH
         return true;
     }
 
-    void TextureAtlas::increaseTotalQuadsWith(int64 amount) {
+    void TextureAtlas::increaseTotalQuadsWith(uint64 amount) {
         vbo_.u2.bufferCount += amount;
     }
 
-    void TextureAtlas::moveQuadsFromIndex(int64 oldIndex, int64 amount, int64 newIndex) {
+    void TextureAtlas::moveQuadsFromIndex(uint64 oldIndex, uint64 amount, uint64 newIndex) {
         if( oldIndex == newIndex ) {
             return;
         }
@@ -1168,16 +1168,16 @@ namespace GRAPH
         dirty_ = true;
     }
 
-    void TextureAtlas::moveQuadsFromIndex(int64 index, int64 newIndex) {
+    void TextureAtlas::moveQuadsFromIndex(uint64 index, uint64 newIndex) {
         memmove(vbo_.u2.bufferData + newIndex,vbo_.u2.bufferData + index, (vbo_.u2.bufferCount - index) * sizeof(vbo_.u2.bufferData[0]));
     }
 
-    void TextureAtlas::fillWithEmptyQuadsFromIndex(int64 index, int64 amount) {
+    void TextureAtlas::fillWithEmptyQuadsFromIndex(uint64 index, uint64 amount) {
         V3F_C4B_T2F_Quad quad;
         memset(&quad, 0, sizeof(quad));
 
         auto to = index + amount;
-        for (int64 i = index ; i < to ; i++) {
+        for (uint64 i = index ; i < to ; i++) {
             vbo_.u2.bufferData[i] = quad;
         }
     }
@@ -1187,11 +1187,11 @@ namespace GRAPH
         this->drawNumberOfQuads(vbo_.u2.bufferCount, 0);
     }
 
-    void TextureAtlas::drawNumberOfQuads(int64 numberOfQuads) {
+    void TextureAtlas::drawNumberOfQuads(uint64 numberOfQuads) {
         this->drawNumberOfQuads(numberOfQuads, 0);
     }
 
-    void TextureAtlas::drawNumberOfQuads(int64 numberOfQuads, int64 start) {
+    void TextureAtlas::drawNumberOfQuads(uint64 numberOfQuads, uint64 start) {
         if(!numberOfQuads)
             return;
 

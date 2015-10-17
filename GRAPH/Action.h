@@ -218,7 +218,7 @@ namespace GRAPH
         void removeAllActionsByTag(int tag, Node *target);
 
         Action* getActionByTag(int tag, const Node *target) const;
-        int64 getNumberOfRunningActionsInTarget(const Node *target) const;
+        uint64 getNumberOfRunningActionsInTarget(const Node *target) const;
 
         void pauseTarget(Node *target);
         void resumeTarget(Node *target);
@@ -229,7 +229,7 @@ namespace GRAPH
         void update(float dt);
 
     protected:
-        void removeActionAtIndex(int64 index, ActionEntry *element);
+        void removeActionAtIndex(uint64 index, ActionEntry *element);
         void deleteHashElement(ActionEntry *element);
         void actionAllocWithHashElement(ActionEntry *element);
 

@@ -34,13 +34,13 @@ namespace GRAPH
     public:
         RenderQueue();
         void push_back(RenderCommand* command);
-        int64 size() const;
+        uint64 size() const;
         void sort();
-        RenderCommand* operator[](int64 index) const;
+        RenderCommand* operator[](uint64 index) const;
         void clear();
         void realloc(size_t reserveSize);
         inline std::vector<RenderCommand*>& getSubQueue(QUEUE_GROUP group) { return commands_[group]; }
-        inline int64 getSubQueueSize(QUEUE_GROUP group) const { return commands_[group].size();}
+        inline uint64 getSubQueueSize(QUEUE_GROUP group) const { return commands_[group].size();}
 
         void saveRenderState();
         void restoreRenderState();
@@ -56,7 +56,7 @@ namespace GRAPH
     struct RenderStackElement
     {
         int renderQueueID;
-        int64 currentIndex;
+        uint64 currentIndex;
     };
 
     class GroupCommandManager;

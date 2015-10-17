@@ -298,7 +298,7 @@ namespace GRAPH
         }
     }
 
-    void ActionManager::removeActionAtIndex(int64 index, ActionEntry *element) {
+    void ActionManager::removeActionAtIndex(uint64 index, ActionEntry *element) {
         Action *action = (Action*)(*element->actions)[index];
         if (action == element->currentAction && (! element->currentActionSalvaged)) {
             element->currentAction->retain();
@@ -515,7 +515,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    int64 ActionManager::getNumberOfRunningActionsInTarget(const Node *target) const
+    uint64 ActionManager::getNumberOfRunningActionsInTarget(const Node *target) const
     {
         ActionEntry *element = nullptr;
         for (auto iter : _targets) {

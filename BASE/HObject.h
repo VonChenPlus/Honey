@@ -41,13 +41,13 @@ typedef void (HObject::*SelectorF)(float);
 class HObjectArray
 {
 public:
-    HObjectArray(int64 capacity);
+    HObjectArray(uint64 capacity);
     ~HObjectArray();
 
     void doubleCapacity();
-    void ensureExtraCapacity(int64 extra);
+    void ensureExtraCapacity(uint64 extra);
     void shrink();
-    int64 getIndexOfObject(HObject* object);
+    uint64 getIndexOfObject(HObject* object);
     bool containsObject(HObject* object);
 
     void appendObject(HObject* object);
@@ -55,14 +55,14 @@ public:
     void appendArray(HObjectArray *plusArr);
     void appendArrayWithResize(HObjectArray *plusArr);
 
-    void insertObjectAtIndex(HObject* object, int64 index);
-    void swapObjectsAtIndexes(int64 index1, int64 index2);
+    void insertObjectAtIndex(HObject* object, uint64 index);
+    void swapObjectsAtIndexes(uint64 index1, uint64 index2);
 
-    void fastRemoveObjectAtIndex(int64 index);
+    void fastRemoveObjectAtIndex(uint64 index);
     void fastRemoveObject(HObject* object);
 
     void removeAllObjects();
-    void removeObjectAtIndex(int64 index, bool releaseObj = true);
+    void removeObjectAtIndex(uint64 index, bool releaseObj = true);
     void removeObject(HObject* object, bool releaseObj = true);
     void removeArray(HObjectArray *minusArr);
     void fullRemoveArray(HObjectArray *minusArr);
@@ -71,12 +71,12 @@ public:
         return array_[index];
     }
 
-    int64 number() { return number_; }
-    int64 maximun() { return maximum_; }
+    uint64 number() { return number_; }
+    uint64 maximun() { return maximum_; }
 
 private:
-    int64 number_;
-    int64 maximum_;
+    uint64 number_;
+    uint64 maximum_;
     HObject** array_;
 };
 
@@ -111,7 +111,7 @@ public:
         : data_() {        
     }
 
-    explicit HObjectVector<T>(int64 capacity)
+    explicit HObjectVector<T>(uint64 capacity)
         : data_() {
         reserve(capacity);
     }
@@ -146,15 +146,15 @@ public:
         return *this;
     }
 
-    void reserve(int64 n) {
+    void reserve(uint64 n) {
         data_.reserve(n);
     }
 
-    int64 capacity() const {
+    uint64 capacity() const {
         return data_.capacity();
     }
 
-    int64 size() const {
+    uint64 size() const {
         return  data_.size();
     }
 
@@ -162,11 +162,11 @@ public:
         return data_.empty();
     }
 
-    int64 max_size() const {
+    uint64 max_size() const {
         return data_.max_size();
     }
 
-    int64 getIndex(T object) const {
+    uint64 getIndex(T object) const {
         auto iter = std::find(data_.begin(), data_.end(), object);
         if (iter != data_.end())
             return iter - data_.begin();
@@ -182,7 +182,7 @@ public:
         return std::find(data_.begin(), data_.end(), object);
     }
 
-    T at(int64 index) const {
+    T at(uint64 index) const {
         return data_[index];
     }
 
@@ -197,7 +197,7 @@ public:
     T getRandomObject() const {
         if (!data_.empty())
         {
-            int64 randIdx = rand() % data_.size();
+            uint64 randIdx = rand() % data_.size();
             return *(data_.begin() + randIdx);
         }
         return nullptr;
@@ -208,11 +208,11 @@ public:
     }
 
     bool equals(const HObjectVector<T> &other) {
-        int64 s = this->size();
+        uint64 s = this->size();
         if (s != other.size())
             return false;
 
-        for (int64 i = 0; i < s; i++)
+        for (uint64 i = 0; i < s; i++)
         {
             if (this->at(i) != other.at(i))
             {
@@ -235,7 +235,7 @@ public:
         }
     }
 
-    void insert(int64 index, T object) {
+    void insert(uint64 index, T object) {
         data_.insert((std::begin(data_) + index), object);
         object->retain();
     }
@@ -280,7 +280,7 @@ public:
         return data_.erase(first, last);
     }
 
-    iterator erase(int64 index) {
+    iterator erase(uint64 index) {
         auto it = std::next( begin(), index );
         (*it)->release();
         return data_.erase(it);
@@ -294,17 +294,17 @@ public:
     }
 
     void swap(T object1, T object2) {
-        int64 idx1 = getIndex(object1);
-        int64 idx2 = getIndex(object2);
+        uint64 idx1 = getIndex(object1);
+        uint64 idx2 = getIndex(object2);
 
         std::swap( data_[idx1], data_[idx2] );
     }
 
-    void swap(int64 index1, int64 index2) {
+    void swap(uint64 index1, uint64 index2) {
         std::swap( data_[index1], data_[index2] );
     }
 
-    void replace(int64 index, T object) {
+    void replace(uint64 index, T object) {
         data_[index]->release();
         data_[index] = object;
         object->retain();
@@ -350,7 +350,7 @@ public:
         : data_() {
     }
 
-    explicit HObjectMap<K, V>(int64 capacity)
+    explicit HObjectMap<K, V>(uint64 capacity)
         : data_() {
         data_.reserve(capacity);
     }
@@ -369,23 +369,23 @@ public:
         clear();
     }
 
-    void reserve(int64 capacity) {
+    void reserve(uint64 capacity) {
         data_.reserve(capacity);
     }
 
-    int64 bucketCount() const {
+    uint64 bucketCount() const {
         return data_.bucket_count();
     }
 
-    int64 bucketSize(int64 n) const {
+    uint64 bucketSize(uint64 n) const {
         return data_.bucket_size(n);
     }
 
-    int64 bucket(const K& k) const {
+    uint64 bucket(const K& k) const {
         return data_.bucket(k);
     }
 
-    int64 size() const {
+    uint64 size() const {
         return data_.size();
     }
 
@@ -486,7 +486,7 @@ public:
     V getRandomObject() const {
         if (!data_.empty())
         {
-            int64 randIdx = rand() % data_.size();
+            uint64 randIdx = rand() % data_.size();
             const_iterator randIter = data_.begin();
             std::advance(randIter , randIdx);
             return randIter->second;

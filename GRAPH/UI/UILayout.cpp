@@ -1156,8 +1156,8 @@ namespace GRAPH
 
         int Layout::findFirstFocusEnabledWidgetIndex()
         {
-            int64 index = 0;
-            int64 count = this->getChildren().size();
+            uint64 index = 0;
+            uint64 count = this->getChildren().size();
             while (index < count)
             {
                 Widget* w =  dynamic_cast<Widget*>(_children.at(index));
@@ -1178,7 +1178,7 @@ namespace GRAPH
                 return this->findFirstFocusEnabledWidgetIndex();
             }
             int index = 0;
-            int64 count = this->getChildren().size();
+            uint64 count = this->getChildren().size();
 
             float distance = MATH::MATH_FLOAT_MAX();
             int found = 0;
@@ -1224,7 +1224,7 @@ namespace GRAPH
                 return this->findFirstFocusEnabledWidgetIndex();
             }
             int index = 0;
-            int64 count = this->getChildren().size();
+            uint64 count = this->getChildren().size();
 
             float distance = -MATH::MATH_FLOAT_MAX();
             int found = 0;
@@ -1265,7 +1265,7 @@ namespace GRAPH
 
 
 
-        Widget* Layout::findFocusEnabledChildWidgetByIndex(int64 index)
+        Widget* Layout::findFocusEnabledChildWidgetByIndex(uint64 index)
         {
 
             Widget *widget = this->getChildWidgetByIndex(index);
@@ -1414,11 +1414,11 @@ namespace GRAPH
             return ret;
         }
 
-        Widget* Layout::getChildWidgetByIndex(int64 index)const
+        Widget* Layout::getChildWidgetByIndex(uint64 index)const
         {
-            int64 size = _children.size();
+            uint64 size = _children.size();
             int count = 0;
-            int64 oldIndex = index;
+            uint64 oldIndex = index;
             Widget *widget = nullptr;
             while (index < size)
             {
@@ -1455,7 +1455,7 @@ namespace GRAPH
         Widget* Layout::getPreviousFocusedWidget(FocusDirection direction, Widget *current)
         {
             Widget *nextWidget = nullptr;
-            int64 previousWidgetPos = _children.getIndex(current);
+            uint64 previousWidgetPos = _children.getIndex(current);
             previousWidgetPos = previousWidgetPos - 1;
             if (previousWidgetPos >= 0)
             {
@@ -1544,7 +1544,7 @@ namespace GRAPH
         Widget* Layout::getNextFocusedWidget(FocusDirection direction, Widget *current)
         {
             Widget *nextWidget = nullptr;
-            int64 previousWidgetPos = _children.getIndex(current);
+            uint64 previousWidgetPos = _children.getIndex(current);
             previousWidgetPos = previousWidgetPos + 1;
             if (previousWidgetPos < _children.size())
             {
@@ -1647,7 +1647,7 @@ namespace GRAPH
             }
 
             auto& container = parent->getChildren();
-            int64 index = container.getIndex(widget);
+            uint64 index = container.getIndex(widget);
             if (parent->getLayoutType() == Type::THORIZONTAL)
             {
                 if (direction == FocusDirection::LEFT)

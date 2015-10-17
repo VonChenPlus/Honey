@@ -100,7 +100,7 @@ namespace GRAPH
             return _labelRenderer->getString();
         }
 
-        int64 Text::getStringLength()const
+        uint64 Text::getStringLength()const
         {
             return _labelRenderer->getStringLength();
         }
@@ -286,7 +286,7 @@ namespace GRAPH
             _labelRenderer->setPosition(_contentSize.width / 2.0f, _contentSize.height / 2.0f);
         }
 
-        void Text::enableShadow(const Color4B& shadowColor,const MATH::Sizef &offset, int blurRadius)
+        void Text::enableShadow(const Color4B& shadowColor,const MATH::Sizef &offset, int)
         {
             _labelRenderer->enableShadow(shadowColor, offset);
         }

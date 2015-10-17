@@ -3,7 +3,7 @@
 #include "IO/FileUtils.h"
 #include "UTILS/STRING/StringUtils.h"
 #include "GRAPH/Director.h"
-#include "GRAPH/UNITY3D/Texture2D.h"
+#include "GRAPH/UNITY3D/GLTexture.h"
 
 namespace GRAPH
 {
@@ -14,14 +14,14 @@ namespace GRAPH
         return spriteFrame;
     }
 
-    SpriteFrame* SpriteFrame::createWithTexture(Texture2D *texture, const MATH::Rectf& rect) {
+    SpriteFrame* SpriteFrame::createWithTexture(GLTexture *texture, const MATH::Rectf& rect) {
         SpriteFrame *spriteFrame = new (std::nothrow) SpriteFrame();
         spriteFrame->initWithTexture(texture, rect);
         spriteFrame->autorelease();
         return spriteFrame;
     }
 
-    SpriteFrame* SpriteFrame::createWithTexture(Texture2D* texture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize) {
+    SpriteFrame* SpriteFrame::createWithTexture(GLTexture* texture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize) {
         SpriteFrame *spriteFrame = new (std::nothrow) SpriteFrame();
         spriteFrame->initWithTexture(texture, rect, rotated, offset, originalSize);
         spriteFrame->autorelease();
@@ -41,7 +41,7 @@ namespace GRAPH
 
     }
 
-    bool SpriteFrame::initWithTexture(Texture2D* texture, const MATH::Rectf& rect) {
+    bool SpriteFrame::initWithTexture(GLTexture* texture, const MATH::Rectf& rect) {
         return initWithTexture(texture, rect, false, MATH::Vec2fZERO, rect.size);
     }
 
@@ -49,7 +49,7 @@ namespace GRAPH
         return initWithTextureFilename(filename, rect, false, MATH::Vec2fZERO, rect.size);
     }
 
-    bool SpriteFrame::initWithTexture(Texture2D* texture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize) {
+    bool SpriteFrame::initWithTexture(GLTexture* texture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize) {
         texture_ = texture;
         if (texture) {
             texture->retain();
@@ -89,7 +89,7 @@ namespace GRAPH
         offset_ = offsets;
     }
 
-    void SpriteFrame::setTexture(Texture2D * texture) {
+    void SpriteFrame::setTexture(GLTexture * texture) {
         if( texture_ != texture ) {
             SAFE_RELEASE(texture_);
             SAFE_RETAIN(texture);
@@ -97,7 +97,7 @@ namespace GRAPH
         }
     }
 
-    Texture2D* SpriteFrame::getTexture() {
+    GLTexture* SpriteFrame::getTexture() {
         if( texture_ ) {
             return texture_;
         }
@@ -125,7 +125,7 @@ namespace GRAPH
         SAFE_DELETE(loadedFileNames_);
     }
 
-    void SpriteFrameCache::addSpriteFramesWithFile(const std::string& plist, Texture2D *texture) {
+    void SpriteFrameCache::addSpriteFramesWithFile(const std::string& plist, GLTexture *texture) {
         if (loadedFileNames_->find(plist) != loadedFileNames_->end()) {
             return;
         }
@@ -137,13 +137,13 @@ namespace GRAPH
         loadedFileNames_->insert(plist);
     }
 
-    void SpriteFrameCache::addSpriteFramesWithFileContent(const std::string& plist_content, Texture2D *texture) {
+    void SpriteFrameCache::addSpriteFramesWithFileContent(const std::string& plist_content, GLTexture *texture) {
         ValueMap dict = IO::FileUtils::getInstance().getValueMapFromData((const HBYTE *)plist_content.c_str(), static_cast<int>(plist_content.size()));
         addSpriteFramesWithDictionary(dict, texture);
     }
 
     void SpriteFrameCache::addSpriteFramesWithFile(const std::string& plist, const std::string& textureFileName) {
-        Texture2D *texture = Director::getInstance().getTextureCache()->addImage(textureFileName);
+        GLTexture *texture = Director::getInstance().getTextureCache()->addImage(textureFileName);
 
         if (texture) {
             addSpriteFramesWithFile(plist, texture);
@@ -179,7 +179,7 @@ namespace GRAPH
                 texturePath = texturePath.append(".png");
             }
 
-            Texture2D *texture = Director::getInstance().getTextureCache()->addImage(texturePath.c_str());
+            GLTexture *texture = Director::getInstance().getTextureCache()->addImage(texturePath.c_str());
             if (texture) {
                 addSpriteFramesWithDictionary(dict, texture);
                 loadedFileNames_->insert(plist);
@@ -187,7 +187,7 @@ namespace GRAPH
         }
     }
 
-    void SpriteFrameCache::addSpriteFramesWithDictionary(ValueMap& dictionary, Texture2D* texture) {
+    void SpriteFrameCache::addSpriteFramesWithDictionary(ValueMap& dictionary, GLTexture* texture) {
         ValueMap& framesDict = dictionary["frames"].asValueMap();
         int format = 0;
         // get the format
@@ -371,7 +371,7 @@ namespace GRAPH
         spriteFrames_.erase(keysToRemove);
     }
 
-    void SpriteFrameCache::removeSpriteFramesFromTexture(Texture2D* texture) {
+    void SpriteFrameCache::removeSpriteFramesFromTexture(GLTexture* texture) {
         std::vector<std::string> keysToRemove;
 
         for (auto iter = spriteFrames_.cbegin(); iter != spriteFrames_.cend(); ++iter) {

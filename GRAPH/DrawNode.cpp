@@ -31,7 +31,7 @@ namespace GRAPH
         return ret;
     }
 
-    void DrawNode::ensureCapacity(int type, int64 count) {
+    void DrawNode::ensureCapacity(int type, uint64 count) {
         if(vboArray_[type].u1.bufferCount + count > vboArray_[type].u1.bufferCapacity) {
             vboArray_[type].u1.bufferCapacity += MATH::MATH_MAX(vboArray_[type].u1.bufferCapacity, count);
             vboArray_[type].u1.bufferData = (V2F_C4B_T2F*)realloc(vboArray_[type].u1.bufferData, vboArray_[type].u1.bufferCapacity*sizeof(V2F_C4B_T2F));

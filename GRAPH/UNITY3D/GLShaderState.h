@@ -26,13 +26,13 @@ namespace GRAPH
 
         void setFloat(float value);
         void setInt(int value);
-        void setFloatv(int64 size, const float* pointer);
+        void setFloatv(uint64 size, const float* pointer);
         void setVec2(const MATH::Vector2f& value);
-        void setVec2v(int64 size, const MATH::Vector2f* pointer);
+        void setVec2v(uint64 size, const MATH::Vector2f* pointer);
         void setVec3(const MATH::Vector3f& value);
-        void setVec3v(int64 size, const MATH::Vector3f* pointer);
+        void setVec3v(uint64 size, const MATH::Vector3f* pointer);
         void setVec4(const MATH::Vector4f& value);
-        void setVec4v(int64 size, const MATH::Vector4f* pointer);
+        void setVec4v(uint64 size, const MATH::Vector4f* pointer);
         void setMat4(const MATH::Matrix4& value);
 
         void setCallback(const std::function<void(GLShader*, Uniform*)> &callback);
@@ -144,33 +144,33 @@ namespace GRAPH
         void setGLShader(GLShader* glShader);
         GLShader* getGLShader() const { return glShader_; }
         uint32_t getVertexAttribsFlags() const;
-        int64 getVertexAttribCount() const;
+        uint64 getVertexAttribCount() const;
         void setVertexAttribCallback(const std::string& name, const std::function<void(VertexAttrib*)> &callback);
         void setVertexAttribPointer(const std::string& name, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid *pointer);
-        int64 getUniformCount() const { return uniforms_.size(); }
+        uint64 getUniformCount() const { return uniforms_.size(); }
 
         void setUniformInt(const std::string& uniformName, int value);
         void setUniformFloat(const std::string& uniformName, float value);
-        void setUniformFloatv(const std::string& uniformName, int64 size, const float* pointer);
+        void setUniformFloatv(const std::string& uniformName, uint64 size, const float* pointer);
         void setUniformVec2(const std::string& uniformName, const MATH::Vector2f& value);
-        void setUniformVec2v(const std::string& uniformName, int64 size, const MATH::Vector2f* pointer);
+        void setUniformVec2v(const std::string& uniformName, uint64 size, const MATH::Vector2f* pointer);
         void setUniformVec3(const std::string& uniformName, const MATH::Vector3f& value);
-        void setUniformVec3v(const std::string& uniformName, int64 size, const MATH::Vector3f* pointer);
+        void setUniformVec3v(const std::string& uniformName, uint64 size, const MATH::Vector3f* pointer);
         void setUniformVec4(const std::string& uniformName, const MATH::Vector4f& value);
-        void setUniformVec4v(const std::string& uniformName, int64 size, const MATH::Vector4f* pointer);
+        void setUniformVec4v(const std::string& uniformName, uint64 size, const MATH::Vector4f* pointer);
         void setUniformMat4(const std::string& uniformName, const MATH::Matrix4& value);
         void setUniformCallback(const std::string& uniformName, const std::function<void(GLShader*, Uniform*)> &callback);
         void setUniformTexture(const std::string& uniformName, GLuint textureId);
 
         void setUniformInt(GLint uniformLocation, int value);
         void setUniformFloat(GLint uniformLocation, float value);
-        void setUniformFloatv(GLint uniformLocation, int64 size, const float* pointer);
+        void setUniformFloatv(GLint uniformLocation, uint64 size, const float* pointer);
         void setUniformVec2(GLint uniformLocation, const MATH::Vector2f& value);
-        void setUniformVec2v(GLint uniformLocation, int64 size, const MATH::Vector2f* pointer);
+        void setUniformVec2v(GLint uniformLocation, uint64 size, const MATH::Vector2f* pointer);
         void setUniformVec3(GLint uniformLocation, const MATH::Vector3f& value);
-        void setUniformVec3v(GLint uniformLocation, int64 size, const MATH::Vector3f* pointer);
+        void setUniformVec3v(GLint uniformLocation, uint64 size, const MATH::Vector3f* pointer);
         void setUniformVec4(GLint uniformLocation, const MATH::Vector4f& value);
-        void setUniformVec4v(GLint uniformLocation, int64 size, const MATH::Vector4f* pointer);
+        void setUniformVec4v(GLint uniformLocation, uint64 size, const MATH::Vector4f* pointer);
         void setUniformMat4(GLint uniformLocation, const MATH::Matrix4& value);
         void setUniformCallback(GLint uniformLocation, const std::function<void(GLShader*, Uniform*)> &callback);
         void setUniformTexture(GLint uniformLocation, GLuint textureId);

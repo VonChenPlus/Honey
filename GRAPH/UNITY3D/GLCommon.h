@@ -117,18 +117,18 @@ namespace GRAPH
         {
             struct {
                 GLuint objectID;
-                int64 bufferCapacity;
-                int64 bufferCount;
+                uint64 bufferCapacity;
+                uint64 bufferCount;
                 T *bufferData;
             } u1;
             struct{
                 GLuint objectID[2];
-                int64 bufferCapacity;
-                int64 bufferCount;
+                uint64 bufferCapacity;
+                uint64 bufferCount;
                 T *bufferData;
                 GLushort *indexData;
-                int64 indexCapacity;
-                int64 indexCount;
+                uint64 indexCapacity;
+                uint64 indexCount;
             } u2;
         };
     };

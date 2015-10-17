@@ -19,8 +19,8 @@ namespace GRAPH
                 return root;
             }
             const auto& arrayRootChildren = root->getChildren();
-            int64 length = arrayRootChildren.size();
-            for (int64 i=0;i<length;i++)
+            uint64 length = arrayRootChildren.size();
+            for (uint64 i=0;i<length;i++)
             {
                 Widget* child = dynamic_cast<Widget*>(arrayRootChildren.at(i));
                 if (child)
