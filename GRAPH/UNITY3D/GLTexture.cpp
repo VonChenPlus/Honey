@@ -217,7 +217,7 @@ namespace GRAPH
         MATH::Sizef      imageSize = MATH::Sizef((float)imageWidth, (float)imageHeight);
         IMAGE::PixelFormat      pixelFormat = ((IMAGE::PixelFormat::NONE == format) || (IMAGE::PixelFormat::AUTO == format)) ? image->getRenderFormat() : format;
         IMAGE::PixelFormat      renderFormat = image->getRenderFormat();
-        size_t	         tempDataLen = image->getDataLen();
+        uint64	         tempDataLen = image->getDataLen();
 
 
         if (image->isCompressed()) {
@@ -567,9 +567,9 @@ namespace GRAPH
             auto it = textures_.find(asyncStruct->filename);
             if( it == textures_.end() ) {
                ImageInfo *imageInfo;
-               size_t pos = 0;
+               uint64 pos = 0;
                asyncMutex_.lock();
-               size_t infoSize = imageInfoQueue_->size();
+               uint64 infoSize = imageInfoQueue_->size();
                for (; pos < infoSize; pos++)
                {
                    imageInfo = (*imageInfoQueue_)[pos];
@@ -1151,7 +1151,7 @@ namespace GRAPH
             return;
         }
         //create buffer
-        size_t quadSize = sizeof(V3F_C4B_T2F_Quad);
+        uint64 quadSize = sizeof(V3F_C4B_T2F_Quad);
         V3F_C4B_T2F_Quad* tempQuads = (V3F_C4B_T2F_Quad*)malloc( quadSize * amount);
         memcpy( tempQuads, &vbo_.u2.bufferData[oldIndex], quadSize * amount );
 

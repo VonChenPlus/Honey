@@ -40,7 +40,7 @@ namespace UTILS
         bool EndsWithNoCase(const std::string &str, const std::string &what) {
             if (str.size() < what.size())
                 return false;
-            const size_t offset = str.size() - what.size();
+            const uint64 offset = str.size() - what.size();
             return strncasecmp(str.c_str() + offset, what.c_str(), what.size()) == 0;
         }
 
@@ -50,10 +50,10 @@ namespace UTILS
 
         unsigned int ParseHexString(const char *_szValue) {
             int Value = 0;
-            size_t Finish = strlen(_szValue);
+            uint64 Finish = strlen(_szValue);
             if (Finish > 8 ) { Finish = 8; }
 
-            for (size_t Count = 0; Count < Finish; Count++) {
+            for (uint64 Count = 0; Count < Finish; Count++) {
                 Value = (Value << 4);
                 switch( _szValue[Count] ) {
                 case '0': break;
@@ -91,9 +91,9 @@ namespace UTILS
             return (value.compare("true")==0);
         }
 
-        void DataToHexString(const uint8 *data, size_t size, std::string *output) {
+        void DataToHexString(const uint8 *data, uint64 size, std::string *output) {
             HBuffer buffer;
-            for (size_t i = 0; i < size; i++) {
+            for (uint64 i = 0; i < size; i++) {
                 buffer.writeAsFormat((const HBYTE *)"%02x ", data[i]);
                 if (i && !(i & 15))
                     buffer.writeAsFormat((const HBYTE *)"\n");
@@ -110,8 +110,8 @@ namespace UTILS
             std::string content = str;
 
             // find the first '{' and the third '}'
-            size_t nPosLeft = content.find('{');
-            size_t nPosRight = content.find('}');
+            uint64 nPosLeft = content.find('{');
+            uint64 nPosRight = content.find('}');
             for (int i = 1; i < 3; ++i)
             {
                 if (nPosRight == std::string::npos)
@@ -124,7 +124,7 @@ namespace UTILS
                 throw _HException_Normal("Unknow rect string format!");
 
             content = content.substr(nPosLeft + 1, nPosRight - nPosLeft - 1);
-            size_t nPointEnd = content.find('}');
+            uint64 nPointEnd = content.find('}');
             if (nPointEnd == std::string::npos)
                 throw _HException_Normal("Unknow rect string format!");
             nPointEnd = content.find(',', nPointEnd);
@@ -223,9 +223,9 @@ namespace UTILS
         }
 
         void SplitString(const std::string& src, const std::string& token, std::vector<std::string>& output) {
-            size_t nend = 0;
-            size_t nbegin = 0;
-            size_t tokenSize = token.size();
+            uint64 nend = 0;
+            uint64 nbegin = 0;
+            uint64 tokenSize = token.size();
             while (nend != std::string::npos)
             {
                 nend = src.find(token, nbegin);
@@ -240,8 +240,8 @@ namespace UTILS
         void SplitWithForm(const std::string& content, std::vector<std::string>& output) {
             if (content.empty()) return;
 
-            size_t nPosLeft = content.find('{');
-            size_t nPosRight = content.find('}');
+            uint64 nPosLeft = content.find('{');
+            uint64 nPosRight = content.find('}');
 
             // don't have '{' and '}'
             if (nPosLeft == std::string::npos || nPosRight == std::string::npos)
@@ -254,8 +254,8 @@ namespace UTILS
             // nothing between '{' and '}'
             if (pointStr.length() == 0) return;
 
-            size_t nPos1 = pointStr.find('{');
-            size_t nPos2 = pointStr.find('}');
+            uint64 nPos1 = pointStr.find('{');
+            uint64 nPos2 = pointStr.find('}');
             // contain '{' or '}' 
             if (nPos1 != std::string::npos || nPos2 != std::string::npos)
                 throw _HException_Normal("Unknow string format!");

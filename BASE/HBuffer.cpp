@@ -12,19 +12,19 @@ HBuffer::HBuffer() {
 HBuffer::~HBuffer() {
 }
 
-HBYTE *HBuffer::appendBufferSize(size_t length) {
-    size_t old_size = data_.size();
+HBYTE *HBuffer::appendBufferSize(uint64 length) {
+    uint64 old_size = data_.size();
     data_.resize(old_size + length);
     return &data_[0] + old_size;
 }
 
-void HBuffer::write(size_t len, const HBYTE *data, bool) {
+void HBuffer::write(uint64 len, const HBYTE *data, bool) {
     HBYTE *dest = appendBufferSize(len);
     memcpy(dest, data, len);
 }
 
 void HBuffer::write(const HBuffer &other) {
-    size_t len = other.size();
+    uint64 len = other.size();
     HBYTE *dest = appendBufferSize(len);
     memcpy(dest, &other.data_[0], len);
 }
@@ -45,7 +45,7 @@ void HBuffer::writeAsFormat(const HBYTE *fmt, ...) {
     memcpy(ptr, buffer, retval);
 }
 
-void HBuffer::read(size_t length, HBYTE *dest, bool) {
+void HBuffer::read(uint64 length, HBYTE *dest, bool) {
     if (length > data_.size()) {
         throw _HException_Normal("truncating length");
     }
@@ -54,7 +54,7 @@ void HBuffer::read(size_t length, HBYTE *dest, bool) {
     data_.erase(data_.begin(), data_.begin() + length);
 }
 
-void HBuffer::read(size_t length, HBuffer &other, bool) {
+void HBuffer::read(uint64 length, HBuffer &other, bool) {
     if (length > data_.size()) {
         throw _HException_Normal("truncating length");
     }
@@ -64,14 +64,14 @@ void HBuffer::read(size_t length, HBuffer &other, bool) {
     data_.erase(data_.begin(), data_.begin() + length);
 }
 
-void HBuffer::peek(size_t length, HBYTE *dest, bool) {
+void HBuffer::peek(uint64 length, HBYTE *dest, bool) {
     if (length > data_.size()) {
         throw _HException_Normal("truncating length");
     }
     memcpy(dest, &data_[0], length);
 }
 
-void HBuffer::peek(size_t length, HBuffer &other, bool) {
+void HBuffer::peek(uint64 length, HBuffer &other, bool) {
     if (length > data_.size()) {
         throw _HException_Normal("truncating length");
     }
@@ -80,7 +80,7 @@ void HBuffer::peek(size_t length, HBuffer &other, bool) {
     memcpy(&other.data_[0], &data_[0], length);
 }
 
-void HBuffer::skip(size_t length, bool) {
+void HBuffer::skip(uint64 length, bool) {
     if (length > data_.size()) {
         throw _HException_Normal("truncating length");
     }

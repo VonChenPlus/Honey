@@ -358,7 +358,7 @@ namespace GRAPH
         int _tag;
 
         std::string _name;
-        size_t _hashOfName;
+        uint64 _hashOfName;
 
         void *_userData;
         HObject *_userObject;

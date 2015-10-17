@@ -75,7 +75,7 @@ namespace UTILS
           return true;
         }
 
-        bool hasUTF16ByteOrderMark(const char* S, size_t len) {
+        bool hasUTF16ByteOrderMark(const char* S, uint64 len) {
           return (len >= 2 &&
                   ((S[0] == '\xff' && S[1] == '\xfe') ||
                    (S[0] == '\xfe' && S[1] == '\xff')));
@@ -109,7 +109,7 @@ namespace UTILS
           std::vector<UTF16> ByteSwapped;
           if (Src[0] == UNI_UTF16_BYTE_ORDER_MARK_SWAPPED) {
             ByteSwapped.insert(ByteSwapped.end(), Src, SrcEnd);
-            for (size_t I = 0, E = ByteSwapped.size(); I != E; ++I)
+            for (uint64 I = 0, E = ByteSwapped.size(); I != E; ++I)
               ByteSwapped[I] = SwapByteOrder_16(ByteSwapped[I]);
             Src = &ByteSwapped[0];
             SrcEnd = &ByteSwapped[ByteSwapped.size() - 1] + 1;
@@ -197,7 +197,7 @@ namespace UTILS
             {	// destroy the object
             }
 
-        size_t converted() const
+        uint64 converted() const
             {	// get conversion count
             return (_Nconv);
             }
@@ -231,7 +231,7 @@ namespace UTILS
 
             if (!_Has_state)
                 _State = _State0;	// reset state if not remembered
-            _Wbuf.append((size_t)_BUF_INC, (_Elem)'\0');
+            _Wbuf.append((uint64)_BUF_INC, (_Elem)'\0');
             for (_Nconv = 0; _First != _Last; _Nconv = _First - _First_sav)
                 {	// convert one or more bytes
                 _Elem *_Dest = &*_Wbuf.begin();
@@ -244,9 +244,9 @@ namespace UTILS
                 case _Codecvt::partial:
                 case _Codecvt::ok:
                     if (_Dest < _Dnext)
-                        _Wstr.append(_Dest, (size_t)(_Dnext - _Dest));
+                        _Wstr.append(_Dest, (uint64)(_Dnext - _Dest));
                     else if (_Wbuf.size() < _BUF_MAX)
-                        _Wbuf.append((size_t)_BUF_INC, '\0');
+                        _Wbuf.append((uint64)_BUF_INC, '\0');
                     else if (_Has_werr)
                         return (_Werr);
                     else
@@ -255,7 +255,7 @@ namespace UTILS
 
                 case _Codecvt::noconv:
                     for (; _First != _Last; ++_First)
-                        _Wstr.append((size_t)1,
+                        _Wstr.append((uint64)1,
                             (_Elem)(unsigned char)*_First);
                     break;	// no conversion, just copy code values
 
@@ -296,7 +296,7 @@ namespace UTILS
 
             if (!_Has_state)
                 _State = _State0;	// reset state if not remembered
-            _Bbuf.append((size_t)_BUF_INC, '\0');
+            _Bbuf.append((uint64)_BUF_INC, '\0');
             for (_Nconv = 0; _First != _Last; _Nconv = _First - _First_sav)
                 {	// convert one or more wide chars
                 char *_Dest = &*_Bbuf.begin();
@@ -309,9 +309,9 @@ namespace UTILS
                 case _Codecvt::partial:
                 case _Codecvt::ok:
                     if (_Dest < _Dnext)
-                        _Bstr.append(_Dest, (size_t)(_Dnext - _Dest));
+                        _Bstr.append(_Dest, (uint64)(_Dnext - _Dest));
                     else if (_Bbuf.size() < _BUF_MAX)
-                        _Bbuf.append((size_t)_BUF_INC, '\0');
+                        _Bbuf.append((uint64)_BUF_INC, '\0');
                     else if (_Has_berr)
                         return (_Berr);
                     else
@@ -320,7 +320,7 @@ namespace UTILS
 
                 case _Codecvt::noconv:
                     for (; _First != _Last; ++_First)
-                        _Bstr.append((size_t)1,
+                        _Bstr.append((uint64)1,
                             (char)(int_type)*_First);
                     break;	// no conversion, just copy code values
 
@@ -346,7 +346,7 @@ namespace UTILS
         bool _Has_berr;
         bool _Has_werr;
         bool _Has_state;
-        size_t _Nconv;
+        uint64 _Nconv;
         };
 
         enum codecvt_mode {
@@ -369,7 +369,7 @@ namespace UTILS
         typedef _Byte extern_type;
         typedef _Statype state_type;
 
-        explicit codecvt_utf8(size_t _Refs = 0)
+        explicit codecvt_utf8(uint64 _Refs = 0)
             : _Mybase(_Refs)
             {	// construct with ref count
             }
@@ -509,9 +509,9 @@ namespace UTILS
             }
 
         virtual int do_length(_Statype& _State, const _Byte *_First1,
-            const _Byte *_Last1, size_t _Count) const
+            const _Byte *_Last1, uint64 _Count) const
             {	// return min(_Count, converted length of bytes [_First1, _Last1))
-            size_t _Wchars = 0;
+            uint64 _Wchars = 0;
             _Statype _Mystate = _State;
 
             for (; _Wchars < _Count && _First1 != _Last1; )
@@ -564,7 +564,7 @@ namespace UTILS
                 return;
             }
 
-            const size_t utf16Bytes = (utf8.length()+1) * sizeof(char16_t);
+            const uint64 utf16Bytes = (utf8.length()+1) * sizeof(char16_t);
             char16_t* utf16 = (char16_t*)malloc(utf16Bytes);
             memset(utf16, 0, utf16Bytes);
 
@@ -585,7 +585,7 @@ namespace UTILS
                 return;
             }
 
-            const size_t utf32Bytes = (utf8.length()+1) * sizeof(char32_t);
+            const uint64 utf32Bytes = (utf8.length()+1) * sizeof(char32_t);
             char32_t* utf32 = (char32_t*)malloc(utf32Bytes);
             memset(utf32, 0, utf32Bytes);
 

@@ -38,7 +38,7 @@ namespace GRAPH
         void sort();
         RenderCommand* operator[](uint64 index) const;
         void clear();
-        void realloc(size_t reserveSize);
+        void realloc(uint64 reserveSize);
         inline std::vector<RenderCommand*>& getSubQueue(QUEUE_GROUP group) { return commands_[group]; }
         inline uint64 getSubQueueSize(QUEUE_GROUP group) const { return commands_[group].size();}
 

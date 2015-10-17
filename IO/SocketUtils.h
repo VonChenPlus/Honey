@@ -8,8 +8,8 @@
 
 namespace IO
 {
-    void ReadWithProgress(int fd, size_t length, HBuffer &buffer, float *progress);
-    void WriteWithProgress(int fd, size_t length, HBuffer &buffer, float *progress);
+    void ReadWithProgress(int fd, uint64 length, HBuffer &buffer, float *progress);
+    void WriteWithProgress(int fd, uint64 length, HBuffer &buffer, float *progress);
 
     // Returns true if the fd became ready, false if it didn't or
     // if there was another error.

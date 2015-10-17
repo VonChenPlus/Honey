@@ -10,7 +10,7 @@ namespace IMAGE
     // return value of 1 == success.
     void PNGLoad(const char *file, int *pwidth, int *pheight, int *pcolor, unsigned char **data, int *datalen);
 
-    void PNGLoadPtr(const unsigned  char *input_ptr, size_t input_len, int *pwidth,
+    void PNGLoadPtr(const unsigned  char *input_ptr, uint64 input_len, int *pwidth,
                 int *pheight, int *pcolor, unsigned char **data, int *datalen);
 }
 

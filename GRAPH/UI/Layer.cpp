@@ -176,7 +176,7 @@ namespace GRAPH
             _displayedColor.blue = _realColor.blue = color.blue;
             _displayedOpacity = _realOpacity = color.alpha;
 
-            for (size_t i = 0; i<sizeof(_squareVertices) / sizeof( _squareVertices[0]); i++ )
+            for (uint64 i = 0; i<sizeof(_squareVertices) / sizeof( _squareVertices[0]); i++ )
             {
                 _squareVertices[i].x = 0.0f;
                 _squareVertices[i].y = 0.0f;

@@ -173,7 +173,7 @@ namespace IO
             throw _HException_Normal("FileUitls::writeDataToFile Params Error!");
         }
 
-        size_t size = 0;
+        uint64 size = 0;
         const char* mode = "wb";
 
         do {
@@ -275,7 +275,7 @@ namespace IO
     std::string FileUtils::getPathForFilename(const std::string& filename, const std::string& resolutionDirectory, const std::string& searchPath) const {
         std::string file = filename;
         std::string file_path = "";
-        size_t pos = filename.find_last_of("/");
+        uint64 pos = filename.find_last_of("/");
         if (pos != std::string::npos) {
             file_path = filename.substr(0, pos+1);
             file = filename.substr(pos+1);
@@ -459,8 +459,8 @@ namespace IO
 
         HData ret;
         HBYTE* buffer = nullptr;
-        size_t size = 0;
-        size_t readSize = 0;
+        uint64 size = 0;
+        uint64 readSize = 0;
 
         do {
             // Read the file from hardware

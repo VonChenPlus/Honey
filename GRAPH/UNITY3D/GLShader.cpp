@@ -11,7 +11,7 @@ namespace GRAPH
     static void ReplaceDefines(const std::string& compileTimeDefines, std::string& out) {
         // Replace semicolons with '#define ... \n'
         if (compileTimeDefines.size() > 0) {
-            size_t pos;
+            uint64 pos;
             out = compileTimeDefines;
             out.insert(0, "#define ");
             while ((pos = out.find(';')) != std::string::npos) {

@@ -71,7 +71,7 @@ namespace GRAPH
         }
     }
 
-    void RenderQueue::realloc(size_t reserveSize) {
+    void RenderQueue::realloc(uint64 reserveSize) {
         for(int i = 0; i < QUEUE_COUNT; ++i) {
             commands_[i] = std::vector<RenderCommand*>();
             commands_[i].reserve(reserveSize);
@@ -380,7 +380,7 @@ namespace GRAPH
     }
 
     void Renderer::clean() {
-        for (size_t j = 0 ; j < renderGroups_.size(); j++) {
+        for (uint64 j = 0 ; j < renderGroups_.size(); j++) {
             renderGroups_[j].clear();
         }
 

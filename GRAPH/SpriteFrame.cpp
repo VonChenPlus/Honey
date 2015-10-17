@@ -173,7 +173,7 @@ namespace GRAPH
                 // build texture path by replacing file extension
                 texturePath = plist;
                 // remove .xxx
-                size_t startPos = texturePath.find_last_of(".");
+                uint64 startPos = texturePath.find_last_of(".");
                 texturePath = texturePath.erase(startPos);
                 // append .png
                 texturePath = texturePath.append(".png");

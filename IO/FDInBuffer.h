@@ -14,8 +14,8 @@ namespace IO
         void setTimeout(int timeoutms);
 
     private:
-        void read(size_t length, HBYTE *dest, bool wait = true) override;
-        void fillBuffer(size_t length, bool wait = true) override;
+        void read(uint64 length, HBYTE *dest, bool wait = true) override;
+        void fillBuffer(uint64 length, bool wait = true) override;
         bool bigEndian() override { return true; }
 
     private:

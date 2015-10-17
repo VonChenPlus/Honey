@@ -50,7 +50,7 @@ namespace GRAPH
         public:
             EventListenerVector();
             ~EventListenerVector();
-            size_t size() const;
+            uint64 size() const;
             bool empty() const;
 
             void push_back(EventListener* item);

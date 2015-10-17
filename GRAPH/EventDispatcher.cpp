@@ -67,8 +67,8 @@ namespace GRAPH
         SAFE_DELETE(_fixedListeners);
     }
 
-    size_t EventDispatcher::EventListenerVector::size() const {
-        size_t ret = 0;
+    uint64 EventDispatcher::EventListenerVector::size() const {
+        uint64 ret = 0;
         if (_sceneGraphListeners)
             ret += _sceneGraphListeners->size();
         if (_fixedListeners)

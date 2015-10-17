@@ -97,7 +97,7 @@ namespace GRAPH
 
 
     void GLStateCache::DeleteTexture(GLuint textureId) {
-        for (size_t i = 0; i < MAX_ACTIVE_TEXTURE; ++i) {
+        for (uint64 i = 0; i < MAX_ACTIVE_TEXTURE; ++i) {
             if (s_currentBoundTexture[i] == textureId)
             {
                 s_currentBoundTexture[i] = -1;

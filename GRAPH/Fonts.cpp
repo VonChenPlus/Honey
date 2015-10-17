@@ -20,7 +20,7 @@ namespace GRAPH
             delete [] _customGlyphs;
 
         if (customGlyphs) {
-            size_t length = strlen(customGlyphs);
+            uint64 length = strlen(customGlyphs);
             _customGlyphs = new char [length + 2];
             memcpy(_customGlyphs, customGlyphs, length);
 
@@ -127,7 +127,7 @@ namespace GRAPH
         if(fontTTf == nullptr)
             return false;
 
-        size_t length = utf16String.length();
+        uint64 length = utf16String.length();
         long bitmapWidth;
         long bitmapHeight;
         FontLetterDefinition tempDef;
@@ -137,7 +137,7 @@ namespace GRAPH
         bool existNewLetter = false;
         float startY = _currentPageOrigY;
 
-        for (size_t i = 0; i < length; ++i)
+        for (uint64 i = 0; i < length; ++i)
         {
             auto outIterator = _letterDefinitions.find(utf16String[i]);
 

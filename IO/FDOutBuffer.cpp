@@ -21,7 +21,7 @@ namespace IO
         timeoutms_ = timeoutms;
     }
 
-    void FDOutBuffer::write(size_t length, const HBYTE *data, bool wait) {
+    void FDOutBuffer::write(uint64 length, const HBYTE *data, bool wait) {
         if (length < MIN_BULK_SIZE) {
             HBuffer::write(length, data, wait);
             return;
@@ -31,7 +31,7 @@ namespace IO
         flushBuffer(size(), wait);
     }
 
-    void FDOutBuffer::flushBuffer(size_t length, bool wait) {
+    void FDOutBuffer::flushBuffer(uint64 length, bool wait) {
         while (true) {
             try {
                 WaitUntilReady(fd_, wait ? timeoutms_ : 0, true);

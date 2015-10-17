@@ -54,7 +54,7 @@ namespace IO
     SAXParser::~SAXParser(void) {
     }
 
-    bool SAXParser::parse(const HBYTE* xmlData, size_t dataLength) {
+    bool SAXParser::parse(const HBYTE* xmlData, uint64 dataLength) {
         tinyxml2::XMLDocument tinyDoc;
         tinyDoc.Parse((const char *)xmlData, dataLength);
         XmlSaxHander printer;

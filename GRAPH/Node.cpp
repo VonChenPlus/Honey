@@ -674,7 +674,7 @@ namespace GRAPH
     Node* Node::getChildByName(const std::string& name) const
     {
         std::hash<std::string> h;
-        size_t hash = h(name);
+        uint64 hash = h(name);
 
         for (const auto& child : _children)
         {
@@ -686,10 +686,10 @@ namespace GRAPH
 
     void Node::enumerateChildren(const std::string &name, std::function<bool (Node *)> callback) const
     {
-        size_t length = name.length();
+        uint64 length = name.length();
 
-        size_t subStrStartPos = 0;  // sub string start index
-        size_t subStrlength = length; // sub string length
+        uint64 subStrStartPos = 0;  // sub string start index
+        uint64 subStrlength = length; // sub string length
 
         bool searchRecursively = false;
         if (length > 2 && name[0] == '/' && name[1] == '/')
@@ -752,7 +752,7 @@ namespace GRAPH
 
     bool Node::doEnumerate(std::string name, std::function<bool (Node *)> callback) const
     {
-        size_t pos = name.find('/');
+        uint64 pos = name.find('/');
         std::string searchName = name;
         bool needRecursive = false;
         if (pos != name.npos)

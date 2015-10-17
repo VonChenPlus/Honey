@@ -51,11 +51,11 @@ HBYTE* HData::getBytes() const {
     return bytes_;
 }
 
-size_t HData::getSize() const {
+uint64 HData::getSize() const {
     return size_;
 }
 
-void HData::copy(const HBYTE* bytes, const size_t size) {
+void HData::copy(const HBYTE* bytes, const uint64 size) {
     clear();
 
     if (size > 0) {
@@ -65,7 +65,7 @@ void HData::copy(const HBYTE* bytes, const size_t size) {
     }
 }
 
-void HData::fastSet(HBYTE* bytes, const size_t size) {
+void HData::fastSet(HBYTE* bytes, const uint64 size) {
     bytes_ = bytes;
     size_ = size;
 }

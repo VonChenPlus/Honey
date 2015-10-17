@@ -457,7 +457,7 @@ public:
         return data_.erase(position);
     }
 
-    size_t erase(const K& k) {
+    uint64 erase(const K& k) {
         auto iter = data_.find(k);
         if (iter != data_.end())
         {

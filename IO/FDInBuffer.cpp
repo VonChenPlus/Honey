@@ -20,13 +20,13 @@ namespace IO
         timeoutms_ = timeoutms;
     }
 
-    void FDInBuffer::read(size_t length, HBYTE *dest, bool wait) {
+    void FDInBuffer::read(uint64 length, HBYTE *dest, bool wait) {
         // do not know total buffer size sometimes, so we do not throw exception
         checkBuffer(length, wait, false);
         HBuffer::read(length, dest, wait);
     }
 
-    void FDInBuffer::fillBuffer(size_t length, bool wait) {
+    void FDInBuffer::fillBuffer(uint64 length, bool wait) {
         while (true) {
             try {
                 WaitUntilReady(fd_, wait ? timeoutms_ : 0);

@@ -303,7 +303,7 @@ bool HValue::operator== (const HValue& v) const {
         const auto &v2 = *(v._field.vectorVal);
         const auto size = v1.size();
         if (size == v2.size()) {
-            for (size_t i = 0; i < size; i++) {
+            for (uint64 i = 0; i < size; i++) {
                 if (v1[i] != v2[i]) return false;
             }
         }

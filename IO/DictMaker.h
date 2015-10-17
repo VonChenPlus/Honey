@@ -24,7 +24,7 @@ namespace IO
     public:
         SAXParser();
         ~SAXParser(void);
-        bool parse(const HBYTE* xmlData, size_t dataLength);
+        bool parse(const HBYTE* xmlData, uint64 dataLength);
         bool parse(const std::string& filename);
         void setDelegator(SAXDelegator* delegator);
         static void startElement(void *ctx, const char *name, const char **atts);
