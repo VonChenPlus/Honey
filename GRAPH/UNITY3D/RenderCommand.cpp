@@ -26,6 +26,7 @@ namespace GRAPH
 
     GroupCommandManager::GroupCommandManager(Renderer *renderer) {
         renderer_ = renderer;
+        renderer_->retain();
     }
 
     GroupCommandManager::~GroupCommandManager(){

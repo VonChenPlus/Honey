@@ -135,7 +135,7 @@ namespace GRAPH
         renderGroups_.clear();
         groupCommandManager_->release();
 
-        for (auto object : vboArray_) {
+        for (auto &object : vboArray_) {
             delete[] object.u2.bufferData;
             delete[] object.u2.indexData;
             glDeleteBuffers(2, object.u2.objectID);

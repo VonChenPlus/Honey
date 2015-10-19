@@ -1219,22 +1219,22 @@ namespace GRAPH
 
     void Node::schedule(SelectorF selector, float interval, unsigned int repeat, float delay)
     {
-        _scheduler->schedule(selector, this, interval , repeat, delay, !_running);
+        _scheduler->schedule(selector, this, !_running, interval , repeat, delay);
     }
 
     void Node::schedule(const std::function<void(float)> &callback, const std::string &key)
     {
-        _scheduler->schedule(callback, this, 0, !_running, key);
+        _scheduler->schedule(callback, this, key, !_running, 0);
     }
 
     void Node::schedule(const std::function<void(float)> &callback, float interval, const std::string &key)
     {
-        _scheduler->schedule(callback, this, interval, !_running, key);
+        _scheduler->schedule(callback, this, key, !_running, interval);
     }
 
     void Node::schedule(const std::function<void(float)>& callback, float interval, unsigned int repeat, float delay, const std::string &key)
     {
-        _scheduler->schedule(callback, this, interval, repeat, delay, !_running, key);
+        _scheduler->schedule(callback, this, key, !_running, interval, repeat, delay);
     }
 
     void Node::scheduleOnce(SelectorF selector, float delay)
@@ -1244,7 +1244,7 @@ namespace GRAPH
 
     void Node::scheduleOnce(const std::function<void(float)> &callback, float delay, const std::string &key)
     {
-        _scheduler->schedule(callback, this, 0, 0, delay, !_running, key);
+        _scheduler->schedule(callback, this, key, !_running, 0, 0, delay);
     }
 
     void Node::unschedule(SelectorF selector)

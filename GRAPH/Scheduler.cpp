@@ -11,12 +11,12 @@ namespace GRAPH
         , timesExecuted_(0)
         , repeat_(0)
         , delay_(0.0f)
-        , _interval(0.0f) {
+        , interval_(0.0f) {
     }
 
     void Timer::setupTimerWithInterval(float seconds, unsigned int repeat, float delay) {
         elapsed_ = -1;
-        _interval = seconds;
+        interval_ = seconds;
         delay_ = delay;
         useDelay_ = (delay_ > 0.0f) ? true : false;
         repeat_ = repeat;
@@ -31,7 +31,7 @@ namespace GRAPH
         else {
             if (runForever_ && !useDelay_) {
                 elapsed_ += dt;
-                if (elapsed_ >= _interval) {
+                if (elapsed_ >= interval_) {
                     trigger();
                     elapsed_ = 0;
                 }
@@ -47,7 +47,7 @@ namespace GRAPH
                     }
                 }
                 else {
-                    if (elapsed_ >= _interval) {
+                    if (elapsed_ >= interval_) {
                         trigger();
                         elapsed_ = 0;
                         timesExecuted_ += 1;
@@ -61,52 +61,75 @@ namespace GRAPH
         }
     }
 
-    TimerTargetSelector::TimerTargetSelector()
-        : target_(nullptr)
-        , selector_(nullptr) {
-    }
+    class TimerTargetSelector : public Timer
+    {
+    public:
+        TimerTargetSelector()
+            : target_(nullptr)
+            , selector_(nullptr) {
 
-    bool TimerTargetSelector::initWithSelector(Scheduler* scheduler, SelectorF selector, HObject* target, float seconds, unsigned int repeat, float delay) {
-        scheduler_ = scheduler;
-        target_ = target;
-        selector_ = selector;
-        setupTimerWithInterval(seconds, repeat, delay);
-        return true;
-    }
-
-    void TimerTargetSelector::trigger() {
-        if (target_ && selector_) {
-            (target_->*selector_)(elapsed_);
         }
-    }
 
-    void TimerTargetSelector::cancel() {
-        scheduler_->unschedule(selector_, target_);
-    }
-
-    TimerTargetCallback::TimerTargetCallback()
-        : target_(nullptr)
-        , callback_(nullptr) {
-    }
-
-    bool TimerTargetCallback::initWithCallback(Scheduler* scheduler, const SchedulerFunc& callback, void *target, const std::string& key, float seconds, unsigned int repeat, float delay) {
-        scheduler_ = scheduler;
-        target_ = target;
-        callback_ = callback;
-        key_ = key;
-        setupTimerWithInterval(seconds, repeat, delay);
-        return true;
-    }
-
-    void TimerTargetCallback::trigger() {
-        if (callback_) {
-            callback_(elapsed_);
+        bool initWithSelector(Scheduler* scheduler, SelectorF selector, HObject* target, float seconds, unsigned int repeat, float delay) {
+            scheduler_ = scheduler;
+            target_ = target;
+            selector_ = selector;
+            setupTimerWithInterval(seconds, repeat, delay);
+            return true;
         }
-    }
 
-    void TimerTargetCallback::cancel() {
-        scheduler_->unschedule(key_, target_);
-    }
+        inline SelectorF getSelector() const { return selector_; }
+
+        virtual void trigger() override {
+            if (target_ && selector_) {
+                (target_->*selector_)(elapsed_);
+            }
+        }
+
+        virtual void cancel() override {
+            scheduler_->unschedule(selector_, target_);
+        }
+
+    protected:
+        HObject* target_;
+        SelectorF selector_;
+    };
+
+    class TimerTargetCallback : public Timer
+    {
+    public:
+        TimerTargetCallback()
+            : target_(nullptr)
+            , callback_(nullptr) {
+
+      }
+
+        bool initWithCallback(Scheduler* scheduler, const SchedulerFunc& callback, void *target, const std::string& key, float seconds, unsigned int repeat, float delay) {
+            scheduler_ = scheduler;
+            target_ = target;
+            callback_ = callback;
+            key_ = key;
+            setupTimerWithInterval(seconds, repeat, delay);
+            return true;
+        }
+
+        inline const SchedulerFunc& getCallback() const { return callback_; }
+        inline const std::string& getKey() const { return key_; }
+
+        virtual void trigger() override {
+            if (callback_) {
+                callback_(elapsed_);
+            }
+        }
+        virtual void cancel() override {
+            scheduler_->unschedule(key_, target_);
+        }
+
+    protected:
+        void* target_;
+        SchedulerFunc callback_;
+        std::string key_;
+    };
 
     // Priority level reserved for system services.
     const int Scheduler::PRIORITY_SYSTEM = MATH::MATH_INT32_MIN();
@@ -115,8 +138,7 @@ namespace GRAPH
     const int Scheduler::PRIORITY_NON_SYSTEM_MIN = PRIORITY_SYSTEM + 1;
 
     Scheduler::Scheduler(void)
-        : timeScale_(1.0f)
-        , currentTimerSalvaged_(false)
+        : currentTimerSalvaged_(false)
         , updateMapLocked_(false) {
     }
 
@@ -124,32 +146,25 @@ namespace GRAPH
         unscheduleAll();
     }
 
-    void Scheduler::schedule(const SchedulerFunc& callback, void *target, float interval, bool paused, const std::string& key) {
-        this->schedule(callback, target, interval, -1, 0.0f, paused, key);
-    }
-
-    void Scheduler::schedule(const SchedulerFunc& callback, void *target, float interval, unsigned int repeat, float delay, bool paused, const std::string& key) {
+    void Scheduler::schedule(const SchedulerFunc& callback, void *target, const std::string& key, bool paused,
+                             float interval, unsigned int repeat, float delay) {
         TimerEntry *element = nullptr;
         if (timersMap_.find(target) != timersMap_.end())
             element = timersMap_[target];
 
         if (! element) {
-            element = new TimerEntry;
+            element = new(std::nothrow) TimerEntry;
             element->target = target;
-
-            timersMap_.insert(std::unordered_map<void *, TimerEntry *>::value_type(target, element));
-
-            // Is this the 1st element ? Then set the pause level to all the selectors of this target
             element->paused = paused;
+            timersMap_.insert(std::unordered_map<void *, TimerEntry *>::value_type(target, element));
         }
 
         if (element->timers == nullptr) {
-            element->timers = new HObjectArray(10);
+            element->timers = new(std::nothrow) HObjectArray(10);
         }
         else {
             for (int i = 0; i < element->timers->number(); ++i) {
                 TimerTargetCallback *timer = dynamic_cast<TimerTargetCallback*>((*element->timers)[i]);
-
                 if (timer && key == timer->getKey()) {
                     timer->setInterval(interval);
                     return;
@@ -167,7 +182,7 @@ namespace GRAPH
 
     void Scheduler::unschedule(const std::string &key, void *target) {
         if (target == nullptr || key.empty()) {
-            return;
+            throw _HException_Normal("Scheduler::unschedule");
         }
 
         TimerEntry *element = nullptr;
@@ -220,7 +235,6 @@ namespace GRAPH
         else {
             for (int i = 0; i < element->timers->number(); ++i) {
                 TimerTargetCallback *timer = static_cast<TimerTargetCallback*>((*element->timers)[i]);
-
                 if (key == timer->getKey()) {
                     return true;
                 }
@@ -231,28 +245,24 @@ namespace GRAPH
         return false;
     }
 
-    void Scheduler::schedule(SelectorF selector, HObject *target, float interval, unsigned int repeat, float delay, bool paused) {
+    void Scheduler::schedule(SelectorF selector, HObject *target, bool paused, float interval, unsigned int repeat, float delay) {
         TimerEntry *element = nullptr;
         if (timersMap_.find(target) != timersMap_.end())
             element = timersMap_[target];
 
         if (! element) {
-            element = new TimerEntry;
+            element = new (std::nothrow) TimerEntry;
             element->target = target;
-
-            timersMap_.insert(std::unordered_map<void *,TimerEntry *>::value_type(target, element));
-
-            // Is this the 1st element ? Then set the pause level to all the selectors of this target
             element->paused = paused;
+            timersMap_.insert(std::unordered_map<void *,TimerEntry *>::value_type(target, element));
         }
 
         if (element->timers == nullptr) {
-            element->timers = new HObjectArray(10);
+            element->timers = new (std::nothrow) HObjectArray(10);
         }
         else {
             for (int i = 0; i < element->timers->number(); ++i) {
                 TimerTargetSelector *timer = dynamic_cast<TimerTargetSelector*>((*element->timers)[i]);
-
                 if (timer && selector == timer->getSelector()) {
                     timer->setInterval(interval);
                     return;
@@ -265,10 +275,6 @@ namespace GRAPH
         timer->initWithSelector(this, selector, target, interval, repeat, delay);
         element->timers->appendObject(timer);
         timer->release();
-    }
-
-    void Scheduler::schedule(SelectorF selector, HObject *target, float interval, bool paused) {
-        this->schedule(selector, target, interval, -1, 0.0f, paused);
     }
 
     bool Scheduler::isScheduled(SelectorF selector, HObject *target) {
@@ -296,9 +302,8 @@ namespace GRAPH
     }
 
     void Scheduler::unschedule(SelectorF selector, HObject *target) {
-        // explicity handle nil arguments when removing an object
         if (target == nullptr || selector == nullptr) {
-            return;
+            throw _HException_Normal("Scheduler::unschedule failed!");
         }
 
         TimerEntry *element = nullptr;
@@ -338,7 +343,7 @@ namespace GRAPH
 
     void Scheduler::unscheduleUpdate(void *target) {
         if (target == nullptr) {
-            return;
+            throw _HException_Normal("Scheduler::unscheduleUpdate failed!");
         }
 
         UpdateEntry *element = nullptr;
@@ -367,30 +372,38 @@ namespace GRAPH
 
         // Updates selectors
         if(minPriority < 0) {
-            for (auto entry : updatesNegList_) {
-                if(entry->priority >= minPriority) {
-                    unscheduleUpdate(entry->target);
+            for (auto entry = updatesNegList_.begin(); entry != updatesNegList_.end();) {
+                if((*entry)->priority >= minPriority) {
+                    auto curEntry = entry++;
+                    unscheduleUpdate((*curEntry)->target);
+                }
+                else {
+                    ++entry;
                 }
             }
         }
 
         if(minPriority <= 0) {
-            for (auto entry : updates0List_) {
-                unscheduleUpdate(entry->target);
+            for (auto entry = updates0List_.begin(); entry != updates0List_.end();) {
+                auto curEntry = entry++;
+                unscheduleUpdate((*curEntry)->target);
             }
         }
 
-        for (auto entry : updatesPosList_) {
-            if(entry->priority >= minPriority) {
-                unscheduleUpdate(entry->target);
+        for (auto entry = updatesPosList_.begin(); entry != updatesPosList_.end();) {
+            if((*entry)->priority >= minPriority) {
+                auto curEntry = entry++;
+                unscheduleUpdate((*curEntry)->target);
+            }
+            else {
+                ++entry;
             }
         }
     }
 
     void Scheduler::unscheduleAllForTarget(void *target) {
-        // explicit nullptr handling
         if (target == nullptr) {
-            return;
+            throw _HException_Normal("Scheduler::unscheduleAllForTarget failed!");
         }
 
         // Custom Selectors
@@ -415,7 +428,7 @@ namespace GRAPH
         }
 
         // update selector
-        unscheduleUpdate(target);
+        return unscheduleUpdate(target);
     }
 
     void Scheduler::resumeTarget(void *target) {
@@ -479,10 +492,6 @@ namespace GRAPH
     // main loop
     void Scheduler::update(float dt) {
         updateMapLocked_ = true;
-
-        if (timeScale_ != 1.0f) {
-            dt *= timeScale_;
-        }
 
         //
         // Selector callbacks
@@ -614,8 +623,8 @@ namespace GRAPH
         UpdateEntry *hashElement = nullptr;
         if (updatesMap_.find(target) != updatesMap_.end())
             hashElement = updatesMap_[target];
+
         if (hashElement) {
-            // check if priority has changed
             if ((*hashElement->list->begin())->priority != priority) {
                 if (updateMapLocked_) {
                     hashElement->entry->markedForDeletion = false;
@@ -658,10 +667,12 @@ namespace GRAPH
         UpdateEntry *element = nullptr;
         if (updatesMap_.find(entry->target) != updatesMap_.end())
             element = updatesMap_[entry->target];
+
         if (element) {
             for (auto iter = element->list->begin(); iter != element->list->end(); ++iter) {
                 if ((*iter) == element->entry) {
                     element->list->erase(iter);
+                    break;
                 }
             }
             SAFE_DELETE(element->entry);
@@ -671,56 +682,50 @@ namespace GRAPH
     }
 
     void Scheduler::priorityIn(std::list<ListEntry *> &list, const SchedulerFunc& callback, void *target, int priority, bool paused) {
-        ListEntry *listElement = new ListEntry();
+        ListEntry *listEntry = new ListEntry();
+        listEntry->callback = callback;
+        listEntry->target = target;
+        listEntry->priority = priority;
+        listEntry->paused = paused;
+        listEntry->markedForDeletion = false;
 
-        listElement->callback = callback;
-        listElement->target = target;
-        listElement->priority = priority;
-        listElement->paused = paused;
-        listElement->markedForDeletion = false;
-
-        // empty list ?
         if (list.empty()) {
-            list.push_back(listElement);
+            list.push_back(listEntry);
         }
         else {
-            bool added = false;
-
-            for (auto iter = list.begin(); iter != list.end(); ++iter) {
+            auto iter = list.begin();
+            for (; iter != list.end(); ++iter) {
                 if (priority < (*iter)->priority) {
-                    list.insert(iter, listElement);
-                    added = true;
+                    list.insert(iter, listEntry);
                     break;
                 }
             }
 
-            if (! added) {
-                list.push_back(listElement);
+            if (iter == list.end()) {
+                list.push_back(listEntry);
             }
         }
 
         UpdateEntry *hashElement = new UpdateEntry;
         hashElement->target = target;
         hashElement->list = &list;
-        hashElement->entry = listElement;
+        hashElement->entry = listEntry;
         updatesMap_.insert(std::unordered_map<void *, UpdateEntry *>::value_type(target, hashElement));
     }
 
     void Scheduler::appendIn(std::list<ListEntry *> &list, const SchedulerFunc& callback, void *target, bool paused) {
-        ListEntry *listElement = new ListEntry();
-
-        listElement->callback = callback;
-        listElement->target = target;
-        listElement->paused = paused;
-        listElement->priority = 0;
-        listElement->markedForDeletion = false;
-
-        list.push_back(listElement);
+        ListEntry *listEntry = new ListEntry();
+        listEntry->callback = callback;
+        listEntry->target = target;
+        listEntry->paused = paused;
+        listEntry->priority = 0;
+        listEntry->markedForDeletion = false;
+        list.push_back(listEntry);
 
         UpdateEntry *hashElement = new UpdateEntry;
         hashElement->target = target;
         hashElement->list = &list;
-        hashElement->entry = listElement;
+        hashElement->entry = listEntry;
         updatesMap_.insert(std::unordered_map<void *, UpdateEntry *>::value_type(target, hashElement));
     }
 }

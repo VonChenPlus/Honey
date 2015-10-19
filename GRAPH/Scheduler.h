@@ -18,8 +18,8 @@ namespace GRAPH
     protected:
         Timer();
     public:
-        inline float getInterval() const { return _interval; }
-        inline void setInterval(float interval) { _interval = interval; }
+        inline float getInterval() const { return interval_; }
+        inline void setInterval(float interval) { interval_ = interval; }
 
         void setupTimerWithInterval(float seconds, unsigned int repeat, float delay);
 
@@ -36,47 +36,15 @@ namespace GRAPH
         unsigned int timesExecuted_;
         unsigned int repeat_; //0 = once, 1 is 2 x executed
         float delay_;
-        float _interval;
-    };
-
-    class TimerTargetSelector : public Timer
-    {
-    public:
-        TimerTargetSelector();
-
-        bool initWithSelector(Scheduler* scheduler, SelectorF selector, HObject* target, float seconds, unsigned int repeat, float delay);
-
-        inline SelectorF getSelector() const { return selector_; }
-
-        virtual void trigger() override;
-        virtual void cancel() override;
-
-    protected:
-        HObject* target_;
-        SelectorF selector_;
-    };
-
-    class TimerTargetCallback : public Timer
-    {
-    public:
-        TimerTargetCallback();
-
-        bool initWithCallback(Scheduler* scheduler, const SchedulerFunc& callback, void *target, const std::string& key, float seconds, unsigned int repeat, float delay);
-
-        inline const SchedulerFunc& getCallback() const { return callback_; }
-        inline const std::string& getKey() const { return key_; }
-
-        virtual void trigger() override;
-        virtual void cancel() override;
-
-    protected:
-        void* target_;
-        SchedulerFunc callback_;
-        std::string key_;
+        float interval_;
     };
 
     struct ListEntry
     {
+        ListEntry() {
+            memset(this, 0, sizeof(ListEntry));
+        }
+
         SchedulerFunc       callback;
         void                *target;
         int                 priority;
@@ -86,14 +54,19 @@ namespace GRAPH
 
     struct UpdateEntry
     {
+        UpdateEntry() {
+            memset(this, 0, sizeof(UpdateEntry));
+        }
         std::list<ListEntry *> *list;
         ListEntry *entry;
         void                *target;
-        SchedulerFunc     callback;
     };
 
     struct TimerEntry
     {
+        TimerEntry() {
+            memset(this, 0, sizeof(TimerEntry));
+        }
         HObjectArray        *timers;
         void                *target;
         int                 timerIndex;
@@ -111,13 +84,8 @@ namespace GRAPH
         Scheduler();
         virtual ~Scheduler();
 
-        inline float getTimeScale() { return timeScale_; }
-        inline void setTimeScale(float timeScale) { timeScale_ = timeScale; }
-
-        void schedule(const SchedulerFunc& callback, void *target, float interval, unsigned int repeat, float delay, bool paused, const std::string& key);
-        void schedule(const SchedulerFunc& callback, void *target, float interval, bool paused, const std::string& key);
-        void schedule(SelectorF selector, HObject *target, float interval, unsigned int repeat, float delay, bool paused);
-        void schedule(SelectorF selector, HObject *target, float interval, bool paused);
+        void schedule(const SchedulerFunc& callback, void *target, const std::string& key, bool paused, float interval, unsigned int repeat = -1, float delay = 0.0f);
+        void schedule(SelectorF selector, HObject *target, bool paused, float interval, unsigned int repeat = -1, float delay = 0.0f);
 
         template <class T>
         void scheduleUpdate(T *target, int priority, bool paused)
@@ -158,7 +126,6 @@ namespace GRAPH
         void appendIn(std::list<ListEntry *> &list, const SchedulerFunc& callback, void *target, bool paused);
 
     private:
-        float timeScale_;
         std::list<ListEntry *> updatesNegList_;
         std::list<ListEntry *> updates0List_;
         std::list<ListEntry *> updatesPosList_;
