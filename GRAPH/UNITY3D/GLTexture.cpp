@@ -107,11 +107,11 @@ namespace GRAPH
             return false;
         }
 
-        if (IMAGE::TinyImage::getPixelFormatInfoMap().find(pixelFormat) == IMAGE::TinyImage::getPixelFormatInfoMap().end()) {
+        if (IMAGE::ImageObject::getPixelFormatInfoMap().find(pixelFormat) == IMAGE::ImageObject::getPixelFormatInfoMap().end()) {
             return false;
         }
 
-        const IMAGE::PixelFormatInfo& info = IMAGE::TinyImage::getPixelFormatInfoMap().at(pixelFormat);
+        const IMAGE::PixelFormatInfo& info = IMAGE::ImageObject::getPixelFormatInfoMap().at(pixelFormat);
 
         //Set the row align only when mipmapsNum == 1 and the data is uncompressed
         if (mipmapsNum == 1 && !info.compressed) {
@@ -194,18 +194,18 @@ namespace GRAPH
     bool GLTexture::updateWithData(const void *data,int offsetX,int offsetY,int width,int height) {
         if (name_) {
             GLStateCache::BindTexture2D(name_);
-            const IMAGE::PixelFormatInfo& info = IMAGE::TinyImage::getPixelFormatInfoMap().at(pixelFormat_);
+            const IMAGE::PixelFormatInfo& info = IMAGE::ImageObject::getPixelFormatInfoMap().at(pixelFormat_);
             glTexSubImage2D(GL_TEXTURE_2D,0,offsetX,offsetY,width,height,info.format, info.type,data);
             return true;
         }
         return false;
     }
 
-    bool GLTexture::initWithImage(IMAGE::TinyImage *image) {
+    bool GLTexture::initWithImage(IMAGE::ImageObject *image) {
         return initWithImage(image, g_defaultAlphaPixelFormat);
     }
 
-    bool GLTexture::initWithImage(IMAGE::TinyImage *image, IMAGE::PixelFormat format) {
+    bool GLTexture::initWithImage(IMAGE::ImageObject *image, IMAGE::PixelFormat format) {
         if (image == nullptr) {
             return false;
         }
@@ -561,7 +561,7 @@ namespace GRAPH
                 asyncMutex_.unlock();
             }
 
-            IMAGE::TinyImage *image = nullptr;
+            IMAGE::ImageObject *image = nullptr;
             bool generateImage = false;
 
             auto it = textures_.find(asyncStruct->filename);
@@ -584,7 +584,7 @@ namespace GRAPH
             if (generateImage) {
                 const std::string& filename = asyncStruct->filename;
                 // generate image
-                image = new (std::nothrow) IMAGE::TinyImage();
+                image = new (std::nothrow) IMAGE::ImageObject();
                 if (image && !image->initWithImageFileThreadSafe(filename)) {
                     SAFE_RELEASE(image);
                     asyncMutex_.lock();
@@ -628,7 +628,7 @@ namespace GRAPH
             asyncMutex_.unlock();
 
             AsyncStruct *asyncStruct = imageInfo->asyncStruct;
-            IMAGE::TinyImage *image = imageInfo->image;
+            IMAGE::ImageObject *image = imageInfo->image;
 
             const std::string& filename = asyncStruct->filename;
 
@@ -670,11 +670,7 @@ namespace GRAPH
 
     GLTexture * TextureCache::addImage(const std::string &path) {
         GLTexture * texture = nullptr;
-        IMAGE::TinyImage* image = nullptr;
-        // Split up directory and filename
-        // MUTEX:
-        // Needed since addImageAsync calls this method from a different thread
-
+        IMAGE::ImageObject* image = nullptr;
         std::string fullpath = IO::FileUtils::getInstance().fullPathForFilename(path);
         if (fullpath.size() == 0) {
             return nullptr;
@@ -683,12 +679,11 @@ namespace GRAPH
         if( it != textures_.end() )
             texture = it->second;
 
-        if (! texture)
-        {
+        if (! texture) {
             // all images are handled by UIImage except PVR extension that is handled by our own handler
             do
             {
-                image = new (std::nothrow) IMAGE::TinyImage();
+                image = new (std::nothrow) IMAGE::ImageObject();
                 if (nullptr == image) break;
 
                 bool bRet = image->initWithImageFile(fullpath);
@@ -709,7 +704,7 @@ namespace GRAPH
         return texture;
     }
 
-    GLTexture* TextureCache::addImage(IMAGE::TinyImage *image, const std::string &key) {
+    GLTexture* TextureCache::addImage(IMAGE::ImageObject *image, const std::string &key) {
         GLTexture * texture = nullptr;
 
         do {
@@ -736,7 +731,7 @@ namespace GRAPH
 
     bool TextureCache::reloadTexture(const std::string& fileName) {
         GLTexture * texture = nullptr;
-        IMAGE::TinyImage * image = nullptr;
+        IMAGE::ImageObject * image = nullptr;
 
         std::string fullpath = IO::FileUtils::getInstance().fullPathForFilename(fileName);
         if (fullpath.size() == 0) {
@@ -755,7 +750,7 @@ namespace GRAPH
         }
         else {
             do {
-                image = new (std::nothrow) IMAGE::TinyImage();
+                image = new (std::nothrow) IMAGE::ImageObject();
                 if (nullptr == image) break;
 
                 bool bRet = image->initWithImageFile(fullpath);

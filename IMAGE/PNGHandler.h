@@ -1,5 +1,5 @@
-#ifndef THINPNG_H
-#define THINPNG_H
+#ifndef PNGHANDLER_H
+#define PNGHANDLER_H
 
 #include "BASE/Honey.h"
 #include "EXTERNALS/libpng17/png.h"
@@ -14,4 +14,4 @@ namespace IMAGE
                 int *pheight, int *pcolor, unsigned char **data, int *datalen);
 }
 
-#endif // THINPNG_H
+#endif // PNGHANDLER_H

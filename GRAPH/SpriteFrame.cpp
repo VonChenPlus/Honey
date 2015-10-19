@@ -197,7 +197,7 @@ namespace GRAPH
         }
 
         auto textureFileName = Director::getInstance().getTextureCache()->getTextureFilePath(texture);
-        auto image = new IMAGE::TinyImage();
+        auto image = new IMAGE::ImageObject();
         image->initWithImageFile(textureFileName);
 
         for (auto iter = framesDict.begin(); iter != framesDict.end(); ++iter) {

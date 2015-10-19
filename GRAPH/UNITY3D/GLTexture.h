@@ -16,7 +16,7 @@
 #include "MATH/Vector.h"
 #include "MATH/Rectangle.h"
 #include "MATH/Size.h"
-#include "IMAGE/TinyImage.h"
+#include "IMAGE/ImageObject.h"
 
 namespace GRAPH
 {
@@ -62,8 +62,8 @@ namespace GRAPH
         void drawAtPoint(const MATH::Vector2f& point);
         void drawInRect(const MATH::Rectf& rect);
 
-        bool initWithImage(IMAGE::TinyImage * image);
-        bool initWithImage(IMAGE::TinyImage * image, IMAGE::PixelFormat format);
+        bool initWithImage(IMAGE::ImageObject * image);
+        bool initWithImage(IMAGE::ImageObject * image, IMAGE::PixelFormat format);
         bool initWithString(const char *text,  const std::string &fontName, float fontSize, const MATH::Sizef& dimensions = MATH::Sizef(0, 0), TextHAlignment hAlignment = TextHAlignment::CENTER, TextVAlignment vAlignment = TextVAlignment::TOP);
         bool initWithString(const char *text, const FontDefinition& textDefinition);
 
@@ -119,7 +119,7 @@ namespace GRAPH
         virtual ~TextureCache();
 
         GLTexture* addImage(const std::string &filepath);
-        GLTexture* addImage(IMAGE::TinyImage *image, const std::string &key);
+        GLTexture* addImage(IMAGE::ImageObject *image, const std::string &key);
         virtual void addImageAsync(const std::string &filepath, const std::function<void(GLTexture*)>& callback);
 
         virtual void unbindImageAsync(const std::string &filename);
@@ -154,7 +154,7 @@ namespace GRAPH
         struct ImageInfo
         {
             AsyncStruct *asyncStruct;
-            IMAGE::TinyImage *image;
+            IMAGE::ImageObject *image;
         };
 
         std::thread* loadingThread_;

@@ -1,10 +1,8 @@
-#include "IMAGE/TinyImage.h"
-
+#include "IMAGE/ImageObject.h"
 #include <string.h>
-
 #include "BASE/HData.h"
 #include "IO/FileUtils.h"
-#include "IMAGE/TinyPNG.h"
+#include "IMAGE/PNGHandler.h"
 #include "EXTERNALS/rg_etc1/etc1.h"
 #include "EXTERNALS/jpge/jpgd.h"
 
@@ -535,7 +533,7 @@ namespace IMAGE
     const PixelFormatInfoMap _pixelFormatInfoTables(TexturePixelFormatInfoTablesValue,
                                                                          TexturePixelFormatInfoTablesValue + sizeof(TexturePixelFormatInfoTablesValue) / sizeof(TexturePixelFormatInfoTablesValue[0]));
 
-    TinyImage::TinyImage()
+    ImageObject::ImageObject()
         : data_(nullptr)
         , dataLen_(0)
         , width_(0)
@@ -546,11 +544,11 @@ namespace IMAGE
 
     }
 
-    TinyImage::~TinyImage() {
+    ImageObject::~ImageObject() {
         SAFE_FREE(data_);
     }
 
-    bool TinyImage::initWithImageFile(const std::string& path) {
+    bool ImageObject::initWithImageFile(const std::string& path) {
         bool ret = false;
         filePath_ = IO::FileUtils::getInstance().fullPathForFilename(path);
 
@@ -563,7 +561,7 @@ namespace IMAGE
         return ret;
     }
 
-    bool TinyImage::initWithImageFileThreadSafe(const std::string& fullpath) {
+    bool ImageObject::initWithImageFileThreadSafe(const std::string& fullpath) {
         bool ret = false;
         filePath_ = fullpath;
 
@@ -576,7 +574,7 @@ namespace IMAGE
         return ret;
     }
 
-    bool TinyImage::initWithImageData(const unsigned char *data, uint64 dataLen) {
+    bool ImageObject::initWithImageData(const unsigned char *data, uint64 dataLen) {
         bool ret = false;
 
         do {
@@ -613,7 +611,7 @@ namespace IMAGE
         return ret;
     }
 
-    bool TinyImage::isPng(const unsigned char *data, uint64 dataLen) {
+    bool ImageObject::isPng(const unsigned char *data, uint64 dataLen) {
         if (dataLen <= 8) {
             return false;
         }
@@ -623,11 +621,11 @@ namespace IMAGE
         return memcmp(PNG_SIGNATURE, data, sizeof(PNG_SIGNATURE)) == 0;
     }
 
-    bool TinyImage::isEtc(const unsigned char * data, uint64) {
+    bool ImageObject::isEtc(const unsigned char * data, uint64) {
         return etc1_pkm_is_valid((etc1_byte*)data) ? true : false;
     }
 
-    bool TinyImage::isJpg(const unsigned char * data, uint64 dataLen) {
+    bool ImageObject::isJpg(const unsigned char * data, uint64 dataLen) {
         if (dataLen <= 4) {
             return false;
         }
@@ -637,7 +635,7 @@ namespace IMAGE
         return memcmp(data, JPG_SOI, 2) == 0;
     }
 
-    TinyImage::Format TinyImage::detectFormat(const unsigned char * data, uint64 dataLen) {
+    ImageObject::Format ImageObject::detectFormat(const unsigned char * data, uint64 dataLen) {
         if (isPng(data, dataLen)) {
             return Format::PNG;
         }
@@ -652,19 +650,19 @@ namespace IMAGE
         }
     }
 
-    int TinyImage::getBitPerPixel() {
+    int ImageObject::getBitPerPixel() {
         return getPixelFormatInfoMap().at(renderFormat_).bpp;
     }
 
-    bool TinyImage::hasAlpha() {
+    bool ImageObject::hasAlpha() {
         return getPixelFormatInfoMap().at(renderFormat_).alpha;
     }
 
-    bool TinyImage::isCompressed() {
+    bool ImageObject::isCompressed() {
         return getPixelFormatInfoMap().at(renderFormat_).compressed;
     }
 
-    bool TinyImage::initWithJpgData(const unsigned char * data, uint64 dataLen) {
+    bool ImageObject::initWithJpgData(const unsigned char * data, uint64 dataLen) {
         int actual_components = 0;
         data_ = (unsigned char*)jpgd::decompress_jpeg_image_from_memory((const unsigned char*)data, (int)dataLen, &width_, &height_, &actual_components, 4);
         renderFormat_ = PixelFormat::RGB888;
@@ -672,12 +670,11 @@ namespace IMAGE
         return true;
     }
 
-    bool TinyImage::initWithPngData(const unsigned char *data, uint64 dataLen) {
+    bool ImageObject::initWithPngData(const unsigned char *data, uint64 dataLen) {
         int color_type;
         PNGLoadPtr((const unsigned char*)data, dataLen, &width_, &height_, &color_type, (unsigned char**)&data_, (int *)&dataLen_);
 
-        switch (color_type)
-        {
+        switch (color_type) {
         case PNG_COLOR_TYPE_GRAY:
             renderFormat_ = PixelFormat::I8;
             break;
@@ -705,7 +702,7 @@ namespace IMAGE
         return true;
     }
 
-    bool TinyImage::initWithETCData(const unsigned char * data, uint64) {
+    bool ImageObject::initWithETCData(const unsigned char * data, uint64) {
         const etc1_byte* header = static_cast<const etc1_byte*>(data);
 
         //check the data
@@ -739,10 +736,9 @@ namespace IMAGE
         return true;
     }
 
-    bool TinyImage::initWithRawData(const unsigned char * data, uint64, int width, int height, int, bool preMulti) {
+    bool ImageObject::initWithRawData(const unsigned char * data, uint64, int width, int height, int, bool preMulti) {
         bool ret = false;
-        do
-        {
+        do {
             if(0 == width || 0 == height) break;
 
             height_   = height;
@@ -763,7 +759,7 @@ namespace IMAGE
         return ret;
     }
 
-    void TinyImage::premultipliedAlpha() {
+    void ImageObject::premultipliedAlpha() {
         unsigned int* fourBytes = (unsigned int*)data_;
         for(int i = 0; i < width_ * height_; i++) {
             unsigned char* p = data_ + i * 4;
@@ -773,11 +769,11 @@ namespace IMAGE
         hasPremultipliedAlpha_ = true;
     }
 
-    void TinyImage::setPVRImagesHavePremultipliedAlpha(bool haveAlphaPremultiplied) {
+    void ImageObject::setPVRImagesHavePremultipliedAlpha(bool haveAlphaPremultiplied) {
         _PVRHaveAlphaPremultiplied = haveAlphaPremultiplied;
     }
 
-    const PixelFormatInfoMap& TinyImage::getPixelFormatInfoMap() {
+    const PixelFormatInfoMap& ImageObject::getPixelFormatInfoMap() {
         return _pixelFormatInfoTables;
     }
 }

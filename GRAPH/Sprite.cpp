@@ -296,7 +296,7 @@ namespace GRAPH
             texture = Director::getInstance().getTextureCache()->getTextureForKey(_2x2_WHITE_IMAGE_KEY);
 
             if (texture == nullptr) {
-                IMAGE::TinyImage* image = new (std::nothrow) IMAGE::TinyImage();
+                IMAGE::ImageObject* image = new (std::nothrow) IMAGE::ImageObject();
                 image->initWithRawData(_2x2_white_image, sizeof(_2x2_white_image), 2, 2, 8);
                 texture = Director::getInstance().getTextureCache()->addImage(image, _2x2_WHITE_IMAGE_KEY);
                 SAFE_RELEASE(image);

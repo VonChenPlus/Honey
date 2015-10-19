@@ -1,5 +1,4 @@
-#include "TinyPNG.h"
-
+#include "PNGHandler.h"
 #include <string.h>
 #include <stdlib.h>
 #include "EXTERNALS/libpng17/pngpriv.h"
