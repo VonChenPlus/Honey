@@ -6,6 +6,7 @@
 #include <set>
 #include <list>
 #include <unordered_map>
+#include <string.h>
 #include "BASE/HObject.h"
 
 namespace GRAPH
