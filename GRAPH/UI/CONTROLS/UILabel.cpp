@@ -7,6 +7,7 @@
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/GLTexture.h"
+#include "GRAPH/UNITY3D/GLTextureAtlas.h"
 #include "IO/FileUtils.h"
 #include "UTILS/STRING/UTFUtils.h"
 
@@ -1407,7 +1408,7 @@ namespace GRAPH
                 color4.blue *= _displayedOpacity/255.0f;
             }
 
-            TextureAtlas* textureAtlas;
+            GLTextureAtlas* textureAtlas;
             V3F_C4B_T2F_Quad *quads;
             for (auto&& batchNode:_batchNodes)
             {

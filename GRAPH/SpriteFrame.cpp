@@ -103,7 +103,7 @@ namespace GRAPH
         }
 
         if( textureFilename_.length() > 0 ) {
-            return Director::getInstance().getTextureCache()->addImage(textureFilename_.c_str());
+            return TextureCache::getInstance().addImage(textureFilename_.c_str());
         }
 
         return nullptr;
@@ -143,7 +143,7 @@ namespace GRAPH
     }
 
     void SpriteFrameCache::addSpriteFramesWithFile(const std::string& plist, const std::string& textureFileName) {
-        GLTexture *texture = Director::getInstance().getTextureCache()->addImage(textureFileName);
+        GLTexture *texture = TextureCache::getInstance().addImage(textureFileName);
 
         if (texture) {
             addSpriteFramesWithFile(plist, texture);
@@ -179,7 +179,7 @@ namespace GRAPH
                 texturePath = texturePath.append(".png");
             }
 
-            GLTexture *texture = Director::getInstance().getTextureCache()->addImage(texturePath.c_str());
+            GLTexture *texture = TextureCache::getInstance().addImage(texturePath.c_str());
             if (texture) {
                 addSpriteFramesWithDictionary(dict, texture);
                 loadedFileNames_->insert(plist);
@@ -196,7 +196,7 @@ namespace GRAPH
             format = metadataDict["format"].asInt();
         }
 
-        auto textureFileName = Director::getInstance().getTextureCache()->getTextureFilePath(texture);
+        auto textureFileName = TextureCache::getInstance().getTextureFilePath(texture);
         auto image = new IMAGE::ImageObject();
         image->initWithImageFile(textureFileName);
 

@@ -33,7 +33,6 @@ namespace GRAPH
         actionManager_ = new (std::nothrow) ActionManager;
         scheduler_->scheduleUpdate(actionManager_, Scheduler::PRIORITY_SYSTEM, false);
         eventDispatcher_ = new (std::nothrow) EventDispatcher;
-        textureCache_ = new (std::nothrow) TextureCache();
         renderer_ = new (std::nothrow) Renderer;
         projection_ = Projection::_3D;
 
@@ -46,11 +45,6 @@ namespace GRAPH
         SAFE_DELETE(eventDispatcher_);
         SAFE_DELETE(renderer_);
         SAFE_RELEASE(camera_);
-
-        if (textureCache_) {
-            textureCache_->waitForQuit();
-            SAFE_RELEASE_NULL(textureCache_);
-        }
     }
 
     void Director::setRenderView(RenderView *view) {

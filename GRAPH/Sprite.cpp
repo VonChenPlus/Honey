@@ -3,6 +3,7 @@
 #include "GRAPH/SpriteFrame.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/UNITY3D/GLTexture.h"
+#include "GRAPH/UNITY3D/GLTextureAtlas.h"
 #include "GRAPH/UNITY3D/GLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/Renderer.h"
@@ -196,7 +197,7 @@ namespace GRAPH
     }
 
     bool Sprite::initWithFile(const std::string& filename) {
-        GLTexture *texture = Director::getInstance().getTextureCache()->addImage(filename);
+        GLTexture *texture = TextureCache::getInstance().addImage(filename);
         if (texture) {
             MATH::Rectf rect = MATH::RectfZERO;
             rect.size = texture->getContentSize();
@@ -207,7 +208,7 @@ namespace GRAPH
     }
 
     bool Sprite::initWithFile(const std::string &filename, const MATH::Rectf& rect) {
-        GLTexture *texture = Director::getInstance().getTextureCache()->addImage(filename);
+        GLTexture *texture = TextureCache::getInstance().addImage(filename);
         if (texture) {
             return initWithTexture(texture, rect);
         }
@@ -282,7 +283,7 @@ namespace GRAPH
     #define _2x2_WHITE_IMAGE_KEY  "/_2x2_white_image"
 
     void Sprite::setTexture(const std::string &filename) {
-        GLTexture *texture = Director::getInstance().getTextureCache()->addImage(filename);
+        GLTexture *texture = TextureCache::getInstance().addImage(filename);
         setTexture(texture);
 
         MATH::Rectf rect = MATH::RectfZERO;
@@ -293,12 +294,12 @@ namespace GRAPH
 
     void Sprite::setTexture(GLTexture *texture) {
         if (texture == nullptr) {
-            texture = Director::getInstance().getTextureCache()->getTextureForKey(_2x2_WHITE_IMAGE_KEY);
+            texture = TextureCache::getInstance().getTextureForKey(_2x2_WHITE_IMAGE_KEY);
 
             if (texture == nullptr) {
                 IMAGE::ImageObject* image = new (std::nothrow) IMAGE::ImageObject();
                 image->initWithRawData(_2x2_white_image, sizeof(_2x2_white_image), 2, 2, 8);
-                texture = Director::getInstance().getTextureCache()->addImage(image, _2x2_WHITE_IMAGE_KEY);
+                texture = TextureCache::getInstance().addImage(image, _2x2_WHITE_IMAGE_KEY);
                 SAFE_RELEASE(image);
             }
         }
@@ -822,7 +823,7 @@ namespace GRAPH
         if (!tex->hasPremultipliedAlpha()) {
             blendFunc_ = BlendFunc::ALPHA_NON_PREMULTIPLIED;
         }
-        textureAtlas_ = new (std::nothrow) TextureAtlas();
+        textureAtlas_ = new (std::nothrow) GLTextureAtlas();
 
         if (capacity == 0) {
             capacity = DEFAULT_CAPACITY;
@@ -847,7 +848,7 @@ namespace GRAPH
     }
 
     bool SpriteBatchNode::initWithFile(const std::string& fileImage, uint64 capacity/* = DEFAULT_CAPACITY*/) {
-        GLTexture *texture2D = Director::getInstance().getTextureCache()->addImage(fileImage);
+        GLTexture *texture2D = TextureCache::getInstance().addImage(fileImage);
         return initWithTexture(texture2D, capacity);
     }
 
@@ -913,7 +914,7 @@ namespace GRAPH
         Node::removeChild(sprite, cleanup);
     }
 
-    void SpriteBatchNode::setTextureAtlas(TextureAtlas* textureAtlas) {
+    void SpriteBatchNode::setTextureAtlas(GLTextureAtlas* textureAtlas) {
         if (textureAtlas != textureAtlas_) {
             SAFE_RETAIN(textureAtlas);
             SAFE_RELEASE(textureAtlas_);

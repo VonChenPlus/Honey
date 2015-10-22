@@ -60,7 +60,6 @@ namespace GRAPH
         ActionManager* getActionManager() const { return actionManager_; }
         Scheduler *getScheduler() const { return scheduler_; }
         EventDispatcher *getEventDispatcher() const { return eventDispatcher_; }
-        TextureCache* getTextureCache() const { return textureCache_; }
         Renderer* getRenderer() const { return renderer_; }
 
         void setGLDefaultValues();
@@ -123,7 +122,6 @@ namespace GRAPH
         Scheduler *scheduler_;
         EventDispatcher *eventDispatcher_;
         RenderView *renderView_;
-        TextureCache *textureCache_;
         Renderer *renderer_;
     };
 }

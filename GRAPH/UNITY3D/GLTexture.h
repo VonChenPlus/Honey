@@ -1,5 +1,5 @@
-#ifndef TEXTURE2D_H
-#define TEXTURE2D_H
+#ifndef GLTEXTURE_H
+#define GLTEXTURE_H
 
 #include <string>
 #include <mutex>
@@ -115,8 +115,7 @@ namespace GRAPH
     class TextureCache : public HObject
     {
     public:
-        TextureCache();
-        virtual ~TextureCache();
+        static TextureCache &getInstance();
 
         GLTexture* addImage(const std::string &filepath);
         GLTexture* addImage(IMAGE::ImageObject *image, const std::string &key);
@@ -138,6 +137,9 @@ namespace GRAPH
         void waitForQuit();
 
     private:
+        TextureCache();
+        virtual ~TextureCache();
+
         void addImageAsyncCallBack(float dt);
         void loadImageThread();
 
@@ -167,63 +169,6 @@ namespace GRAPH
         int asyncRefCount_;
         std::unordered_map<std::string, GLTexture*> textures_;
     };
-
-    class TextureAtlas : public HObject
-    {
-    public:
-        static TextureAtlas* create(const std::string& file , uint64 capacity);
-        static TextureAtlas* createWithTexture(GLTexture *texture, uint64 capacity);
-
-        TextureAtlas();
-        virtual ~TextureAtlas();
-
-        bool initWithFile(const std::string& file, uint64 capacity);
-        bool initWithTexture(GLTexture *texture, uint64 capacity);
-
-        void updateQuad(V3F_C4B_T2F_Quad* quad, uint64 index);
-        void insertQuad(V3F_C4B_T2F_Quad* quad, uint64 index);
-        void insertQuads(V3F_C4B_T2F_Quad* quads, uint64 index, uint64 amount);
-        void insertQuadFromIndex(uint64 fromIndex, uint64 newIndex);
-
-        void removeQuadAtIndex(uint64 index);
-        void removeQuadsAtIndex(uint64 index, uint64 amount);
-        void removeAllQuads();
-
-        bool resizeCapacity(uint64 capacity);
-
-        void increaseTotalQuadsWith(uint64 amount);
-        void moveQuadsFromIndex(uint64 oldIndex, uint64 amount, uint64 newIndex);
-        void moveQuadsFromIndex(uint64 index, uint64 newIndex);
-        void fillWithEmptyQuadsFromIndex(uint64 index, uint64 amount);
-
-        void drawNumberOfQuads(uint64 n);
-        void drawNumberOfQuads(uint64 numberOfQuads, uint64 start);
-        void drawQuads();
-
-        inline bool isDirty(void) { return dirty_; }
-        inline void setDirty(bool bDirty) { dirty_ = bDirty; }
-
-        uint64 getTotalQuads() const;
-        uint64 getCapacity() const;
-
-        GLTexture* getTexture() const;
-        void setTexture(GLTexture* texture);
-
-        V3F_C4B_T2F_Quad* getQuads();
-        void setQuads(V3F_C4B_T2F_Quad* quads);
-
-    private:
-        void renderCommand();
-
-        void setupIndices();
-        void mapBuffers();
-        void setupVBO();
-
-    protected:
-        VertexBufferObject<V3F_C4B_T2F_Quad> vbo_;
-        bool    dirty_;
-        GLTexture* texture_;
-    };
 }
 
-#endif // TEXTURE2D_H
+#endif // GLTEXTURE_H
