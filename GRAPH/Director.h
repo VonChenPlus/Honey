@@ -105,6 +105,7 @@ namespace GRAPH
 
     private:
         bool paused_;
+        float lastTime_;
 
         Camera *camera_;
 

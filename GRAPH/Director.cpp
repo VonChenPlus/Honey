@@ -10,6 +10,7 @@
 #include "GRAPH/UNITY3D/GLTexture.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
+#include "UTILS/TIME/TimeUtils.h"
 
 namespace GRAPH
 {
@@ -24,6 +25,7 @@ namespace GRAPH
 
     bool Director::init(void) {
         paused_ = false;
+        lastTime_ = 0.0f;
 
         initMatrixStack();
 
@@ -335,7 +337,9 @@ namespace GRAPH
 
     void Director::drawScene() {
         if (!paused_) {
-            scheduler_->update(0);
+            auto curTime = UTILS::TIME::FetchCurrentTime();
+            scheduler_->update(curTime - lastTime_);
+            lastTime_ = curTime;
         }
 
         renderer_->clear();
