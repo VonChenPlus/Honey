@@ -334,7 +334,7 @@ namespace GRAPH
     }
 
     void Director::drawScene() {
-        if (paused_) {
+        if (!paused_) {
             scheduler_->update(0);
         }
 
