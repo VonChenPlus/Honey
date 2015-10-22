@@ -11,6 +11,10 @@
 namespace GRAPH
 {
     class GLTexture;
+    namespace UI
+    {
+        class Label;
+    }
 
     struct FontLetterDefinition
     {
@@ -93,7 +97,6 @@ namespace GRAPH
         float _commonLineHeight;
         Font * _font;
 
-        // Dynamic GlyphCollection related stuff
         int _currentPage;
         unsigned char *_currentPageData;
         int _currentPageDataSize;
@@ -105,7 +108,7 @@ namespace GRAPH
         bool _antialiasEnabled;
         int _currLineHeight;
 
-        friend class Label;
+        friend class UI::Label;
     };
 
     class FontAtlasCache

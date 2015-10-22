@@ -7,7 +7,7 @@
 #include "GRAPH/UNITY3D/GLShader.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UI/UIScale9Sprite.h"
-#include "GRAPH/UI/Layer.h"
+#include "GRAPH/UI/UILayer.h"
 #include "GRAPH/RenderView.h"
 #include "GRAPH/UI/UIHelper.h"
 

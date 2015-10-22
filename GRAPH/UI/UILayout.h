@@ -9,13 +9,13 @@
 namespace GRAPH
 {
     class DrawNode;
-    class LayerColor;
-    class LayerGradient;
 
     namespace UI
     {
         class Scale9Sprite;
         class LayoutManager;
+        class LayerColor;
+        class LayerGradient;
 
         class LayoutProtocol
         {

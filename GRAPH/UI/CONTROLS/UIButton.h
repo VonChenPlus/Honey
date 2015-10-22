@@ -5,12 +5,12 @@
 
 namespace GRAPH
 {
-    class Label;
     class SpriteFrame;
 
     namespace UI
     {
         class Scale9Sprite;
+        class Label;
 
         class Button : public Widget
         {

@@ -2,7 +2,7 @@
 #define UITEXT_H
 
 #include "GRAPH/UI/UIWidget.h"
-#include "GRAPH/UI/CONTROLS/Label.h"
+#include "GRAPH/UI/CONTROLS/UILabel.h"
 
 namespace GRAPH
 {

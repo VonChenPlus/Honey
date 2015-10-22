@@ -1,7 +1,7 @@
 #include <algorithm>
 #include "GRAPH/UI/CONTROLS/UIButton.h"
 #include "GRAPH/UI/UIScale9Sprite.h"
-#include "GRAPH/UI/CONTROLS//Label.h"
+#include "GRAPH/UI/CONTROLS//UILabel.h"
 #include "GRAPH/UI/UIHelper.h"
 #include "GRAPH/Action.h"
 #include "IO/FileUtils.h"
@@ -124,7 +124,7 @@ namespace GRAPH
 
         void Button::createTitleRenderer()
         {
-            _titleRenderer = Label::create();
+            _titleRenderer = UI::Label::create();
             _titleRenderer->setAnchorPoint(MATH::Vec2fMIDDLE);
             addProtectedChild(_titleRenderer, TITLE_RENDERER_Z, -1);
         }
