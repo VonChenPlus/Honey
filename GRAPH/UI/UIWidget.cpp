@@ -203,37 +203,37 @@ namespace GRAPH
             }
         }
 
-        Widget* Widget::_focusedWidget = nullptr;
-        Widget::FocusNavigationController* Widget::_focusNavigationController = nullptr;
+        Widget* Widget::focusedWidget_ = nullptr;
+        Widget::FocusNavigationController* Widget::focusNavigationController_ = nullptr;
 
         Widget::Widget():
-        _usingLayoutComponent(false),
-        _unifySize(false),
-        _enabled(true),
-        _bright(true),
-        _touchEnabled(false),
-        _highlight(false),
-        _affectByClipping(false),
-        _ignoreSize(false),
-        _propagateTouchEvents(true),
-        _brightStyle(BrightStyle::NONE),
-        _sizeType(SizeType::ST_ABSOLUTE),
-        _positionType(PositionType::PT_ABSOLUTE),
-        _actionTag(0),
-        _customSize(MATH::SizefZERO),
-        _hitted(false),
-        _hittedByCamera(nullptr),
-        _touchListener(nullptr),
-        _flippedX(false),
-        _flippedY(false),
-        _layoutParameterType(LayoutParameter::Type::TNONE),
-        _focused(false),
-        _focusEnabled(true),
-        _touchEventListener(nullptr),
-        _touchEventSelector(nullptr),
-        _ccEventCallback(nullptr),
-        _callbackType(""),
-        _callbackName("")
+        usingLayoutComponent_(false),
+        unifySize_(false),
+        enabled_(true),
+        bright_(true),
+        touchEnabled_(false),
+        highlight_(false),
+        affectByClipping_(false),
+        ignoreSize_(false),
+        propagateTouchEvents_(true),
+        brightStyle_(BrightStyle::NONE),
+        sizeType_(SizeType::ST_ABSOLUTE),
+        positionType_(PositionType::PT_ABSOLUTE),
+        actionTag_(0),
+        customSize_(MATH::SizefZERO),
+        hitted_(false),
+        hittedByCamera_(nullptr),
+        touchListener_(nullptr),
+        flippedX_(false),
+        flippedY_(false),
+        layoutParameterType_(LayoutParameter::Type::TNONE),
+        focused_(false),
+        focusEnabled_(true),
+        touchEventListener_(nullptr),
+        touchEventSelector_(nullptr),
+        EventCallback_(nullptr),
+        callbackType_(""),
+        callbackName_("")
         {
 
         }
@@ -246,15 +246,15 @@ namespace GRAPH
         void Widget::cleanupWidget()
         {
             //clean up _touchListener
-            _eventDispatcher->removeEventListener(_touchListener);
-            SAFE_RELEASE_NULL(_touchListener);
+            eventDispatcher_->removeEventListener(touchListener_);
+            SAFE_RELEASE_NULL(touchListener_);
 
             //cleanup focused widget and focus navigation controller
-            if (_focusedWidget == this)
+            if (focusedWidget_ == this)
             {
                 //delete
-                SAFE_DELETE(_focusNavigationController);
-                _focusedWidget = nullptr;
+                SAFE_DELETE(focusNavigationController_);
+                focusedWidget_ = nullptr;
             }
 
         }
@@ -290,7 +290,7 @@ namespace GRAPH
 
         void Widget::onEnter()
         {
-            if (!_usingLayoutComponent)
+            if (!usingLayoutComponent_)
                 updateSizeAndPosition();
             ProtectedNode::onEnter();
         }
@@ -303,7 +303,7 @@ namespace GRAPH
 
         void Widget::visit(Renderer *renderer, const MATH::Matrix4 &parentTransform, uint32_t parentFlags)
         {
-            if (_visible)
+            if (visible_)
             {
                 adaptRenderers();
                 ProtectedNode::visit(renderer, parentTransform, parentFlags);
@@ -317,7 +317,7 @@ namespace GRAPH
 
         void Widget::setEnabled(bool enabled)
         {
-            _enabled = enabled;
+            enabled_ = enabled;
         }
 
         void Widget::initRenderer()
@@ -328,16 +328,16 @@ namespace GRAPH
         {
             ProtectedNode::setContentSize(contentSize);
 
-            _customSize = contentSize;
-            if (_unifySize)
+            customSize_ = contentSize;
+            if (unifySize_)
             {
                 //unify Size logic
             }
-            else if (_ignoreSize)
+            else if (ignoreSize_)
             {
-                _contentSize = getVirtualRendererSize();
+                contentSize_ = getVirtualRendererSize();
             }
-            if (!_usingLayoutComponent && _running)
+            if (!usingLayoutComponent_ && running_)
             {
                 Widget* widgetParent = getWidgetParent();
                 MATH::Sizef pSize;
@@ -347,19 +347,19 @@ namespace GRAPH
                 }
                 else
                 {
-                    pSize = _parent->getContentSize();
+                    pSize = parent_->getContentSize();
                 }
                 float spx = 0.0f;
                 float spy = 0.0f;
                 if (pSize.width > 0.0f)
                 {
-                    spx = _customSize.width / pSize.width;
+                    spx = customSize_.width / pSize.width;
                 }
                 if (pSize.height > 0.0f)
                 {
-                    spy = _customSize.height / pSize.height;
+                    spy = customSize_.height / pSize.height;
                 }
-                _sizePercent.set(spx, spy);
+                sizePercent_.set(spx, spy);
             }
             onSizeChanged();
         }
@@ -379,7 +379,7 @@ namespace GRAPH
 
         void Widget::setSizePercent(const MATH::Vector2f &percent)
         {
-            if (_usingLayoutComponent)
+            if (usingLayoutComponent_)
             {
                 auto component = this->getOrCreateLayoutComponent();
                 component->setUsingPercentContentSize(true);
@@ -388,9 +388,9 @@ namespace GRAPH
             }
             else
             {
-                _sizePercent = percent;
-                MATH::Sizef cSize = _customSize;
-                if (_running)
+                sizePercent_ = percent;
+                MATH::Sizef cSize = customSize_;
+                if (running_)
                 {
                     Widget* widgetParent = getWidgetParent();
                     if (widgetParent)
@@ -399,10 +399,10 @@ namespace GRAPH
                     }
                     else
                     {
-                        cSize = MATH::Sizef(_parent->getContentSize().width * percent.x, _parent->getContentSize().height * percent.y);
+                        cSize = MATH::Sizef(parent_->getContentSize().width * percent.x, parent_->getContentSize().height * percent.y);
                     }
                 }
-                if (_ignoreSize)
+                if (ignoreSize_)
                 {
                     this->setContentSize(getVirtualRendererSize());
                 }
@@ -410,19 +410,19 @@ namespace GRAPH
                 {
                     this->setContentSize(cSize);
                 }
-                _customSize = cSize;
+                customSize_ = cSize;
             }
         }
 
         void Widget::setSizeType(SizeType type)
         {
-            _sizeType = type;
+            sizeType_ = type;
 
-            if (_usingLayoutComponent)
+            if (usingLayoutComponent_)
             {
                 auto component = this->getOrCreateLayoutComponent();
 
-                if (_sizeType == Widget::SizeType::ST_PERCENT)
+                if (sizeType_ == Widget::SizeType::ST_PERCENT)
                 {
                     component->setUsingPercentContentSize(true);
                 }
@@ -434,47 +434,47 @@ namespace GRAPH
         }
         Widget::SizeType Widget::getSizeType() const
         {
-            return _sizeType;
+            return sizeType_;
         }
 
         void Widget::updateSizeAndPosition()
         {
-            MATH::Sizef pSize = _parent->getContentSize();
+            MATH::Sizef pSize = parent_->getContentSize();
 
             updateSizeAndPosition(pSize);
         }
 
         void Widget::updateSizeAndPosition(const MATH::Sizef &parentSize)
         {
-            switch (_sizeType)
+            switch (sizeType_)
             {
                 case SizeType::ST_ABSOLUTE:
                 {
-                    if (_ignoreSize)
+                    if (ignoreSize_)
                     {
                         this->setContentSize(getVirtualRendererSize());
                     }
                     else
                     {
-                        this->setContentSize(_customSize);
+                        this->setContentSize(customSize_);
                     }
                     float spx = 0.0f;
                     float spy = 0.0f;
                     if (parentSize.width > 0.0f)
                     {
-                        spx = _customSize.width / parentSize.width;
+                        spx = customSize_.width / parentSize.width;
                     }
                     if (parentSize.height > 0.0f)
                     {
-                        spy = _customSize.height / parentSize.height;
+                        spy = customSize_.height / parentSize.height;
                     }
-                    _sizePercent.set(spx, spy);
+                    sizePercent_.set(spx, spy);
                     break;
                 }
                 case SizeType::ST_PERCENT:
                 {
-                    MATH::Sizef cSize = MATH::Sizef(parentSize.width * _sizePercent.x , parentSize.height * _sizePercent.y);
-                    if (_ignoreSize)
+                    MATH::Sizef cSize = MATH::Sizef(parentSize.width * sizePercent_.x , parentSize.height * sizePercent_.y);
+                    if (ignoreSize_)
                     {
                         this->setContentSize(getVirtualRendererSize());
                     }
@@ -482,7 +482,7 @@ namespace GRAPH
                     {
                         this->setContentSize(cSize);
                     }
-                    _customSize = cSize;
+                    customSize_ = cSize;
                     break;
                 }
                 default:
@@ -491,23 +491,23 @@ namespace GRAPH
 
             //update position & position percent
             MATH::Vector2f absPos = getPosition();
-            switch (_positionType)
+            switch (positionType_)
             {
                 case PositionType::PT_ABSOLUTE:
                 {
                     if (parentSize.width <= 0.0f || parentSize.height <= 0.0f)
                     {
-                        _positionPercent.setZero();
+                        positionPercent_.setZero();
                     }
                     else
                     {
-                        _positionPercent.set(absPos.x / parentSize.width, absPos.y / parentSize.height);
+                        positionPercent_.set(absPos.x / parentSize.width, absPos.y / parentSize.height);
                     }
                     break;
                 }
                 case PositionType::PT_PERCENT:
                 {
-                    absPos.set(parentSize.width * _positionPercent.x, parentSize.height * _positionPercent.y);
+                    absPos.set(parentSize.width * positionPercent_.x, parentSize.height * positionPercent_.y);
                     break;
                 }
                 default:
@@ -518,51 +518,51 @@ namespace GRAPH
 
         void Widget::ignoreContentAdaptWithSize(bool ignore)
         {
-            if (_unifySize)
+            if (unifySize_)
             {
-                this->setContentSize(_customSize);
+                this->setContentSize(customSize_);
                 return;
             }
-            if (_ignoreSize == ignore)
+            if (ignoreSize_ == ignore)
             {
                 return;
             }
-            _ignoreSize = ignore;
-            if (_ignoreSize)
+            ignoreSize_ = ignore;
+            if (ignoreSize_)
             {
                 MATH::Sizef s = getVirtualRendererSize();
                 this->setContentSize(s);
             }
             else
             {
-                this->setContentSize(_customSize);
+                this->setContentSize(customSize_);
             }
         }
 
         bool Widget::isIgnoreContentAdaptWithSize() const
         {
-            return _ignoreSize;
+            return ignoreSize_;
         }
 
         const MATH::Sizef& Widget::getCustomSize() const
         {
-            return _customSize;
+            return customSize_;
         }
 
         const MATH::Vector2f& Widget::getSizePercent()
         {
-            if (_usingLayoutComponent)
+            if (usingLayoutComponent_)
             {
                 auto component = this->getOrCreateLayoutComponent();
-                _sizePercent = component->getPercentContentSize();
+                sizePercent_ = component->getPercentContentSize();
             }
 
-            return _sizePercent;
+            return sizePercent_;
         }
 
         MATH::Vector2f Widget::getWorldPosition()const
         {
-            return convertToWorldSpace(MATH::Vector2f(_anchorPoint.x * _contentSize.width, _anchorPoint.y * _contentSize.height));
+            return convertToWorldSpace(MATH::Vector2f(anchorPoint_.x * contentSize_.width, anchorPoint_.y * contentSize_.height));
         }
 
         Node* Widget::getVirtualRenderer()
@@ -572,7 +572,7 @@ namespace GRAPH
 
         void Widget::onSizeChanged()
         {
-            if (!_usingLayoutComponent)
+            if (!usingLayoutComponent_)
             {
                 for (auto& child : getChildren())
                 {
@@ -587,71 +587,71 @@ namespace GRAPH
 
         MATH::Sizef Widget::getVirtualRendererSize() const
         {
-            return _contentSize;
+            return contentSize_;
         }
 
         void Widget::updateContentSizeWithTextureSize(const MATH::Sizef &size)
         {
-            if (_unifySize)
+            if (unifySize_)
             {
                 this->setContentSize(size);
                 return;
             }
-            if (_ignoreSize)
+            if (ignoreSize_)
             {
                 this->setContentSize(size);
             }
             else
             {
-                this->setContentSize(_customSize);
+                this->setContentSize(customSize_);
             }
         }
 
         void Widget::setTouchEnabled(bool enable)
         {
-            if (enable == _touchEnabled)
+            if (enable == touchEnabled_)
             {
                 return;
             }
-            _touchEnabled = enable;
-            if (_touchEnabled)
+            touchEnabled_ = enable;
+            if (touchEnabled_)
             {
-                _touchListener = EventListenerTouchOneByOne::create();
-                SAFE_RETAIN(_touchListener);
-                _touchListener->setSwallowTouches(true);
-                _touchListener->onTouchBegan = std::bind(&Widget::onTouchBegan, this, std::placeholders::_1, std::placeholders::_2);
-                _touchListener->onTouchMoved = std::bind(&Widget::onTouchMoved, this, std::placeholders::_1, std::placeholders::_2);
-                _touchListener->onTouchEnded = std::bind(&Widget::onTouchEnded, this, std::placeholders::_1, std::placeholders::_2);
-                _touchListener->onTouchCancelled = std::bind(&Widget::onTouchCancelled, this, std::placeholders::_1, std::placeholders::_2);
-                _eventDispatcher->addEventListenerWithSceneGraphPriority(_touchListener, this);
+                touchListener_ = EventListenerTouchOneByOne::create();
+                SAFE_RETAIN(touchListener_);
+                touchListener_->setSwallowTouches(true);
+                touchListener_->onTouchBegan = std::bind(&Widget::onTouchBegan, this, std::placeholders::_1, std::placeholders::_2);
+                touchListener_->onTouchMoved = std::bind(&Widget::onTouchMoved, this, std::placeholders::_1, std::placeholders::_2);
+                touchListener_->onTouchEnded = std::bind(&Widget::onTouchEnded, this, std::placeholders::_1, std::placeholders::_2);
+                touchListener_->onTouchCancelled = std::bind(&Widget::onTouchCancelled, this, std::placeholders::_1, std::placeholders::_2);
+                eventDispatcher_->addEventListenerWithSceneGraphPriority(touchListener_, this);
             }
             else
             {
-                _eventDispatcher->removeEventListener(_touchListener);
-                SAFE_RELEASE_NULL(_touchListener);
+                eventDispatcher_->removeEventListener(touchListener_);
+                SAFE_RELEASE_NULL(touchListener_);
             }
         }
 
         bool Widget::isTouchEnabled() const
         {
-            return _touchEnabled;
+            return touchEnabled_;
         }
 
         bool Widget::isHighlighted() const
         {
-            return _highlight;
+            return highlight_;
         }
 
         void Widget::setHighlighted(bool hilight)
         {
-            if (hilight == _highlight)
+            if (hilight == highlight_)
             {
                 return;
             }
-            _highlight = hilight;
-            if (_bright)
+            highlight_ = hilight;
+            if (bright_)
             {
-                if (_highlight)
+                if (highlight_)
                 {
                     setBrightStyle(BrightStyle::HIGHLIGHT);
                 }
@@ -668,10 +668,10 @@ namespace GRAPH
 
         void Widget::setBright(bool bright)
         {
-            _bright = bright;
-            if (_bright)
+            bright_ = bright;
+            if (bright_)
             {
-                _brightStyle = BrightStyle::NONE;
+                brightStyle_ = BrightStyle::NONE;
                 setBrightStyle(BrightStyle::NORMAL);
             }
             else
@@ -682,12 +682,12 @@ namespace GRAPH
 
         void Widget::setBrightStyle(BrightStyle style)
         {
-            if (_brightStyle == style)
+            if (brightStyle_ == style)
             {
                 return;
             }
-            _brightStyle = style;
-            switch (_brightStyle)
+            brightStyle_ = style;
+            switch (brightStyle_)
             {
                 case BrightStyle::NORMAL:
                     onPressStateChangedToNormal();
@@ -777,47 +777,47 @@ namespace GRAPH
 
         void Widget::setPropagateTouchEvents(bool isPropagate)
         {
-            _propagateTouchEvents = isPropagate;
+            propagateTouchEvents_ = isPropagate;
         }
 
         bool Widget::isPropagateTouchEvents()const
         {
-            return _propagateTouchEvents;
+            return propagateTouchEvents_;
         }
 
         void Widget::setSwallowTouches(bool swallow)
         {
-            if (_touchListener)
+            if (touchListener_)
             {
-                _touchListener->setSwallowTouches(swallow);
+                touchListener_->setSwallowTouches(swallow);
             }
         }
 
         bool Widget::isSwallowTouches()const
         {
-            if (_touchListener)
+            if (touchListener_)
             {
-                return _touchListener->isSwallowTouches();
+                return touchListener_->isSwallowTouches();
             }
             return false;
         }
 
         bool Widget::onTouchBegan(Touch *touch, Event *)
         {
-            _hitted = false;
+            hitted_ = false;
             if (isVisible() && isEnabled() && isAncestorsEnabled() && isAncestorsVisible(this) )
             {
-                _touchBeganPosition = touch->getLocation();
+                touchBeganPosition_ = touch->getLocation();
                 auto camera = Director::getInstance().getCamera();
-                if(hitTest(_touchBeganPosition, camera, nullptr))
+                if(hitTest(touchBeganPosition_, camera, nullptr))
                 {
-                    _hittedByCamera = camera;
-                    if (isClippingParentContainsPoint(_touchBeganPosition)) {
-                        _hitted = true;
+                    hittedByCamera_ = camera;
+                    if (isClippingParentContainsPoint(touchBeganPosition_)) {
+                        hitted_ = true;
                     }
                 }
             }
-            if (!_hitted)
+            if (!hitted_)
             {
                 return false;
             }
@@ -826,7 +826,7 @@ namespace GRAPH
             /*
              * Propagate touch events to its parents
              */
-            if (_propagateTouchEvents)
+            if (propagateTouchEvents_)
             {
                 this->propagateTouchEvent(TouchEventType::BEGAN, this, touch);
             }
@@ -846,14 +846,14 @@ namespace GRAPH
 
         void Widget::onTouchMoved(Touch *touch, Event *)
         {
-            _touchMovePosition = touch->getLocation();
+            touchMovePosition_ = touch->getLocation();
 
-            setHighlighted(hitTest(_touchMovePosition, _hittedByCamera, nullptr));
+            setHighlighted(hitTest(touchMovePosition_, hittedByCamera_, nullptr));
 
             /*
              * Propagate touch events to its parents
              */
-            if (_propagateTouchEvents)
+            if (propagateTouchEvents_)
             {
                 this->propagateTouchEvent(TouchEventType::MOVED, this, touch);
             }
@@ -863,17 +863,17 @@ namespace GRAPH
 
         void Widget::onTouchEnded(Touch *touch, Event *)
         {
-            _touchEndPosition = touch->getLocation();
+            touchEndPosition_ = touch->getLocation();
 
             /*
              * Propagate touch events to its parents
              */
-            if (_propagateTouchEvents)
+            if (propagateTouchEvents_)
             {
                 this->propagateTouchEvent(TouchEventType::ENDED, this, touch);
             }
 
-            bool highlight = _highlight;
+            bool highlight = highlight_;
             setHighlighted(false);
 
             if (highlight)
@@ -895,14 +895,14 @@ namespace GRAPH
         void Widget::pushDownEvent()
         {
             this->retain();
-            if (_touchEventCallback)
+            if (touchEventCallback_)
             {
-                _touchEventCallback(this, TouchEventType::BEGAN);
+                touchEventCallback_(this, TouchEventType::BEGAN);
             }
 
-            if (_touchEventListener && _touchEventSelector)
+            if (touchEventListener_ && touchEventSelector_)
             {
-                (_touchEventListener->*_touchEventSelector)(this,TOUCH_EVENT_BEGAN);
+                (touchEventListener_->*touchEventSelector_)(this,TOUCH_EVENT_BEGAN);
             }
             this->release();
         }
@@ -910,14 +910,14 @@ namespace GRAPH
         void Widget::moveEvent()
         {
             this->retain();
-            if (_touchEventCallback)
+            if (touchEventCallback_)
             {
-                _touchEventCallback(this, TouchEventType::MOVED);
+                touchEventCallback_(this, TouchEventType::MOVED);
             }
 
-            if (_touchEventListener && _touchEventSelector)
+            if (touchEventListener_ && touchEventSelector_)
             {
-                (_touchEventListener->*_touchEventSelector)(this,TOUCH_EVENT_MOVED);
+                (touchEventListener_->*touchEventSelector_)(this,TOUCH_EVENT_MOVED);
             }
             this->release();
         }
@@ -925,18 +925,18 @@ namespace GRAPH
         void Widget::releaseUpEvent()
         {
             this->retain();
-            if (_touchEventCallback)
+            if (touchEventCallback_)
             {
-                _touchEventCallback(this, TouchEventType::ENDED);
+                touchEventCallback_(this, TouchEventType::ENDED);
             }
 
-            if (_touchEventListener && _touchEventSelector)
+            if (touchEventListener_ && touchEventSelector_)
             {
-                (_touchEventListener->*_touchEventSelector)(this,TOUCH_EVENT_ENDED);
+                (touchEventListener_->*touchEventSelector_)(this,TOUCH_EVENT_ENDED);
             }
 
-            if (_clickEventListener) {
-                _clickEventListener(this);
+            if (clickEventListener_) {
+                clickEventListener_(this);
             }
             this->release();
         }
@@ -944,31 +944,31 @@ namespace GRAPH
         void Widget::cancelUpEvent()
         {
             this->retain();
-            if (_touchEventCallback)
+            if (touchEventCallback_)
             {
-                _touchEventCallback(this, TouchEventType::CANCELED);
+                touchEventCallback_(this, TouchEventType::CANCELED);
             }
 
-            if (_touchEventListener && _touchEventSelector)
+            if (touchEventListener_ && touchEventSelector_)
             {
-                (_touchEventListener->*_touchEventSelector)(this,TOUCH_EVENT_CANCELED);
+                (touchEventListener_->*touchEventSelector_)(this,TOUCH_EVENT_CANCELED);
             }
             this->release();
         }
 
-        void Widget::addTouchEventListener(const ccWidgetTouchCallback& callback)
+        void Widget::addTouchEventListener(const WidgetTouchCallback& callback)
         {
-            this->_touchEventCallback = callback;
+            this->touchEventCallback_ = callback;
         }
 
-        void Widget::addClickEventListener(const ccWidgetClickCallback &callback)
+        void Widget::addClickEventListener(const WidgetClickCallback &callback)
         {
-            this->_clickEventListener = callback;
+            this->clickEventListener_ = callback;
         }
 
-        void Widget::addCCSEventListener(const ccWidgetEventCallback &callback)
+        void Widget::addCCSEventListener(const WidgetEventCallback &callback)
         {
-            this->_ccEventCallback = callback;
+            this->EventCallback_ = callback;
         }
 
         bool Widget::hitTest(const MATH::Vector2f &pt, const Camera* camera, MATH::Vector3f *p) const
@@ -980,7 +980,7 @@ namespace GRAPH
 
         bool Widget::isClippingParentContainsPoint(const MATH::Vector2f &pt)
         {
-            _affectByClipping = false;
+            affectByClipping_ = false;
             Widget* parent = getWidgetParent();
             Widget* clippingParent = nullptr;
             while (parent)
@@ -990,7 +990,7 @@ namespace GRAPH
                 {
                     if (layoutParent->isClippingEnabled())
                     {
-                        _affectByClipping = true;
+                        affectByClipping_ = true;
                         clippingParent = layoutParent;
                         break;
                     }
@@ -998,7 +998,7 @@ namespace GRAPH
                 parent = parent->getWidgetParent();
             }
 
-            if (!_affectByClipping)
+            if (!affectByClipping_)
             {
                 return true;
             }
@@ -1007,7 +1007,7 @@ namespace GRAPH
             if (clippingParent)
             {
                 bool bRet = false;
-                if (clippingParent->hitTest(pt, _hittedByCamera, nullptr))
+                if (clippingParent->hitTest(pt, hittedByCamera_, nullptr))
                 {
                     bRet = true;
                 }
@@ -1032,7 +1032,7 @@ namespace GRAPH
 
         void Widget::setPosition(const MATH::Vector2f &pos)
         {
-            if (!_usingLayoutComponent && _running)
+            if (!usingLayoutComponent_ && running_)
             {
                 Widget* widgetParent = getWidgetParent();
                 if (widgetParent)
@@ -1040,11 +1040,11 @@ namespace GRAPH
                     MATH::Sizef pSize = widgetParent->getContentSize();
                     if (pSize.width <= 0.0f || pSize.height <= 0.0f)
                     {
-                        _positionPercent.setZero();
+                        positionPercent_.setZero();
                     }
                     else
                     {
-                        _positionPercent.set(pos.x / pSize.width, pos.y / pSize.height);
+                        positionPercent_.set(pos.x / pSize.width, pos.y / pSize.height);
                     }
                 }
             }
@@ -1053,7 +1053,7 @@ namespace GRAPH
 
         void Widget::setPositionPercent(const MATH::Vector2f &percent)
         {
-            if (_usingLayoutComponent)
+            if (usingLayoutComponent_)
             {
                 auto component = this->getOrCreateLayoutComponent();
                 component->setPositionPercentX(percent.x);
@@ -1062,14 +1062,14 @@ namespace GRAPH
             }
             else
             {
-                _positionPercent = percent;
-                if (_running)
+                positionPercent_ = percent;
+                if (running_)
                 {
                     Widget* widgetParent = getWidgetParent();
                     if (widgetParent)
                     {
                         MATH::Sizef parentSize = widgetParent->getContentSize();
-                        MATH::Vector2f absPos(parentSize.width * _positionPercent.x, parentSize.height * _positionPercent.y);
+                        MATH::Vector2f absPos(parentSize.width * positionPercent_.x, parentSize.height * positionPercent_.y);
                         setPosition(absPos);
                     }
                 }
@@ -1077,21 +1077,21 @@ namespace GRAPH
         }
 
         const MATH::Vector2f& Widget::getPositionPercent(){
-            if (_usingLayoutComponent)
+            if (usingLayoutComponent_)
             {
                 auto component = this->getOrCreateLayoutComponent();
                 float percentX = component->getPositionPercentX();
                 float percentY = component->getPositionPercentY();
 
-                _positionPercent.set(percentX, percentY);
+                positionPercent_.set(percentX, percentY);
             }
-            return _positionPercent;
+            return positionPercent_;
         }
 
         void Widget::setPositionType(PositionType type)
         {
-            _positionType = type;
-            if (_usingLayoutComponent)
+            positionType_ = type;
+            if (usingLayoutComponent_)
             {
                 auto component = this->getOrCreateLayoutComponent();
                 if (type == Widget::PositionType::PT_ABSOLUTE)
@@ -1109,52 +1109,52 @@ namespace GRAPH
 
         Widget::PositionType Widget::getPositionType() const
         {
-            return _positionType;
+            return positionType_;
         }
 
         bool Widget::isBright() const
         {
-            return _bright;
+            return bright_;
         }
 
         bool Widget::isEnabled() const
         {
-            return _enabled;
+            return enabled_;
         }
 
         float Widget::getLeftBoundary() const
         {
-            return getPosition().x - getAnchorPoint().x * _contentSize.width;
+            return getPosition().x - getAnchorPoint().x * contentSize_.width;
         }
 
         float Widget::getBottomBoundary() const
         {
-            return getPosition().y - getAnchorPoint().y * _contentSize.height;
+            return getPosition().y - getAnchorPoint().y * contentSize_.height;
         }
 
         float Widget::getRightBoundary() const
         {
-            return getLeftBoundary() + _contentSize.width;
+            return getLeftBoundary() + contentSize_.width;
         }
 
         float Widget::getTopBoundary() const
         {
-            return getBottomBoundary() + _contentSize.height;
+            return getBottomBoundary() + contentSize_.height;
         }
 
         const MATH::Vector2f& Widget::getTouchBeganPosition()const
         {
-            return _touchBeganPosition;
+            return touchBeganPosition_;
         }
 
         const MATH::Vector2f& Widget::getTouchMovePosition()const
         {
-            return _touchMovePosition;
+            return touchMovePosition_;
         }
 
         const MATH::Vector2f& Widget::getTouchEndPosition()const
         {
-            return _touchEndPosition;
+            return touchEndPosition_;
         }
 
         void Widget::setLayoutParameter(LayoutParameter *parameter)
@@ -1163,13 +1163,13 @@ namespace GRAPH
             {
                 return;
             }
-            _layoutParameterDictionary.insert((int)parameter->getLayoutType(), parameter);
-            _layoutParameterType = parameter->getLayoutType();
+            layoutParameterDictionary_.insert((int)parameter->getLayoutType(), parameter);
+            layoutParameterType_ = parameter->getLayoutType();
         }
 
         LayoutParameter* Widget::getLayoutParameter()const
         {
-            return dynamic_cast<LayoutParameter*>(_layoutParameterDictionary.at((int)_layoutParameterType));
+            return dynamic_cast<LayoutParameter*>(layoutParameterDictionary_.at((int)layoutParameterType_));
         }
 
         Widget* Widget::clone()
@@ -1228,13 +1228,13 @@ namespace GRAPH
             setTag(widget->getTag());
             setName(widget->getName());
             setActionTag(widget->getActionTag());
-            _ignoreSize = widget->_ignoreSize;
-            this->setContentSize(widget->_contentSize);
-            _customSize = widget->_customSize;
-            _sizeType = widget->getSizeType();
-            _sizePercent = widget->_sizePercent;
-            _positionType = widget->_positionType;
-            _positionPercent = widget->_positionPercent;
+            ignoreSize_ = widget->ignoreSize_;
+            this->setContentSize(widget->contentSize_);
+            customSize_ = widget->customSize_;
+            sizeType_ = widget->getSizeType();
+            sizePercent_ = widget->sizePercent_;
+            positionType_ = widget->positionType_;
+            positionPercent_ = widget->positionPercent_;
             setPosition(widget->getPosition());
             setAnchorPoint(widget->getAnchorPoint());
             setScaleX(widget->getScaleX());
@@ -1246,17 +1246,17 @@ namespace GRAPH
             setFlippedY(widget->isFlippedY());
             setColor(widget->getColor());
             setOpacity(widget->getOpacity());
-            _touchEventCallback = widget->_touchEventCallback;
-            _touchEventListener = widget->_touchEventListener;
-            _touchEventSelector = widget->_touchEventSelector;
-            _clickEventListener = widget->_clickEventListener;
-            _focused = widget->_focused;
-            _focusEnabled = widget->_focusEnabled;
-            _propagateTouchEvents = widget->_propagateTouchEvents;
+            touchEventCallback_ = widget->touchEventCallback_;
+            touchEventListener_ = widget->touchEventListener_;
+            touchEventSelector_ = widget->touchEventSelector_;
+            clickEventListener_ = widget->clickEventListener_;
+            focused_ = widget->focused_;
+            focusEnabled_ = widget->focusEnabled_;
+            propagateTouchEvents_ = widget->propagateTouchEvents_;
 
             copySpecialProperties(widget);
 
-            HObjectMap<int, LayoutParameter*>& layoutParameterDic = widget->_layoutParameterDictionary;
+            HObjectMap<int, LayoutParameter*>& layoutParameterDic = widget->layoutParameterDictionary_;
             for (auto iter = layoutParameterDic.begin(); iter != layoutParameterDic.end(); ++iter)
             {
                 setLayoutParameter(iter->second->clone());
@@ -1267,14 +1267,14 @@ namespace GRAPH
             {
 
                 float realScale = this->getScaleX();
-                _flippedX = flippedX;
+                flippedX_ = flippedX;
                 this->setScaleX(realScale);
             }
 
             void Widget::setFlippedY(bool flippedY)
             {
                 float realScale = this->getScaleY();
-                _flippedY = flippedY;
+                flippedY_ = flippedY;
                 this->setScaleY(realScale);
             }
 
@@ -1282,7 +1282,7 @@ namespace GRAPH
 
             void Widget::setScaleX(float scaleX)
             {
-                if (_flippedX) {
+                if (flippedX_) {
                     scaleX = scaleX * -1;
                 }
                 Node::setScaleX(scaleX);
@@ -1290,7 +1290,7 @@ namespace GRAPH
 
             void Widget::setScaleY(float scaleY)
             {
-                if (_flippedY) {
+                if (flippedY_) {
                     scaleY = scaleY * -1;
                 }
                 Node::setScaleY(scaleY);
@@ -1312,7 +1312,7 @@ namespace GRAPH
             float Widget::getScaleX()const
             {
                 float originalScale = Node::getScaleX();
-                if (_flippedX)
+                if (flippedX_)
                 {
                     originalScale = originalScale * -1.0;
                 }
@@ -1322,7 +1322,7 @@ namespace GRAPH
             float Widget::getScaleY()const
             {
                 float originalScale = Node::getScaleY();
-                if (_flippedY)
+                if (flippedY_)
                 {
                     originalScale = originalScale * -1.0;
                 }
@@ -1338,23 +1338,23 @@ namespace GRAPH
         /*temp action*/
         void Widget::setActionTag(int tag)
         {
-            _actionTag = tag;
+            actionTag_ = tag;
         }
 
         int Widget::getActionTag()const
         {
-            return _actionTag;
+            return actionTag_;
         }
 
         void Widget::setFocused(bool focus)
         {
-            _focused = focus;
+            focused_ = focus;
 
             //make sure there is only one focusedWidget
             if (focus) {
-                _focusedWidget = this;
-                if (_focusNavigationController) {
-                    _focusNavigationController->setFirstFocsuedWidget(this);
+                focusedWidget_ = this;
+                if (focusNavigationController_) {
+                    focusNavigationController_->setFirstFocsuedWidget(this);
                 }
             }
 
@@ -1362,17 +1362,17 @@ namespace GRAPH
 
         bool Widget::isFocused()const
         {
-            return _focused;
+            return focused_;
         }
 
         void Widget::setFocusEnabled(bool enable)
         {
-            _focusEnabled = enable;
+            focusEnabled_ = enable;
         }
 
         bool Widget::isFocusEnabled()const
         {
-            return _focusEnabled;
+            return focusEnabled_;
         }
 
         Widget* Widget::findNextFocusedWidget(FocusDirection direction,  Widget* current)
@@ -1416,7 +1416,7 @@ namespace GRAPH
             //if the widgetLoseFocus doesn't get focus, it will use the previous focused widget instead
             if (widgetLoseFocus && !widgetLoseFocus->isFocused())
             {
-                widgetLoseFocus = _focusedWidget;
+                widgetLoseFocus = focusedWidget_;
             }
 
             if (widgetGetFocus != widgetLoseFocus)
@@ -1441,12 +1441,12 @@ namespace GRAPH
 
         void Widget::requestFocus()
         {
-            if (this == _focusedWidget)
+            if (this == focusedWidget_)
             {
                 return;
             }
 
-            this->dispatchFocusEvent(_focusedWidget, this);
+            this->dispatchFocusEvent(focusedWidget_, this);
         }
 
         void Widget::onFocusChange(Widget* widgetLostFocus, Widget* widgetGetFocus)
@@ -1465,52 +1465,52 @@ namespace GRAPH
 
         Widget* Widget::getCurrentFocusedWidget()const
         {
-            return _focusedWidget;
+            return focusedWidget_;
         }
 
         void Widget::enableDpadNavigation(bool enable)
         {
             if (enable)
             {
-                if (nullptr == _focusNavigationController)
+                if (nullptr == focusNavigationController_)
                 {
-                    _focusNavigationController = new (std::nothrow) FocusNavigationController;
-                    if (_focusedWidget)
+                    focusNavigationController_ = new (std::nothrow) FocusNavigationController;
+                    if (focusedWidget_)
                     {
-                        _focusNavigationController->setFirstFocsuedWidget(_focusedWidget);
+                        focusNavigationController_->setFirstFocsuedWidget(focusedWidget_);
                     }
                 }
             }
             else
             {
-                SAFE_DELETE(_focusNavigationController);
+                SAFE_DELETE(focusNavigationController_);
             }
 
-            if (nullptr != _focusNavigationController)
+            if (nullptr != focusNavigationController_)
             {
-                _focusNavigationController->enableFocusNavigation(enable);
+                focusNavigationController_->enableFocusNavigation(enable);
             }
         }
 
 
         bool Widget::isUnifySizeEnabled()const
         {
-            return _unifySize;
+            return unifySize_;
         }
 
         void Widget::setUnifySizeEnabled(bool enable)
         {
-            _unifySize = enable;
+            unifySize_ = enable;
         }
 
         void Widget::setLayoutComponentEnabled(bool enable)
         {
-            _usingLayoutComponent = enable;
+            usingLayoutComponent_ = enable;
         }
 
         bool Widget::isLayoutComponentEnabled()const
         {
-            return _usingLayoutComponent;
+            return usingLayoutComponent_;
         }
     }
 }

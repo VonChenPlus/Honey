@@ -30,9 +30,9 @@ namespace GRAPH
         _capInsetsNormal(MATH::RectfZERO),
         _capInsetsPressed(MATH::RectfZERO),
         _capInsetsDisabled(MATH::RectfZERO),
-        _normalTextureSize(_contentSize),
-        _pressedTextureSize(_contentSize),
-        _disabledTextureSize(_contentSize),
+        _normalTextureSize(contentSize_),
+        _pressedTextureSize(contentSize_),
+        _disabledTextureSize(contentSize_),
         _normalTextureScaleXInSize(1.0f),
         _normalTextureScaleYInSize(1.0f),
         _pressedTextureScaleXInSize(1.0f),
@@ -144,7 +144,7 @@ namespace GRAPH
 
             if (_scale9Enabled)
             {
-                bool ignoreBefore = _ignoreSize;
+                bool ignoreBefore = ignoreSize_;
                 ignoreContentAdaptWithSize(false);
                 _prevIgnoreSize = ignoreBefore;
             }
@@ -157,8 +157,8 @@ namespace GRAPH
             setCapInsetsPressedRenderer(_capInsetsPressed);
             setCapInsetsDisabledRenderer(_capInsetsDisabled);
 
-            _brightStyle = BrightStyle::NONE;
-            setBright(_bright);
+            brightStyle_ = BrightStyle::NONE;
+            setBright(bright_);
 
             _normalTextureAdaptDirty = true;
             _pressedTextureAdaptDirty = true;
@@ -172,7 +172,7 @@ namespace GRAPH
 
         void Button::ignoreContentAdaptWithSize(bool ignore)
         {
-            if (_unifySize)
+            if (unifySize_)
             {
                 this->updateContentSize();
                 return;
@@ -222,7 +222,7 @@ namespace GRAPH
 
             this->updateChildrenDisplayedRGBA();
 
-            if (_unifySize )
+            if (unifySize_ )
             {
                 if (!_scale9Enabled)
                 {
@@ -399,7 +399,7 @@ namespace GRAPH
                     if(nullptr != _titleRenderer)
                     {
                         _titleRenderer->stopAllActions();
-                        if (_unifySize)
+                        if (unifySize_)
                         {
                             Action *zoomTitleAction = ScaleTo::create(ZOOM_ACTION_TIME_STEP, 1.0f, 1.0f);
                             _titleRenderer->runAction(zoomTitleAction);
@@ -500,16 +500,16 @@ namespace GRAPH
 
         void Button::updateTitleLocation()
         {
-            _titleRenderer->setPosition(_contentSize.width * 0.5f, _contentSize.height * 0.5f);
+            _titleRenderer->setPosition(contentSize_.width * 0.5f, contentSize_.height * 0.5f);
         }
 
         void Button::updateContentSize()
         {
-            if (_unifySize)
+            if (unifySize_)
             {
                 if (_scale9Enabled)
                 {
-                    ProtectedNode::setContentSize(_customSize);
+                    ProtectedNode::setContentSize(customSize_);
                 }
                 else
                 {
@@ -520,7 +520,7 @@ namespace GRAPH
                 return;
             }
 
-            if (_ignoreSize)
+            if (ignoreSize_)
             {
                 this->setContentSize(getVirtualRendererSize());
             }
@@ -561,7 +561,7 @@ namespace GRAPH
 
         MATH::Sizef Button::getVirtualRendererSize() const
         {
-            if (_unifySize)
+            if (unifySize_)
             {
                 return this->getNormalSize();
             }
@@ -579,9 +579,9 @@ namespace GRAPH
 
         Node* Button::getVirtualRenderer()
         {
-            if (_bright)
+            if (bright_)
             {
-                switch (_brightStyle)
+                switch (brightStyle_)
                 {
                     case BrightStyle::NORMAL:
                         return _buttonNormalRenderer;
@@ -600,7 +600,7 @@ namespace GRAPH
         void Button::normalTextureScaleChangedWithSize()
         {
 
-            if (_ignoreSize && !_unifySize)
+            if (ignoreSize_ && !unifySize_)
             {
                 if (!_scale9Enabled)
                 {
@@ -612,7 +612,7 @@ namespace GRAPH
             {
                 if (_scale9Enabled)
                 {
-                    _buttonNormalRenderer->setPreferredSize(_contentSize);
+                    _buttonNormalRenderer->setPreferredSize(contentSize_);
                     _normalTextureScaleXInSize = _normalTextureScaleYInSize = 1.0f;
                     _buttonNormalRenderer->setScale(_normalTextureScaleXInSize,_normalTextureScaleYInSize);
                 }
@@ -624,8 +624,8 @@ namespace GRAPH
                         _buttonNormalRenderer->setScale(1.0f);
                         return;
                     }
-                    float scaleX = _contentSize.width / textureSize.width;
-                    float scaleY = _contentSize.height / textureSize.height;
+                    float scaleX = contentSize_.width / textureSize.width;
+                    float scaleY = contentSize_.height / textureSize.height;
                     _buttonNormalRenderer->setScaleX(scaleX);
                     _buttonNormalRenderer->setScaleY(scaleY);
                     _normalTextureScaleXInSize = scaleX;
@@ -633,13 +633,13 @@ namespace GRAPH
                 }
             }
 
-            _buttonNormalRenderer->setPosition(_contentSize.width / 2.0f, _contentSize.height / 2.0f);
+            _buttonNormalRenderer->setPosition(contentSize_.width / 2.0f, contentSize_.height / 2.0f);
         }
 
         void Button::pressedTextureScaleChangedWithSize()
         {
 
-            if (_ignoreSize && !_unifySize)
+            if (ignoreSize_ && !unifySize_)
             {
                 if (!_scale9Enabled)
                 {
@@ -651,7 +651,7 @@ namespace GRAPH
             {
                 if (_scale9Enabled)
                 {
-                    _buttonClickedRenderer->setPreferredSize(_contentSize);
+                    _buttonClickedRenderer->setPreferredSize(contentSize_);
                     _pressedTextureScaleXInSize = _pressedTextureScaleYInSize = 1.0f;
                     _buttonClickedRenderer->setScale(_pressedTextureScaleXInSize,_pressedTextureScaleYInSize);
                 }
@@ -663,21 +663,21 @@ namespace GRAPH
                         _buttonClickedRenderer->setScale(1.0f);
                         return;
                     }
-                    float scaleX = _contentSize.width / _pressedTextureSize.width;
-                    float scaleY = _contentSize.height / _pressedTextureSize.height;
+                    float scaleX = contentSize_.width / _pressedTextureSize.width;
+                    float scaleY = contentSize_.height / _pressedTextureSize.height;
                     _buttonClickedRenderer->setScaleX(scaleX);
                     _buttonClickedRenderer->setScaleY(scaleY);
                     _pressedTextureScaleXInSize = scaleX;
                     _pressedTextureScaleYInSize = scaleY;
                 }
             }
-            _buttonClickedRenderer->setPosition(_contentSize.width / 2.0f, _contentSize.height / 2.0f);
+            _buttonClickedRenderer->setPosition(contentSize_.width / 2.0f, contentSize_.height / 2.0f);
         }
 
         void Button::disabledTextureScaleChangedWithSize()
         {
 
-            if (_ignoreSize && !_unifySize)
+            if (ignoreSize_ && !unifySize_)
             {
                 if (!_scale9Enabled)
                 {
@@ -689,7 +689,7 @@ namespace GRAPH
                 if (_scale9Enabled)
                 {
                     _buttonDisableRenderer->setScale(1.0);
-                    _buttonDisableRenderer->setPreferredSize(_contentSize);
+                    _buttonDisableRenderer->setPreferredSize(contentSize_);
                 }
                 else
                 {
@@ -699,13 +699,13 @@ namespace GRAPH
                         _buttonDisableRenderer->setScale(1.0f);
                         return;
                     }
-                    float scaleX = _contentSize.width / _disabledTextureSize.width;
-                    float scaleY = _contentSize.height / _disabledTextureSize.height;
+                    float scaleX = contentSize_.width / _disabledTextureSize.width;
+                    float scaleY = contentSize_.height / _disabledTextureSize.height;
                     _buttonDisableRenderer->setScaleX(scaleX);
                     _buttonDisableRenderer->setScaleY(scaleY);
                 }
             }
-            _buttonDisableRenderer->setPosition(_contentSize.width / 2.0f, _contentSize.height / 2.0f);
+            _buttonDisableRenderer->setPosition(contentSize_.width / 2.0f, contentSize_.height / 2.0f);
         }
 
         void Button::setPressedActionEnabled(bool enabled)

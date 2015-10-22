@@ -363,12 +363,10 @@ namespace GRAPH
 
     void RenderState::StateBlock::setBlend(bool enabled) {
         blendEnabled_ = enabled;
-        if (enabled)
-        {
+        if (enabled) {
             stateBits_ &= ~RS_BLEND;
         }
-        else
-        {
+        else {
             stateBits_ |= RS_BLEND;
         }
     }
@@ -381,7 +379,6 @@ namespace GRAPH
     void RenderState::StateBlock::setBlendSrc(Blend blend) {
         blendSrc_ = blend;
         if (blendSrc_ == BLEND_ONE && blendDst_ == BLEND_ZERO) {
-            // Default blend func
             stateBits_ &= ~RS_BLEND_FUNC;
         }
         else {
@@ -392,7 +389,6 @@ namespace GRAPH
     void RenderState::StateBlock::setBlendDst(Blend blend) {
         blendDst_ = blend;
         if (blendSrc_ == BLEND_ONE && blendDst_ == BLEND_ZERO) {
-            // Default blend func
             stateBits_ &= ~RS_BLEND_FUNC;
         }
         else {
@@ -413,7 +409,6 @@ namespace GRAPH
     void RenderState::StateBlock::setCullFaceSide(CullFaceSide side) {
         cullFaceSide_ = side;
         if (cullFaceSide_ == CULL_FACE_SIDE_BACK) {
-            // Default cull side
             stateBits_ &= ~RS_CULL_FACE_SIDE;
         }
         else {
@@ -424,7 +419,6 @@ namespace GRAPH
     void RenderState::StateBlock::setFrontFace(FrontFace winding) {
         frontFace_ = winding;
         if (frontFace_ == FRONT_FACE_CCW) {
-            // Default front face
             stateBits_ &= ~RS_FRONT_FACE;
         }
         else {
@@ -455,7 +449,6 @@ namespace GRAPH
     void RenderState::StateBlock::setDepthFunction(DepthFunction func) {
         depthFunction_ = func;
         if (depthFunction_ == DEPTH_LESS) {
-            // Default depth function
             stateBits_ &= ~RS_DEPTH_FUNC;
         }
         else {

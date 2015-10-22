@@ -422,7 +422,7 @@ namespace GRAPH
 
         void AbstractCheckButton::backGroundTextureScaleChangedWithSize()
         {
-            if (_ignoreSize)
+            if (ignoreSize_)
             {
                 _backGroundBoxRenderer->setScale(1.0f);
                 _backgroundTextureScaleX = _backgroundTextureScaleY = 1.0f;
@@ -436,19 +436,19 @@ namespace GRAPH
                     _backgroundTextureScaleX = _backgroundTextureScaleY = 1.0f;
                     return;
                 }
-                float scaleX = _contentSize.width / textureSize.width;
-                float scaleY = _contentSize.height / textureSize.height;
+                float scaleX = contentSize_.width / textureSize.width;
+                float scaleY = contentSize_.height / textureSize.height;
                 _backgroundTextureScaleX = scaleX;
                 _backgroundTextureScaleY = scaleY;
                 _backGroundBoxRenderer->setScaleX(scaleX);
                 _backGroundBoxRenderer->setScaleY(scaleY);
             }
-            _backGroundBoxRenderer->setPosition(_contentSize.width / 2, _contentSize.height / 2);
+            _backGroundBoxRenderer->setPosition(contentSize_.width / 2, contentSize_.height / 2);
         }
 
         void AbstractCheckButton::backGroundSelectedTextureScaleChangedWithSize()
         {
-            if (_ignoreSize)
+            if (ignoreSize_)
             {
                 _backGroundSelectedBoxRenderer->setScale(1.0f);
             }
@@ -460,17 +460,17 @@ namespace GRAPH
                     _backGroundSelectedBoxRenderer->setScale(1.0f);
                     return;
                 }
-                float scaleX = _contentSize.width / textureSize.width;
-                float scaleY = _contentSize.height / textureSize.height;
+                float scaleX = contentSize_.width / textureSize.width;
+                float scaleY = contentSize_.height / textureSize.height;
                 _backGroundSelectedBoxRenderer->setScaleX(scaleX);
                 _backGroundSelectedBoxRenderer->setScaleY(scaleY);
             }
-            _backGroundSelectedBoxRenderer->setPosition(_contentSize.width / 2, _contentSize.height / 2);
+            _backGroundSelectedBoxRenderer->setPosition(contentSize_.width / 2, contentSize_.height / 2);
         }
 
         void AbstractCheckButton::frontCrossTextureScaleChangedWithSize()
         {
-            if (_ignoreSize)
+            if (ignoreSize_)
             {
                 _frontCrossRenderer->setScale(1.0f);
             }
@@ -482,17 +482,17 @@ namespace GRAPH
                     _frontCrossRenderer->setScale(1.0f);
                     return;
                 }
-                float scaleX = _contentSize.width / textureSize.width;
-                float scaleY = _contentSize.height / textureSize.height;
+                float scaleX = contentSize_.width / textureSize.width;
+                float scaleY = contentSize_.height / textureSize.height;
                 _frontCrossRenderer->setScaleX(scaleX);
                 _frontCrossRenderer->setScaleY(scaleY);
             }
-            _frontCrossRenderer->setPosition(_contentSize.width / 2, _contentSize.height / 2);
+            _frontCrossRenderer->setPosition(contentSize_.width / 2, contentSize_.height / 2);
         }
 
         void AbstractCheckButton::backGroundDisabledTextureScaleChangedWithSize()
         {
-            if (_ignoreSize)
+            if (ignoreSize_)
             {
                 _backGroundBoxDisabledRenderer->setScale(1.0f);
             }
@@ -504,17 +504,17 @@ namespace GRAPH
                     _backGroundBoxDisabledRenderer->setScale(1.0f);
                     return;
                 }
-                float scaleX = _contentSize.width / textureSize.width;
-                float scaleY = _contentSize.height / textureSize.height;
+                float scaleX = contentSize_.width / textureSize.width;
+                float scaleY = contentSize_.height / textureSize.height;
                 _backGroundBoxDisabledRenderer->setScaleX(scaleX);
                 _backGroundBoxDisabledRenderer->setScaleY(scaleY);
             }
-            _backGroundBoxDisabledRenderer->setPosition(_contentSize.width / 2, _contentSize.height / 2);
+            _backGroundBoxDisabledRenderer->setPosition(contentSize_.width / 2, contentSize_.height / 2);
         }
 
         void AbstractCheckButton::frontCrossDisabledTextureScaleChangedWithSize()
         {
-            if (_ignoreSize)
+            if (ignoreSize_)
             {
                 _frontCrossDisabledRenderer->setScale(1.0f);
             }
@@ -526,12 +526,12 @@ namespace GRAPH
                     _frontCrossDisabledRenderer->setScale(1.0f);
                     return;
                 }
-                float scaleX = _contentSize.width / textureSize.width;
-                float scaleY = _contentSize.height / textureSize.height;
+                float scaleX = contentSize_.width / textureSize.width;
+                float scaleY = contentSize_.height / textureSize.height;
                 _frontCrossDisabledRenderer->setScaleX(scaleX);
                 _frontCrossDisabledRenderer->setScaleY(scaleY);
             }
-            _frontCrossDisabledRenderer->setPosition(_contentSize.width / 2, _contentSize.height / 2);
+            _frontCrossDisabledRenderer->setPosition(contentSize_.width / 2, contentSize_.height / 2);
         }
 
         void AbstractCheckButton::copySpecialProperties(Widget *widget)
@@ -645,9 +645,9 @@ namespace GRAPH
             {
                 _checkBoxEventCallback(this, eventType);
             }
-            if (_ccEventCallback)
+            if (EventCallback_)
             {
-                _ccEventCallback(this, static_cast<int>(eventType));
+                EventCallback_(this, static_cast<int>(eventType));
             }
 
             if (_checkBoxEventListener && _checkBoxEventSelector)
@@ -677,7 +677,7 @@ namespace GRAPH
                 _checkBoxEventListener = checkBox->_checkBoxEventListener;
                 _checkBoxEventSelector = checkBox->_checkBoxEventSelector;
                 _checkBoxEventCallback = checkBox->_checkBoxEventCallback;
-                _ccEventCallback = checkBox->_ccEventCallback;
+                EventCallback_ = checkBox->EventCallback_;
             }
         }
     }

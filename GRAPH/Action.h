@@ -21,23 +21,23 @@ namespace GRAPH
         virtual void step(float dt);
         virtual void update(float time);
 
-        inline Node* getTarget() const { return _target; }
-        inline void setTarget(Node *target) { _target = target; }
+        inline Node* getTarget() const { return target_; }
+        inline void setTarget(Node *target) { target_ = target; }
 
-        inline Node* getOriginalTarget() const { return _originalTarget; }
-        inline void setOriginalTarget(Node *originalTarget) { _originalTarget = originalTarget; }
+        inline Node* getOriginalTarget() const { return originalTarget_; }
+        inline void setOriginalTarget(Node *originalTarget) { originalTarget_ = originalTarget; }
 
-        inline int getTag() const { return _tag; }
-        inline void setTag(int tag) { _tag = tag; }
+        inline int getTag() const { return tag_; }
+        inline void setTag(int tag) { tag_ = tag; }
 
     public:
         Action();
         virtual ~Action();
 
     protected:
-        Node    *_originalTarget;
-        Node    *_target;
-        int     _tag;
+        Node    *originalTarget_;
+        Node    *target_;
+        int     tag_;
 
     private:
         DISALLOW_COPY_AND_ASSIGN(Action)
@@ -46,18 +46,18 @@ namespace GRAPH
     class FiniteTimeAction : public Action
     {
     public:
-        inline float getDuration() const { return _duration; }
-        inline void setDuration(float duration) { _duration = duration; }
+        inline float getDuration() const { return duration_; }
+        inline void setDuration(float duration) { duration_ = duration; }
 
     public:
         FiniteTimeAction()
-            : _duration(0) {
+            : duration_(0) {
 
         }
         virtual ~FiniteTimeAction(){}
 
     protected:
-        float _duration;
+        float duration_;
 
     private:
         DISALLOW_COPY_AND_ASSIGN(FiniteTimeAction)
@@ -66,7 +66,7 @@ namespace GRAPH
     class ActionInterval : public FiniteTimeAction
     {
     public:
-        inline float getElapsed(void) { return _elapsed; }
+        inline float getElapsed(void) { return elapsed_; }
 
         void setAmplitudeRate(float amp);
         float getAmplitudeRate(void);
@@ -79,79 +79,41 @@ namespace GRAPH
         bool initWithDuration(float d);
 
     protected:
-        float _elapsed;
-        bool   _firstTick;
+        float elapsed_;
+        bool   firstTick_;
     };
 
     class  ScaleTo : public ActionInterval
     {
     public:
-        /**
-         * Creates the action with the same scale factor for X and Y.
-         * @param duration Duration time, in seconds.
-         * @param s Scale factor of x and y.
-         * @return An autoreleased ScaleTo object.
-         */
         static ScaleTo* create(float duration, float s);
-
-        /**
-         * Creates the action with and X factor and a Y factor.
-         * @param duration Duration time, in seconds.
-         * @param sx Scale factor of x.
-         * @param sy Scale factor of y.
-         * @return An autoreleased ScaleTo object.
-         */
         static ScaleTo* create(float duration, float sx, float sy);
-
-        /**
-         * Creates the action with X Y Z factor.
-         * @param duration Duration time, in seconds.
-         * @param sx Scale factor of x.
-         * @param sy Scale factor of y.
-         * @param sz Scale factor of z.
-         * @return An autoreleased ScaleTo object.
-         */
         static ScaleTo* create(float duration, float sx, float sy, float sz);
 
         virtual void startWithTarget(Node *target) override;
-        /**
-         * @param time In seconds.
-         */
         virtual void update(float time) override;
 
     public:
         ScaleTo() {}
         virtual ~ScaleTo() {}
 
-        /**
-         * initializes the action with the same scale factor for X and Y
-         * @param duration in seconds
-         */
         bool initWithDuration(float duration, float s);
-        /**
-         * initializes the action with and X factor and a Y factor
-         * @param duration in seconds
-         */
         bool initWithDuration(float duration, float sx, float sy);
-        /**
-         * initializes the action with X Y Z factor
-         * @param duration in seconds
-         */
         bool initWithDuration(float duration, float sx, float sy, float sz);
 
     protected:
-        float _scaleX;
-        float _scaleY;
-        float _scaleZ;
-        float _startScaleX;
-        float _startScaleY;
-        float _startScaleZ;
-        float _endScaleX;
-        float _endScaleY;
-        float _endScaleZ;
-        float _deltaX;
-        float _deltaY;
-        float _deltaZ;
+        float scaleX_;
+        float scaleY_;
+        float scaleZ_;
+        float startScaleX_;
+        float startScaleY_;
+        float startScaleZ_;
+        float endScaleX_;
+        float endScaleY_;
+        float endScaleZ_;
+        float deltaX_;
+        float deltaY_;
+        float deltaZ_;
 
     private:
         DISALLOW_COPY_AND_ASSIGN(ScaleTo)
@@ -162,8 +124,8 @@ namespace GRAPH
     public:
         static Follow* create(HObject *followedHObject, const MATH::Rectf& rect = MATH::RectfZERO);
 
-        inline bool isBoundarySet() const { return _boundarySet; }
-        inline void setBoundarySet(bool value) { _boundarySet = value; }
+        inline bool isBoundarySet() const { return boundarySet_; }
+        inline void setBoundarySet(bool value) { boundarySet_ = value; }
 
         virtual void step(float dt) override;
         virtual bool isDone() const override;
@@ -176,18 +138,18 @@ namespace GRAPH
         bool initWithTarget(HObject *followedHObject, const MATH::Rectf& rect = MATH::RectfZERO);
 
     protected:
-        HObject *_followedHObject;
-        bool _boundarySet;
-        bool _boundaryFullyCovered;
+        HObject *followedObject_;
+        bool boundarySet_;
+        bool boundaryFullyCovered_;
 
-        MATH::Vector2f _halfScreenSize;
-        MATH::Vector2f _fullScreenSize;
+        MATH::Vector2f halfScreenSize_;
+        MATH::Vector2f fullScreenSize_;
 
-        float _leftBoundary;
-        float _rightBoundary;
-        float _topBoundary;
-        float _bottomBoundary;
-        MATH::Rectf _worldRect;
+        float leftBoundary_;
+        float rightBoundary_;
+        float topBoundary_;
+        float bottomBoundary_;
+        MATH::Rectf worldRect_;
 
     private:
         DISALLOW_COPY_AND_ASSIGN(Follow)
@@ -195,12 +157,12 @@ namespace GRAPH
 
     struct ActionEntry
     {
-        HObjectArray        *actions;
-        Node             *target;
-        int                 actionIndex;
-        Action              *currentAction;
-        bool                currentActionSalvaged;
-        bool                paused;
+        HObjectArray *actions;
+        Node *target;
+        int actionIndex;
+        Action *currentAction;
+        bool currentActionSalvaged;
+        bool paused;
     };
 
     class ActionManager : public HObject
@@ -234,9 +196,9 @@ namespace GRAPH
         void actionAllocWithHashElement(ActionEntry *element);
 
     protected:
-        std::unordered_map<Node *, ActionEntry *> _targets;
-        ActionEntry    *_currentTarget;
-        bool            _currentTargetSalvaged;
+        std::unordered_map<Node *, ActionEntry *> targets_;
+        ActionEntry    *currentTarget_;
+        bool            currentTargetSalvaged_;
     };
 }
 

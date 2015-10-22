@@ -8,7 +8,6 @@
 
 namespace GRAPH
 {
-    // helper
     static bool compareRenderCommand(RenderCommand* a, RenderCommand* b)
     {
         return a->getGlobalOrder() < b->getGlobalOrder();
@@ -19,7 +18,6 @@ namespace GRAPH
         return  a->getDepth() > b->getDepth();
     }
 
-    // queue
     RenderQueue::RenderQueue() {
 
     }
@@ -539,10 +537,6 @@ namespace GRAPH
         glVertexAttribPointer(GLShader::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboArray_[1].u2.objectID[1]);
-
-
-        // FIXME: The logic of this code is confusing, and error prone
-        // Needs refactoring
 
         //Start drawing vertices in batch
         for(const auto& cmd : batchQuadCommands_) {

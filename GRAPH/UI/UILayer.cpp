@@ -21,7 +21,7 @@ namespace GRAPH
         , _touchMode(Touch::DispatchMode::ALL_AT_ONCE)
         , _swallowsTouches(true)
         {
-            _ignoreAnchorPointForPosition = true;
+            ignoreAnchorPointForPosition_ = true;
             setAnchorPoint(MATH::Vector2f(0.5f, 0.5f));
         }
 
@@ -173,10 +173,10 @@ namespace GRAPH
                 // default blend function
                 _blendFunc = BlendFunc::ALPHA_NON_PREMULTIPLIED;
 
-                _displayedColor.red = _realColor.red = color.red;
-                _displayedColor.green = _realColor.green = color.green;
-                _displayedColor.blue = _realColor.blue = color.blue;
-                _displayedOpacity = _realOpacity = color.alpha;
+                displayedColor_.red = realColor_.red = color.red;
+                displayedColor_.green = realColor_.green = color.green;
+                displayedColor_.blue = realColor_.blue = color.blue;
+                displayedOpacity_ = realOpacity_ = color.alpha;
 
                 for (uint64 i = 0; i<sizeof(_squareVertices) / sizeof( _squareVertices[0]); i++ )
                 {
@@ -218,37 +218,37 @@ namespace GRAPH
 
         void LayerColor::changeWidth(GLfloat w)
         {
-            this->setContentSize(MATH::Sizef(w, _contentSize.height));
+            this->setContentSize(MATH::Sizef(w, contentSize_.height));
         }
 
         void LayerColor::changeHeight(GLfloat h)
         {
-            this->setContentSize(MATH::Sizef(_contentSize.width, h));
+            this->setContentSize(MATH::Sizef(contentSize_.width, h));
         }
 
         void LayerColor::updateColor()
         {
             for( unsigned int i=0; i < 4; i++ )
             {
-                _squareColors[i].red = _displayedColor.red / 255.0f;
-                _squareColors[i].green = _displayedColor.green / 255.0f;
-                _squareColors[i].blue = _displayedColor.blue / 255.0f;
-                _squareColors[i].alpha = _displayedOpacity / 255.0f;
+                _squareColors[i].red = displayedColor_.red / 255.0f;
+                _squareColors[i].green = displayedColor_.green / 255.0f;
+                _squareColors[i].blue = displayedColor_.blue / 255.0f;
+                _squareColors[i].alpha = displayedOpacity_ / 255.0f;
             }
         }
 
         void LayerColor::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags)
         {
-            _customCommand.init(_globalZOrder, transform, flags);
+            _customCommand.init(globalZOrder_, transform, flags);
             _customCommand.func = std::bind(&LayerColor::onDraw, this, transform, flags);
             renderer->addCommand(&_customCommand);
 
             for(int i = 0; i < 4; ++i)
             {
                 MATH::Vector4f pos;
-                pos.x = _squareVertices[i].x; pos.y = _squareVertices[i].y; pos.z = _positionZ;
+                pos.x = _squareVertices[i].x; pos.y = _squareVertices[i].y; pos.z = positionZ_;
                 pos.w = 1;
-                _modelViewTransform.transformVector(&pos);
+                modelViewTransform_.transformVector(&pos);
                 _noMVPVertices[i] = MATH::Vector3f(pos.x,pos.y,pos.z)/pos.w;
             }
         }
@@ -371,12 +371,12 @@ namespace GRAPH
                 u = u * (h2 * (float)c);
             }
 
-            float opacityf = (float)_displayedOpacity / 255.0f;
+            float opacityf = (float)displayedOpacity_ / 255.0f;
 
             Color4F S(
-                _displayedColor.red / 255.0f,
-                _displayedColor.green / 255.0f,
-                _displayedColor.blue / 255.0f,
+                displayedColor_.red / 255.0f,
+                displayedColor_.green / 255.0f,
+                displayedColor_.blue / 255.0f,
                 _startOpacity * opacityf / 255.0f
             );
 
@@ -411,7 +411,7 @@ namespace GRAPH
 
         const Color3B& LayerGradient::getStartColor() const
         {
-            return _realColor;
+            return realColor_;
         }
 
         void LayerGradient::setStartColor(const Color3B& color)

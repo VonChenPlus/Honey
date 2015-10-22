@@ -50,8 +50,8 @@ namespace GRAPH
         virtual ~Font() {}
         void setCurrentGlyphCollection(GlyphCollection glyphs, const char *customGlyphs = 0);
 
-        GlyphCollection     _usedGlyphs;
-        char              * _customGlyphs;
+        GlyphCollection     usedGlyphs_;
+        char              * customGlyphs_;
     };
 
     class FontAtlas : public HObject
@@ -70,7 +70,7 @@ namespace GRAPH
 
         bool prepareLetterDefinitions(const std::u16string& utf16String);
 
-        inline const std::unordered_map<uint64, GLTexture*>& getTextures() const{ return _atlasTextures;}
+        inline const std::unordered_map<uint64, GLTexture*>& getTextures() const{ return atlasTextures_;}
         void  addTexture(GLTexture *texture, int slot);
         float getCommonLineHeight() const;
         void  setCommonLineHeight(float newHeight);
@@ -92,21 +92,21 @@ namespace GRAPH
         void relaseTextures();
 
     private:
-        std::unordered_map<uint64, GLTexture*> _atlasTextures;
-        std::unordered_map<unsigned short, FontLetterDefinition> _letterDefinitions;
-        float _commonLineHeight;
-        Font * _font;
+        std::unordered_map<uint64, GLTexture*> atlasTextures_;
+        std::unordered_map<unsigned short, FontLetterDefinition> letterDefinitions_;
+        float commonLineHeight_;
+        Font * font_;
 
-        int _currentPage;
-        unsigned char *_currentPageData;
-        int _currentPageDataSize;
-        float _currentPageOrigX;
-        float _currentPageOrigY;
-        float _letterPadding;
+        int currentPage_;
+        unsigned char *currentPageData_;
+        int currentPageDataSize_;
+        float currentPageOrigX_;
+        float currentPageOrigY_;
+        float letterPadding_;
 
-        EventListenerCustom* _rendererRecreatedListener;
-        bool _antialiasEnabled;
-        int _currLineHeight;
+        EventListenerCustom* rendererRecreatedListener_;
+        bool antialiasEnabled_;
+        int currLineHeight_;
 
         friend class UI::Label;
     };
@@ -119,7 +119,7 @@ namespace GRAPH
 
     private:
         static std::string generateFontName(const std::string& fontFileName, int size, GlyphCollection theGlyphs, bool useDistanceField);
-        static std::unordered_map<std::string, FontAtlas *> _atlasMap;
+        static std::unordered_map<std::string, FontAtlas *> atlasMap_;
     };
 }
 

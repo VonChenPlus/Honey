@@ -10,30 +10,30 @@
 namespace GRAPH
 {
     Font::Font()
-        : _usedGlyphs(GlyphCollection::DYNAMIC)
-        , _customGlyphs(nullptr) {
+        : usedGlyphs_(GlyphCollection::DYNAMIC)
+        , customGlyphs_(nullptr) {
 
     }
 
     void Font::setCurrentGlyphCollection(GlyphCollection glyphs, const char *customGlyphs) {
-        if (_customGlyphs)
-            delete [] _customGlyphs;
+        if (customGlyphs_)
+            delete [] customGlyphs_;
 
         if (customGlyphs) {
             uint64 length = strlen(customGlyphs);
-            _customGlyphs = new char [length + 2];
-            memcpy(_customGlyphs, customGlyphs, length);
+            customGlyphs_ = new char [length + 2];
+            memcpy(customGlyphs_, customGlyphs, length);
 
-            _customGlyphs[length]   = 0;
-            _customGlyphs[length+1] = 0;
+            customGlyphs_[length]   = 0;
+            customGlyphs_[length+1] = 0;
         }
 
-        _usedGlyphs = glyphs;
+        usedGlyphs_ = glyphs;
     }
 
     const char *Font::getCurrentGlyphCollection() const {
-        if (_customGlyphs) {
-            return _customGlyphs;
+        if (customGlyphs_) {
+            return customGlyphs_;
         }
         else {
             return 0;
@@ -46,27 +46,27 @@ namespace GRAPH
     const char* FontAtlas::CMD_RESET_FONTATLAS = "_RESET_FONTATLAS";
 
     FontAtlas::FontAtlas(Font &theFont)
-        : _font(&theFont)
-        , _currentPageData(nullptr)
-        , _rendererRecreatedListener(nullptr)
-        , _antialiasEnabled(true)
-        , _currLineHeight(0) {
+        : font_(&theFont)
+        , currentPageData_(nullptr)
+        , rendererRecreatedListener_(nullptr)
+        , antialiasEnabled_(true)
+        , currLineHeight_(0) {
 
-        _font->retain();
-        Font* fontTTf = _font;
+        font_->retain();
+        Font* fontTTf = font_;
         if (fontTTf) {
-            _commonLineHeight = _font->getFontMaxHeight();
+            commonLineHeight_ = font_->getFontMaxHeight();
             auto texture = new (std::nothrow) GLTexture;
-            _currentPage = 0;
-            _currentPageOrigX = 0;
-            _currentPageOrigY = 0;
-            _letterPadding = 0;
-            _currentPageDataSize = CacheTextureWidth * CacheTextureHeight;
-            _currentPageData = new unsigned char[_currentPageDataSize];
-            memset(_currentPageData, 0, _currentPageDataSize);
+            currentPage_ = 0;
+            currentPageOrigX_ = 0;
+            currentPageOrigY_ = 0;
+            letterPadding_ = 0;
+            currentPageDataSize_ = CacheTextureWidth * CacheTextureHeight;
+            currentPageData_ = new unsigned char[currentPageDataSize_];
+            memset(currentPageData_, 0, currentPageDataSize_);
 
             auto  pixelFormat = IMAGE::PixelFormat::A8;
-            texture->initWithData(_currentPageData, _currentPageDataSize,
+            texture->initWithData(currentPageData_, currentPageDataSize_,
                 pixelFormat, CacheTextureWidth, CacheTextureHeight, MATH::Sizef(CacheTextureWidth,CacheTextureHeight) );
 
             addTexture(texture,0);
@@ -75,22 +75,22 @@ namespace GRAPH
     }
 
     FontAtlas::~FontAtlas() {
-        _font->release();
+        font_->release();
         relaseTextures();
 
-        delete []_currentPageData;
+        delete []currentPageData_;
     }
 
     void FontAtlas::relaseTextures() {
-        for( auto &item: _atlasTextures) {
+        for( auto &item: atlasTextures_) {
             item.second->release();
         }
-        _atlasTextures.clear();
+        atlasTextures_.clear();
     }
 
     void FontAtlas::purgeTexturesAtlas() {
-        Font* fontTTf = _font;
-        if (fontTTf && _atlasTextures.size() > 1) {
+        Font* fontTTf = font_;
+        if (fontTTf && atlasTextures_.size() > 1) {
             auto eventDispatcher = Director::getInstance().getEventDispatcher();
             eventDispatcher->dispatchCustomEvent(CMD_PURGE_FONTATLAS,this);
             eventDispatcher->dispatchCustomEvent(CMD_RESET_FONTATLAS,this);
@@ -98,7 +98,7 @@ namespace GRAPH
     }
 
     void FontAtlas::listenRendererRecreated(EventCustom *) {
-        Font* fontTTf = _font;
+        Font* fontTTf = font_;
         if (fontTTf) {
             auto eventDispatcher = Director::getInstance().getEventDispatcher();
             eventDispatcher->dispatchCustomEvent(CMD_PURGE_FONTATLAS,this);
@@ -107,13 +107,13 @@ namespace GRAPH
     }
 
     void FontAtlas::addLetterDefinition(const FontLetterDefinition &letterDefinition) {
-        _letterDefinitions[letterDefinition.letteCharUTF16] = letterDefinition;
+        letterDefinitions_[letterDefinition.letteCharUTF16] = letterDefinition;
     }
 
     bool FontAtlas::getLetterDefinitionForChar(char16_t letteCharUTF16, FontLetterDefinition &outDefinition) {
-        auto outIterator = _letterDefinitions.find(letteCharUTF16);
+        auto outIterator = letterDefinitions_.find(letteCharUTF16);
 
-        if (outIterator != _letterDefinitions.end()) {
+        if (outIterator != letterDefinitions_.end()) {
             outDefinition = (*outIterator).second;
             return true;
         }
@@ -123,7 +123,7 @@ namespace GRAPH
     }
 
     bool FontAtlas::prepareLetterDefinitions(const std::u16string& utf16String) {
-        Font* fontTTf = _font;
+        Font* fontTTf = font_;
         if(fontTTf == nullptr)
             return false;
 
@@ -135,13 +135,13 @@ namespace GRAPH
         auto  pixelFormat = IMAGE::PixelFormat::A8;
 
         bool existNewLetter = false;
-        float startY = _currentPageOrigY;
+        float startY = currentPageOrigY_;
 
         for (uint64 i = 0; i < length; ++i)
         {
-            auto outIterator = _letterDefinitions.find(utf16String[i]);
+            auto outIterator = letterDefinitions_.find(utf16String[i]);
 
-            if (outIterator == _letterDefinitions.end())
+            if (outIterator == letterDefinitions_.end())
             {
                 existNewLetter = true;
 
@@ -149,39 +149,39 @@ namespace GRAPH
                 if (bitmap)
                 {
                     tempDef.letteCharUTF16   = utf16String[i];
-                    tempDef.width            = bitmapWidth + _letterPadding;
-                    tempDef.height           = bitmapHeight + _letterPadding;
+                    tempDef.width            = bitmapWidth + letterPadding_;
+                    tempDef.height           = bitmapHeight + letterPadding_;
 
-                    if (bitmapHeight > _currLineHeight)
+                    if (bitmapHeight > currLineHeight_)
                     {
-                        _currLineHeight = bitmapHeight + 1;
+                        currLineHeight_ = bitmapHeight + 1;
                     }
-                    if (_currentPageOrigX + tempDef.width > CacheTextureWidth)
+                    if (currentPageOrigX_ + tempDef.width > CacheTextureWidth)
                     {
-                        _currentPageOrigY += _currLineHeight;
-                        _currLineHeight = 0;
-                        _currentPageOrigX = 0;
-                        if(_currentPageOrigY + _commonLineHeight >= CacheTextureHeight)
+                        currentPageOrigY_ += currLineHeight_;
+                        currLineHeight_ = 0;
+                        currentPageOrigX_ = 0;
+                        if(currentPageOrigY_ + commonLineHeight_ >= CacheTextureHeight)
                         {
                             unsigned char *data = nullptr;
                             if(pixelFormat == IMAGE::PixelFormat::AI88)
                             {
-                                data = _currentPageData + CacheTextureWidth * (int)startY * 2;
+                                data = currentPageData_ + CacheTextureWidth * (int)startY * 2;
                             }
                             else
                             {
-                                data = _currentPageData + CacheTextureWidth * (int)startY;
+                                data = currentPageData_ + CacheTextureWidth * (int)startY;
                             }
-                            _atlasTextures[_currentPage]->updateWithData(data, 0, startY,
+                            atlasTextures_[currentPage_]->updateWithData(data, 0, startY,
                                 CacheTextureWidth, CacheTextureHeight - startY);
 
                             startY = 0.0f;
 
-                            _currentPageOrigY = 0;
-                            memset(_currentPageData, 0, _currentPageDataSize);
-                            _currentPage++;
+                            currentPageOrigY_ = 0;
+                            memset(currentPageData_, 0, currentPageDataSize_);
+                            currentPage_++;
                             auto tex = new (std::nothrow) GLTexture;
-                            if (_antialiasEnabled)
+                            if (antialiasEnabled_)
                             {
                                 tex->setAntiAliasTexParameters();
                             }
@@ -189,19 +189,19 @@ namespace GRAPH
                             {
                                 tex->setAliasTexParameters();
                             }
-                            tex->initWithData(_currentPageData, _currentPageDataSize,
+                            tex->initWithData(currentPageData_, currentPageDataSize_,
                                 pixelFormat, CacheTextureWidth, CacheTextureHeight, MATH::Sizef(CacheTextureWidth,CacheTextureHeight) );
-                            addTexture(tex,_currentPage);
+                            addTexture(tex,currentPage_);
                             tex->release();
                         }
                     }
 
-                    renderCharAt(_currentPageData,_currentPageOrigX,_currentPageOrigY,bitmap,bitmapWidth,bitmapHeight);
+                    renderCharAt(currentPageData_,currentPageOrigX_,currentPageOrigY_,bitmap,bitmapWidth,bitmapHeight);
 
-                    tempDef.U                = _currentPageOrigX;
-                    tempDef.V                = _currentPageOrigY;
-                    tempDef.textureID        = _currentPage;
-                    _currentPageOrigX        += tempDef.width + 1;
+                    tempDef.U                = currentPageOrigX_;
+                    tempDef.V                = currentPageOrigY_;
+                    tempDef.textureID        = currentPage_;
+                    currentPageOrigX_        += tempDef.width + 1;
                     // take from pixels to points
                     tempDef.width  =    tempDef.width;
                     tempDef.height =    tempDef.height;
@@ -216,23 +216,23 @@ namespace GRAPH
                     tempDef.U                = 0;
                     tempDef.V                = 0;
                     tempDef.textureID        = 0;
-                    _currentPageOrigX += 1;
+                    currentPageOrigX_ += 1;
                 }
 
-                _letterDefinitions[tempDef.letteCharUTF16] = tempDef;
+                letterDefinitions_[tempDef.letteCharUTF16] = tempDef;
             }
         }
 
         if(existNewLetter) {
             unsigned char *data = nullptr;
             if(pixelFormat == IMAGE::PixelFormat::AI88) {
-                data = _currentPageData + CacheTextureWidth * (int)startY * 2;
+                data = currentPageData_ + CacheTextureWidth * (int)startY * 2;
             }
             else {
-                data = _currentPageData + CacheTextureWidth * (int)startY;
+                data = currentPageData_ + CacheTextureWidth * (int)startY;
             }
-            _atlasTextures[_currentPage]->updateWithData(data, 0, startY,
-                                                         CacheTextureWidth, _currentPageOrigY - startY + _commonLineHeight);
+            atlasTextures_[currentPage_]->updateWithData(data, 0, startY,
+                                                         CacheTextureWidth, currentPageOrigY_ - startY + commonLineHeight_);
         }
         return true;
     }
@@ -256,47 +256,47 @@ namespace GRAPH
 
     void FontAtlas::addTexture(GLTexture *texture, int slot) {
         texture->retain();
-        _atlasTextures[slot] = texture;
+        atlasTextures_[slot] = texture;
     }
 
     GLTexture* FontAtlas::getTexture(int slot) {
-        return _atlasTextures[slot];
+        return atlasTextures_[slot];
     }
 
     float FontAtlas::getCommonLineHeight() const {
-        return _commonLineHeight;
+        return commonLineHeight_;
     }
 
     void  FontAtlas::setCommonLineHeight(float newHeight) {
-        _commonLineHeight = newHeight;
+        commonLineHeight_ = newHeight;
     }
 
     const Font * FontAtlas::getFont() const {
-        return _font;
+        return font_;
     }
 
     void FontAtlas::setAliasTexParameters() {
-        if (_antialiasEnabled) {
-            _antialiasEnabled = false;
-            for (const auto & tex : _atlasTextures) {
+        if (antialiasEnabled_) {
+            antialiasEnabled_ = false;
+            for (const auto & tex : atlasTextures_) {
                 tex.second->setAliasTexParameters();
             }
         }
     }
 
     void FontAtlas::setAntiAliasTexParameters() {
-        if (! _antialiasEnabled) {
-            _antialiasEnabled = true;
-            for (const auto & tex : _atlasTextures) {
+        if (! antialiasEnabled_) {
+            antialiasEnabled_ = true;
+            for (const auto & tex : atlasTextures_) {
                 tex.second->setAntiAliasTexParameters();
             }
         }
     }
 
-    std::unordered_map<std::string, FontAtlas *> FontAtlasCache::_atlasMap;
+    std::unordered_map<std::string, FontAtlas *> FontAtlasCache::atlasMap_;
 
     void FontAtlasCache::purgeCachedData() {
-        for (auto & atlas:_atlasMap) {
+        for (auto & atlas:atlasMap_) {
             atlas.second->purgeTexturesAtlas();
         }
     }
@@ -326,13 +326,13 @@ namespace GRAPH
     {
         if (nullptr != atlas)
         {
-            for( auto &item: _atlasMap )
+            for( auto &item: atlasMap_ )
             {
                 if ( item.second == atlas )
                 {
                     if (atlas->getReferenceCount() == 1)
                     {
-                      _atlasMap.erase(item.first);
+                      atlasMap_.erase(item.first);
                     }
 
                     atlas->release();

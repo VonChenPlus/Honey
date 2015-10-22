@@ -51,10 +51,10 @@ namespace GRAPH
         static Node * create();
 
         virtual void setLocalZOrder(int localZOrder);
-        virtual int getLocalZOrder() const { return _localZOrder; }
+        virtual int getLocalZOrder() const { return localZOrder_; }
 
         virtual void setGlobalZOrder(float globalZOrder);
-        virtual float getGlobalZOrder() const { return _globalZOrder; }
+        virtual float getGlobalZOrder() const { return globalZOrder_; }
 
         virtual void setScaleX(float scaleX);
         virtual float getScaleX() const;
@@ -128,12 +128,12 @@ namespace GRAPH
         template <typename T>
         inline T getChildByName(const std::string& name) const { return static_cast<T>(getChildByName(name)); }
         virtual void enumerateChildren(const std::string &name, std::function<bool(Node* node)> callback) const;
-        virtual HObjectVector<Node*>& getChildren() { return _children; }
-        virtual const HObjectVector<Node*>& getChildren() const { return _children; }
+        virtual HObjectVector<Node*>& getChildren() { return children_; }
+        virtual const HObjectVector<Node*>& getChildren() const { return children_; }
         virtual uint64 getChildrenCount() const;
         virtual void setParent(Node* parent);
-        virtual Node* getParent() { return _parent; }
-        virtual const Node* getParent() const { return _parent; }
+        virtual Node* getParent() { return parent_; }
+        virtual const Node* getParent() const { return parent_; }
         virtual void removeFromParent();
         virtual void removeFromParentAndCleanup(bool cleanup);
         virtual void removeChild(Node* child, bool cleanup = true);
@@ -150,11 +150,11 @@ namespace GRAPH
         virtual std::string getName() const;
         virtual void setName(const std::string& name);
 
-        virtual void* getUserData() { return _userData; }
-        virtual const void* getUserData() const { return _userData; }
+        virtual void* getUserData() { return userData_; }
+        virtual const void* getUserData() const { return userData_; }
         virtual void setUserData(void *userData);
-        virtual HObject* getUserObject() { return _userObject; }
-        virtual const HObject* getUserObject() const { return _userObject; }
+        virtual HObject* getUserObject() { return userObject_; }
+        virtual const HObject* getUserObject() const { return userObject_; }
         virtual void setUserObject(HObject *userObject);
 
         GLShader* getGLShader() const;
@@ -185,11 +185,11 @@ namespace GRAPH
         virtual MATH::Rectf getBoundingBox() const;
 
         virtual void setEventDispatcher(EventDispatcher* dispatcher);
-        virtual EventDispatcher* getEventDispatcher() const { return _eventDispatcher; }
+        virtual EventDispatcher* getEventDispatcher() const { return eventDispatcher_; }
 
         virtual void setActionManager(ActionManager* actionManager);
-        virtual ActionManager* getActionManager() { return _actionManager; }
-        virtual const ActionManager* getActionManager() const { return _actionManager; }
+        virtual ActionManager* getActionManager() { return actionManager_; }
+        virtual const ActionManager* getActionManager() const { return actionManager_; }
 
         virtual Action* runAction(Action* action);
         void stopAllActions();
@@ -200,8 +200,8 @@ namespace GRAPH
         uint64 getNumberOfRunningActions() const;
 
         virtual void setScheduler(Scheduler* scheduler);
-        virtual Scheduler* getScheduler() { return _scheduler; }
-        virtual const Scheduler* getScheduler() const { return _scheduler; }
+        virtual Scheduler* getScheduler() { return scheduler_; }
+        virtual const Scheduler* getScheduler() const { return scheduler_; }
 
         bool isScheduled(SelectorF selector);
         bool isScheduled(const std::string &key);
@@ -267,16 +267,16 @@ namespace GRAPH
         virtual void setOpacityModifyRGB(bool) {}
         virtual bool isOpacityModifyRGB() const { return false; }
 
-        void setOnEnterCallback(const std::function<void()>& callback) { _onEnterCallback = callback; }
-        const std::function<void()>& getOnEnterCallback() const { return _onEnterCallback; }
-        void setOnExitCallback(const std::function<void()>& callback) { _onExitCallback = callback; }
-        const std::function<void()>& getOnExitCallback() const { return _onExitCallback; }
-        void setonEnterTransitionDidFinishCallback(const std::function<void()>& callback) { _onEnterTransitionDidFinishCallback = callback; }
-        const std::function<void()>& getonEnterTransitionDidFinishCallback() const { return _onEnterTransitionDidFinishCallback; }
-        void setonExitTransitionDidStartCallback(const std::function<void()>& callback) { _onExitTransitionDidStartCallback = callback; }
-        const std::function<void()>& getonExitTransitionDidStartCallback() const { return _onExitTransitionDidStartCallback; }
+        void setOnEnterCallback(const std::function<void()>& callback) { onEnterCallback = callback; }
+        const std::function<void()>& getOnEnterCallback() const { return onEnterCallback; }
+        void setOnExitCallback(const std::function<void()>& callback) { onExitCallback = callback; }
+        const std::function<void()>& getOnExitCallback() const { return onExitCallback; }
+        void setonEnterTransitionDidFinishCallback(const std::function<void()>& callback) { onEnterTransitionDidFinishCallback = callback; }
+        const std::function<void()>& getonEnterTransitionDidFinishCallback() const { return onEnterTransitionDidFinishCallback; }
+        void setonExitTransitionDidStartCallback(const std::function<void()>& callback) { onExitTransitionDidStartCallback = callback; }
+        const std::function<void()>& getonExitTransitionDidStartCallback() const { return onExitTransitionDidStartCallback; }
 
-        unsigned short getCameraMask() const { return _cameraMask; }
+        unsigned short getCameraMask() const { return cameraMask_; }
         virtual void setCameraMask(unsigned short mask, bool applyChildren = true);
 
     public:
@@ -312,93 +312,93 @@ namespace GRAPH
 
     protected:
 
-        float _rotationX;
-        float _rotationY;
+        float rotationX_;
+        float rotationY_;
 
-        float _rotationZ_X;
-        float _rotationZ_Y;
+        float rotationZ_X_;
+        float rotationZ_Y_;
 
-        MATH::Quaternion _rotationQuat;
+        MATH::Quaternion rotationQuat_;
 
-        float _scaleX;
-        float _scaleY;
-        float _scaleZ;
+        float scaleX_;
+        float scaleY_;
+        float scaleZ_;
 
-        MATH::Vector2f _position;
-        float _positionZ;
-        MATH::Vector2f _normalizedPosition;
-        bool _usingNormalizedPosition;
-        bool _normalizedPositionDirty;
+        MATH::Vector2f position_;
+        float positionZ_;
+        MATH::Vector2f normalizedPosition_;
+        bool usingNormalizedPosition_;
+        bool normalizedPositionDirty_;
 
-        float _skewX;
-        float _skewY;
+        float skewX_;
+        float skewY_;
 
-        MATH::Vector2f _anchorPointInPoints;
-        MATH::Vector2f _anchorPoint;
+        MATH::Vector2f anchorPointInPoints_;
+        MATH::Vector2f anchorPoint_;
 
-        MATH::Sizef _contentSize;
-        bool _contentSizeDirty;
+        MATH::Sizef contentSize_;
+        bool contentSizeDirty_;
 
-        MATH::Matrix4 _modelViewTransform;
+        MATH::Matrix4 modelViewTransform_;
 
-        mutable MATH::Matrix4 _transform;
-        mutable bool _transformDirty;
-        mutable MATH::Matrix4 _inverse;
-        mutable bool _inverseDirty;
-        mutable MATH::Matrix4 _additionalTransform;
-        bool _useAdditionalTransform;
-        bool _transformUpdated;
+        mutable MATH::Matrix4 transform_;
+        mutable bool transformDirty_;
+        mutable MATH::Matrix4 inverse_;
+        mutable bool inverseDirty_;
+        mutable MATH::Matrix4 additionalTransform_;
+        bool useAdditionalTransform_;
+        bool transformUpdated_;
 
-        int _localZOrder;
-        float _globalZOrder;
+        int localZOrder_;
+        float globalZOrder_;
 
-        HObjectVector<Node*> _children;
-        Node *_parent;
-        Director* _director;
-        int _tag;
+        HObjectVector<Node*> children_;
+        Node *parent_;
+        Director* director_;
+        int tag_;
 
-        std::string _name;
-        uint64 _hashOfName;
+        std::string name_;
+        uint64 hashOfName_;
 
-        void *_userData;
-        HObject *_userObject;
+        void *userData_;
+        HObject *userObject_;
 
-        GLShaderState *_glShaderState;
+        GLShaderState *glShaderState_;
 
-        int _orderOfArrival;
+        int orderOfArrival_;
 
-        Scheduler *_scheduler;
+        Scheduler *scheduler_;
 
-        ActionManager *_actionManager;
+        ActionManager *actionManager_;
 
-        EventDispatcher* _eventDispatcher;
+        EventDispatcher* eventDispatcher_;
 
-        bool _running;
+        bool running_;
 
-        bool _visible;
+        bool visible_;
 
-        bool _ignoreAnchorPointForPosition;
+        bool ignoreAnchorPointForPosition_;
 
-        bool _reorderChildDirty;
-        bool _isTransitionFinished;
+        bool reorderChildDirty_;
+        bool isTransitionFinished_;
 
-        ComponentContainer *_componentContainer;
+        ComponentContainer *componentContainer_;
 
-        GLubyte		_displayedOpacity;
-        GLubyte     _realOpacity;
-        Color3B	    _displayedColor;
-        Color3B     _realColor;
-        bool		_cascadeColorEnabled;
-        bool        _cascadeOpacityEnabled;
+        GLubyte		displayedOpacity_;
+        GLubyte     realOpacity_;
+        Color3B	    displayedColor_;
+        Color3B     realColor_;
+        bool		cascadeColorEnabled_;
+        bool        cascadeOpacityEnabled_;
 
         static int s_globalOrderOfArrival;
 
-        unsigned short _cameraMask;
+        unsigned short cameraMask_;
 
-        std::function<void()> _onEnterCallback;
-        std::function<void()> _onExitCallback;
-        std::function<void()> _onEnterTransitionDidFinishCallback;
-        std::function<void()> _onExitTransitionDidStartCallback;
+        std::function<void()> onEnterCallback;
+        std::function<void()> onExitCallback;
+        std::function<void()> onEnterTransitionDidFinishCallback;
+        std::function<void()> onExitTransitionDidStartCallback;
 
         static bool nodeComparisonLess(Node* n1, Node* n2);
         static bool isScreenPointInRect(const MATH::Vector2f &pt, const Camera* camera, const MATH::Matrix4& w2l,
@@ -449,8 +449,8 @@ namespace GRAPH
     protected:
         void insertProtectedChild(Node* child, int z);
 
-        HObjectVector<Node*> _protectedChildren;
-        bool _reorderProtectedChildDirty;
+        HObjectVector<Node*> protectedChildren_;
+        bool reorderProtectedChildDirty_;
 
     private:
         DISALLOW_COPY_AND_ASSIGN(ProtectedNode)

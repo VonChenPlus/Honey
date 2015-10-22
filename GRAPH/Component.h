@@ -43,9 +43,9 @@ namespace GRAPH
         Node* getOwner() const;
 
     protected:
-        Node *_owner;
-        std::string _name;
-        bool _enabled;
+        Node *owner_;
+        std::string name_;
+        bool enabled_;
     };
 
     class ComponentContainer
@@ -73,8 +73,8 @@ namespace GRAPH
         void alloc(void);
 
     private:
-        HObjectMap<std::string, Component*>* _components;
-        Node *_owner;
+        HObjectMap<std::string, Component*>* components_;
+        Node *owner_;
 
         friend class Node;
     };

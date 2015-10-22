@@ -818,7 +818,7 @@ namespace GRAPH
 
         void Scale9Sprite::updatePositions()
         {
-            MATH::Sizef size = this->_contentSize;
+            MATH::Sizef size = this->contentSize_;
 
             float sizableWidth = size.width - _topLeftSize.width - _bottomRightSize.width;
             float sizableHeight = size.height - _topLeftSize.height - _bottomRightSize.height;
@@ -983,7 +983,7 @@ namespace GRAPH
 
         void Scale9Sprite::setCapInsets(const MATH::Rectf& capInsets)
         {
-            MATH::Sizef contentSize = this->_contentSize;
+            MATH::Sizef contentSize = this->contentSize_;
             this->updateWithSprite(this->_scale9Image,
                                    _spriteRect,
                                    _spriteFrameRotated,
@@ -1026,7 +1026,7 @@ namespace GRAPH
         {
 
             // quick return if not visible. children won't be drawn.
-            if (!_visible)
+            if (!visible_)
             {
                 return;
             }
@@ -1037,7 +1037,7 @@ namespace GRAPH
             // To ease the migration to v3.0, we still support the Mat4 stack,
             // but it is deprecated and your code should not rely on it            
             Director::getInstance().pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-            Director::getInstance().loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, _modelViewTransform);
+            Director::getInstance().loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, modelViewTransform_);
 
             int i = 0;      // used by _children
             int j = 0;      // used by _protectedChildren
@@ -1048,12 +1048,12 @@ namespace GRAPH
             //
             // draw children and protectedChildren zOrder < 0
             //
-            for( ; i < _children.size(); i++ )
+            for( ; i < children_.size(); i++ )
             {
-                auto node = _children.at(i);
+                auto node = children_.at(i);
 
                 if ( node && node->getLocalZOrder() < 0 )
-                    node->visit(renderer, _modelViewTransform, flags);
+                    node->visit(renderer, modelViewTransform_, flags);
                 else
                     break;
             }
@@ -1065,7 +1065,7 @@ namespace GRAPH
                     auto node = _protectedChildren.at(j);
 
                     if ( node && node->getLocalZOrder() < 0 )
-                        node->visit(renderer, _modelViewTransform, flags);
+                        node->visit(renderer, modelViewTransform_, flags);
                     else
                         break;
                 }
@@ -1074,14 +1074,14 @@ namespace GRAPH
             {
                 if (_scale9Image && _scale9Image->getLocalZOrder() < 0 )
                 {
-                    _scale9Image->visit(renderer, _modelViewTransform, flags);
+                    _scale9Image->visit(renderer, modelViewTransform_, flags);
                 }
             }
 
             //
             // draw self
             //
-            this->draw(renderer, _modelViewTransform, flags);
+            this->draw(renderer, modelViewTransform_, flags);
 
             //
             // draw children and protectedChildren zOrder >= 0
@@ -1089,19 +1089,19 @@ namespace GRAPH
             if (_scale9Enabled)
             {
                 for(auto it=_protectedChildren.cbegin()+j; it != _protectedChildren.cend(); ++it)
-                    (*it)->visit(renderer, _modelViewTransform, flags);
+                    (*it)->visit(renderer, modelViewTransform_, flags);
             }
             else
             {
                 if (_scale9Image && _scale9Image->getLocalZOrder() >= 0 )
                 {
-                    _scale9Image->visit(renderer, _modelViewTransform, flags);
+                    _scale9Image->visit(renderer, modelViewTransform_, flags);
                 }
             }
 
 
-            for(auto it=_children.cbegin()+i; it != _children.cend(); ++it)
-                (*it)->visit(renderer, _modelViewTransform, flags);
+            for(auto it=children_.cbegin()+i; it != children_.cend(); ++it)
+                (*it)->visit(renderer, modelViewTransform_, flags);
 
             // FIX ME: Why need to set _orderOfArrival to 0??
             // Please refer to https://github.com/cocos2d/cocos2d-x/pull/6920
@@ -1160,7 +1160,7 @@ namespace GRAPH
             _protectedChildren.clear();
 
             //we must invalide the transform when toggling scale9enabled
-            _transformUpdated = _transformDirty = _inverseDirty = true;
+            transformUpdated_ = transformDirty_ = inverseDirty_ = true;
 
             if (_scale9Enabled)
             {
@@ -1209,8 +1209,8 @@ namespace GRAPH
         {
             if (_scale9Image)
             {
-                _scale9Image->setPosition(_contentSize.width * _scale9Image->getAnchorPoint().x,
-                                          _contentSize.height * _scale9Image->getAnchorPoint().y);
+                _scale9Image->setPosition(contentSize_.width * _scale9Image->getAnchorPoint().x,
+                                          contentSize_.height * _scale9Image->getAnchorPoint().y);
             }
         }
 
@@ -1265,57 +1265,57 @@ namespace GRAPH
 
         void Scale9Sprite::updateDisplayedColor(const Color3B &parentColor)
         {
-            _displayedColor.red = _realColor.red * parentColor.red/255.0;
-            _displayedColor.green = _realColor.green * parentColor.green/255.0;
-            _displayedColor.blue = _realColor.blue * parentColor.blue/255.0;
+            displayedColor_.red = realColor_.red * parentColor.red/255.0;
+            displayedColor_.green = realColor_.green * parentColor.green/255.0;
+            displayedColor_.blue = realColor_.blue * parentColor.blue/255.0;
             updateColor();
 
             if (_scale9Image)
             {
-                _scale9Image->updateDisplayedColor(_displayedColor);
+                _scale9Image->updateDisplayedColor(displayedColor_);
             }
 
             for(const auto &child : _protectedChildren)
             {
-                child->updateDisplayedColor(_displayedColor);
+                child->updateDisplayedColor(displayedColor_);
             }
 
-            if (_cascadeColorEnabled)
+            if (cascadeColorEnabled_)
             {
-                for(const auto &child : _children)
+                for(const auto &child : children_)
                 {
-                    child->updateDisplayedColor(_displayedColor);
+                    child->updateDisplayedColor(displayedColor_);
                 }
             }
         }
 
         void Scale9Sprite::updateDisplayedOpacity(GLubyte parentOpacity)
         {
-            _displayedOpacity = _realOpacity * parentOpacity/255.0;
+            displayedOpacity_ = realOpacity_ * parentOpacity/255.0;
             updateColor();
 
             if (_scale9Image)
             {
-                _scale9Image->updateDisplayedOpacity(_displayedOpacity);
+                _scale9Image->updateDisplayedOpacity(displayedOpacity_);
             }
 
             for(auto child : _protectedChildren)
             {
-                child->updateDisplayedOpacity(_displayedOpacity);
+                child->updateDisplayedOpacity(displayedOpacity_);
             }
 
-            if (_cascadeOpacityEnabled)
+            if (cascadeOpacityEnabled_)
             {
-                for(auto child : _children)
+                for(auto child : children_)
                 {
-                    child->updateDisplayedOpacity(_displayedOpacity);
+                    child->updateDisplayedOpacity(displayedOpacity_);
                 }
             }
         }
 
         void Scale9Sprite::disableCascadeColor()
         {
-            for(auto child : _children)
+            for(auto child : children_)
             {
                 child->updateDisplayedColor(Color3B::WHITE);
             }
@@ -1331,9 +1331,9 @@ namespace GRAPH
 
         void Scale9Sprite::disableCascadeOpacity()
         {
-            _displayedOpacity = _realOpacity;
+            displayedOpacity_ = realOpacity_;
 
-            for(auto child : _children){
+            for(auto child : children_){
                 child->updateDisplayedOpacity(255);
             }
 

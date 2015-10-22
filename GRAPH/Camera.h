@@ -8,21 +8,21 @@ namespace GRAPH
     struct Viewport
     {
         Viewport(float left, float bottom, float width, float height)
-            : _left(left)
-            , _bottom(bottom)
-            , _width(width)
-            , _height(height) {
+            : left_(left)
+            , bottom_(bottom)
+            , width_(width)
+            , height_(height) {
 
             }
         Viewport() {
-            _left = _bottom = 0.f;
-            _width = _height = 1.0f;
+            left_ = bottom_ = 0.f;
+            width_ = height_ = 1.0f;
         }
 
-        float _left;
-        float _bottom;
-        float _width;
-        float _height;
+        float left_;
+        float bottom_;
+        float width_;
+        float height_;
     };
 
     class Camera :public Node

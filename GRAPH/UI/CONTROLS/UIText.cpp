@@ -143,9 +143,9 @@ namespace GRAPH
         void Text::setTextAreaSize(const MATH::Sizef &size)
         {
             _labelRenderer->setDimensions(size.width,size.height);
-            if (!_ignoreSize)
+            if (!ignoreSize_)
             {
-                _customSize=size;
+                customSize_=size;
             }
             updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
             _labelRendererAdaptDirty = true;
@@ -244,11 +244,11 @@ namespace GRAPH
         MATH::Sizef Text::getAutoRenderSize()
         {
             MATH::Sizef virtualSize = _labelRenderer->getContentSize();
-            if (!_ignoreSize)
+            if (!ignoreSize_)
             {
                 _labelRenderer->setDimensions(0, 0);
                 virtualSize = _labelRenderer->getContentSize();
-                _labelRenderer->setDimensions(_contentSize.width, _contentSize.height);
+                _labelRenderer->setDimensions(contentSize_.width, contentSize_.height);
             }
 
             return virtualSize;
@@ -261,7 +261,7 @@ namespace GRAPH
 
         void Text::labelScaleChangedWithSize()
         {
-            if (_ignoreSize)
+            if (ignoreSize_)
             {
                 _labelRenderer->setDimensions(0,0);
                 _labelRenderer->setScale(1.0f);
@@ -269,21 +269,21 @@ namespace GRAPH
             }
             else
             {
-                _labelRenderer->setDimensions(_contentSize.width,_contentSize.height);
+                _labelRenderer->setDimensions(contentSize_.width,contentSize_.height);
                 MATH::Sizef textureSize = _labelRenderer->getContentSize();
                 if (textureSize.width <= 0.0f || textureSize.height <= 0.0f)
                 {
                     _labelRenderer->setScale(1.0f);
                     return;
                 }
-                float scaleX = _contentSize.width / textureSize.width;
-                float scaleY = _contentSize.height / textureSize.height;
+                float scaleX = contentSize_.width / textureSize.width;
+                float scaleY = contentSize_.height / textureSize.height;
                 _labelRenderer->setScaleX(scaleX);
                 _labelRenderer->setScaleY(scaleY);
                 _normalScaleValueX = scaleX;
                 _normalScaleValueY = scaleY;
             }
-            _labelRenderer->setPosition(_contentSize.width / 2.0f, _contentSize.height / 2.0f);
+            _labelRenderer->setPosition(contentSize_.width / 2.0f, contentSize_.height / 2.0f);
         }
 
         void Text::enableShadow(const Color4B& shadowColor,const MATH::Sizef &offset, int)

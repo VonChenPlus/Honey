@@ -89,10 +89,10 @@ namespace GRAPH
                     float dx = x1 * cr - y2 * sr2 + x;
                     float dy = x1 * sr + y2 * cr2 + y;
 
-                    quad_.bl.vertices.set(ax, ay, _positionZ);
-                    quad_.br.vertices.set(bx, by, _positionZ);
-                    quad_.tl.vertices.set(dx, dy, _positionZ);
-                    quad_.tr.vertices.set(cx, cy, _positionZ);
+                    quad_.bl.vertices.set(ax, ay, positionZ_);
+                    quad_.br.vertices.set(bx, by, positionZ_);
+                    quad_.tl.vertices.set(dx, dy, positionZ_);
+                    quad_.tr.vertices.set(cx, cy, positionZ_);
 
                     if (textureAtlas_)
                     {
@@ -113,13 +113,13 @@ namespace GRAPH
                     return;
                 }
 
-                Color4B color4(_displayedColor.red, _displayedColor.green, _displayedColor.blue, _displayedOpacity);
+                Color4B color4(displayedColor_.red, displayedColor_.green, displayedColor_.blue, displayedOpacity_);
                 // special opacity for premultiplied textures
                 if (opacityModifyRGB_)
                 {
-                    color4.red *= _displayedOpacity / 255.0f;
-                    color4.green *= _displayedOpacity / 255.0f;
-                    color4.blue *= _displayedOpacity / 255.0f;
+                    color4.red *= displayedOpacity_ / 255.0f;
+                    color4.green *= displayedOpacity_ / 255.0f;
+                    color4.blue *= displayedOpacity_ / 255.0f;
                 }
                 quad_.bl.colors = color4;
                 quad_.br.colors = color4;
@@ -609,7 +609,7 @@ namespace GRAPH
                     else
                     {
                         auto& letterInfo = _lettersInfo[letterIndex];
-                        auto& letterDef = _fontAtlas->_letterDefinitions[letterInfo.utf16Char];
+                        auto& letterDef = _fontAtlas->letterDefinitions_[letterInfo.utf16Char];
                         uvRect.size.height = letterDef.height;
                         uvRect.size.width = letterDef.width;
                         uvRect.origin.x = letterDef.U;
@@ -699,13 +699,13 @@ namespace GRAPH
             case TextHAlignment::CENTER:
                 for (auto lineWidth : _linesWidth)
                 {
-                    _linesOffsetX.push_back((_contentSize.width - lineWidth) / 2.f);
+                    _linesOffsetX.push_back((contentSize_.width - lineWidth) / 2.f);
                 }
                 break;
             case TextHAlignment::RIGHT:
                 for (auto lineWidth : _linesWidth)
                 {
-                    _linesOffsetX.push_back(_contentSize.width - lineWidth);
+                    _linesOffsetX.push_back(contentSize_.width - lineWidth);
                 }
                 break;
             default:
@@ -715,10 +715,10 @@ namespace GRAPH
             switch (_vAlignment)
             {
             case TextVAlignment::TOP:
-                _letterOffsetY = _contentSize.height;
+                _letterOffsetY = contentSize_.height;
                 break;
             case TextVAlignment::CENTER:
-                _letterOffsetY = (_contentSize.height + _textDesiredHeight) / 2.f;
+                _letterOffsetY = (contentSize_.height + _textDesiredHeight) / 2.f;
                 break;
             case TextVAlignment::BOTTOM:
                 _letterOffsetY = _textDesiredHeight;
@@ -781,7 +781,7 @@ namespace GRAPH
             {
                 if (_lettersInfo[ctr].valid)
                 {
-                    auto& letterDef = _fontAtlas->_letterDefinitions[_lettersInfo[ctr].utf16Char];
+                    auto& letterDef = _fontAtlas->letterDefinitions_[_lettersInfo[ctr].utf16Char];
 
                     _reusedRect.size.height = letterDef.height;
                     _reusedRect.size.width  = letterDef.width;
@@ -938,8 +938,8 @@ namespace GRAPH
             }
 
             _textSprite->retain();
-            _textSprite->updateDisplayedColor(_displayedColor);
-            _textSprite->updateDisplayedOpacity(_displayedOpacity);
+            _textSprite->updateDisplayedColor(displayedColor_);
+            _textSprite->updateDisplayedOpacity(displayedOpacity_);
         }
 
         void Label::createShadowSpriteForSystemFont(const FontDefinition& fontDef)
@@ -978,8 +978,8 @@ namespace GRAPH
                 _shadowNode->setPosition(_shadowOffset.width, _shadowOffset.height);
 
                 _shadowNode->retain();
-                _shadowNode->updateDisplayedColor(_displayedColor);
-                _shadowNode->updateDisplayedOpacity(_displayedOpacity);
+                _shadowNode->updateDisplayedColor(displayedColor_);
+                _shadowNode->updateDisplayedOpacity(displayedOpacity_);
             }
         }
 
@@ -1038,9 +1038,9 @@ namespace GRAPH
 
         void Label::onDrawShadow(GLShader* glShader)
         {
-            Color3B oldColor = _realColor;
-            GLubyte oldOPacity = _displayedOpacity;
-            _displayedOpacity = _shadowOpacity;
+            Color3B oldColor = realColor_;
+            GLubyte oldOPacity = displayedOpacity_;
+            displayedOpacity_ = _shadowOpacity;
             setColor(_shadowColor3B);
 
             glShader->setUniformsForBuiltins(_shadowTransform);
@@ -1053,7 +1053,7 @@ namespace GRAPH
                 batchNode->getTextureAtlas()->drawQuads();
             }
 
-            _displayedOpacity = oldOPacity;
+            displayedOpacity_ = oldOPacity;
             setColor(oldColor);
         }
 
@@ -1088,11 +1088,11 @@ namespace GRAPH
             }
             // Don't do calculate the culling if the transform was not updated
             bool transformUpdated = flags & FLAGS_TRANSFORM_DIRTY;
-                _insideBounds = transformUpdated ? Director::getInstance().checkVisibility(transform, _contentSize) : _insideBounds;
+                _insideBounds = transformUpdated ? Director::getInstance().checkVisibility(transform, contentSize_) : _insideBounds;
 
             if (_insideBounds)
             {
-                _customCommand.init(_globalZOrder, transform, flags);
+                _customCommand.init(globalZOrder_, transform, flags);
                 _customCommand.func = std::bind(&Label::onDraw, this, transform, transformUpdated);
 
                 renderer->addCommand(&_customCommand);
@@ -1101,7 +1101,7 @@ namespace GRAPH
 
         void Label::visit(Renderer *renderer, const MATH::Matrix4 &parentTransform, uint32_t parentFlags)
         {
-            if (! _visible || (_utf8Text.empty() && _children.empty()) )
+            if (! visible_ || (_utf8Text.empty() && children_.empty()) )
             {
                 return;
             }
@@ -1115,20 +1115,20 @@ namespace GRAPH
 
             if (!_utf8Text.empty() && _shadowEnabled && (_shadowDirty || (flags & FLAGS_DIRTY_MASK)))
             {
-                _position.x += _shadowOffset.width;
-                _position.y += _shadowOffset.height;
-                _transformDirty = _inverseDirty = true;
+                position_.x += _shadowOffset.width;
+                position_.y += _shadowOffset.height;
+                transformDirty_ = inverseDirty_ = true;
 
                 _shadowTransform = transform(parentTransform);
 
-                _position.x -= _shadowOffset.width;
-                _position.y -= _shadowOffset.height;
-                _transformDirty = _inverseDirty = true;
+                position_.x -= _shadowOffset.width;
+                position_.y -= _shadowOffset.height;
+                transformDirty_ = inverseDirty_ = true;
 
                 _shadowDirty = false;
             }
 
-            if (_children.empty() && !_textSprite)
+            if (children_.empty() && !_textSprite)
             {
                 return;
             }
@@ -1136,30 +1136,30 @@ namespace GRAPH
             // IMPORTANT:
             // To ease the migration to v3.0, we still support the MATH::Matrix4 stack,
             // but it is deprecated and your code should not rely on it
-            _director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-            _director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, _modelViewTransform);
+            director_->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+            director_->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, modelViewTransform_);
 
-            if (!_children.empty())
+            if (!children_.empty())
             {
                 sortAllChildren();
 
                 int i = 0;
                 // draw children zOrder < 0
-                for (; i < _children.size(); i++)
+                for (; i < children_.size(); i++)
                 {
-                    auto node = _children.at(i);
+                    auto node = children_.at(i);
 
                     if (node && node->getLocalZOrder() < 0)
-                        node->visit(renderer, _modelViewTransform, flags);
+                        node->visit(renderer, modelViewTransform_, flags);
                     else
                         break;
                 }
 
                 this->drawSelf(renderer, flags);
 
-                for (auto it = _children.cbegin() + i; it != _children.cend(); ++it)
+                for (auto it = children_.cbegin() + i; it != children_.cend(); ++it)
                 {
-                    (*it)->visit(renderer, _modelViewTransform, flags);
+                    (*it)->visit(renderer, modelViewTransform_, flags);
                 }
 
             }
@@ -1168,7 +1168,7 @@ namespace GRAPH
                 this->drawSelf(renderer, flags);
             }
 
-            _director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+            director_->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
         }
 
         void Label::drawSelf(Renderer* renderer, uint32_t flags)
@@ -1177,13 +1177,13 @@ namespace GRAPH
             {
                 if (_shadowNode)
                 {
-                    _shadowNode->visit(renderer, _modelViewTransform, flags);
+                    _shadowNode->visit(renderer, modelViewTransform_, flags);
                 }
-                _textSprite->visit(renderer, _modelViewTransform, flags);
+                _textSprite->visit(renderer, modelViewTransform_, flags);
             }
             else if (!_utf8Text.empty())
             {
-                draw(renderer, _modelViewTransform, flags);
+                draw(renderer, modelViewTransform_, flags);
             }
         }
 
@@ -1236,7 +1236,7 @@ namespace GRAPH
 
                     if (letter == nullptr)
                     {
-                        auto& letterDef = _fontAtlas->_letterDefinitions[letterInfo.utf16Char];
+                        auto& letterDef = _fontAtlas->letterDefinitions_[letterInfo.utf16Char];
                         auto textureID = letterDef.textureID;
                         MATH::Rectf uvRect;
                         uvRect.size.height = letterDef.height;
@@ -1256,7 +1256,7 @@ namespace GRAPH
                             auto px = letterInfo.positionX + uvRect.size.width / 2 + _linesOffsetX[letterInfo.lineIndex];
                             auto py = letterInfo.positionY - uvRect.size.height / 2 + _letterOffsetY;
                             letter->setPosition(px,py);
-                            letter->setOpacity(_realOpacity);
+                            letter->setOpacity(realOpacity_);
                         }
 
                         addChild(letter);
@@ -1350,16 +1350,16 @@ namespace GRAPH
 
             if (_textSprite)
             {
-                _textSprite->updateDisplayedColor(_displayedColor);
+                _textSprite->updateDisplayedColor(displayedColor_);
                 if (_shadowNode)
                 {
-                    _shadowNode->updateDisplayedColor(_displayedColor);
+                    _shadowNode->updateDisplayedColor(displayedColor_);
                 }
             }
 
             for (auto&& it : _letters)
             {
-                it.second->updateDisplayedColor(_displayedColor);;
+                it.second->updateDisplayedColor(displayedColor_);;
             }
         }
 
@@ -1369,16 +1369,16 @@ namespace GRAPH
 
             if (_textSprite)
             {
-                _textSprite->updateDisplayedOpacity(_displayedOpacity);
+                _textSprite->updateDisplayedOpacity(displayedOpacity_);
                 if (_shadowNode)
                 {
-                    _shadowNode->updateDisplayedOpacity(_displayedOpacity);
+                    _shadowNode->updateDisplayedOpacity(displayedOpacity_);
                 }
             }
 
             for (auto&& it : _letters)
             {
-                it.second->updateDisplayedOpacity(_displayedOpacity);;
+                it.second->updateDisplayedOpacity(displayedOpacity_);;
             }
         }
 
@@ -1398,14 +1398,14 @@ namespace GRAPH
                 return;
             }
 
-            Color4B color4( _displayedColor.red, _displayedColor.green, _displayedColor.blue, _displayedOpacity );
+            Color4B color4( displayedColor_.red, displayedColor_.green, displayedColor_.blue, displayedOpacity_ );
 
             // special opacity for premultiplied textures
             if (_isOpacityModifyRGB)
             {
-                color4.red *= _displayedOpacity/255.0f;
-                color4.green *= _displayedOpacity/255.0f;
-                color4.blue *= _displayedOpacity/255.0f;
+                color4.red *= displayedOpacity_/255.0f;
+                color4.green *= displayedOpacity_/255.0f;
+                color4.blue *= displayedOpacity_/255.0f;
             }
 
             GLTextureAtlas* textureAtlas;
@@ -1433,7 +1433,7 @@ namespace GRAPH
             {
                 const_cast<Label*>(this)->updateContent();
             }
-            return _contentSize;
+            return contentSize_;
         }
 
         MATH::Rectf Label::getBoundingBox() const

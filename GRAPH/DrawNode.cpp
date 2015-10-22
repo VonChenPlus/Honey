@@ -59,19 +59,19 @@ namespace GRAPH
 
     void DrawNode::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags) {
         if(vboArray_[0].u1.bufferCount) {
-            customCommand_.init(_globalZOrder, transform, flags);
+            customCommand_.init(globalZOrder_, transform, flags);
             customCommand_.func = std::bind(&DrawNode::onDraw, this, transform, flags);
             renderer->addCommand(&customCommand_);
         }
 
         if(vboArray_[1].u1.bufferCount) {
-            customCommandGLPoint_.init(_globalZOrder, transform, flags);
+            customCommandGLPoint_.init(globalZOrder_, transform, flags);
             customCommandGLPoint_.func = std::bind(&DrawNode::onDrawGLPoint, this, transform, flags);
             renderer->addCommand(&customCommandGLPoint_);
         }
 
         if(vboArray_[2].u1.bufferCount) {
-            customCommandGLLine_.init(_globalZOrder, transform, flags);
+            customCommandGLLine_.init(globalZOrder_, transform, flags);
             customCommandGLLine_.func = std::bind(&DrawNode::onDrawGLLine, this, transform, flags);
             renderer->addCommand(&customCommandGLLine_);
         }

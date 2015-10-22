@@ -4,8 +4,8 @@
 namespace GRAPH
 {
     Component::Component(void)
-        : _owner(nullptr)
-        , _enabled(true) {
+        : owner_(nullptr)
+        , enabled_(true) {
     }
 
     Component::~Component(void) {
@@ -46,43 +46,43 @@ namespace GRAPH
     }
 
     const std::string& Component::getName() const {
-        return _name;
+        return name_;
     }
 
     void Component::setName(const std::string& name) {
-        _name = name;
+        name_ = name;
     }
 
     Node* Component::getOwner() const {
-        return _owner;
+        return owner_;
     }
 
     void Component::setOwner(Node *owner) {
-        _owner = owner;
+        owner_ = owner;
     }
 
     bool Component::isEnabled() const {
-        return _enabled;
+        return enabled_;
     }
 
     void Component::setEnabled(bool enable) {
-        _enabled = enable;
+        enabled_ = enable;
     }
 
     ComponentContainer::ComponentContainer(Node *object)
-        : _components(nullptr)
-        , _owner(object) {
+        : components_(nullptr)
+        , owner_(object) {
     }
 
     ComponentContainer::~ComponentContainer(void) {
-        SAFE_DELETE(_components);
+        SAFE_DELETE(components_);
     }
 
     Component* ComponentContainer::get(const std::string& name) const {
         Component* ret = nullptr;
         do {
-            if(nullptr == _components)break;
-            ret = _components->at(name);
+            if(nullptr == components_)break;
+            ret = components_->at(name);
         } while (0);
         return ret;
     }
@@ -90,14 +90,14 @@ namespace GRAPH
     bool ComponentContainer::add(Component *com) {
         bool ret = false;
         do {
-            if (_components == nullptr) {
-                _components = new (std::nothrow) HObjectMap<std::string, Component*>();
+            if (components_ == nullptr) {
+                components_ = new (std::nothrow) HObjectMap<std::string, Component*>();
             }
 
-            Component *component = _components->at(com->getName());
+            Component *component = components_->at(com->getName());
             if(component) break;
-            com->setOwner(_owner);
-            _components->insert(com->getName(), com);
+            com->setOwner(owner_);
+            components_->insert(com->getName(), com);
             com->onAdd();
             ret = true;
         } while(0);
@@ -107,16 +107,16 @@ namespace GRAPH
     bool ComponentContainer::remove(const std::string& name) {
         bool ret = false;
         do {
-            if(!_components) break;
+            if(!components_) break;
 
-            auto iter = _components->find(name);
-            if(iter == _components->end()) break;
+            auto iter = components_->find(name);
+            if(iter == components_->end()) break;
 
             auto com = iter->second;
             com->onRemove();
             com->setOwner(nullptr);
 
-            _components->erase(iter);
+            components_->erase(iter);
             ret = true;
         } while(0);
         return ret;
@@ -125,13 +125,13 @@ namespace GRAPH
     bool ComponentContainer::remove(Component *com) {
         bool ret = false;
         do {
-            if(!_components) break;
+            if(!components_) break;
 
-            for (auto iter = _components->begin(); iter != _components->end(); ++iter) {
+            for (auto iter = components_->begin(); iter != components_->end(); ++iter) {
                 if (iter->second == com) {
                     com->onRemove();
                     com->setOwner(nullptr);
-                    _components->erase(iter);
+                    components_->erase(iter);
                     break;
                 }
             }
@@ -142,45 +142,45 @@ namespace GRAPH
     }
 
     void ComponentContainer::removeAll() {
-        if (_components != nullptr) {
-            for (auto iter = _components->begin(); iter != _components->end(); ++iter) {
+        if (components_ != nullptr) {
+            for (auto iter = components_->begin(); iter != components_->end(); ++iter) {
                 iter->second->onRemove();
                 iter->second->setOwner(nullptr);
             }
 
-            _components->clear();
-            SAFE_DELETE(_components);
+            components_->clear();
+            SAFE_DELETE(components_);
 
-            dynamic_cast<Node *>(_owner)->unscheduleUpdate();
+            dynamic_cast<Node *>(owner_)->unscheduleUpdate();
         }
     }
 
     void ComponentContainer::alloc(void) {
-        _components = new (std::nothrow) HObjectMap<std::string, Component*>();
+        components_ = new (std::nothrow) HObjectMap<std::string, Component*>();
     }
 
     void ComponentContainer::visit(float delta) {
-        if (_components != nullptr) {
-            SAFE_RETAIN(_owner);
-            for (auto iter = _components->begin(); iter != _components->end(); ++iter) {
+        if (components_ != nullptr) {
+            SAFE_RETAIN(owner_);
+            for (auto iter = components_->begin(); iter != components_->end(); ++iter) {
                 iter->second->update(delta);
             }
-            SAFE_RELEASE(_owner);
+            SAFE_RELEASE(owner_);
         }
     }
 
     bool ComponentContainer::isEmpty() const {
-        return (_components == nullptr || _components->empty());
+        return (components_ == nullptr || components_->empty());
     }
 
     void ComponentContainer::onEnter() {
-        for (auto iter = _components->begin(); iter != _components->end(); ++iter) {
+        for (auto iter = components_->begin(); iter != components_->end(); ++iter) {
             iter->second->onEnter();
         }
     }
 
     void ComponentContainer::onExit() {
-        for (auto iter = _components->begin(); iter != _components->end(); ++iter) {
+        for (auto iter = components_->begin(); iter != components_->end(); ++iter) {
             iter->second->onExit();
         }
     }

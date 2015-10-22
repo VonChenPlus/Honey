@@ -173,7 +173,7 @@ namespace GRAPH
 
         void Layout::visit(Renderer *renderer, const MATH::Matrix4 &parentTransform, uint32_t parentFlags)
         {
-            if (!_visible)
+            if (!visible_)
             {
                 return;
             }
@@ -203,7 +203,7 @@ namespace GRAPH
 
         void Layout::stencilClippingVisit(Renderer *renderer, const MATH::Matrix4& parentTransform, uint32_t parentFlags)
         {
-            if(!_visible)
+            if(!visible_)
                 return;
 
             uint32_t flags = processParentFlags(parentTransform, parentFlags);
@@ -212,21 +212,21 @@ namespace GRAPH
             // To ease the migration to v3.0, we still support the MATH::Matrix4 stack,
             // but it is deprecated and your code should not rely on it
             Director::getInstance().pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-            Director::getInstance().loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, _modelViewTransform);
+            Director::getInstance().loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, modelViewTransform_);
             //Add group command
 
-            _groupCommand.init(_globalZOrder);
+            _groupCommand.init(globalZOrder_);
             renderer->addCommand(&_groupCommand);
 
             renderer->pushGroup(_groupCommand.getRenderQueueID());
 
-            _beforeVisitCmdStencil.init(_globalZOrder);
+            _beforeVisitCmdStencil.init(globalZOrder_);
             _beforeVisitCmdStencil.func = std::bind(&Layout::onBeforeVisitStencil, this);
             renderer->addCommand(&_beforeVisitCmdStencil);
 
-            _clippingStencil->visit(renderer, _modelViewTransform, flags);
+            _clippingStencil->visit(renderer, modelViewTransform_, flags);
 
-            _afterDrawStencilCmd.init(_globalZOrder);
+            _afterDrawStencilCmd.init(globalZOrder_);
             _afterDrawStencilCmd.func = std::bind(&Layout::onAfterDrawStencil, this);
             renderer->addCommand(&_afterDrawStencilCmd);
 
@@ -239,22 +239,22 @@ namespace GRAPH
             //
             // draw children and protectedChildren zOrder < 0
             //
-            for( ; i < _children.size(); i++ )
+            for( ; i < children_.size(); i++ )
             {
-                auto node = _children.at(i);
+                auto node = children_.at(i);
 
                 if ( node && node->getLocalZOrder() < 0 )
-                    node->visit(renderer, _modelViewTransform, flags);
+                    node->visit(renderer, modelViewTransform_, flags);
                 else
                     break;
             }
 
-            for( ; j < _protectedChildren.size(); j++ )
+            for( ; j < protectedChildren_.size(); j++ )
             {
-                auto node = _protectedChildren.at(j);
+                auto node = protectedChildren_.at(j);
 
                 if ( node && node->getLocalZOrder() < 0 )
-                    node->visit(renderer, _modelViewTransform, flags);
+                    node->visit(renderer, modelViewTransform_, flags);
                 else
                     break;
             }
@@ -262,19 +262,19 @@ namespace GRAPH
             //
             // draw self
             //
-            this->draw(renderer, _modelViewTransform, flags);
+            this->draw(renderer, modelViewTransform_, flags);
 
             //
             // draw children and protectedChildren zOrder >= 0
             //
-            for(auto it=_protectedChildren.cbegin()+j; it != _protectedChildren.cend(); ++it)
-                (*it)->visit(renderer, _modelViewTransform, flags);
+            for(auto it=protectedChildren_.cbegin()+j; it != protectedChildren_.cend(); ++it)
+                (*it)->visit(renderer, modelViewTransform_, flags);
 
-            for(auto it=_children.cbegin()+i; it != _children.cend(); ++it)
-                (*it)->visit(renderer, _modelViewTransform, flags);
+            for(auto it=children_.cbegin()+i; it != children_.cend(); ++it)
+                (*it)->visit(renderer, modelViewTransform_, flags);
 
 
-            _afterVisitCmdStencil.init(_globalZOrder);
+            _afterVisitCmdStencil.init(globalZOrder_);
             _afterVisitCmdStencil.func = std::bind(&Layout::onAfterVisitStencil, this);
             renderer->addCommand(&_afterVisitCmdStencil);
 
@@ -392,13 +392,13 @@ namespace GRAPH
 
         void Layout::scissorClippingVisit(Renderer *renderer, const MATH::Matrix4& parentTransform, uint32_t parentFlags)
         {
-            _beforeVisitCmdScissor.init(_globalZOrder);
+            _beforeVisitCmdScissor.init(globalZOrder_);
             _beforeVisitCmdScissor.func = std::bind(&Layout::onBeforeVisitScissor, this);
             renderer->addCommand(&_beforeVisitCmdScissor);
 
             ProtectedNode::visit(renderer, parentTransform, parentFlags);
 
-            _afterVisitCmdScissor.init(_globalZOrder);
+            _afterVisitCmdScissor.init(globalZOrder_);
             _afterVisitCmdScissor.func = std::bind(&Layout::onAfterVisitScissor, this);
             renderer->addCommand(&_afterVisitCmdScissor);
         }
@@ -422,16 +422,16 @@ namespace GRAPH
                             once = false;
                         }
                         _clippingStencil = DrawNode::create();
-                        if (_running)
+                        if (running_)
                         {
                             _clippingStencil->onEnter();
                         }
                         _clippingStencil->retain();
-                        setStencilClippingSize(_contentSize);
+                        setStencilClippingSize(contentSize_);
                     }
                     else
                     {
-                        if (_running)
+                        if (running_)
                         {
                             _clippingStencil->onExit();
                         }
@@ -467,9 +467,9 @@ namespace GRAPH
             {
                 MATH::Vector2f rect[4];
                 // rect[0].setZero(); Zero default
-                rect[1].set(_contentSize.width, 0.0f);
-                rect[2].set(_contentSize.width, _contentSize.height);
-                rect[3].set(0.0f, _contentSize.height);
+                rect[1].set(contentSize_.width, 0.0f);
+                rect[2].set(contentSize_.width, contentSize_.height);
+                rect[3].set(0.0f, contentSize_.height);
                 Color4F green(0.0f, 1.0f, 0.0f, 1.0f);
                 _clippingStencil->clear();
                 _clippingStencil->drawPolygon(rect, 4, green, 0, green);
@@ -482,8 +482,8 @@ namespace GRAPH
             {
                 MATH::Vector2f worldPos = convertToWorldSpace(MATH::Vec2fZERO);
                 MATH::AffineTransform t = getNodeToWorldAffineTransform();
-                float scissorWidth = _contentSize.width*t.a;
-                float scissorHeight = _contentSize.height*t.d;
+                float scissorWidth = contentSize_.width*t.a;
+                float scissorHeight = contentSize_.height*t.d;
                 MATH::Rectf parentClippingRect;
                 Layout* parent = this;
 
@@ -503,8 +503,8 @@ namespace GRAPH
                 if (_clippingParent)
                 {
                     parentClippingRect = _clippingParent->getClippingRect();
-                    float finalX = worldPos.x - (scissorWidth * _anchorPoint.x);
-                    float finalY = worldPos.y - (scissorHeight * _anchorPoint.y);
+                    float finalX = worldPos.x - (scissorWidth * anchorPoint_.x);
+                    float finalY = worldPos.y - (scissorHeight * anchorPoint_.y);
                     float finalWidth = scissorWidth;
                     float finalHeight = scissorHeight;
 
@@ -545,8 +545,8 @@ namespace GRAPH
                 }
                 else
                 {
-                    _clippingRect.origin.x = worldPos.x - (scissorWidth * _anchorPoint.x);
-                    _clippingRect.origin.y = worldPos.y - (scissorHeight * _anchorPoint.y);
+                    _clippingRect.origin.x = worldPos.x - (scissorWidth * anchorPoint_.x);
+                    _clippingRect.origin.y = worldPos.y - (scissorHeight * anchorPoint_.y);
                     _clippingRect.size.width = scissorWidth;
                     _clippingRect.size.height = scissorHeight;
                 }
@@ -558,24 +558,24 @@ namespace GRAPH
         void Layout::onSizeChanged()
         {
             Widget::onSizeChanged();
-            setStencilClippingSize(_contentSize);
+            setStencilClippingSize(contentSize_);
             _doLayoutDirty = true;
             _clippingRectDirty = true;
             if (_backGroundImage)
             {
-                _backGroundImage->setPosition(_contentSize.width/2.0f, _contentSize.height/2.0f);
+                _backGroundImage->setPosition(contentSize_.width/2.0f, contentSize_.height/2.0f);
                 if (_backGroundScale9Enabled && _backGroundImage)
                 {
-                    _backGroundImage->setPreferredSize(_contentSize);
+                    _backGroundImage->setPreferredSize(contentSize_);
                 }
             }
             if (_colorRender)
             {
-                _colorRender->setContentSize(_contentSize);
+                _colorRender->setContentSize(contentSize_);
             }
             if (_gradientRender)
             {
-                _gradientRender->setContentSize(_contentSize);
+                _gradientRender->setContentSize(contentSize_);
             }
         }
 
@@ -626,11 +626,11 @@ namespace GRAPH
                     break;
             }
             if (_backGroundScale9Enabled) {
-                _backGroundImage->setPreferredSize(_contentSize);
+                _backGroundImage->setPreferredSize(contentSize_);
             }
 
             _backGroundImageTextureSize = _backGroundImage->getContentSize();
-            _backGroundImage->setPosition(_contentSize.width/2.0f, _contentSize.height/2.0f);
+            _backGroundImage->setPosition(contentSize_.width/2.0f, contentSize_.height/2.0f);
             updateBackGroundImageRGBA();
         }
 
@@ -689,7 +689,7 @@ namespace GRAPH
 
             addProtectedChild(_backGroundImage, BACKGROUNDIMAGE_Z, -1);
 
-            _backGroundImage->setPosition(_contentSize.width/2.0f, _contentSize.height/2.0f);
+            _backGroundImage->setPosition(contentSize_.width/2.0f, contentSize_.height/2.0f);
         }
 
         void Layout::removeBackGroundImage()
@@ -748,14 +748,14 @@ namespace GRAPH
                     break;
                 case BackGroundColorType::SOLID:
                     _colorRender = LayerColor::create();
-                    _colorRender->setContentSize(_contentSize);
+                    _colorRender->setContentSize(contentSize_);
                     _colorRender->setOpacity(_cOpacity);
                     _colorRender->setColor(_cColor);
                     addProtectedChild(_colorRender, BCAKGROUNDCOLORRENDERER_Z, -1);
                     break;
                 case BackGroundColorType::GRADIENT:
                     _gradientRender = LayerGradient::create();
-                    _gradientRender->setContentSize(_contentSize);
+                    _gradientRender->setContentSize(contentSize_);
                     _gradientRender->setOpacity(_cOpacity);
                     _gradientRender->setStartColor(_gStartColor);
                     _gradientRender->setEndColor(_gEndColor);
@@ -903,7 +903,7 @@ namespace GRAPH
         {
             _layoutType = type;
 
-            for (auto& child : _children)
+            for (auto& child : children_)
             {
                 Widget* widgetChild = dynamic_cast<Widget*>(child);
                 if (widgetChild)
@@ -1087,7 +1087,7 @@ namespace GRAPH
 
             MATH::Vector2f widgetPosition =  this->getWorldCenterPoint(baseWidget);
 
-            for (Node* node : _children)
+            for (Node* node : children_)
             {
                 Layout *layout = dynamic_cast<Layout*>(node);
                 int length;
@@ -1125,7 +1125,7 @@ namespace GRAPH
 
             MATH::Vector2f widgetPosition =  this->getWorldCenterPoint(baseWidget);
 
-            for (Node* node : _children)
+            for (Node* node : children_)
             {
                 Layout *layout = dynamic_cast<Layout*>(node);
                 int length;
@@ -1160,7 +1160,7 @@ namespace GRAPH
             uint64 count = this->getChildren().size();
             while (index < count)
             {
-                Widget* w =  dynamic_cast<Widget*>(_children.at(index));
+                Widget* w =  dynamic_cast<Widget*>(children_.at(index));
                 if (w && w->isFocusEnabled())
                 {
                     return (int)index;
@@ -1285,7 +1285,7 @@ namespace GRAPH
         Widget *Layout::findFirstNonLayoutWidget()
         {
             Widget* widget = nullptr;
-            for(Node *node : _children)
+            for(Node *node : children_)
             {
                 Layout* layout = dynamic_cast<Layout*>(node);
                 if (layout)
@@ -1402,7 +1402,7 @@ namespace GRAPH
         bool Layout::checkFocusEnabledChild()const
         {
             bool ret = false;
-            for(Node* node : _children)
+            for(Node* node : children_)
             {
                 Widget* widget = dynamic_cast<Widget*>(node);
                 if (widget && widget->isFocusEnabled())
@@ -1416,13 +1416,13 @@ namespace GRAPH
 
         Widget* Layout::getChildWidgetByIndex(uint64 index)const
         {
-            uint64 size = _children.size();
+            uint64 size = children_.size();
             int count = 0;
             uint64 oldIndex = index;
             Widget *widget = nullptr;
             while (index < size)
             {
-                Widget* firstChild = dynamic_cast<Widget*>(_children.at(index));
+                Widget* firstChild = dynamic_cast<Widget*>(children_.at(index));
                 if (firstChild)
                 {
                     widget = firstChild;
@@ -1437,7 +1437,7 @@ namespace GRAPH
                 int begin = 0;
                 while (begin < oldIndex)
                 {
-                    Widget* firstChild = dynamic_cast<Widget*>(_children.at(begin));
+                    Widget* firstChild = dynamic_cast<Widget*>(children_.at(begin));
                     if (firstChild)
                     {
                         widget = firstChild;
@@ -1455,7 +1455,7 @@ namespace GRAPH
         Widget* Layout::getPreviousFocusedWidget(FocusDirection direction, Widget *current)
         {
             Widget *nextWidget = nullptr;
-            uint64 previousWidgetPos = _children.getIndex(current);
+            uint64 previousWidgetPos = children_.getIndex(current);
             previousWidgetPos = previousWidgetPos - 1;
             if (previousWidgetPos >= 0)
             {
@@ -1483,7 +1483,7 @@ namespace GRAPH
                 {
                     if (checkFocusEnabledChild())
                     {
-                        previousWidgetPos = _children.size()-1;
+                        previousWidgetPos = children_.size()-1;
                         nextWidget = this->getChildWidgetByIndex(previousWidgetPos);
                         if (nextWidget->isFocusEnabled())
                         {
@@ -1512,7 +1512,7 @@ namespace GRAPH
                         }
                         else
                         {
-                            return _focusedWidget;
+                            return focusedWidget_;
                         }
                     }
                 }
@@ -1530,7 +1530,7 @@ namespace GRAPH
                         }
                         else
                         {
-                            return _focusedWidget;
+                            return focusedWidget_;
                         }
                     }
                     else
@@ -1544,9 +1544,9 @@ namespace GRAPH
         Widget* Layout::getNextFocusedWidget(FocusDirection direction, Widget *current)
         {
             Widget *nextWidget = nullptr;
-            uint64 previousWidgetPos = _children.getIndex(current);
+            uint64 previousWidgetPos = children_.getIndex(current);
             previousWidgetPos = previousWidgetPos + 1;
-            if (previousWidgetPos < _children.size())
+            if (previousWidgetPos < children_.size())
             {
                 nextWidget = this->getChildWidgetByIndex(previousWidgetPos);
                 //handle widget
@@ -1610,7 +1610,7 @@ namespace GRAPH
                         }
                         else
                         {
-                            return _focusedWidget;
+                            return focusedWidget_;
                         }
                     }
                 }
@@ -1627,7 +1627,7 @@ namespace GRAPH
                         }
                         else
                         {
-                            return _focusedWidget;
+                            return focusedWidget_;
                         }
                     }
                     else
@@ -2587,7 +2587,7 @@ namespace GRAPH
                 , _actived(true)
                 , _isPercentOnly(false)
             {
-                _name = __LAYOUT_COMPONENT_NAME;
+                name_ = __LAYOUT_COMPONENT_NAME;
             }
 
             LayoutComponent::~LayoutComponent()
@@ -2631,7 +2631,7 @@ namespace GRAPH
 
             Node* LayoutComponent::getOwnerParent()
             {
-                Node* parent = _owner->getParent();
+                Node* parent = owner_->getParent();
                 return parent;
             }
             void LayoutComponent::refreshHorizontalMargin()
@@ -2640,9 +2640,9 @@ namespace GRAPH
                 if (parent == nullptr)
                     return;
 
-                const MATH::Vector2f& ownerPoint = _owner->getPosition();
-                const MATH::Vector2f& ownerAnchor = _owner->getAnchorPoint();
-                const MATH::Sizef& ownerSize = _owner->getContentSize();
+                const MATH::Vector2f& ownerPoint = owner_->getPosition();
+                const MATH::Vector2f& ownerAnchor = owner_->getAnchorPoint();
+                const MATH::Sizef& ownerSize = owner_->getContentSize();
                 const MATH::Sizef& parentSize = parent->getContentSize();
 
                 _leftMargin = ownerPoint.x - ownerAnchor.x * ownerSize.width;
@@ -2654,9 +2654,9 @@ namespace GRAPH
                 if (parent == nullptr)
                     return;
 
-                const MATH::Vector2f& ownerPoint = _owner->getPosition();
-                const MATH::Vector2f& ownerAnchor = _owner->getAnchorPoint();
-                const MATH::Sizef& ownerSize = _owner->getContentSize();
+                const MATH::Vector2f& ownerPoint = owner_->getPosition();
+                const MATH::Vector2f& ownerAnchor = owner_->getAnchorPoint();
+                const MATH::Sizef& ownerSize = owner_->getContentSize();
                 const MATH::Sizef& parentSize = parent->getContentSize();
 
                 _bottomMargin = ownerPoint.y - ownerAnchor.y * ownerSize.height;
@@ -2689,18 +2689,18 @@ namespace GRAPH
             //Position & Margin
             const MATH::Vector2f& LayoutComponent::getAnchorPosition()const
             {
-                return _owner->getAnchorPoint();
+                return owner_->getAnchorPoint();
             }
 
             void LayoutComponent::setAnchorPosition(const MATH::Vector2f& point)
             {
-                MATH::Rectf oldRect = _owner->getBoundingBox();
-                _owner->setAnchorPoint(point);
-                MATH::Rectf newRect = _owner->getBoundingBox();
+                MATH::Rectf oldRect = owner_->getBoundingBox();
+                owner_->setAnchorPoint(point);
+                MATH::Rectf newRect = owner_->getBoundingBox();
                 float offSetX = oldRect.origin.x - newRect.origin.x;
                 float offSetY = oldRect.origin.y - newRect.origin.y;
 
-                MATH::Vector2f ownerPosition = _owner->getPosition();
+                MATH::Vector2f ownerPosition = owner_->getPosition();
                 ownerPosition.x += offSetX;
                 ownerPosition.y += offSetY;
 
@@ -2709,7 +2709,7 @@ namespace GRAPH
 
             const MATH::Vector2f& LayoutComponent::getPosition()const
             {
-                return _owner->getPosition();
+                return owner_->getPosition();
             }
 
             void LayoutComponent::setPosition(const MATH::Vector2f& position)
@@ -2738,13 +2738,13 @@ namespace GRAPH
                             ownerPoint.y = 0;
                     }
 
-                    _owner->setPosition(ownerPoint);
+                    owner_->setPosition(ownerPoint);
 
                     this->refreshHorizontalMargin();
                     this->refreshVerticalMargin();
                 }
                 else
-                    _owner->setPosition(position);
+                    owner_->setPosition(position);
             }
 
             bool LayoutComponent::isPositionPercentXEnabled()const
@@ -2772,7 +2772,7 @@ namespace GRAPH
                 Node* parent = this->getOwnerParent();
                 if (parent != nullptr)
                 {
-                    _owner->setPositionX(parent->getContentSize().width * _positionPercentX);
+                    owner_->setPositionX(parent->getContentSize().width * _positionPercentX);
                     this->refreshHorizontalMargin();
                 }
             }
@@ -2801,7 +2801,7 @@ namespace GRAPH
                 Node* parent = this->getOwnerParent();
                 if (parent != nullptr)
                 {
-                    _owner->setPositionY(parent->getContentSize().height * _positionPercentY);
+                    owner_->setPositionY(parent->getContentSize().height * _positionPercentY);
                     this->refreshVerticalMargin();
                 }
             }
@@ -2821,7 +2821,7 @@ namespace GRAPH
                 Node* parent = this->getOwnerParent();
                 if (parent != nullptr)
                 {
-                    MATH::Vector2f ownerPoint = _owner->getPosition();
+                    MATH::Vector2f ownerPoint = owner_->getPosition();
                     const MATH::Sizef& parentSize = parent->getContentSize();
                     if (parentSize.width != 0)
                         _positionPercentX = ownerPoint.x / parentSize.width;
@@ -2830,7 +2830,7 @@ namespace GRAPH
                         _positionPercentX = 0;
                         ownerPoint.x = 0;
                         if (_usingPositionPercentX)
-                            _owner->setPosition(ownerPoint);
+                            owner_->setPosition(ownerPoint);
                     }
 
                     this->refreshHorizontalMargin();
@@ -2852,7 +2852,7 @@ namespace GRAPH
                 Node* parent = this->getOwnerParent();
                 if (parent != nullptr)
                 {
-                    MATH::Vector2f ownerPoint = _owner->getPosition();
+                    MATH::Vector2f ownerPoint = owner_->getPosition();
                     const MATH::Sizef& parentSize = parent->getContentSize();
                     if (parentSize.height != 0)
                         _positionPercentY = ownerPoint.y / parentSize.height;
@@ -2861,7 +2861,7 @@ namespace GRAPH
                         _positionPercentY = 0;
                         ownerPoint.y = 0;
                         if (_usingPositionPercentY)
-                            _owner->setPosition(ownerPoint);
+                            owner_->setPosition(ownerPoint);
                     }
 
                     this->refreshVerticalMargin();
@@ -2935,13 +2935,13 @@ namespace GRAPH
                             ownerSize.height = 0;
                     }
 
-                    _owner->setContentSize(ownerSize);
+                    owner_->setContentSize(ownerSize);
 
                     this->refreshHorizontalMargin();
                     this->refreshVerticalMargin();
                 }
                 else
-                    _owner->setContentSize(size);
+                    owner_->setContentSize(size);
             }
 
             bool LayoutComponent::isPercentWidthEnabled()const
@@ -2959,11 +2959,11 @@ namespace GRAPH
 
             float LayoutComponent::getSizeWidth()const
             {
-                return _owner->getContentSize().width;
+                return owner_->getContentSize().width;
             }
             void LayoutComponent::setSizeWidth(float width)
             {
-                MATH::Sizef ownerSize = _owner->getContentSize();
+                MATH::Sizef ownerSize = owner_->getContentSize();
                 ownerSize.width = width;
 
                 Node* parent = this->getOwnerParent();
@@ -2978,11 +2978,11 @@ namespace GRAPH
                         if (_usingPercentWidth)
                             ownerSize.width = 0;
                     }
-                    _owner->setContentSize(ownerSize);
+                    owner_->setContentSize(ownerSize);
                     this->refreshHorizontalMargin();
                 }
                 else
-                    _owner->setContentSize(ownerSize);
+                    owner_->setContentSize(ownerSize);
             }
 
             float LayoutComponent::getPercentWidth()const
@@ -2996,9 +2996,9 @@ namespace GRAPH
                 Node* parent = this->getOwnerParent();
                 if (parent != nullptr)
                 {
-                    MATH::Sizef ownerSize = _owner->getContentSize();
+                    MATH::Sizef ownerSize = owner_->getContentSize();
                     ownerSize.width = parent->getContentSize().width * _percentWidth;
-                    _owner->setContentSize(ownerSize);
+                    owner_->setContentSize(ownerSize);
 
                     this->refreshHorizontalMargin();
                 }
@@ -3019,11 +3019,11 @@ namespace GRAPH
 
             float LayoutComponent::getSizeHeight()const
             {
-                return _owner->getContentSize().height;
+                return owner_->getContentSize().height;
             }
             void LayoutComponent::setSizeHeight(float height)
             {
-                MATH::Sizef ownerSize = _owner->getContentSize();
+                MATH::Sizef ownerSize = owner_->getContentSize();
                 ownerSize.height = height;
 
                 Node* parent = this->getOwnerParent();
@@ -3038,11 +3038,11 @@ namespace GRAPH
                         if (_usingPercentHeight)
                             ownerSize.height = 0;
                     }
-                    _owner->setContentSize(ownerSize);
+                    owner_->setContentSize(ownerSize);
                     this->refreshVerticalMargin();
                 }
                 else
-                    _owner->setContentSize(ownerSize);
+                    owner_->setContentSize(ownerSize);
             }
 
             float LayoutComponent::getPercentHeight()const
@@ -3056,9 +3056,9 @@ namespace GRAPH
                 Node* parent = this->getOwnerParent();
                 if (parent != nullptr)
                 {
-                    MATH::Sizef ownerSize = _owner->getContentSize();
+                    MATH::Sizef ownerSize = owner_->getContentSize();
                     ownerSize.height = parent->getContentSize().height * _percentHeight;
-                    _owner->setContentSize(ownerSize);
+                    owner_->setContentSize(ownerSize);
 
                     this->refreshVerticalMargin();
                 }
@@ -3100,9 +3100,9 @@ namespace GRAPH
                     return;
 
                 const MATH::Sizef& parentSize = parent->getContentSize();
-                const MATH::Vector2f& ownerAnchor = _owner->getAnchorPoint();
-                MATH::Sizef ownerSize = _owner->getContentSize();
-                MATH::Vector2f ownerPosition = _owner->getPosition();
+                const MATH::Vector2f& ownerAnchor = owner_->getAnchorPoint();
+                MATH::Sizef ownerSize = owner_->getContentSize();
+                MATH::Vector2f ownerPosition = owner_->getPosition();
 
                 switch (this->_horizontalEdge)
                 {
@@ -3206,10 +3206,10 @@ namespace GRAPH
                     break;
                 }
 
-                _owner->setPosition(ownerPosition);
-                _owner->setContentSize(ownerSize);
+                owner_->setPosition(ownerPosition);
+                owner_->setContentSize(ownerSize);
 
-                Helper::doLayout(_owner);
+                Helper::doLayout(owner_);
             }
 
             void LayoutComponent::setActiveEnabled(bool enable)

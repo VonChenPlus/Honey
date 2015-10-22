@@ -103,17 +103,17 @@ namespace GRAPH
         void visitTarget(HObject* target, bool isRootTarget);
 
     private:
-        std::unordered_map<EventListener::ListenerID, EventListenerVector*> _listenerMap;
-        std::unordered_map<EventListener::ListenerID, DirtyFlag> _priorityDirtyFlagMap;
-        std::unordered_map<HObject*, std::vector<EventListener*>*> _nodeListenersMap;
-        std::unordered_map<HObject*, int> _nodePriorityMap;
-        std::unordered_map<float, std::vector<HObject*>> _globalZOrderNodeMap;
-        std::vector<EventListener*> _toAddedListeners;
-        std::set<HObject*> _dirtyNodes;
-        int _inDispatch;
-        bool _isEnabled;
-        int _nodePriorityIndex;
-        std::set<std::string> _internalCustomListenerIDs;
+        std::unordered_map<EventListener::ListenerID, EventListenerVector*> listenerMap_;
+        std::unordered_map<EventListener::ListenerID, DirtyFlag> priorityDirtyFlagMap_;
+        std::unordered_map<HObject*, std::vector<EventListener*>*> nodeListenersMap_;
+        std::unordered_map<HObject*, int> nodePriorityMap_;
+        std::unordered_map<float, std::vector<HObject*>> globalZOrderNodeMap_;
+        std::vector<EventListener*> toAddedListeners_;
+        std::set<HObject*> dirtyNodes_;
+        int inDispatch_;
+        bool isEnabled_;
+        int nodePriorityIndex_;
+        std::set<std::string> internalCustomListenerIDs_;
 
         friend class Node;
     };

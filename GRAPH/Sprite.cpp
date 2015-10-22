@@ -337,8 +337,8 @@ namespace GRAPH
             relativeOffsetY = -relativeOffsetY;
         }
 
-        offsetPosition_.x = relativeOffsetX + (_contentSize.width - rect_.size.width) / 2;
-        offsetPosition_.y = relativeOffsetY + (_contentSize.height - rect_.size.height) / 2;
+        offsetPosition_.x = relativeOffsetX + (contentSize_.width - rect_.size.width) / 2;
+        offsetPosition_.y = relativeOffsetY + (contentSize_.height - rect_.size.height) / 2;
 
         if (batchNode_) {
             setDirty(true);
@@ -400,7 +400,7 @@ namespace GRAPH
                                                rect_,
                                                rectRotated_,
                                                unflippedOffsetPositionFromCenter_,
-                                               _contentSize);
+                                               contentSize_);
     }
 
     void Sprite::setTextureCoords(MATH::Rectf rect) {
@@ -464,7 +464,7 @@ namespace GRAPH
 
     void Sprite::updateTransform(void) {
         if( isDirty() ) {
-            if( !_visible || ( _parent && _parent != batchNode_ && static_cast<Sprite*>(_parent)->shouldBeHidden_) ) {
+            if( !visible_ || ( parent_ && parent_ != batchNode_ && static_cast<Sprite*>(parent_)->shouldBeHidden_) ) {
                 quad_.br.vertices.setZero();
                 quad_.tl.vertices.setZero();
                 quad_.tr.vertices.setZero();
@@ -474,12 +474,12 @@ namespace GRAPH
             else {
                 shouldBeHidden_ = false;
 
-                if( ! _parent || _parent == batchNode_ ) {
+                if( ! parent_ || parent_ == batchNode_ ) {
                     transformToBatch_ = getNodeToParentTransform();
                 }
                 else {
                     const MATH::Matrix4 &nodeToParent = getNodeToParentTransform();
-                    MATH::Matrix4 &parentTransform = static_cast<Sprite*>(_parent)->transformToBatch_;
+                    MATH::Matrix4 &parentTransform = static_cast<Sprite*>(parent_)->transformToBatch_;
                     transformToBatch_ = parentTransform * nodeToParent;
                 }
 
@@ -509,10 +509,10 @@ namespace GRAPH
                 float dx = x1 * cr - y2 * sr2 + x;
                 float dy = x1 * sr + y2 * cr2 + y;
 
-                quad_.bl.vertices.set(ax, ay, _positionZ);
-                quad_.br.vertices.set(bx, by, _positionZ);
-                quad_.tl.vertices.set(dx, dy, _positionZ);
-                quad_.tr.vertices.set(cx, cy, _positionZ);
+                quad_.bl.vertices.set(ax, ay, positionZ_);
+                quad_.br.vertices.set(bx, by, positionZ_);
+                quad_.tl.vertices.set(dx, dy, positionZ_);
+                quad_.tr.vertices.set(cx, cy, positionZ_);
             }
 
             if (textureAtlas_) {
@@ -527,7 +527,7 @@ namespace GRAPH
     }
 
     void Sprite::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags) {
-        trianglesCommand_.init(_globalZOrder, texture_->getName(), getGLShaderState(), blendFunc_, polyInfo_.triangles, transform, flags);
+        trianglesCommand_.init(globalZOrder_, texture_->getName(), getGLShaderState(), blendFunc_, polyInfo_.triangles, transform, flags);
         renderer->addCommand(&trianglesCommand_);
     }
 
@@ -536,7 +536,7 @@ namespace GRAPH
             Sprite* childSprite = dynamic_cast<Sprite*>(child);
             batchNode_->appendChild(childSprite);
 
-            if (!_reorderChildDirty) {
+            if (!reorderChildDirty_) {
                 setReorderChildDirtyRecursively();
             }
         }
@@ -548,7 +548,7 @@ namespace GRAPH
             Sprite* childSprite = dynamic_cast<Sprite*>(child);
             batchNode_->appendChild(childSprite);
 
-            if (!_reorderChildDirty) {
+            if (!reorderChildDirty_) {
                 setReorderChildDirtyRecursively();
             }
         }
@@ -556,7 +556,7 @@ namespace GRAPH
     }
 
     void Sprite::reorderChild(Node *child, int zOrder) {
-        if( batchNode_ && ! _reorderChildDirty) {
+        if( batchNode_ && ! reorderChildDirty_) {
             setReorderChildDirtyRecursively();
             batchNode_->reorderBatch(true);
         }
@@ -574,7 +574,7 @@ namespace GRAPH
 
     void Sprite::removeAllChildrenWithCleanup(bool cleanup) {
         if (batchNode_) {
-            for(const auto &child : _children) {
+            for(const auto &child : children_) {
                 Sprite* sprite = dynamic_cast<Sprite*>(child);
                 if (sprite) {
                     batchNode_->removeSpriteFromAtlas(sprite);
@@ -586,22 +586,22 @@ namespace GRAPH
     }
 
     void Sprite::sortAllChildren() {
-        if (_reorderChildDirty) {
-            std::sort(std::begin(_children), std::end(_children), NodeComparisonLess);
+        if (reorderChildDirty_) {
+            std::sort(std::begin(children_), std::end(children_), NodeComparisonLess);
 
             if ( batchNode_) {
-                for(const auto &child : _children)
+                for(const auto &child : children_)
                     child->sortAllChildren();
             }
 
-            _reorderChildDirty = false;
+            reorderChildDirty_ = false;
         }
     }
 
     void Sprite::setReorderChildDirtyRecursively(void) {
-        if ( ! _reorderChildDirty ) {
-            _reorderChildDirty = true;
-            Node* node = static_cast<Node*>(_parent);
+        if ( ! reorderChildDirty_ ) {
+            reorderChildDirty_ = true;
+            Node* node = static_cast<Node*>(parent_);
             while (node && node != batchNode_) {
                 static_cast<Sprite*>(node)->setReorderChildDirtyRecursively();
                 node=node->getParent();
@@ -613,7 +613,7 @@ namespace GRAPH
         recursiveDirty_ = bValue;
         setDirty(bValue);
 
-        for(const auto &child: _children) {
+        for(const auto &child: children_) {
             Sprite* sp = dynamic_cast<Sprite*>(child);
             if (sp) {
                 sp->setDirtyRecursively(true);
@@ -621,89 +621,89 @@ namespace GRAPH
         }
     }
 
-    #define SETdirty__RECURSIVELY() {                       \
+    #define SET_DIRTY_RECURSIVELY() {                       \
                         if (! recursiveDirty_) {            \
                             recursiveDirty_ = true;         \
                             setDirty(true);                 \
-                            if (!_children.empty())         \
+                            if (!children_.empty())         \
                                 setDirtyRecursively(true);  \
                             }                               \
                         }
 
     void Sprite::setPosition(const MATH::Vector2f& pos) {
         Node::setPosition(pos);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setPosition(float x, float y) {
         Node::setPosition(x, y);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setRotation(float rotation) {
         Node::setRotation(rotation);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setRotationSkewX(float fRotationX) {
         Node::setRotationSkewX(fRotationX);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setRotationSkewY(float fRotationY) {
         Node::setRotationSkewY(fRotationY);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setSkewX(float sx) {
         Node::setSkewX(sx);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setSkewY(float sy) {
         Node::setSkewY(sy);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setScaleX(float scaleX) {
         Node::setScaleX(scaleX);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setScaleY(float scaleY) {
         Node::setScaleY(scaleY);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setScale(float fScale) {
         Node::setScale(fScale);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setScale(float scaleX, float scaleY) {
         Node::setScale(scaleX, scaleY);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setPositionZ(float fVertexZ) {
         Node::setPositionZ(fVertexZ);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setAnchorPoint(const MATH::Vector2f& anchor) {
         Node::setAnchorPoint(anchor);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setVisible(bool bVisible) {
         Node::setVisible(bVisible);
-        SETdirty__RECURSIVELY();
+        SET_DIRTY_RECURSIVELY();
     }
 
     void Sprite::setFlippedX(bool flippedX) {
         if (flippedX_ != flippedX) {
             flippedX_ = flippedX;
-            setTextureRect(rect_, rectRotated_, _contentSize);
+            setTextureRect(rect_, rectRotated_, contentSize_);
         }
     }
 
@@ -714,7 +714,7 @@ namespace GRAPH
     void Sprite::setFlippedY(bool flippedY) {
         if (flippedY_ != flippedY) {
             flippedY_ = flippedY;
-            setTextureRect(rect_, rectRotated_, _contentSize);
+            setTextureRect(rect_, rectRotated_, contentSize_);
         }
     }
 
@@ -723,11 +723,11 @@ namespace GRAPH
     }
 
     void Sprite::updateColor(void) {
-        Color4B color4( _displayedColor.red, _displayedColor.green, _displayedColor.blue, _displayedOpacity );
+        Color4B color4( displayedColor_.red, displayedColor_.green, displayedColor_.blue, displayedOpacity_ );
         if (opacityModifyRGB_) {
-            color4.red *= _displayedOpacity/255.0f;
-            color4.green *= _displayedOpacity/255.0f;
-            color4.blue *= _displayedOpacity/255.0f;
+            color4.red *= displayedOpacity_/255.0f;
+            color4.green *= displayedOpacity_/255.0f;
+            color4.blue *= displayedOpacity_/255.0f;
         }
 
         quad_.bl.colors = color4;
@@ -833,7 +833,7 @@ namespace GRAPH
 
         updateBlendFunc();
 
-        _children.reserve(capacity);
+        children_.reserve(capacity);
 
         descendants_.reserve(capacity);
 
@@ -862,7 +862,7 @@ namespace GRAPH
     }
 
     void SpriteBatchNode::visit(Renderer *renderer, const MATH::Matrix4 &parentTransform, uint32_t parentFlags) {
-        if (!_visible) {
+        if (!visible_) {
             return;
         }
 
@@ -871,9 +871,9 @@ namespace GRAPH
         uint32_t flags = processParentFlags(parentTransform, parentFlags);
 
         Director::getInstance().pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-        Director::getInstance().loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, _modelViewTransform);
+        Director::getInstance().loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, modelViewTransform_);
 
-        draw(renderer, _modelViewTransform, flags);
+        draw(renderer, modelViewTransform_, flags);
 
         Director::getInstance().popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
     }
@@ -923,7 +923,7 @@ namespace GRAPH
     }
 
     void SpriteBatchNode::removeChildAtIndex(uint64 index, bool doCleanup) {
-        removeChild(_children.at(index), doCleanup);
+        removeChild(children_.at(index), doCleanup);
     }
 
     void SpriteBatchNode::removeAllChildrenWithCleanup(bool doCleanup) {
@@ -938,22 +938,22 @@ namespace GRAPH
     }
 
     void SpriteBatchNode::sortAllChildren() {
-        if (_reorderChildDirty) {
-            std::sort(std::begin(_children), std::end(_children), NodeComparisonLess);
+        if (reorderChildDirty_) {
+            std::sort(std::begin(children_), std::end(children_), NodeComparisonLess);
 
-            if (!_children.empty()) {
-                for (const auto &child : _children) {
+            if (!children_.empty()) {
+                for (const auto &child : children_) {
                     child->sortAllChildren();
                 }
 
                 uint64 index = 0;
-                for (const auto &child : _children) {
+                for (const auto &child : children_) {
                     Sprite* sp = static_cast<Sprite*>(child);
                     updateAtlasIndex(sp, &index);
                 }
             }
 
-            _reorderChildDirty = false;
+            reorderChildDirty_ = false;
         }
     }
 
@@ -1024,7 +1024,7 @@ namespace GRAPH
     }
 
     void SpriteBatchNode::reorderBatch(bool reorder) {
-        _reorderChildDirty = reorder;
+        reorderChildDirty_ = reorder;
     }
 
     void SpriteBatchNode::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags) {
@@ -1032,11 +1032,11 @@ namespace GRAPH
             return;
         }
 
-        for (const auto &child : _children) {
+        for (const auto &child : children_) {
             child->updateTransform();
         }
 
-        batchCommand_.init(_globalZOrder, getGLShader(), blendFunc_, textureAtlas_, transform, flags);
+        batchCommand_.init(globalZOrder_, getGLShader(), blendFunc_, textureAtlas_, transform, flags);
         renderer->addCommand(&batchCommand_);
     }
 
@@ -1133,7 +1133,7 @@ namespace GRAPH
     }
 
     void SpriteBatchNode::appendChild(Sprite* sprite) {
-        _reorderChildDirty = true;
+        reorderChildDirty_ = true;
         sprite->setBatchNode(this);
         sprite->setDirty(true);
 

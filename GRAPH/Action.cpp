@@ -6,9 +6,9 @@
 namespace GRAPH
 {
     Action::Action()
-        :_originalTarget(nullptr)
-        ,_target(nullptr)
-        ,_tag(Action::INVALID_TAG) {
+        :originalTarget_(nullptr)
+        ,target_(nullptr)
+        ,tag_(Action::INVALID_TAG) {
 
     }
 
@@ -17,11 +17,11 @@ namespace GRAPH
     }
 
     void Action::startWithTarget(Node *aTarget) {
-        _originalTarget = _target = aTarget;
+        originalTarget_ = target_ = aTarget;
     }
 
     void Action::stop() {
-        _target = nullptr;
+        target_ = nullptr;
     }
 
     bool Action::isDone() const {
@@ -36,42 +36,42 @@ namespace GRAPH
 
     bool ActionInterval::initWithDuration(float d)
     {
-        _duration = d;
+        duration_ = d;
 
         // prevent division by 0
         // This comparison could be in step:, but it might decrease the performance
         // by 3% in heavy based action games.
-        if (_duration == 0)
+        if (duration_ == 0)
         {
-            _duration = MATH::MATH_FLOAT_EPSILON();
+            duration_ = MATH::MATH_FLOAT_EPSILON();
         }
 
-        _elapsed = 0;
-        _firstTick = true;
+        elapsed_ = 0;
+        firstTick_ = true;
 
         return true;
     }
 
     bool ActionInterval::isDone() const
     {
-        return _elapsed >= _duration;
+        return elapsed_ >= duration_;
     }
 
     void ActionInterval::step(float dt)
     {
-        if (_firstTick)
+        if (firstTick_)
         {
-            _firstTick = false;
-            _elapsed = 0;
+            firstTick_ = false;
+            elapsed_ = 0;
         }
         else
         {
-            _elapsed += dt;
+            elapsed_ += dt;
         }
 
         this->update(MATH::MATH_MAX (0.0f,                                  // needed for rewind. elapsed could be negative
-                          MATH::MATH_MIN(1.0f, _elapsed /
-                              MATH::MATH_MAX(_duration, MATH::MATH_FLOAT_MAX())   // division by 0
+                          MATH::MATH_MIN(1.0f, elapsed_ /
+                              MATH::MATH_MAX(duration_, MATH::MATH_FLOAT_MAX())   // division by 0
                               )
                           )
                      );
@@ -89,8 +89,8 @@ namespace GRAPH
     void ActionInterval::startWithTarget(Node *target)
     {
         FiniteTimeAction::startWithTarget(target);
-        _elapsed = 0.0f;
-        _firstTick = true;
+        elapsed_ = 0.0f;
+        firstTick_ = true;
     }
 
     ScaleTo* ScaleTo::create(float duration, float s)
@@ -124,9 +124,9 @@ namespace GRAPH
     {
         if (ActionInterval::initWithDuration(duration))
         {
-            _endScaleX = s;
-            _endScaleY = s;
-            _endScaleZ = s;
+            endScaleX_ = s;
+            endScaleY_ = s;
+            endScaleZ_ = s;
 
             return true;
         }
@@ -138,9 +138,9 @@ namespace GRAPH
     {
         if (ActionInterval::initWithDuration(duration))
         {
-            _endScaleX = sx;
-            _endScaleY = sy;
-            _endScaleZ = 1.f;
+            endScaleX_ = sx;
+            endScaleY_ = sy;
+            endScaleZ_ = 1.f;
 
             return true;
         }
@@ -152,9 +152,9 @@ namespace GRAPH
     {
         if (ActionInterval::initWithDuration(duration))
         {
-            _endScaleX = sx;
-            _endScaleY = sy;
-            _endScaleZ = sz;
+            endScaleX_ = sx;
+            endScaleY_ = sy;
+            endScaleZ_ = sz;
 
             return true;
         }
@@ -165,38 +165,38 @@ namespace GRAPH
     void ScaleTo::startWithTarget(Node *target)
     {
         ActionInterval::startWithTarget(target);
-        _startScaleX = target->getScaleX();
-        _startScaleY = target->getScaleY();
-        _startScaleZ = target->getScaleZ();
-        _deltaX = _endScaleX - _startScaleX;
-        _deltaY = _endScaleY - _startScaleY;
-        _deltaZ = _endScaleZ - _startScaleZ;
+        startScaleX_ = target->getScaleX();
+        startScaleY_ = target->getScaleY();
+        startScaleZ_ = target->getScaleZ();
+        deltaX_ = endScaleX_ - startScaleX_;
+        deltaY_ = endScaleY_ - startScaleY_;
+        deltaZ_ = endScaleZ_ - startScaleZ_;
     }
 
     void ScaleTo::update(float time)
     {
-        if (_target)
+        if (target_)
         {
-            _target->setScaleX(_startScaleX + _deltaX * time);
-            _target->setScaleY(_startScaleY + _deltaY * time);
-            _target->setScaleZ(_startScaleZ + _deltaZ * time);
+            target_->setScaleX(startScaleX_ + deltaX_ * time);
+            target_->setScaleY(startScaleY_ + deltaY_ * time);
+            target_->setScaleZ(startScaleZ_ + deltaZ_ * time);
         }
     }
 
     Follow::Follow()
-        : _followedHObject(nullptr)
-        , _boundarySet(false)
-        , _boundaryFullyCovered(false)
-        , _leftBoundary(0.0)
-        , _rightBoundary(0.0)
-        , _topBoundary(0.0)
-        , _bottomBoundary(0.0)
-        , _worldRect(MATH::RectfZERO) {
+        : followedObject_(nullptr)
+        , boundarySet_(false)
+        , boundaryFullyCovered_(false)
+        , leftBoundary_(0.0)
+        , rightBoundary_(0.0)
+        , topBoundary_(0.0)
+        , bottomBoundary_(0.0)
+        , worldRect_(MATH::RectfZERO) {
 
     }
 
     Follow::~Follow() {
-        SAFE_RELEASE(_followedHObject);
+        SAFE_RELEASE(followedObject_);
     }
 
     Follow* Follow::create(HObject *followedHObject, const MATH::Rectf& rect) {
@@ -211,34 +211,34 @@ namespace GRAPH
 
     bool Follow::initWithTarget(HObject *followedHObject, const MATH::Rectf& rect) {
         followedHObject->retain();
-        _followedHObject = followedHObject;
-        _worldRect = rect;
-        _boundarySet = !rect.equals(MATH::RectfZERO);
-        _boundaryFullyCovered = false;
+        followedObject_ = followedHObject;
+        worldRect_ = rect;
+        boundarySet_ = !rect.equals(MATH::RectfZERO);
+        boundaryFullyCovered_ = false;
 
         MATH::Sizef winSize = Director::getInstance().getWinSize();
-        _fullScreenSize.set(winSize.width, winSize.height);
-        _halfScreenSize = _fullScreenSize * 0.5f;
+        fullScreenSize_.set(winSize.width, winSize.height);
+        halfScreenSize_ = fullScreenSize_ * 0.5f;
 
-        if (_boundarySet) {
-            _leftBoundary = -((rect.origin.x+rect.size.width) - _fullScreenSize.x);
-            _rightBoundary = -rect.origin.x ;
-            _topBoundary = -rect.origin.y;
-            _bottomBoundary = -((rect.origin.y+rect.size.height) - _fullScreenSize.y);
+        if (boundarySet_) {
+            leftBoundary_ = -((rect.origin.x+rect.size.width) - fullScreenSize_.x);
+            rightBoundary_ = -rect.origin.x ;
+            topBoundary_ = -rect.origin.y;
+            bottomBoundary_ = -((rect.origin.y+rect.size.height) - fullScreenSize_.y);
 
-            if(_rightBoundary < _leftBoundary) {
+            if(rightBoundary_ < leftBoundary_) {
                 // screen width is larger than world's boundary width
                 //set both in the middle of the world
-                _rightBoundary = _leftBoundary = (_leftBoundary + _rightBoundary) / 2;
+                rightBoundary_ = leftBoundary_ = (leftBoundary_ + rightBoundary_) / 2;
             }
-            if(_topBoundary < _bottomBoundary) {
+            if(topBoundary_ < bottomBoundary_) {
                 // screen width is larger than world's boundary width
                 //set both in the middle of the world
-                _topBoundary = _bottomBoundary = (_topBoundary + _bottomBoundary) / 2;
+                topBoundary_ = bottomBoundary_ = (topBoundary_ + bottomBoundary_) / 2;
             }
 
-            if( (_topBoundary == _bottomBoundary) && (_leftBoundary == _rightBoundary) ) {
-                _boundaryFullyCovered = true;
+            if( (topBoundary_ == bottomBoundary_) && (leftBoundary_ == rightBoundary_) ) {
+                boundaryFullyCovered_ = true;
             }
         }
 
@@ -246,34 +246,34 @@ namespace GRAPH
     }
 
     void Follow::step(float) {
-        if(_boundarySet) {
+        if(boundarySet_) {
             // whole map fits inside a single screen, no need to modify the position - unless map boundaries are increased
-            if(_boundaryFullyCovered) {
+            if(boundaryFullyCovered_) {
                 return;
             }
 
-            MATH::Vector2f tempPos = _halfScreenSize - dynamic_cast<Node *>(_followedHObject)->getPosition();
+            MATH::Vector2f tempPos = halfScreenSize_ - dynamic_cast<Node *>(followedObject_)->getPosition();
 
-            dynamic_cast<Node *>(_target)->setPosition(MATH_CLAMP(tempPos.x, _leftBoundary, _rightBoundary),
-                                       MATH_CLAMP(tempPos.y, _bottomBoundary, _topBoundary));
+            dynamic_cast<Node *>(target_)->setPosition(MATH_CLAMP(tempPos.x, leftBoundary_, rightBoundary_),
+                                       MATH_CLAMP(tempPos.y, bottomBoundary_, topBoundary_));
         }
         else {
-            dynamic_cast<Node *>(_target)->setPosition(_halfScreenSize - dynamic_cast<Node *>(_followedHObject)->getPosition());
+            dynamic_cast<Node *>(target_)->setPosition(halfScreenSize_ - dynamic_cast<Node *>(followedObject_)->getPosition());
         }
     }
 
     bool Follow::isDone() const {
-        return ( !dynamic_cast<Node *>(_followedHObject)->isRunning() );
+        return ( !dynamic_cast<Node *>(followedObject_)->isRunning() );
     }
 
     void Follow::stop() {
-        _target = nullptr;
+        target_ = nullptr;
         Action::stop();
     }
 
     ActionManager::ActionManager()
-    : _currentTarget(nullptr),
-      _currentTargetSalvaged(false) {
+    : currentTarget_(nullptr),
+      currentTargetSalvaged_(false) {
 
     }
 
@@ -283,7 +283,7 @@ namespace GRAPH
 
     void ActionManager::deleteHashElement(ActionEntry *element) {
         SAFE_DELETE(element->actions);
-        _targets.erase(element->target);
+        targets_.erase(element->target);
         element->target->release();
         delete element;
     }
@@ -313,8 +313,8 @@ namespace GRAPH
         }
 
         if (element->actions->number() == 0) {
-            if (_currentTarget == element) {
-                _currentTargetSalvaged = true;
+            if (currentTarget_ == element) {
+                currentTargetSalvaged_ = true;
             }
             else {
                 deleteHashElement(element);
@@ -324,7 +324,7 @@ namespace GRAPH
 
     void ActionManager::pauseTarget(Node *target) {
         ActionEntry *element = nullptr;
-        for (auto iter : _targets) {
+        for (auto iter : targets_) {
             if (iter.first == target) {
                 element = iter.second;
             }
@@ -337,7 +337,7 @@ namespace GRAPH
 
     void ActionManager::resumeTarget(Node *target) {
         ActionEntry *element = nullptr;
-        for (auto iter : _targets) {
+        for (auto iter : targets_) {
             if (iter.first == target) {
                 element = iter.second;
             }
@@ -351,7 +351,7 @@ namespace GRAPH
     std::vector<Node*> ActionManager::pauseAllRunningActions() {
         std::vector<Node*> idsWithActions;
 
-        for (auto iter : _targets) {
+        for (auto iter : targets_) {
             if (!iter.second->paused) {
                 iter.second->paused = true;
                 idsWithActions.push_back(iter.first);
@@ -369,7 +369,7 @@ namespace GRAPH
 
     void ActionManager::addAction(Action *action, Node *target, bool paused) {
         ActionEntry *element = nullptr;
-        for (auto iter : _targets) {
+        for (auto iter : targets_) {
             if (iter.first == target) {
                 element = iter.second;
             }
@@ -380,7 +380,7 @@ namespace GRAPH
             element->paused = paused;
             target->retain();
             element->target = target;
-            _targets.insert(std::unordered_map<Node *, ActionEntry *>::value_type(target, element));
+            targets_.insert(std::unordered_map<Node *, ActionEntry *>::value_type(target, element));
         }
 
          actionAllocWithHashElement(element);
@@ -390,7 +390,7 @@ namespace GRAPH
     }
 
     void ActionManager::removeAllActions() {
-        for (auto iter : _targets) {
+        for (auto iter : targets_) {
             removeAllActionsFromTarget(iter.first);
         }
     }
@@ -401,7 +401,7 @@ namespace GRAPH
         }
 
         ActionEntry *element = nullptr;
-        for (auto iter : _targets) {
+        for (auto iter : targets_) {
             if (iter.first == target) {
                 element = iter.second;
             }
@@ -414,8 +414,8 @@ namespace GRAPH
             }
 
             element->actions->removeAllObjects();
-            if (_currentTarget == element) {
-                _currentTargetSalvaged = true;
+            if (currentTarget_ == element) {
+                currentTargetSalvaged_ = true;
             }
             else {
                 deleteHashElement(element);
@@ -430,7 +430,7 @@ namespace GRAPH
 
         ActionEntry *element = nullptr;
         HObject *target = action->getOriginalTarget();
-        for (auto iter : _targets) {
+        for (auto iter : targets_) {
             if (iter.first == target) {
                 element = iter.second;
             }
@@ -446,7 +446,7 @@ namespace GRAPH
 
     void ActionManager::removeActionByTag(int tag, Node *target) {
         ActionEntry *element = nullptr;
-        for (auto iter : _targets) {
+        for (auto iter : targets_) {
             if (iter.first == target) {
                 element = iter.second;
             }
@@ -468,7 +468,7 @@ namespace GRAPH
     void ActionManager::removeAllActionsByTag(int tag, Node *target)
     {
         ActionEntry *element = nullptr;
-        for (auto iter : _targets) {
+        for (auto iter : targets_) {
             if (iter.first == target) {
                 element = iter.second;
             }
@@ -493,7 +493,7 @@ namespace GRAPH
     Action* ActionManager::getActionByTag(int tag, const Node *target) const
     {
         ActionEntry *element = nullptr;
-        for (auto iter : _targets) {
+        for (auto iter : targets_) {
             if (iter.first == target) {
                 element = iter.second;
             }
@@ -518,7 +518,7 @@ namespace GRAPH
     uint64 ActionManager::getNumberOfRunningActionsInTarget(const Node *target) const
     {
         ActionEntry *element = nullptr;
-        for (auto iter : _targets) {
+        for (auto iter : targets_) {
             if (iter.first == target) {
                 element = iter.second;
             }
@@ -532,47 +532,47 @@ namespace GRAPH
     }
 
     void ActionManager::update(float dt) {
-        for (auto iter : _targets) {
-            _currentTarget = iter.second;
-            _currentTargetSalvaged = false;
+        for (auto iter : targets_) {
+            currentTarget_ = iter.second;
+            currentTargetSalvaged_ = false;
 
-            if (! _currentTarget->paused) {
-                for (_currentTarget->actionIndex = 0; _currentTarget->actionIndex < _currentTarget->actions->number();
-                    _currentTarget->actionIndex++) {
-                    _currentTarget->currentAction = (Action*)(*_currentTarget->actions)[_currentTarget->actionIndex];
-                    if (_currentTarget->currentAction == nullptr) {
+            if (! currentTarget_->paused) {
+                for (currentTarget_->actionIndex = 0; currentTarget_->actionIndex < currentTarget_->actions->number();
+                    currentTarget_->actionIndex++) {
+                    currentTarget_->currentAction = (Action*)(*currentTarget_->actions)[currentTarget_->actionIndex];
+                    if (currentTarget_->currentAction == nullptr) {
                         continue;
                     }
 
-                    _currentTarget->currentActionSalvaged = false;
+                    currentTarget_->currentActionSalvaged = false;
 
-                    _currentTarget->currentAction->step(dt);
+                    currentTarget_->currentAction->step(dt);
 
-                    if (_currentTarget->currentActionSalvaged)
+                    if (currentTarget_->currentActionSalvaged)
                     {
                         // The currentAction told the HObject to remove it. To prevent the action from
                         // accidentally deallocating itself before finishing its step, we retained
                         // it. Now that step is done, it's safe to release it.
-                        _currentTarget->currentAction->release();
+                        currentTarget_->currentAction->release();
                     }
-                    else if (_currentTarget->currentAction->isDone()) {
-                        _currentTarget->currentAction->stop();
+                    else if (currentTarget_->currentAction->isDone()) {
+                        currentTarget_->currentAction->stop();
 
-                        Action *action = _currentTarget->currentAction;
-                        _currentTarget->currentAction = nullptr;
+                        Action *action = currentTarget_->currentAction;
+                        currentTarget_->currentAction = nullptr;
                         removeAction(action);
                     }
 
-                    _currentTarget->currentAction = nullptr;
+                    currentTarget_->currentAction = nullptr;
                 }
             }
 
             // only delete currentTarget if no actions were scheduled during the cycle (issue #481)
-            if (_currentTargetSalvaged && _currentTarget->actions->number() == 0) {
-                deleteHashElement(_currentTarget);
+            if (currentTargetSalvaged_ && currentTarget_->actions->number() == 0) {
+                deleteHashElement(currentTarget_);
             }
         }
 
-        _currentTarget = nullptr;
+        currentTarget_ = nullptr;
     }
 }

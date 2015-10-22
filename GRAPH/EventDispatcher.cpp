@@ -137,21 +137,21 @@ namespace GRAPH
     #define EVENT_COME_TO_BACKGROUND    "event_come_to_background"
 
     EventDispatcher::EventDispatcher()
-        : _inDispatch(0)
-        , _isEnabled(false)
-        , _nodePriorityIndex(0) {
-        _toAddedListeners.reserve(50);
+        : inDispatch_(0)
+        , isEnabled_(false)
+        , nodePriorityIndex_(0) {
+        toAddedListeners_.reserve(50);
 
         // Therefore, internal listeners would not be cleaned when removeAllEventListeners is invoked.
-        _internalCustomListenerIDs.insert(EVENT_COME_TO_FOREGROUND);
-        _internalCustomListenerIDs.insert(EVENT_COME_TO_BACKGROUND);
-        _internalCustomListenerIDs.insert(EVENT_RENDERER_RECREATED);
+        internalCustomListenerIDs_.insert(EVENT_COME_TO_FOREGROUND);
+        internalCustomListenerIDs_.insert(EVENT_COME_TO_BACKGROUND);
+        internalCustomListenerIDs_.insert(EVENT_RENDERER_RECREATED);
     }
 
     EventDispatcher::~EventDispatcher() {
         // Clear internal custom listener IDs from set,
         // so removeAllEventListeners would clean internal custom listeners.
-        _internalCustomListenerIDs.clear();
+        internalCustomListenerIDs_.clear();
         removeAllEventListeners();
     }
 
@@ -174,8 +174,8 @@ namespace GRAPH
                     break;
             }
 
-            if (_nodeListenersMap.find(node) != _nodeListenersMap.end()) {
-                _globalZOrderNodeMap[dynamic_cast<Node *>(node)->getGlobalZOrder()].push_back(node);
+            if (nodeListenersMap_.find(node) != nodeListenersMap_.end()) {
+                globalZOrderNodeMap_[dynamic_cast<Node *>(node)->getGlobalZOrder()].push_back(node);
             }
 
             for( ; i < childrenCount; i++ ) {
@@ -185,16 +185,16 @@ namespace GRAPH
             }
         }
         else {
-            if (_nodeListenersMap.find(node) != _nodeListenersMap.end()) {
-                _globalZOrderNodeMap[dynamic_cast<Node *>(node)->getGlobalZOrder()].push_back(node);
+            if (nodeListenersMap_.find(node) != nodeListenersMap_.end()) {
+                globalZOrderNodeMap_[dynamic_cast<Node *>(node)->getGlobalZOrder()].push_back(node);
             }
         }
 
         if (isRootNode) {
             std::vector<float> globalZOrders;
-            globalZOrders.reserve(_globalZOrderNodeMap.size());
+            globalZOrders.reserve(globalZOrderNodeMap_.size());
 
-            for (const auto& e : _globalZOrderNodeMap) {
+            for (const auto& e : globalZOrderNodeMap_) {
                 globalZOrders.push_back(e.first);
             }
 
@@ -203,18 +203,18 @@ namespace GRAPH
             });
 
             for (const auto& globalZ : globalZOrders) {
-                for (const auto& n : _globalZOrderNodeMap[globalZ]) {
-                    _nodePriorityMap[n] = ++_nodePriorityIndex;
+                for (const auto& n : globalZOrderNodeMap_[globalZ]) {
+                    nodePriorityMap_[n] = ++nodePriorityIndex_;
                 }
             }
 
-            _globalZOrderNodeMap.clear();
+            globalZOrderNodeMap_.clear();
         }
     }
 
     void EventDispatcher::pauseEventListenersForTarget(HObject* target, bool recursive/* = false */) {
-        auto listenerIter = _nodeListenersMap.find(target);
-        if (listenerIter != _nodeListenersMap.end()) {
+        auto listenerIter = nodeListenersMap_.find(target);
+        if (listenerIter != nodeListenersMap_.end()) {
             auto listeners = listenerIter->second;
             for (auto& l : *listeners)
             {
@@ -222,7 +222,7 @@ namespace GRAPH
             }
         }
 
-        for (auto& listener : _toAddedListeners) {
+        for (auto& listener : toAddedListeners_) {
             if (listener->getAssociatedNode() == target) {
                 listener->setPaused(true);
             }
@@ -237,15 +237,15 @@ namespace GRAPH
     }
 
     void EventDispatcher::resumeEventListenersForTarget(HObject* target, bool recursive/* = false */) {
-        auto listenerIter = _nodeListenersMap.find(target);
-        if (listenerIter != _nodeListenersMap.end()) {
+        auto listenerIter = nodeListenersMap_.find(target);
+        if (listenerIter != nodeListenersMap_.end()) {
             auto listeners = listenerIter->second;
             for (auto& l : *listeners) {
                 l->setPaused(false);
             }
         }
 
-        for (auto& listener : _toAddedListeners) {
+        for (auto& listener : toAddedListeners_) {
             if (listener->getAssociatedNode() == target)
             {
                 listener->setPaused(false);
@@ -265,11 +265,11 @@ namespace GRAPH
     void EventDispatcher::removeEventListenersForTarget(HObject* target, bool recursive/* = false */) {
         // Ensure the node is removed from these immediately also.
         // Don't want any dangling pointers or the possibility of dealing with deleted objects..
-        _nodePriorityMap.erase(target);
-        _dirtyNodes.erase(target);
+        nodePriorityMap_.erase(target);
+        dirtyNodes_.erase(target);
 
-        auto listenerIter = _nodeListenersMap.find(target);
-        if (listenerIter != _nodeListenersMap.end()) {
+        auto listenerIter = nodeListenersMap_.find(target);
+        if (listenerIter != nodeListenersMap_.end()) {
             auto listeners = listenerIter->second;
             auto listenersCopy = *listeners;
             for (auto& l : listenersCopy) {
@@ -277,14 +277,14 @@ namespace GRAPH
             }
         }
 
-        for (auto iter = _toAddedListeners.begin(); iter != _toAddedListeners.end(); ) {
+        for (auto iter = toAddedListeners_.begin(); iter != toAddedListeners_.end(); ) {
             EventListener * listener = *iter;
 
             if (listener->getAssociatedNode() == target) {
                 listener->setAssociatedNode(nullptr);
                 listener->setRegistered(false);
                 listener->release();
-                iter = _toAddedListeners.erase(iter);
+                iter = toAddedListeners_.erase(iter);
             }
             else {
                 ++iter;
@@ -301,13 +301,13 @@ namespace GRAPH
 
     void EventDispatcher::associateNodeAndEventListener(HObject* node, EventListener* listener) {
         std::vector<EventListener*>* listeners = nullptr;
-        auto found = _nodeListenersMap.find(node);
-        if (found != _nodeListenersMap.end()) {
+        auto found = nodeListenersMap_.find(node);
+        if (found != nodeListenersMap_.end()) {
             listeners = found->second;
         }
         else {
             listeners = new std::vector<EventListener*>();
-            _nodeListenersMap.insert(std::make_pair(node, listeners));
+            nodeListenersMap_.insert(std::make_pair(node, listeners));
         }
 
         listeners->push_back(listener);
@@ -315,8 +315,8 @@ namespace GRAPH
 
     void EventDispatcher::dissociateNodeAndEventListener(HObject* node, EventListener* listener) {
         std::vector<EventListener*>* listeners = nullptr;
-        auto found = _nodeListenersMap.find(node);
-        if (found != _nodeListenersMap.end()) {
+        auto found = nodeListenersMap_.find(node);
+        if (found != nodeListenersMap_.end()) {
             listeners = found->second;
             auto iter = std::find(listeners->begin(), listeners->end(), listener);
             if (iter != listeners->end()) {
@@ -324,18 +324,18 @@ namespace GRAPH
             }
 
             if (listeners->empty()) {
-                _nodeListenersMap.erase(found);
+                nodeListenersMap_.erase(found);
                 delete listeners;
             }
         }
     }
 
     void EventDispatcher::addEventListener(EventListener* listener) {
-        if (_inDispatch == 0) {
+        if (inDispatch_ == 0) {
             forceAddEventListener(listener);
         }
         else {
-            _toAddedListeners.push_back(listener);
+            toAddedListeners_.push_back(listener);
         }
 
         listener->retain();
@@ -344,10 +344,10 @@ namespace GRAPH
     void EventDispatcher::forceAddEventListener(EventListener* listener) {
         EventListenerVector* listeners = nullptr;
         EventListener::ListenerID listenerID = listener->getListenerID();
-        auto itr = _listenerMap.find(listenerID);
-        if (itr == _listenerMap.end()) {
+        auto itr = listenerMap_.find(listenerID);
+        if (itr == listenerMap_.end()) {
             listeners = new (std::nothrow) EventListenerVector();
-            _listenerMap.insert(std::make_pair(listenerID, listeners));
+            listenerMap_.insert(std::make_pair(listenerID, listeners));
         }
         else {
             listeners = itr->second;
@@ -420,7 +420,7 @@ namespace GRAPH
                         l->setAssociatedNode(nullptr);  // nullptr out the node pointer so we don't have any dangling pointers to destroyed nodes.
                     }
 
-                    if (_inDispatch == 0) {
+                    if (inDispatch_ == 0) {
                         listeners->erase(iter);
                         SAFE_RELEASE(l);
                     }
@@ -431,7 +431,7 @@ namespace GRAPH
             }
         };
 
-        for (auto iter = _listenerMap.begin(); iter != _listenerMap.end();) {
+        for (auto iter = listenerMap_.begin(); iter != listenerMap_.end();) {
             auto listeners = iter->second;
             auto fixedPriorityListeners = listeners->getFixedPriorityListeners();
             auto sceneGraphPriorityListeners = listeners->getSceneGraphPriorityListeners();
@@ -448,9 +448,9 @@ namespace GRAPH
             }
 
             if (iter->second->empty()) {
-                _priorityDirtyFlagMap.erase(listener->getListenerID());
+                priorityDirtyFlagMap_.erase(listener->getListenerID());
                 auto list = iter->second;
-                iter = _listenerMap.erase(iter);
+                iter = listenerMap_.erase(iter);
                 SAFE_DELETE(list);
             }
             else {
@@ -465,11 +465,11 @@ namespace GRAPH
             SAFE_RELEASE(listener);
         }
         else {
-            for(auto iter = _toAddedListeners.begin(); iter != _toAddedListeners.end(); ++iter) {
+            for(auto iter = toAddedListeners_.begin(); iter != toAddedListeners_.end(); ++iter) {
                 if (*iter == listener) {
                     listener->setRegistered(false);
                     listener->release();
-                    _toAddedListeners.erase(iter);
+                    toAddedListeners_.erase(iter);
                     break;
                 }
             }
@@ -480,7 +480,7 @@ namespace GRAPH
         if (listener == nullptr)
             return;
 
-        for (auto iter = _listenerMap.begin(); iter != _listenerMap.end(); ++iter) {
+        for (auto iter = listenerMap_.begin(); iter != listenerMap_.end(); ++iter) {
             auto fixedPriorityListeners = iter->second->getFixedPriorityListeners();
             if (fixedPriorityListeners) {
                 auto found = std::find(fixedPriorityListeners->begin(), fixedPriorityListeners->end(), listener);
@@ -597,12 +597,12 @@ namespace GRAPH
     }
 
     void EventDispatcher::dispatchEvent(Event* event) {
-        if (!_isEnabled)
+        if (!isEnabled_)
             return;
 
         updateDirtyFlagForSceneGraph();
 
-        DispatchGuard guard(_inDispatch);
+        DispatchGuard guard(inDispatch_);
 
         if (event->getType() == Event::Type::TOUCH) {
             dispatchTouchEvent(static_cast<EventTouch*>(event));
@@ -617,8 +617,8 @@ namespace GRAPH
         if (event->getType() == Event::Type::MOUSE) {
             pfnDispatchEventToListeners = &EventDispatcher::dispatchTouchEventToListeners;
         }
-        auto iter = _listenerMap.find(listenerID);
-        if (iter != _listenerMap.end()) {
+        auto iter = listenerMap_.find(listenerID);
+        if (iter != listenerMap_.end()) {
             auto listeners = iter->second;
 
             auto onEvent = [&event](EventListener* listener) -> bool{
@@ -801,12 +801,12 @@ namespace GRAPH
     }
 
     void EventDispatcher::updateListeners(Event* event) {
-        if (_inDispatch > 1)
+        if (inDispatch_ > 1)
             return;
 
         auto onUpdateListeners = [this](const EventListener::ListenerID& listenerID) {
-            auto listenersIter = _listenerMap.find(listenerID);
-            if (listenersIter == _listenerMap.end())
+            auto listenersIter = listenerMap_.find(listenerID);
+            if (listenersIter == listenerMap_.end())
                 return;
 
             auto listeners = listenersIter->second;
@@ -857,45 +857,45 @@ namespace GRAPH
             onUpdateListeners(__getListenerID(event));
         }
 
-        for (auto iter = _listenerMap.begin(); iter != _listenerMap.end();) {
+        for (auto iter = listenerMap_.begin(); iter != listenerMap_.end();) {
             if (iter->second->empty()) {
-                _priorityDirtyFlagMap.erase(iter->first);
+                priorityDirtyFlagMap_.erase(iter->first);
                 delete iter->second;
-                iter = _listenerMap.erase(iter);
+                iter = listenerMap_.erase(iter);
             }
             else {
                 ++iter;
             }
         }
 
-        if (!_toAddedListeners.empty()) {
-            for (auto& listener : _toAddedListeners) {
+        if (!toAddedListeners_.empty()) {
+            for (auto& listener : toAddedListeners_) {
                 forceAddEventListener(listener);
             }
-            _toAddedListeners.clear();
+            toAddedListeners_.clear();
         }
     }
 
     void EventDispatcher::updateDirtyFlagForSceneGraph() {
-        if (!_dirtyNodes.empty()) {
-            for (auto& node : _dirtyNodes) {
-                auto iter = _nodeListenersMap.find(node);
-                if (iter != _nodeListenersMap.end()) {
+        if (!dirtyNodes_.empty()) {
+            for (auto& node : dirtyNodes_) {
+                auto iter = nodeListenersMap_.find(node);
+                if (iter != nodeListenersMap_.end()) {
                     for (auto& l : *iter->second) {
                         setDirty(l->getListenerID(), DirtyFlag::SCENE_GRAPH_PRIORITY);
                     }
                 }
             }
 
-            _dirtyNodes.clear();
+            dirtyNodes_.clear();
         }
     }
 
     void EventDispatcher::sortEventListeners(const EventListener::ListenerID& listenerID) {
         DirtyFlag dirtyFlag = DirtyFlag::NONE;
 
-        auto dirtyIter = _priorityDirtyFlagMap.find(listenerID);
-        if (dirtyIter != _priorityDirtyFlagMap.end()) {
+        auto dirtyIter = priorityDirtyFlagMap_.find(listenerID);
+        if (dirtyIter != priorityDirtyFlagMap_.end()) {
             dirtyFlag = dirtyIter->second;
         }
 
@@ -930,14 +930,14 @@ namespace GRAPH
             return;
 
         // Reset priority index
-        _nodePriorityIndex = 0;
-        _nodePriorityMap.clear();
+        nodePriorityIndex_ = 0;
+        nodePriorityMap_.clear();
 
         visitTarget(rootNode, true);
 
         // After sort: priority < 0, > 0
         std::sort(sceneGraphListeners->begin(), sceneGraphListeners->end(), [this](const EventListener* l1, const EventListener* l2) {
-            return _nodePriorityMap[l1->getAssociatedNode()] > _nodePriorityMap[l2->getAssociatedNode()];
+            return nodePriorityMap_[l1->getAssociatedNode()] > nodePriorityMap_[l2->getAssociatedNode()];
         });
     }
 
@@ -967,8 +967,8 @@ namespace GRAPH
     }
 
     EventDispatcher::EventListenerVector* EventDispatcher::getListeners(const EventListener::ListenerID& listenerID) {
-        auto iter = _listenerMap.find(listenerID);
-        if (iter != _listenerMap.end()) {
+        auto iter = listenerMap_.find(listenerID);
+        if (iter != listenerMap_.end()) {
             return iter->second;
         }
 
@@ -976,8 +976,8 @@ namespace GRAPH
     }
 
     void EventDispatcher::removeEventListenersForListenerID(const EventListener::ListenerID& listenerID) {
-        auto listenerItemIter = _listenerMap.find(listenerID);
-        if (listenerItemIter != _listenerMap.end()) {
+        auto listenerItemIter = listenerMap_.find(listenerID);
+        if (listenerItemIter != listenerMap_.end()) {
             auto listeners = listenerItemIter->second;
             auto fixedPriorityListeners = listeners->getFixedPriorityListeners();
             auto sceneGraphPriorityListeners = listeners->getSceneGraphPriorityListeners();
@@ -994,7 +994,7 @@ namespace GRAPH
                         l->setAssociatedNode(nullptr);  // nullptr out the node pointer so we don't have any dangling pointers to destroyed nodes.
                     }
 
-                    if (_inDispatch == 0) {
+                    if (inDispatch_ == 0) {
                         iter = listenerVector->erase(iter);
                         SAFE_RELEASE(l);
                     }
@@ -1009,20 +1009,20 @@ namespace GRAPH
 
             // Remove the dirty flag according the 'listenerID'.
             // No need to check whether the dispatcher is dispatching event.
-            _priorityDirtyFlagMap.erase(listenerID);
+            priorityDirtyFlagMap_.erase(listenerID);
 
-            if (!_inDispatch) {
+            if (!inDispatch_) {
                 listeners->clear();
                 delete listeners;
-                _listenerMap.erase(listenerItemIter);
+                listenerMap_.erase(listenerItemIter);
             }
         }
 
-        for (auto iter = _toAddedListeners.begin(); iter != _toAddedListeners.end();) {
+        for (auto iter = toAddedListeners_.begin(); iter != toAddedListeners_.end();) {
             if ((*iter)->getListenerID() == listenerID) {
                 (*iter)->setRegistered(false);
                 (*iter)->release();
-                iter = _toAddedListeners.erase(iter);
+                iter = toAddedListeners_.erase(iter);
             }
             else {
                 ++iter;
@@ -1055,10 +1055,10 @@ namespace GRAPH
 
     void EventDispatcher::removeAllEventListeners() {
         bool cleanMap = true;
-        std::vector<EventListener::ListenerID> types(_listenerMap.size());
+        std::vector<EventListener::ListenerID> types(listenerMap_.size());
 
-        for (const auto& e : _listenerMap) {
-            if (_internalCustomListenerIDs.find(e.first) != _internalCustomListenerIDs.end()) {
+        for (const auto& e : listenerMap_) {
+            if (internalCustomListenerIDs_.find(e.first) != internalCustomListenerIDs_.end()) {
                 cleanMap = false;
             }
             else {
@@ -1070,23 +1070,23 @@ namespace GRAPH
             removeEventListenersForListenerID(type);
         }
 
-        if (!_inDispatch && cleanMap) {
-            _listenerMap.clear();
+        if (!inDispatch_ && cleanMap) {
+            listenerMap_.clear();
         }
     }
 
     void EventDispatcher::setEnabled(bool isEnabled) {
-        _isEnabled = isEnabled;
+        isEnabled_ = isEnabled;
     }
 
     bool EventDispatcher::isEnabled() const {
-        return _isEnabled;
+        return isEnabled_;
     }
 
     void EventDispatcher::setDirtyForNode(HObject* node) {
         // Mark the node dirty only when there is an eventlistener associated with it.
-        if (_nodeListenersMap.find(node) != _nodeListenersMap.end()) {
-            _dirtyNodes.insert(node);
+        if (nodeListenersMap_.find(node) != nodeListenersMap_.end()) {
+            dirtyNodes_.insert(node);
         }
 
         // Also set the dirty flag for node's children
@@ -1097,9 +1097,9 @@ namespace GRAPH
     }
 
     void EventDispatcher::setDirty(const EventListener::ListenerID& listenerID, DirtyFlag flag) {
-        auto iter = _priorityDirtyFlagMap.find(listenerID);
-        if (iter == _priorityDirtyFlagMap.end()) {
-            _priorityDirtyFlagMap.insert(std::make_pair(listenerID, flag));
+        auto iter = priorityDirtyFlagMap_.find(listenerID);
+        if (iter == priorityDirtyFlagMap_.end()) {
+            priorityDirtyFlagMap_.insert(std::make_pair(listenerID, flag));
         }
         else {
             int ret = (int)flag | (int)iter->second;

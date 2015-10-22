@@ -8,7 +8,7 @@
 namespace GRAPH
 {
     Scene::Scene() {
-        _ignoreAnchorPointForPosition = true;
+        ignoreAnchorPointForPosition_ = true;
         setAnchorPoint(MATH::Vector2f(0.5f, 0.5f));
         defaultCamera_ = Director::getInstance().getCamera();
         defaultCamera_->retain();
