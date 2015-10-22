@@ -27,17 +27,6 @@ namespace UTILS
             return elapsed * frequencyMult;
         }
 
-        int gettimeofday(struct timeval * val, struct timezone *) {
-            if (val) {
-                LARGE_INTEGER liTime, liFreq;
-                QueryPerformanceFrequency( &liFreq );
-                QueryPerformanceCounter( &liTime );
-                val->tv_sec     = (long)( liTime.QuadPart / liFreq.QuadPart );
-                val->tv_usec    = (long)( liTime.QuadPart * 1000000.0 / liFreq.QuadPart - val->tv_sec * 1000000.0 );
-            }
-            return 0;
-        }
-
         #else
 
         uint64 _frequency = 0;
@@ -55,28 +44,5 @@ namespace UTILS
         }
 
         #endif
-
-        int GetTimeOfDay(struct timeval * val, struct timezone *zone)
-        {
-            return gettimeofday(val, zone);
-        }
-
-        void TimeUpdate() {
-            curtime = FetchCurrentTime();
-        }
-
-        double TimeNow() {
-            return curtime;
-        }
-
-        void SleepThread(int ms) {
-            #ifdef _WIN32
-            #ifndef METRO
-                Sleep(ms);
-            #endif
-            #else
-                usleep(ms * 1000);
-            #endif
-        }
     }
 }

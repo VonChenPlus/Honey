@@ -13,13 +13,6 @@ namespace UTILS
     namespace TIME
     {
         double FetchCurrentTime();
-        int GetTimeOfDay(struct timeval * val, struct timezone *zone);
-
-        void TimeUpdate();
-        double TimeNow();
-        int TimeNow_MS();
-
-        void SleepThread(int ms);
     }
 }
 
