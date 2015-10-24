@@ -77,9 +77,9 @@ namespace GRAPH
     }
 
     void RenderQueue::saveRenderState() {
-        isDepthEnabled_ = glIsEnabled(GL_DEPTH_TEST) != GL_FALSE;
-        isCullEnabled_ = glIsEnabled(GL_CULL_FACE) != GL_FALSE;
-        glGetBooleanv(GL_DEPTH_WRITEMASK, &isDepthWrite_);
+        isDepthEnabled_ = RenderState::DefaultState().depthTestEnabled_;
+        isCullEnabled_ = RenderState::DefaultState().cullFaceEnabled_;
+        isDepthWrite_ = RenderState::DefaultState().depthWriteEnabled_;
     }
 
     void RenderQueue::restoreRenderState() {

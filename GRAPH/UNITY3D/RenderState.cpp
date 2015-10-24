@@ -42,9 +42,15 @@ namespace GRAPH
         , stencilFunction_(RenderState::STENCIL_ALWAYS), stencilFunctionRef_(0), stencilFunctionMask_(RS_ALL_ONES)
         , stencilOpSfail_(RenderState::STENCIL_OP_KEEP), stencilOpDpfail_(RenderState::STENCIL_OP_KEEP), stencilOpDppass_(RenderState::STENCIL_OP_KEEP)
         , stateBits_(0L) {
+        setCullFace(glIsEnabled(GL_CULL_FACE) != GL_FALSE);
+        setDepthTest(glIsEnabled(GL_DEPTH_TEST) != GL_FALSE);
+        GLboolean isDepthWrite;
+        glGetBooleanv(GL_DEPTH_WRITEMASK, &isDepthWrite);
+        setDepthWrite(isDepthWrite != GL_FALSE);
     }
 
     RenderState::StateBlock::~StateBlock() {
+
     }
 
     void RenderState::StateBlock::bind() {
