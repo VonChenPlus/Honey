@@ -1,7 +1,6 @@
 #ifndef GLTEXTUREATLAS_H
 #define GLTEXTUREATLAS_H
 
-#include "BASE/HObject.h"
 #include "GRAPH/UNITY3D/Unity3DGL.h"
 
 namespace GRAPH
@@ -54,7 +53,6 @@ namespace GRAPH
 
     private:
         void renderCommand();
-        void mapBuffers();
         void setupIndices();
         void setupVBO();
 

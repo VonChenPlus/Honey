@@ -14,8 +14,8 @@ namespace GRAPH
     GLTextureAtlas::~GLTextureAtlas() {
         SAFE_FREE(vbo_.u2.bufferData);
         SAFE_FREE(vbo_.u2.indexData);
-        delete [] glBuffer_;
-        delete [] glVertexFormat_;
+        SAFE_DELETE_ARRAY(glBuffer_);
+        SAFE_DELETE_ARRAY(glVertexFormat_);
         SAFE_RELEASE(texture_);
     }
 
