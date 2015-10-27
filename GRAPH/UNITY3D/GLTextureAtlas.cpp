@@ -7,13 +7,15 @@ namespace GRAPH
 {
     GLTextureAtlas::GLTextureAtlas()
         : dirty_(false)
-        , texture_(nullptr) {
+        , texture_(nullptr)
+        , glBuffer_(nullptr) {
     }
 
     GLTextureAtlas::~GLTextureAtlas() {
         SAFE_FREE(vbo_.u2.bufferData);
         SAFE_FREE(vbo_.u2.indexData);
-        glDeleteBuffers(2, vbo_.u2.objectID);
+        delete [] glBuffer_;
+        delete [] glVertexFormat_;
         SAFE_RELEASE(texture_);
     }
 
@@ -99,7 +101,7 @@ namespace GRAPH
         memset( vbo_.u2.bufferData, 0, capacity * sizeof(V3F_C4B_T2F_Quad) );
         memset( vbo_.u2.indexData, 0, capacity * 6 * sizeof(GLushort) );
 
-        this->setupIndices();
+        setupIndices();
         setupVBO();
 
         dirty_ = true;
@@ -124,18 +126,23 @@ namespace GRAPH
     }
 
     void GLTextureAtlas::setupVBO() {
-        glGenBuffers(2, vbo_.u2.objectID);
-        mapBuffers();
-    }
+        glBuffer_ = (Unity3DGLBuffer *)operator new(sizeof(Unity3DGLBuffer) * 2);
+        new(&glBuffer_[0])Unity3DGLBuffer(VERTEXDATA | DYNAMIC);
+        new(&glBuffer_[1])Unity3DGLBuffer(INDEXDATA);
 
-    void GLTextureAtlas::mapBuffers() {
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_.u2.objectID[0]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(V3F_C4B_T2F) * vbo_.u2.indexCapacity, vbo_.u2.bufferData, GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBuffer_[0].setData((const uint8 *) vbo_.u2.bufferData, sizeof(V3F_C4B_T2F) * vbo_.u2.bufferCapacity);
+        glBuffer_[1].setData((const uint8 *) vbo_.u2.indexData, sizeof(GLushort) * vbo_.u2.indexCapacity * 6);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_.u2.objectID[1]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * vbo_.u2.indexCapacity * 6, vbo_.u2.indexData, GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        GLState::DefaultState().arrayBuffer.bind(0);
+        GLState::DefaultState().elementArrayBuffer.bind(0);
+
+        glVertexFormat_ = (Unity3DGLVertexFormat *)operator new(sizeof(Unity3DGLVertexFormat) * 1);
+        std::vector<Unity3DVertexComponent> vertexFormat = { 
+            Unity3DVertexComponent(SEM_POSITION, FLOATx3, offsetof(V3F_C4B_T2F, vertices)),
+            Unity3DVertexComponent(SEM_COLOR0, UNORM8x4, offsetof(V3F_C4B_T2F, colors)),
+            Unity3DVertexComponent(SEM_TEXCOORD0, FLOATx2, offsetof(V3F_C4B_T2F, texCoords)) };
+        new(&glVertexFormat_[0])Unity3DGLVertexFormat(vertexFormat, sizeof(V3F_C4B_T2F));
+        glVertexFormat_[0].compile();
     }
 
     // TextureAtlas - Update, Insert, Move & Remove
@@ -288,7 +295,9 @@ namespace GRAPH
         vbo_.u2.indexData = tmpIndices;
 
         setupIndices();
-        mapBuffers();
+
+        glBuffer_[0].setData((const uint8 *) vbo_.u2.bufferData, sizeof(V3F_C4B_T2F) * vbo_.u2.bufferCapacity);
+        glBuffer_[1].setData((const uint8 *) vbo_.u2.indexData, sizeof(GLushort) * vbo_.u2.indexCapacity * 6);
 
         dirty_ = true;
 
@@ -350,30 +359,19 @@ namespace GRAPH
 
         GLStateCache::BindTexture2D(texture_->getName());
 
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_.u2.objectID[0]);
+        dynamic_cast<Unity3DGLBuffer *>(&glBuffer_[0])->bind();
 
-        // FIXME:: update is done in draw... perhaps it should be done in a timer
         if (dirty_) {
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vbo_.u2.bufferData[0]) * vbo_.u2.bufferCount , &vbo_.u2.bufferData[0] );
+            dynamic_cast<Unity3DGLBuffer *>(&glBuffer_[0])->subData((const uint8 *) vbo_.u2.bufferData, 0, sizeof(vbo_.u2.bufferData[0]) * vbo_.u2.bufferCount);
             dirty_ = false;
         }
 
-        GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
-
-        // vertices
-        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
-
-        // colors
-        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, colors));
-
-        // tex coords
-        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_.u2.objectID[1]);
+        dynamic_cast<Unity3DGLVertexFormat *>(&glVertexFormat_[0])->apply();
+        dynamic_cast<Unity3DGLBuffer *>(&glBuffer_[1])->bind();
 
         glDrawElements(GL_TRIANGLES, (GLsizei)numberOfQuads*6, GL_UNSIGNED_SHORT, (GLvoid*) (start*6*sizeof(vbo_.u2.indexData[0])));
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        GLState::DefaultState().arrayBuffer.bind(0);
+        GLState::DefaultState().elementArrayBuffer.bind(0);
     }
 }

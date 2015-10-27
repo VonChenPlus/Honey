@@ -1,5 +1,5 @@
-#ifndef GLSTATE_H
-#define GLSTATE_H
+#ifndef GLSTATECACHE_H
+#define GLSTATECACHE_H
 
 #include <cstdint>
 #include "GRAPH/UNITY3D/GLCommon.h"
@@ -41,4 +41,4 @@ namespace GRAPH
     };
 }
 
-#endif // GLSTATE_H
+#endif // GLSTATECACHE_H

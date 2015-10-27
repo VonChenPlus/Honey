@@ -2,7 +2,7 @@
 #define GLTEXTUREATLAS_H
 
 #include "BASE/HObject.h"
-#include "GRAPH/UNITY3D/GLCommon.h"
+#include "GRAPH/UNITY3D/Unity3DGL.h"
 
 namespace GRAPH
 {
@@ -54,13 +54,14 @@ namespace GRAPH
 
     private:
         void renderCommand();
-
-        void setupIndices();
         void mapBuffers();
+        void setupIndices();
         void setupVBO();
 
     protected:
         VertexBufferObject<V3F_C4B_T2F_Quad> vbo_;
+        Unity3DGLBuffer *glBuffer_;
+        Unity3DGLVertexFormat *glVertexFormat_;
         bool    dirty_;
         GLTexture* texture_;
     };
