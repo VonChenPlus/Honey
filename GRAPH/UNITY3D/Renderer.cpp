@@ -373,12 +373,8 @@ namespace GRAPH
             }
             visitRenderQueue(renderGroups_[0]);
         }
-        clean();
-        isRendering_ = false;
-    }
-
-    void Renderer::clean() {
-        for (uint64 j = 0 ; j < renderGroups_.size(); j++) {
+        
+        for (uint64 j = 0; j < renderGroups_.size(); j++) {
             renderGroups_[j].clear();
         }
 
@@ -390,6 +386,8 @@ namespace GRAPH
             object.u2.bufferCount = 0;
             object.u2.indexCount = 0;
         }
+
+        isRendering_ = false;
     }
 
     void Renderer::clear() {

@@ -84,7 +84,6 @@ namespace GRAPH
 
         void render();
 
-        void clean();
         void clear();
 
         void setClearColor(const Color4F& clearColor);
