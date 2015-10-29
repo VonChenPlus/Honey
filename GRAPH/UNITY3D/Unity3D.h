@@ -88,6 +88,8 @@ namespace GRAPH
         SEM_COLOR0,
         SEM_TEXCOORD0,
         SEM_TEXCOORD1,
+        SEM_TEXCOORD2,
+        SEM_TEXCOORD3,
         SEM_NORMAL,
         SEM_TANGENT,
         SEM_BINORMAL,  // really BITANGENT
@@ -268,9 +270,6 @@ namespace GRAPH
     class Unity3DShaderSet : public Unity3DObject
     {
     public:
-        // TODO: Make some faster way of doing these. Support uniform buffers (and fake them on GL 2.0?)
-        virtual void setVector(const char *name, float *value, int n) = 0;
-        virtual void setMatrix4(const char *name, const MATH::Matrix4 &value) = 0;
     };
 
     struct U3DBlendStateDesc

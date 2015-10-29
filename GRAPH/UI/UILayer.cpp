@@ -1,7 +1,7 @@
 #include <stdarg.h>
 #include "GRAPH/UI/UILayer.h"
 #include "GRAPH/Director.h"
-#include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
@@ -187,7 +187,7 @@ namespace GRAPH
                 updateColor();
                 setContentSize(MATH::Sizef(w, h));
 
-                setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_POSITION_COLOR_NO_MVP));
+                setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_POSITION_COLOR_NO_MVP));
                 return true;
             }
             return false;
@@ -255,8 +255,8 @@ namespace GRAPH
 
         void LayerColor::onDraw(const MATH::Matrix4& transform, uint32_t)
         {
-            getGLShader()->use();
-            getGLShader()->setUniformsForBuiltins(transform);
+            getU3DShader()->apply();
+            getU3DShader()->setUniformsForBuiltins(transform);
 
             GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POSITION | VERTEX_ATTRIB_FLAG_COLOR );
 
@@ -264,8 +264,8 @@ namespace GRAPH
             // Attributes
             //
             glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glVertexAttribPointer(GLShader::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, 0, _noMVPVertices);
-            glVertexAttribPointer(GLShader::VERTEX_ATTRIB_COLOR, 4, GL_FLOAT, GL_FALSE, 0, _squareColors);
+            glVertexAttribPointer(SEM_POSITION, 3, GL_FLOAT, GL_FALSE, 0, _noMVPVertices);
+            glVertexAttribPointer(SEM_COLOR0, 4, GL_FLOAT, GL_FALSE, 0, _squareColors);
 
             GLStateCache::BlendFunc( _blendFunc.src, _blendFunc.dst );
 

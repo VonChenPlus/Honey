@@ -9,7 +9,7 @@
 #include "GRAPH/EventDispatcher.h"
 #include "GRAPH/Component.h"
 #include "GRAPH/Camera.h"
-#include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
 
 namespace GRAPH
@@ -635,19 +635,19 @@ namespace GRAPH
         }
     }
 
-    void Node::setGLShader(GLShader* glShader)
+    void Node::setGLShader(Unity3DGLShaderSet* u3dShader)
     {
-        if (glShaderState_ == nullptr || (glShaderState_ && glShaderState_->getGLShader() != glShader))
+        if (glShaderState_ == nullptr || (glShaderState_ && glShaderState_->getU3DShader() != u3dShader))
         {
             SAFE_RELEASE(glShaderState_);
-            glShaderState_ = GLShaderState::getOrCreateWithGLShader(glShader);
+            glShaderState_ = GLShaderState::getOrCreateWithGLShader(u3dShader);
             glShaderState_->retain();
         }
     }
 
-    GLShader * Node::getGLShader() const
+    Unity3DGLShaderSet * Node::getU3DShader() const
     {
-        return glShaderState_ ? glShaderState_->getGLShader() : nullptr;
+        return glShaderState_ ? glShaderState_->getU3DShader() : nullptr;
     }
 
     MATH::Rectf Node::getBoundingBox() const

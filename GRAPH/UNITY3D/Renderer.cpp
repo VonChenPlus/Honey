@@ -2,7 +2,7 @@
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/RenderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
-#include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/RenderCommand.h"
 #include "MATH/Rectangle.h"
 
@@ -466,13 +466,13 @@ namespace GRAPH
         GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
 
         // vertices
-        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
+        glVertexAttribPointer(SEM_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
 
         // colors
-        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, colors));
+        glVertexAttribPointer(SEM_COLOR0, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, colors));
 
         // tex coords
-        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
+        glVertexAttribPointer(SEM_TEXCOORD0, 2, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboArray_[0].u2.objectID[1]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(vboArray_[0].u2.indexData[0]) * vboArray_[0].u2.indexCount, vboArray_[0].u2.indexData, GL_STATIC_DRAW);
@@ -526,13 +526,13 @@ namespace GRAPH
         GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
 
         // vertices
-        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
+        glVertexAttribPointer(SEM_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
 
         // colors
-        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, colors));
+        glVertexAttribPointer(SEM_COLOR0, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, colors));
 
         // tex coords
-        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
+        glVertexAttribPointer(SEM_TEXCOORD0, 2, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboArray_[1].u2.objectID[1]);
 

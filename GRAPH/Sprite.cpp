@@ -4,7 +4,7 @@
 #include "GRAPH/Director.h"
 #include "GRAPH/UNITY3D/GLTexture.h"
 #include "GRAPH/UNITY3D/GLTextureAtlas.h"
-#include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 
@@ -243,7 +243,7 @@ namespace GRAPH
             quad_.tl.colors = Color4B::WHITE;
             quad_.tr.colors = Color4B::WHITE;
             // shader state
-            setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
+            setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
             // update texture (calls updateBlendFunc)
             setTexture(texture);
             setTextureRect(rect, rotated, rect.size);
@@ -837,7 +837,7 @@ namespace GRAPH
 
         descendants_.reserve(capacity);
 
-        setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR));
+        setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR));
         return true;
     }
 
@@ -1036,7 +1036,7 @@ namespace GRAPH
             child->updateTransform();
         }
 
-        batchCommand_.init(globalZOrder_, getGLShader(), blendFunc_, textureAtlas_, transform, flags);
+        batchCommand_.init(globalZOrder_, getU3DShader(), blendFunc_, textureAtlas_, transform, flags);
         renderer->addCommand(&batchCommand_);
     }
 

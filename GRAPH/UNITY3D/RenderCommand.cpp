@@ -1,6 +1,6 @@
 #include "GRAPH/UNITY3D/RenderCommand.h"
 #include "GRAPH/UNITY3D/Renderer.h"
-#include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/GLTexture.h"
@@ -111,8 +111,8 @@ namespace GRAPH
         skipBatching_ = false;
 
         if(glShaderState_->getUniformCount() == 0) {
-            int glShader = (int)glShaderState_->getGLShader()->getProgram();
-            int intArray[4] = { glShader, (int)textureID_, (int)blendType_.src, (int)blendType_.dst};
+            int u3dShader = (int)glShaderState_->getU3DShader()->getProgram();
+            int intArray[4] = { u3dShader, (int)textureID_, (int)blendType_.src, (int)blendType_.dst};
 
             materialID_ = UTILS::HASH::Fletcher((const uint8*)intArray, sizeof(intArray));
         }
@@ -129,7 +129,7 @@ namespace GRAPH
         //set blend mode
         GLStateCache::BlendFunc(blendType_.src, blendType_.dst);
 
-        glShaderState_->applyGLShader(matrix4_);
+        glShaderState_->applyU3DShader(matrix4_);
         glShaderState_->applyUniforms();
     }
 
@@ -167,8 +167,8 @@ namespace GRAPH
             materialID_ = Renderer::MATERIAL_ID_DO_NOT_BATCH;
         }
         else {
-            int glShader = (int)glShaderState_->getGLShader()->getProgram();
-            int intArray[4] = { glShader, (int)textureID_, (int)blendType_.src, (int)blendType_.dst};
+            int u3dShader = (int)glShaderState_->getU3DShader()->getProgram();
+            int intArray[4] = { u3dShader, (int)textureID_, (int)blendType_.src, (int)blendType_.dst};
 
             materialID_ = UTILS::HASH::Fletcher((const uint8*)intArray, sizeof(intArray));
         }
@@ -212,7 +212,7 @@ namespace GRAPH
         shader_ = nullptr;
     }
 
-    void BatchCommand::init(float globalOrder, GLShader* shader, BlendFunc blendType, GLTextureAtlas *textureAtlas, const MATH::Matrix4& modelViewTransform, uint32_t flags) {
+    void BatchCommand::init(float globalOrder, Unity3DGLShaderSet* shader, BlendFunc blendType, GLTextureAtlas *textureAtlas, const MATH::Matrix4& modelViewTransform, uint32_t flags) {
         RenderCommand::init(globalOrder, modelViewTransform, flags);
         textureID_ = textureAtlas->getTexture()->getName();
         blendType_ = blendType;
@@ -225,7 +225,7 @@ namespace GRAPH
     }
 
     void BatchCommand::execute() {
-        shader_->use();
+        shader_->apply();
         shader_->setUniformsForBuiltins(matrix4_);
         GLStateCache::BindTexture2D(textureID_);
         GLStateCache::BlendFunc(blendType_.src, blendType_.dst);

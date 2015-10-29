@@ -2,7 +2,7 @@
 #include "MATH/AffineTransform.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/SpriteFrame.h"
-#include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/GLTexture.h"
 
@@ -925,12 +925,12 @@ namespace GRAPH
             {
             case State::NORMAL:
             {
-                glState = GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
+                glState = GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
             }
             break;
             case State::GRAY:
             {
-                glState = GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_POSITION_GRAYSCALE);
+                glState = GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_POSITION_GRAYSCALE);
             }
             default:
                 break;

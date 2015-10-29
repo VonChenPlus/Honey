@@ -20,7 +20,7 @@
 
 namespace GRAPH
 {
-    class GLShader;
+    class Unity3DGLShaderSet;
 
     struct MipmapInfo
     {
@@ -59,9 +59,6 @@ namespace GRAPH
 
         bool updateWithData(const void *data,int offsetX,int offsetY,int width,int height);
 
-        void drawAtPoint(const MATH::Vector2f& point);
-        void drawInRect(const MATH::Rectf& rect);
-
         bool initWithImage(IMAGE::ImageObject * image);
         bool initWithImage(IMAGE::ImageObject * image, IMAGE::PixelFormat format);
         bool initWithString(const char *text,  const std::string &fontName, float fontSize, const MATH::Sizef& dimensions = MATH::Sizef(0, 0), TextHAlignment hAlignment = TextHAlignment::CENTER, TextVAlignment vAlignment = TextVAlignment::TOP);
@@ -95,8 +92,8 @@ namespace GRAPH
 
         MATH::Sizef getContentSize() const;
 
-        void setGLShader(GLShader* program);
-        GLShader* getGLShader() const;
+        void setGLShader(Unity3DGLShaderSet* program);
+        Unity3DGLShaderSet* getU3DShader() const;
 
     protected:
         IMAGE::PixelFormat pixelFormat_;
@@ -108,7 +105,7 @@ namespace GRAPH
         MATH::Sizef contentSize_;
         bool hasPremultipliedAlpha_;
         bool hasMipmaps_;
-        GLShader* shaderProgram_;
+        Unity3DGLShaderSet* shaderProgram_;
         bool antialiasEnabled_;
     };
 

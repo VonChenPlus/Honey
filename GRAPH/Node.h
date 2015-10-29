@@ -20,7 +20,7 @@ namespace GRAPH
     class Scene;
     class Renderer;
     class Director;
-    class GLShader;
+    class Unity3DGLShaderSet;
     class GLShaderState;
     class Component;
     class ComponentContainer;
@@ -157,8 +157,8 @@ namespace GRAPH
         virtual const HObject* getUserObject() const { return userObject_; }
         virtual void setUserObject(HObject *userObject);
 
-        GLShader* getGLShader() const;
-        virtual void setGLShader(GLShader *glShader);
+        Unity3DGLShaderSet* getU3DShader() const;
+        virtual void setGLShader(Unity3DGLShaderSet *u3dShader);
 
         GLShaderState *getGLShaderState() const;
         virtual void setGLShaderState(GLShaderState *glShaderState);

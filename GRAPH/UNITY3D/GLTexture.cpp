@@ -2,7 +2,7 @@
 #include "GRAPH/Director.h"
 #include "GRAPH/Scheduler.h"
 #include "GRAPH/UNITY3D/GLTexture.h"
-#include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "IO/FileUtils.h"
 
@@ -80,11 +80,11 @@ namespace GRAPH
         maxT_ = maxT;
     }
 
-    GLShader* GLTexture::getGLShader() const {
+    Unity3DGLShaderSet* GLTexture::getU3DShader() const {
         return shaderProgram_;
     }
 
-    void GLTexture::setGLShader(GLShader* shaderProgram) {
+    void GLTexture::setGLShader(Unity3DGLShaderSet* shaderProgram) {
         SAFE_RETAIN(shaderProgram);
         SAFE_RELEASE(shaderProgram_);
         shaderProgram_ = shaderProgram;
@@ -187,7 +187,7 @@ namespace GRAPH
         hasMipmaps_ = mipmapsNum > 1;
 
         // shader
-        setGLShader(GLShaderCache::getInstance().getGLShader(GLShader::SHADER_NAME_POSITION_TEXTURE));
+        setGLShader(Unity3DGLShaderCache::getInstance().getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE));
         return true;
     }
 
@@ -310,58 +310,6 @@ namespace GRAPH
         }
         hasPremultipliedAlpha_ = hasPremultipliedAlpha;
         return ret;
-    }
-
-    void GLTexture::drawAtPoint(const MATH::Vector2f& point)
-    {
-        GLfloat    coordinates[] = {
-            0.0f,    maxT_,
-            maxS_,maxT_,
-            0.0f,    0.0f,
-            maxS_,0.0f };
-
-        GLfloat    width = (GLfloat)pixelsWidth_ * maxS_,
-            height = (GLfloat)pixelsHight_ * maxT_;
-
-        GLfloat        vertices[] = {
-            point.x,            point.y,
-            width + point.x,    point.y,
-            point.x,            height  + point.y,
-            width + point.x,    height  + point.y };
-
-        GLStateCache::EnableVertexAttribs( VERTEX_ATTRIB_FLAG_POSITION | VERTEX_ATTRIB_FLAG_TEX_COORD );
-        shaderProgram_->use();
-        shaderProgram_->setUniformsForBuiltins();
-
-        GLStateCache::BindTexture2D( name_ );
-
-        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, vertices);
-        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, 0, coordinates);
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    }
-
-    void GLTexture::drawInRect(const MATH::Rectf& rect) {
-        GLfloat    coordinates[] = {
-            0.0f,    maxT_,
-            maxS_,maxT_,
-            0.0f,    0.0f,
-            maxS_,0.0f };
-
-        GLfloat    vertices[] = {    rect.origin.x,        rect.origin.y,                            /*0.0f,*/
-            rect.origin.x + rect.size.width,        rect.origin.y,                            /*0.0f,*/
-            rect.origin.x,                            rect.origin.y + rect.size.height,        /*0.0f,*/
-            rect.origin.x + rect.size.width,        rect.origin.y + rect.size.height,        /*0.0f*/ };
-
-        GLStateCache::EnableVertexAttribs( VERTEX_ATTRIB_FLAG_POSITION | VERTEX_ATTRIB_FLAG_TEX_COORD );
-        shaderProgram_->use();
-        shaderProgram_->setUniformsForBuiltins();
-
-        GLStateCache::BindTexture2D( name_ );
-
-        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, vertices);
-        glVertexAttribPointer(GLShader::VERTEX_ATTRIB_TEX_COORD, 2, GL_FLOAT, GL_FALSE, 0, coordinates);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
     void GLTexture::generateMipmap() {

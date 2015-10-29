@@ -4,7 +4,7 @@
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/RenderState.h"
 #include "MATH/AffineTransform.h"
-#include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UI/UIScale9Sprite.h"
 #include "GRAPH/UI/UILayer.h"
@@ -334,19 +334,19 @@ namespace GRAPH
                 MATH::Vector2f(-1, 1)
             };
 
-            auto glShader = GLShaderCache::getInstance().getGLShader(GLShader::SHADER_NAME_POSITION_U_COLOR);
+            auto u3dShader = Unity3DGLShaderCache::getInstance().getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_U_COLOR);
 
-            int colorLocation = glShader->getUniformLocation("u_color");
+            int colorLocation = u3dShader->getUniformLocation("u_color");
 
             Color4F color(1, 1, 1, 1);
 
-            glShader->use();
-            glShader->setUniformsForBuiltins();
-            glShader->setUniformLocationWith4fv(colorLocation, (GLfloat*) &color.red, 1);
+            u3dShader->apply();
+            u3dShader->setUniformsForBuiltins();
+            u3dShader->setUniformLocationWith4fv(colorLocation, (GLfloat*) &color.red, 1);
 
             GLStateCache::EnableVertexAttribs( VERTEX_ATTRIB_FLAG_POSITION );
 
-            glVertexAttribPointer(GLShader::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, 0, vertices);
+            glVertexAttribPointer(SEM_POSITION, 2, GL_FLOAT, GL_FALSE, 0, vertices);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
             Director::getInstance().popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);

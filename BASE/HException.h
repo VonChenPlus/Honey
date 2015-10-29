@@ -29,7 +29,7 @@ public:
         Unknown = -1,
         Normal = 0,
         IO,
-        GFX,
+        GRAPH,
     };
 
 protected:

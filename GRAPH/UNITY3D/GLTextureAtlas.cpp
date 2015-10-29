@@ -1,7 +1,7 @@
 #include "GRAPH/UNITY3D/GLTextureAtlas.h"
 #include "GRAPH/UNITY3D/GLTexture.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
-#include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 
 namespace GRAPH
 {

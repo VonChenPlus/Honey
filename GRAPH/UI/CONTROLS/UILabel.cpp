@@ -2,7 +2,7 @@
 #include "GRAPH/Director.h"
 #include "GRAPH/Sprite.h"
 #include "GRAPH/EventDispatcher.h"
-#include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
@@ -265,31 +265,31 @@ namespace GRAPH
             {
             case LabelEffect::NORMAL:
                 if (_useDistanceField)
-                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL));
+                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL));
                 else if (_useA8Shader)
-                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_LABEL_NORMAL));
+                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_LABEL_NORMAL));
                 else if (_shadowEnabled)
-                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR));
+                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR));
                 else
-                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
+                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
 
                 break;
             case LabelEffect::OUTLINE:
-                setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_LABEL_OUTLINE));
-                _uniformEffectColor = glGetUniformLocation(getGLShader()->getProgram(), "u_effectColor");
+                setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_LABEL_OUTLINE));
+                _uniformEffectColor = glGetUniformLocation(getU3DShader()->getProgram(), "u_effectColor");
                 break;
             case LabelEffect::GLOW:
                 if (_useDistanceField)
                 {
-                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(GLShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW));
-                    _uniformEffectColor = glGetUniformLocation(getGLShader()->getProgram(), "u_effectColor");
+                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW));
+                    _uniformEffectColor = glGetUniformLocation(getU3DShader()->getProgram(), "u_effectColor");
                 }
                 break;
             default:
                 return;
             }
 
-            _uniformTextColor = glGetUniformLocation(getGLShader()->getProgram(), "u_textColor");
+            _uniformTextColor = glGetUniformLocation(getU3DShader()->getProgram(), "u_textColor");
         }
 
         void Label::setFontAtlas(FontAtlas* atlas,bool distanceFieldEnabled /* = false */, bool useA8Shader /* = false */)
@@ -1036,14 +1036,14 @@ namespace GRAPH
             _contentDirty = false;
         }
 
-        void Label::onDrawShadow(GLShader* glShader)
+        void Label::onDrawShadow(Unity3DGLShaderSet* u3dShader)
         {
             Color3B oldColor = realColor_;
             GLubyte oldOPacity = displayedOpacity_;
             displayedOpacity_ = _shadowOpacity;
             setColor(_shadowColor3B);
 
-            glShader->setUniformsForBuiltins(_shadowTransform);
+            u3dShader->setUniformsForBuiltins(_shadowTransform);
             for (auto&& it : _letters)
             {
                 it.second->updateTransform();
@@ -1059,16 +1059,16 @@ namespace GRAPH
 
         void Label::onDraw(const MATH::Matrix4& transform, bool)
         {
-            auto glShader = getGLShader();
-            glShader->use();
+            auto u3dShader = getU3DShader();
+            u3dShader->apply();
             GLStateCache::BlendFunc(_blendFunc.src, _blendFunc.dst);
 
             if (_shadowEnabled)
             {
-                onDrawShadow(glShader);
+                onDrawShadow(u3dShader);
             }
 
-            glShader->setUniformsForBuiltins(transform);
+            u3dShader->setUniformsForBuiltins(transform);
             for (auto&& it : _letters)
             {
                 it.second->updateTransform();

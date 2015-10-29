@@ -1,18 +1,18 @@
 #include "GLShaderState.h"
-#include "GRAPH/UNITY3D/GLShader.h"
+#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 
 namespace GRAPH
 {
     UniformValue::UniformValue()
         : uniform_(nullptr)
-        , glShader_(nullptr)
+        , u3dShader_(nullptr)
         , type_(Type::VALUE) {
     }
 
-    UniformValue::UniformValue(Uniform *uniform, GLShader* glShader)
+    UniformValue::UniformValue(Uniform *uniform, Unity3DGLShaderSet* u3dShader)
         : uniform_(uniform)
-        , glShader_(glShader)
+        , u3dShader_(u3dShader)
         , type_(Type::VALUE) {
     }
 
@@ -23,24 +23,24 @@ namespace GRAPH
 
     void UniformValue::apply() {
         if (type_ == Type::CALLBACK_FN) {
-            (*value_.callback)(glShader_, uniform_);
+            (*value_.callback)(u3dShader_, uniform_);
         }
         else if (type_ == Type::POINTER) {
             switch (uniform_->type) {
                 case GL_FLOAT:
-                    glShader_->setUniformLocationWith1fv(uniform_->location, value_.floatv.pointer, value_.floatv.size);
+                    u3dShader_->setUniformLocationWith1fv(uniform_->location, value_.floatv.pointer, value_.floatv.size);
                     break;
 
                 case GL_FLOAT_VEC2:
-                    glShader_->setUniformLocationWith2fv(uniform_->location, value_.v2f.pointer, value_.v2f.size);
+                    u3dShader_->setUniformLocationWith2fv(uniform_->location, value_.v2f.pointer, value_.v2f.size);
                     break;
 
                 case GL_FLOAT_VEC3:
-                    glShader_->setUniformLocationWith3fv(uniform_->location, value_.v3f.pointer, value_.v3f.size);
+                    u3dShader_->setUniformLocationWith3fv(uniform_->location, value_.v3f.pointer, value_.v3f.size);
                     break;
 
                 case GL_FLOAT_VEC4:
-                    glShader_->setUniformLocationWith4fv(uniform_->location, value_.v4f.pointer, value_.v4f.size);
+                    u3dShader_->setUniformLocationWith4fv(uniform_->location, value_.v4f.pointer, value_.v4f.size);
                     break;
 
                 default:
@@ -50,37 +50,37 @@ namespace GRAPH
         else{
             switch (uniform_->type) {
                 case GL_SAMPLER_2D:
-                    glShader_->setUniformLocationWith1i(uniform_->location, value_.tex.textureUnit);
+                    u3dShader_->setUniformLocationWith1i(uniform_->location, value_.tex.textureUnit);
                     GLStateCache::BindTexture2DN(value_.tex.textureUnit, value_.tex.textureId);
                     break;
 
                 case GL_SAMPLER_CUBE:
-                    glShader_->setUniformLocationWith1i(uniform_->location, value_.tex.textureUnit);
+                    u3dShader_->setUniformLocationWith1i(uniform_->location, value_.tex.textureUnit);
                     GLStateCache::BindTextureN(value_.tex.textureUnit, value_.tex.textureId, GL_TEXTURE_CUBE_MAP);
                     break;
 
                 case GL_INT:
-                    glShader_->setUniformLocationWith1i(uniform_->location, value_.intValue);
+                    u3dShader_->setUniformLocationWith1i(uniform_->location, value_.intValue);
                     break;
 
                 case GL_FLOAT:
-                    glShader_->setUniformLocationWith1f(uniform_->location, value_.floatValue);
+                    u3dShader_->setUniformLocationWith1f(uniform_->location, value_.floatValue);
                     break;
 
                 case GL_FLOAT_VEC2:
-                    glShader_->setUniformLocationWith2f(uniform_->location, value_.v2Value[0], value_.v2Value[1]);
+                    u3dShader_->setUniformLocationWith2f(uniform_->location, value_.v2Value[0], value_.v2Value[1]);
                     break;
 
                 case GL_FLOAT_VEC3:
-                    glShader_->setUniformLocationWith3f(uniform_->location, value_.v3Value[0], value_.v3Value[1], value_.v3Value[2]);
+                    u3dShader_->setUniformLocationWith3f(uniform_->location, value_.v3Value[0], value_.v3Value[1], value_.v3Value[2]);
                     break;
 
                 case GL_FLOAT_VEC4:
-                    glShader_->setUniformLocationWith4f(uniform_->location, value_.v4Value[0], value_.v4Value[1], value_.v4Value[2], value_.v4Value[3]);
+                    u3dShader_->setUniformLocationWith4f(uniform_->location, value_.v4Value[0], value_.v4Value[1], value_.v4Value[2], value_.v4Value[3]);
                     break;
 
                 case GL_FLOAT_MAT4:
-                    glShader_->setUniformLocationWithMatrix4fv(uniform_->location, (GLfloat*)&value_.matrixValue, 1);
+                    u3dShader_->setUniformLocationWithMatrix4fv(uniform_->location, (GLfloat*)&value_.matrixValue, 1);
                     break;
 
                 default:
@@ -89,11 +89,11 @@ namespace GRAPH
         }
     }
 
-    void UniformValue::setCallback(const std::function<void(GLShader*, Uniform*)> &callback) {
+    void UniformValue::setCallback(const std::function<void(Unity3DGLShaderSet*, Uniform*)> &callback) {
         if (type_ == Type::CALLBACK_FN)
             delete value_.callback;
 
-        value_.callback = new std::function<void(GLShader*, Uniform*)>();
+        value_.callback = new std::function<void(Unity3DGLShaderSet*, Uniform*)>();
         *value_.callback = callback;
 
         type_ = Type::CALLBACK_FN;
@@ -210,10 +210,10 @@ namespace GRAPH
         enabled_ = true;
     }
 
-    GLShaderState* GLShaderState::create(GLShader *glShader) {
+    GLShaderState* GLShaderState::create(Unity3DGLShaderSet *u3dShader) {
         GLShaderState* ret = nullptr;
         ret = new (std::nothrow) GLShaderState();
-        if(ret && ret->init(glShader))
+        if(ret && ret->init(u3dShader))
         {
             ret->autorelease();
             return ret;
@@ -223,52 +223,52 @@ namespace GRAPH
     }
 
     GLShaderState* GLShaderState::getOrCreateWithGLShaderName(const std::string& glShaderName ) {
-        GLShader *glShader = GLShaderCache::getInstance().getGLShader(glShaderName);
-        if( glShader )
-            return getOrCreateWithGLShader(glShader);
+        Unity3DGLShaderSet *u3dShader = Unity3DGLShaderCache::getInstance().getU3DShader(glShaderName);
+        if( u3dShader )
+            return getOrCreateWithGLShader(u3dShader);
 
         return nullptr;
     }
 
-    GLShaderState* GLShaderState::getOrCreateWithGLShader(GLShader *glShader) {
-        GLShaderState* ret = GLShaderStateCache::getInstance().getGLShaderState(glShader);
+    GLShaderState* GLShaderState::getOrCreateWithGLShader(Unity3DGLShaderSet *u3dShader) {
+        GLShaderState* ret = GLShaderStateCache::getInstance().getGLShaderState(u3dShader);
         return ret;
     }
 
     GLShaderState* GLShaderState::getOrCreateWithShaders(const std::string& vertexShader, const std::string& fragShader, const std::string& compileTimeDefines) {
         const std::string key = vertexShader + "+" + fragShader + "+" + compileTimeDefines;
-        auto glShader = GLShaderCache::getInstance().getGLShader(key);
+        auto u3dShader = Unity3DGLShaderCache::getInstance().getU3DShader(key);
 
-        if (!glShader) {
-            glShader = GLShader::createWithFilenames(vertexShader, fragShader, compileTimeDefines);
-            GLShaderCache::getInstance().addGLShader(glShader, key);
+        if (!u3dShader) {
+            u3dShader = Unity3DGLShaderSet::createWithFilenames(vertexShader, fragShader, compileTimeDefines);
+            Unity3DGLShaderCache::getInstance().addU3DShader(u3dShader, key);
         }
 
-        return create(glShader);
+        return create(u3dShader);
     }
 
     GLShaderState::GLShaderState()
         : uniformAttributeValueDirty_(true)
         , textureUnitIndex_(4)  // first 4 textures unites are reserved for _Texture0-3
         , vertexAttribsFlags_(0)
-        , glShader_(nullptr) {
+        , u3dShader_(nullptr) {
     }
 
     GLShaderState::~GLShaderState() {
-        SAFE_RELEASE(glShader_);
+        SAFE_RELEASE(u3dShader_);
     }
 
-    bool GLShaderState::init(GLShader* glShader) {
-        glShader_ = glShader;
-        glShader_->retain();
+    bool GLShaderState::init(Unity3DGLShaderSet* u3dShader) {
+        u3dShader_ = u3dShader;
+        u3dShader_->retain();
 
-        for(auto &attrib : glShader_->vertexAttribs_) {
+        for(auto &attrib : u3dShader_->vertexAttribs_) {
             VertexAttribValue value(&attrib.second);
             attributes_[attrib.first] = value;
         }
 
-        for(auto &uniform : glShader_->userUniforms_) {
-            UniformValue value(&uniform.second, glShader_);
+        for(auto &uniform : u3dShader_->userUniforms_) {
+            UniformValue value(&uniform.second, u3dShader_);
             uniforms_[uniform.second.location] = value;
             uniformsByName_[uniform.first] = uniform.second.location;
         }
@@ -277,15 +277,15 @@ namespace GRAPH
     }
 
     void GLShaderState::resetGLShader() {
-        SAFE_RELEASE(glShader_);
-        glShader_ = nullptr;
+        SAFE_RELEASE(u3dShader_);
+        u3dShader_ = nullptr;
         uniforms_.clear();
         attributes_.clear();
         textureUnitIndex_ = 1;
     }
 
     void GLShaderState::apply(const MATH::Matrix4& modelView) {
-        applyGLShader(modelView);
+        applyU3DShader(modelView);
         applyAttributes();
         applyUniforms();
     }
@@ -293,12 +293,12 @@ namespace GRAPH
     void GLShaderState::updateUniformsAndAttributes() {
         if(uniformAttributeValueDirty_) {
             for(auto& uniformLocation : uniformsByName_) {
-                uniforms_[uniformLocation.second].uniform_ = glShader_->getUniform(uniformLocation.first);
+                uniforms_[uniformLocation.second].uniform_ = u3dShader_->getUniform(uniformLocation.first);
             }
 
             vertexAttribsFlags_ = 0;
             for(auto& attributeValue : attributes_) {
-                attributeValue.second.vertexAttrib_ = glShader_->getVertexAttrib(attributeValue.first);;
+                attributeValue.second.vertexAttrib_ = u3dShader_->getVertexAttrib(attributeValue.first);;
                 if(attributeValue.second.enabled_)
                     vertexAttribsFlags_ |= 1 << attributeValue.second.vertexAttrib_->index;
             }
@@ -308,10 +308,10 @@ namespace GRAPH
         }
     }
 
-    void GLShaderState::applyGLShader(const MATH::Matrix4& modelView) {
+    void GLShaderState::applyU3DShader(const MATH::Matrix4& modelView) {
         updateUniformsAndAttributes();
-        glShader_->use();
-        glShader_->setUniformsForBuiltins(modelView);
+        u3dShader_->apply();
+        u3dShader_->setUniformsForBuiltins(modelView);
     }
 
     void GLShaderState::applyAttributes(bool applyAttribFlags) {
@@ -331,10 +331,10 @@ namespace GRAPH
         }
     }
 
-    void GLShaderState::setGLShader(GLShader *glShader) {
-        if( glShader_ != glShader) {
+    void GLShaderState::setGLShader(Unity3DGLShaderSet *u3dShader) {
+        if( u3dShader_ != u3dShader) {
             resetGLShader();
-            init(glShader);
+            init(u3dShader);
         }
     }
 
@@ -386,13 +386,13 @@ namespace GRAPH
         }
     }
 
-    void GLShaderState::setUniformCallback(const std::string& uniformName, const std::function<void(GLShader*, Uniform*)> &callback) {
+    void GLShaderState::setUniformCallback(const std::string& uniformName, const std::function<void(Unity3DGLShaderSet*, Uniform*)> &callback) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setCallback(callback);
     }
 
-    void GLShaderState::setUniformCallback(GLint uniformLocation, const std::function<void(GLShader*, Uniform*)> &callback) {
+    void GLShaderState::setUniformCallback(GLint uniformLocation, const std::function<void(Unity3DGLShaderSet*, Uniform*)> &callback) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setCallback(callback);
@@ -557,15 +557,15 @@ namespace GRAPH
         return instance;
     }
 
-    GLShaderState* GLShaderStateCache::getGLShaderState(GLShader* glShader) {
-        const auto& itr = glShaderStates_.find(glShader);
+    GLShaderState* GLShaderStateCache::getGLShaderState(Unity3DGLShaderSet* u3dShader) {
+        const auto& itr = glShaderStates_.find(u3dShader);
         if (itr != glShaderStates_.end()) {
             return itr->second;
         }
 
         auto ret = new (std::nothrow) GLShaderState;
-        if(ret && ret->init(glShader)) {
-            glShaderStates_.insert(glShader, ret);
+        if(ret && ret->init(u3dShader)) {
+            glShaderStates_.insert(u3dShader, ret);
             ret->release();
             return ret;
         }

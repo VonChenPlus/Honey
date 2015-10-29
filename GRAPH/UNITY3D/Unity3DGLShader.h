@@ -2,9 +2,10 @@
 #define GLSHADER_H
 
 #include <unordered_map>
-#include "BASE/HObject.h"
-#include "MATH/Matrix.h"
+#include <map>
+#include <string>
 #include "GRAPH/UNITY3D/GLCommon.h"
+#include "GRAPH/UNITY3D/Unity3D.h"
 
 namespace GRAPH
 {
@@ -24,24 +25,50 @@ namespace GRAPH
         std::string name;
     };
 
-    class GLShader : public HObject
+    class Unity3DGLShader : public Unity3DShader
     {
     public:
-        enum
-        {
-            VERTEX_ATTRIB_POSITION,
-            VERTEX_ATTRIB_COLOR,
-            VERTEX_ATTRIB_TEX_COORD,
-            VERTEX_ATTRIB_TEX_COORD1,
-            VERTEX_ATTRIB_TEX_COORD2,
-            VERTEX_ATTRIB_TEX_COORD3,
-            VERTEX_ATTRIB_NORMAL,
-            VERTEX_ATTRIB_BLEND_WEIGHT,
-            VERTEX_ATTRIB_BLEND_INDEX,
-            VERTEX_ATTRIB_MAX,
+        Unity3DGLShader(bool isFragmentShader);
+        ~Unity3DGLShader();
 
-            VERTEX_ATTRIB_TEX_COORDS = VERTEX_ATTRIB_TEX_COORD,
-        };
+        void compile(const char *source, const char *compileTimeDefines);
+
+        GLuint getShader() const { return shader_; }
+
+    private:
+        GLuint shader_;
+        GLuint type_;
+    };
+
+    class Unity3DGLShaderSet : public Unity3DShaderSet
+    {
+    public:
+        Unity3DGLShaderSet();
+        ~Unity3DGLShaderSet();
+
+        static Unity3DGLShaderSet* createWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray);
+        bool initWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray);
+        static Unity3DGLShaderSet* createWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray, const std::string& compileTimeDefines);
+        bool initWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray, const std::string& compileTimeDefines);
+
+        static Unity3DGLShaderSet* createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename);
+        bool initWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename);
+
+        static Unity3DGLShaderSet* createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines);
+        bool initWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines);
+
+        void link();
+        void apply();
+        void unApply();
+
+        inline const GLuint getProgram() const { return program_; }
+
+        Uniform* getUniform(const std::string &name);
+        VertexAttrib* getVertexAttrib(const std::string &name);
+
+        GLint getAttribLocation(const std::string &attributeName) const;
+        GLint getUniformLocation(const std::string &attributeName) const;
+        void bindAttribLocation(const std::string &attributeName, GLuint index) const;
 
         enum
         {
@@ -138,32 +165,8 @@ namespace GRAPH
         /**Attribute blend index.*/
         static const char* ATTRIBUTE_NAME_BLEND_INDEX;
 
-        GLShader();
-        virtual ~GLShader();
-
-        static GLShader* createWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray);
-        bool initWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray);
-        static GLShader* createWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray, const std::string& compileTimeDefines);
-        bool initWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray, const std::string& compileTimeDefines);
-
-        static GLShader* createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename);
-        bool initWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename);
-
-        static GLShader* createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines);
-        bool initWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines);
-
-        Uniform* getUniform(const std::string& name);
-        VertexAttrib* getVertexAttrib(const std::string& name);
-
-        void bindAttribLocation(const std::string& attributeName, GLuint index) const;
-        GLint getAttribLocation(const std::string& attributeName) const;
-        GLint getUniformLocation(const std::string& attributeName) const;
-
-        bool link();
-        void use();
-
         void updateUniforms();
-        GLint getUniformLocationForName(const char* name) const;
+
         void setUniformLocationWith1i(GLint location, GLint i1);
         void setUniformLocationWith2i(GLint location, GLint i1, GLint i2);
         void setUniformLocationWith3i(GLint location, GLint i1, GLint i2, GLint i3);
@@ -187,31 +190,28 @@ namespace GRAPH
         void setUniformsForBuiltins(const MATH::Matrix4 &modelView);
 
         void reset();
-        inline const GLuint getProgram() const { return program_; }
 
-    protected:
-        bool updateUniformLocation(GLint location, const GLvoid* data, unsigned int bytes);
-
+    private:
         void bindPredefinedVertexAttribs();
         void parseVertexAttribs();
         void parseUniforms();
 
-        bool compileShader(GLuint * shader, GLenum type, const GLchar* source, const std::string& convertedDefines);
-        bool compileShader(GLuint * shader, GLenum type, const GLchar* source);
+        bool updateUniformLocation(GLint location, const GLvoid* data, unsigned int bytes);
 
-        GLuint            program_;
-        GLuint            vertShader_;
-        GLuint            fragShader_;
-        GLint             builtInUniforms_[UNIFORM_MAX];
-        bool              hasShaderCompiler_;
+    private:
+        GLuint program_;
+        Unity3DGLShader *vertShader_;
+        Unity3DGLShader *fragShader_;
+
+        GLint builtInUniforms_[UNIFORM_MAX];
 
         struct BulidInUniformsFlags {
-            unsigned int usesTime:1;
-            unsigned int usesNormal:1;
-            unsigned int usesMVP:1;
-            unsigned int usesMV:1;
-            unsigned int usesP:1;
-            unsigned int usesRandom:1;
+            unsigned int usesTime : 1;
+            unsigned int usesNormal : 1;
+            unsigned int usesMVP : 1;
+            unsigned int usesMV : 1;
+            unsigned int usesP : 1;
+            unsigned int usesRandom : 1;
             BulidInUniformsFlags() { memset(this, 0, sizeof(*this)); }
         } uniformsFlags_;
 
@@ -222,27 +222,27 @@ namespace GRAPH
         friend class GLShaderState;
     };
 
-    class GLShaderCache : public HObject
+    class Unity3DGLShaderCache : public HObject
     {
     public:
-        GLShaderCache();
-        ~GLShaderCache();
+        Unity3DGLShaderCache();
+        ~Unity3DGLShaderCache();
 
-        static GLShaderCache& getInstance();
+        static Unity3DGLShaderCache& getInstance();
 
         void loadDefaultGLShaders();
         void reloadDefaultGLShaders();
 
-        GLShader * getGLShader(const std::string &key);
+        Unity3DGLShaderSet *getU3DShader(const std::string &key);
 
-        void addGLShader(GLShader* program, const std::string &key);
+        void addU3DShader(Unity3DGLShaderSet* program, const std::string &key);
 
     private:
         bool init();
-        void loadDefaultGLShader(GLShader *program, int type);
+        void loadDefaultGLShader(Unity3DGLShaderSet *program, int type);
 
     private:
-        std::unordered_map<std::string, GLShader*> programs_;
+        std::unordered_map<std::string, Unity3DGLShaderSet*> programs_;
     };
 }
 
