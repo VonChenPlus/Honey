@@ -1,16 +1,16 @@
-#include "GRAPH/UNITY3D/GLState.h"
+#include "GRAPH/UNITY3D/Unity3DGLState.h"
 #include "UTILS/STRING/StringUtils.h"
 
 namespace GRAPH
 {
-    int GLState::state_count = 0;
+    int Unity3DGLState::state_count = 0;
 
-    GLState &GLState::DefaultState() {
-        static GLState instance;
+    Unity3DGLState &Unity3DGLState::DefaultState() {
+        static Unity3DGLState instance;
         return instance;
     }
 
-    void GLState::restore() {
+    void Unity3DGLState::restore() {
         int count = 0;
 
         blend.restore(); count++;

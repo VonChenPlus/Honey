@@ -4,7 +4,7 @@
 #include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/GLTexture.h"
-#include "GRAPH/UNITY3D/GLTextureAtlas.h"
+#include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "UTILS/HASH/HashUtils.h"
 
 namespace GRAPH
@@ -212,7 +212,7 @@ namespace GRAPH
         shader_ = nullptr;
     }
 
-    void BatchCommand::init(float globalOrder, Unity3DGLShaderSet* shader, BlendFunc blendType, GLTextureAtlas *textureAtlas, const MATH::Matrix4& modelViewTransform, uint32_t flags) {
+    void BatchCommand::init(float globalOrder, Unity3DGLShaderSet* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const MATH::Matrix4& modelViewTransform, uint32_t flags) {
         RenderCommand::init(globalOrder, modelViewTransform, flags);
         textureID_ = textureAtlas->getTexture()->getName();
         blendType_ = blendType;

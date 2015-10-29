@@ -1,54 +1,58 @@
-#include "GRAPH/UNITY3D/GLTextureAtlas.h"
+#include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "GRAPH/UNITY3D/GLTexture.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
-#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 
 namespace GRAPH
 {
-    GLTextureAtlas::GLTextureAtlas()
+    TextureAtlas::TextureAtlas()
         : dirty_(false)
         , texture_(nullptr)
-        , glBuffer_(nullptr) {
+        , u3dVertexBuffer_(nullptr)
+        , u3dIndexBuffer_(nullptr)
+        , u3dVertexFormat_(nullptr)
+        , u3dContext_(Unity3DContext::CreateContext()) {
     }
 
-    GLTextureAtlas::~GLTextureAtlas() {
+    TextureAtlas::~TextureAtlas() {
         SAFE_FREE(vbo_.u2.bufferData);
         SAFE_FREE(vbo_.u2.indexData);
-        SAFE_DELETE_ARRAY(glBuffer_);
-        SAFE_DELETE_ARRAY(glVertexFormat_);
+        SAFE_DELETE(u3dVertexBuffer_);
+        SAFE_DELETE(u3dIndexBuffer_);
+        SAFE_DELETE(u3dVertexFormat_);
+        SAFE_DELETE(u3dContext_);
         SAFE_RELEASE(texture_);
     }
 
-    uint64 GLTextureAtlas::getTotalQuads() const {
+    uint64 TextureAtlas::getTotalQuads() const {
         return vbo_.u2.bufferCount;
     }
 
-    uint64 GLTextureAtlas::getCapacity() const {
+    uint64 TextureAtlas::getCapacity() const {
         return vbo_.u2.bufferCapacity;
     }
 
-    GLTexture* GLTextureAtlas::getTexture() const {
+    GLTexture* TextureAtlas::getTexture() const {
         return texture_;
     }
 
-    void GLTextureAtlas::setTexture(GLTexture * var) {
+    void TextureAtlas::setTexture(GLTexture * var) {
         SAFE_RETAIN(var);
         SAFE_RELEASE(texture_);
         texture_ = var;
     }
 
-    V3F_C4B_T2F_Quad* GLTextureAtlas::getQuads() {
+    V3F_C4B_T2F_Quad* TextureAtlas::getQuads() {
         dirty_ = true;
         return vbo_.u2.bufferData;
     }
 
-    void GLTextureAtlas::setQuads(V3F_C4B_T2F_Quad* quads) {
+    void TextureAtlas::setQuads(V3F_C4B_T2F_Quad* quads) {
         vbo_.u2.bufferData = quads;
     }
 
     // TextureAtlas - alloc & init
-    GLTextureAtlas * GLTextureAtlas::create(const std::string& file, uint64 capacity) {
-        GLTextureAtlas * textureAtlas = new (std::nothrow) GLTextureAtlas();
+    TextureAtlas * TextureAtlas::create(const std::string& file, uint64 capacity) {
+        TextureAtlas * textureAtlas = new (std::nothrow) TextureAtlas();
         if(textureAtlas && textureAtlas->initWithFile(file, capacity)) {
             textureAtlas->autorelease();
             return textureAtlas;
@@ -57,8 +61,8 @@ namespace GRAPH
         return nullptr;
     }
 
-    GLTextureAtlas * GLTextureAtlas::createWithTexture(GLTexture *texture, uint64 capacity) {
-        GLTextureAtlas * textureAtlas = new (std::nothrow) GLTextureAtlas();
+    TextureAtlas * TextureAtlas::createWithTexture(GLTexture *texture, uint64 capacity) {
+        TextureAtlas * textureAtlas = new (std::nothrow) TextureAtlas();
         if (textureAtlas && textureAtlas->initWithTexture(texture, capacity)) {
             textureAtlas->autorelease();
             return textureAtlas;
@@ -67,7 +71,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    bool GLTextureAtlas::initWithFile(const std::string& file, uint64 capacity) {
+    bool TextureAtlas::initWithFile(const std::string& file, uint64 capacity) {
         // retained in property
         GLTexture *texture = TextureCache::getInstance().addImage(file);
 
@@ -78,7 +82,7 @@ namespace GRAPH
         return false;
     }
 
-    bool GLTextureAtlas::initWithTexture(GLTexture *texture, uint64 capacity) {
+    bool TextureAtlas::initWithTexture(GLTexture *texture, uint64 capacity) {
         vbo_.u2.indexCapacity = vbo_.u2.bufferCapacity = capacity;
         vbo_.u2.indexCount = vbo_.u2.bufferCount = 0;
 
@@ -109,7 +113,7 @@ namespace GRAPH
         return true;
     }
 
-    void GLTextureAtlas::setupIndices() {
+    void TextureAtlas::setupIndices() {
         if (vbo_.u2.indexCapacity == 0)
             return;
 
@@ -125,34 +129,28 @@ namespace GRAPH
         }
     }
 
-    void GLTextureAtlas::setupVBO() {
-        glBuffer_ = (Unity3DGLBuffer *)operator new(sizeof(Unity3DGLBuffer) * 2);
-        new(&glBuffer_[0])Unity3DGLBuffer(VERTEXDATA | DYNAMIC);
-        new(&glBuffer_[1])Unity3DGLBuffer(INDEXDATA);
+    void TextureAtlas::setupVBO() {
+        u3dVertexBuffer_ = u3dContext_->createBuffer(VERTEXDATA | DYNAMIC);
+        u3dIndexBuffer_ = u3dContext_->createBuffer(INDEXDATA);
 
-        glBuffer_[0].setData((const uint8 *) vbo_.u2.bufferData, sizeof(V3F_C4B_T2F) * vbo_.u2.bufferCapacity);
-        glBuffer_[1].setData((const uint8 *) vbo_.u2.indexData, sizeof(GLushort) * vbo_.u2.indexCapacity * 6);
+        u3dVertexBuffer_->setData((const uint8 *) vbo_.u2.bufferData, sizeof(V3F_C4B_T2F) * vbo_.u2.bufferCapacity);
+        u3dIndexBuffer_->setData((const uint8 *) vbo_.u2.indexData, sizeof(GLushort) * vbo_.u2.indexCapacity * 6);
 
-        GLState::DefaultState().arrayBuffer.bind(0);
-        GLState::DefaultState().elementArrayBuffer.bind(0);
-
-        glVertexFormat_ = (Unity3DGLVertexFormat *)operator new(sizeof(Unity3DGLVertexFormat) * 1);
         std::vector<Unity3DVertexComponent> vertexFormat = { 
             Unity3DVertexComponent(SEM_POSITION, FLOATx3, offsetof(V3F_C4B_T2F, vertices)),
             Unity3DVertexComponent(SEM_COLOR0, UNORM8x4, offsetof(V3F_C4B_T2F, colors)),
             Unity3DVertexComponent(SEM_TEXCOORD0, FLOATx2, offsetof(V3F_C4B_T2F, texCoords)) };
-        new(&glVertexFormat_[0])Unity3DGLVertexFormat(vertexFormat, sizeof(V3F_C4B_T2F));
-        glVertexFormat_[0].compile();
+        u3dVertexFormat_ = u3dContext_->createVertexFormat(vertexFormat, sizeof(V3F_C4B_T2F));
     }
 
     // TextureAtlas - Update, Insert, Move & Remove
-    void GLTextureAtlas::updateQuad(V3F_C4B_T2F_Quad *quad, uint64 index) {
+    void TextureAtlas::updateQuad(V3F_C4B_T2F_Quad *quad, uint64 index) {
         vbo_.u2.bufferCount = MATH::MATH_MAX( index+1, vbo_.u2.bufferCount);
         vbo_.u2.bufferData[index] = *quad;
         dirty_ = true;
     }
 
-    void GLTextureAtlas::insertQuad(V3F_C4B_T2F_Quad *quad, uint64 index) {
+    void TextureAtlas::insertQuad(V3F_C4B_T2F_Quad *quad, uint64 index) {
         vbo_.u2.bufferCount++;
 
         // issue #575. index can be > totalQuads
@@ -168,7 +166,7 @@ namespace GRAPH
         dirty_ = true;
     }
 
-    void GLTextureAtlas::insertQuads(V3F_C4B_T2F_Quad* quads, uint64 index, uint64 amount) {
+    void TextureAtlas::insertQuads(V3F_C4B_T2F_Quad* quads, uint64 index, uint64 amount) {
         vbo_.u2.bufferCount += amount;
         auto remaining = (vbo_.u2.bufferCount-1) - index - amount;
 
@@ -190,7 +188,7 @@ namespace GRAPH
         dirty_ = true;
     }
 
-    void GLTextureAtlas::insertQuadFromIndex(uint64 oldIndex, uint64 newIndex) {
+    void TextureAtlas::insertQuadFromIndex(uint64 oldIndex, uint64 newIndex) {
         if( oldIndex == newIndex ) {
             return;
         }
@@ -211,7 +209,7 @@ namespace GRAPH
         dirty_ = true;
     }
 
-    void GLTextureAtlas::removeQuadAtIndex(uint64 index) {
+    void TextureAtlas::removeQuadAtIndex(uint64 index) {
         auto remaining = (vbo_.u2.bufferCount-1) - index;
 
         // last object doesn't need to be moved
@@ -223,7 +221,7 @@ namespace GRAPH
         dirty_ = true;
     }
 
-    void GLTextureAtlas::removeQuadsAtIndex(uint64 index, uint64 amount) {
+    void TextureAtlas::removeQuadsAtIndex(uint64 index, uint64 amount) {
         auto remaining = (vbo_.u2.bufferCount) - (index + amount);
 
         vbo_.u2.bufferCount -= amount;
@@ -235,12 +233,12 @@ namespace GRAPH
         dirty_ = true;
     }
 
-    void GLTextureAtlas::removeAllQuads() {
+    void TextureAtlas::removeAllQuads() {
         vbo_.u2.bufferCount = 0;
     }
 
     // TextureAtlas - Resize
-    bool GLTextureAtlas::resizeCapacity(uint64 newCapacity) {
+    bool TextureAtlas::resizeCapacity(uint64 newCapacity) {
         if( newCapacity == vbo_.u2.indexCapacity ) {
             return true;
         }
@@ -296,19 +294,19 @@ namespace GRAPH
 
         setupIndices();
 
-        glBuffer_[0].setData((const uint8 *) vbo_.u2.bufferData, sizeof(V3F_C4B_T2F) * vbo_.u2.bufferCapacity);
-        glBuffer_[1].setData((const uint8 *) vbo_.u2.indexData, sizeof(GLushort) * vbo_.u2.indexCapacity * 6);
+        u3dVertexBuffer_->setData((const uint8 *) vbo_.u2.bufferData, sizeof(V3F_C4B_T2F) * vbo_.u2.bufferCapacity);
+        u3dIndexBuffer_->setData((const uint8 *) vbo_.u2.indexData, sizeof(GLushort) * vbo_.u2.indexCapacity * 6);
 
         dirty_ = true;
 
         return true;
     }
 
-    void GLTextureAtlas::increaseTotalQuadsWith(uint64 amount) {
+    void TextureAtlas::increaseTotalQuadsWith(uint64 amount) {
         vbo_.u2.bufferCount += amount;
     }
 
-    void GLTextureAtlas::moveQuadsFromIndex(uint64 oldIndex, uint64 amount, uint64 newIndex) {
+    void TextureAtlas::moveQuadsFromIndex(uint64 oldIndex, uint64 amount, uint64 newIndex) {
         if( oldIndex == newIndex ) {
             return;
         }
@@ -330,11 +328,11 @@ namespace GRAPH
         dirty_ = true;
     }
 
-    void GLTextureAtlas::moveQuadsFromIndex(uint64 index, uint64 newIndex) {
+    void TextureAtlas::moveQuadsFromIndex(uint64 index, uint64 newIndex) {
         memmove(vbo_.u2.bufferData + newIndex,vbo_.u2.bufferData + index, (vbo_.u2.bufferCount - index) * sizeof(vbo_.u2.bufferData[0]));
     }
 
-    void GLTextureAtlas::fillWithEmptyQuadsFromIndex(uint64 index, uint64 amount) {
+    void TextureAtlas::fillWithEmptyQuadsFromIndex(uint64 index, uint64 amount) {
         V3F_C4B_T2F_Quad quad;
         memset(&quad, 0, sizeof(quad));
 
@@ -345,33 +343,29 @@ namespace GRAPH
     }
 
     // TextureAtlas - Drawing
-    void GLTextureAtlas::drawQuads() {
+    void TextureAtlas::drawQuads() {
         this->drawNumberOfQuads(vbo_.u2.bufferCount, 0);
     }
 
-    void GLTextureAtlas::drawNumberOfQuads(uint64 numberOfQuads) {
+    void TextureAtlas::drawNumberOfQuads(uint64 numberOfQuads) {
         this->drawNumberOfQuads(numberOfQuads, 0);
     }
 
-    void GLTextureAtlas::drawNumberOfQuads(uint64 numberOfQuads, uint64 start) {
+    void TextureAtlas::drawNumberOfQuads(uint64 numberOfQuads, uint64 start) {
         if(!numberOfQuads)
             return;
 
         GLStateCache::BindTexture2D(texture_->getName());
 
-        dynamic_cast<Unity3DGLBuffer *>(&glBuffer_[0])->bind();
-
         if (dirty_) {
-            dynamic_cast<Unity3DGLBuffer *>(&glBuffer_[0])->subData((const uint8 *) vbo_.u2.bufferData, 0, sizeof(vbo_.u2.bufferData[0]) * vbo_.u2.bufferCount);
+            u3dVertexBuffer_->bind();
+            u3dVertexBuffer_->subData((const uint8 *) vbo_.u2.bufferData, 0, sizeof(vbo_.u2.bufferData[0]) * vbo_.u2.bufferCount);
             dirty_ = false;
         }
 
-        dynamic_cast<Unity3DGLVertexFormat *>(&glVertexFormat_[0])->apply();
-        dynamic_cast<Unity3DGLBuffer *>(&glBuffer_[1])->bind();
+        u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_, u3dVertexBuffer_, u3dIndexBuffer_, (void *) (start * 6 * sizeof(vbo_.u2.indexData[0])), (GLsizei) numberOfQuads * 6);
 
-        glDrawElements(GL_TRIANGLES, (GLsizei)numberOfQuads*6, GL_UNSIGNED_SHORT, (GLvoid*) (start*6*sizeof(vbo_.u2.indexData[0])));
-
-        GLState::DefaultState().arrayBuffer.bind(0);
-        GLState::DefaultState().elementArrayBuffer.bind(0);
+        Unity3DGLState::DefaultState().arrayBuffer.bind(0);
+        Unity3DGLState::DefaultState().elementArrayBuffer.bind(0);
     }
 }

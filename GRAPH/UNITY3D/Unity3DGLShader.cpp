@@ -1,6 +1,7 @@
 #include "IO/FileUtils.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
+#include "GRAPH/UNITY3D/Unity3DGLState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/GLSL.h"
 #include "UTILS/RANDOM/RandomUtils.h"
@@ -120,10 +121,19 @@ namespace GRAPH
         }
     }
 
-    Unity3DGLShaderSet::Unity3DGLShaderSet() {
-        program_ = 0;
-        vertShader_ = 0;
-        fragShader_ = 0;
+    Unity3DGLShaderSet::Unity3DGLShaderSet()
+        : program_(0)
+        , vertShader_(0)
+        , fragShader_(0) {
+        memset(builtInUniforms_, 0, sizeof(builtInUniforms_));
+    }
+
+    Unity3DGLShaderSet::Unity3DGLShaderSet(Unity3DShader *vertShader, Unity3DShader *fragShader) 
+        : program_(0)
+        , vertShader_(dynamic_cast<Unity3DGLShader*>(vertShader))
+        , fragShader_(dynamic_cast<Unity3DGLShader*>(fragShader)) {
+        vertShader_->retain();
+        fragShader_->retain();
         memset(builtInUniforms_, 0, sizeof(builtInUniforms_));
     }
 
@@ -242,11 +252,11 @@ namespace GRAPH
     }
 
     void Unity3DGLShaderSet::apply() {
-        glUseProgram(program_);
+        Unity3DGLState::DefaultState().useProgram.set(program_);
     }
 
     void Unity3DGLShaderSet::unApply() {
-        glUseProgram(0);
+        Unity3DGLState::DefaultState().useProgram.set(0);
     }
 
     Uniform* Unity3DGLShaderSet::getUniform(const std::string &name) {

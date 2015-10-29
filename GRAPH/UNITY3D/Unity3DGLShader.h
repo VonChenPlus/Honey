@@ -1,5 +1,5 @@
-#ifndef GLSHADER_H
-#define GLSHADER_H
+#ifndef UNITY3DGLSHADER_H
+#define UNITY3DGLSHADER_H
 
 #include <unordered_map>
 #include <map>
@@ -44,6 +44,7 @@ namespace GRAPH
     {
     public:
         Unity3DGLShaderSet();
+        Unity3DGLShaderSet(Unity3DShader *vertShader, Unity3DShader *fragShader);
         ~Unity3DGLShaderSet();
 
         static Unity3DGLShaderSet* createWithByteArrays(const GLchar* vShaderByteArray, const GLchar* fShaderByteArray);
@@ -246,4 +247,4 @@ namespace GRAPH
     };
 }
 
-#endif // GLSHADER_H
+#endif // UNITY3DGLSHADER_H

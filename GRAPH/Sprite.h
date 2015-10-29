@@ -34,7 +34,7 @@ namespace GRAPH
 
     class SpriteBatchNode;
     class SpriteFrame;
-    class GLTextureAtlas;
+    class TextureAtlas;
 
     class Sprite : public Node, public TextureProtocol
     {
@@ -81,8 +81,8 @@ namespace GRAPH
 
         inline const MATH::Rectf& getTextureRect() const { return rect_; }
 
-        inline GLTextureAtlas* getTextureAtlas() const { return textureAtlas_; }
-        inline void setTextureAtlas(GLTextureAtlas *textureAtlas) { textureAtlas_ = textureAtlas; }
+        inline TextureAtlas* getTextureAtlas() const { return textureAtlas_; }
+        inline void setTextureAtlas(TextureAtlas *textureAtlas) { textureAtlas_ = textureAtlas; }
 
         inline const MATH::Vector2f& getOffsetPosition() const { return offsetPosition_; }
 
@@ -144,7 +144,7 @@ namespace GRAPH
         virtual void setReorderChildDirtyRecursively();
         virtual void setDirtyRecursively(bool value);
 
-        GLTextureAtlas*       textureAtlas_;
+        TextureAtlas*       textureAtlas_;
         uint64             atlasIndex_;
         SpriteBatchNode*    batchNode_;
         bool                dirty_;
@@ -176,8 +176,8 @@ namespace GRAPH
         static SpriteBatchNode* createWithTexture(GLTexture* tex, uint64 capacity = DEFAULT_CAPACITY);
         static SpriteBatchNode* create(const std::string& fileImage, uint64 capacity = DEFAULT_CAPACITY);
 
-        inline GLTextureAtlas* getTextureAtlas() { return textureAtlas_; }
-        void setTextureAtlas(GLTextureAtlas* textureAtlas);
+        inline TextureAtlas* getTextureAtlas() { return textureAtlas_; }
+        void setTextureAtlas(TextureAtlas* textureAtlas);
 
         inline const std::vector<Sprite*>& getDescendants() const { return descendants_; }
 
@@ -229,7 +229,7 @@ namespace GRAPH
         void swap(uint64 oldIndex, uint64 newIndex);
         void updateBlendFunc();
 
-        GLTextureAtlas *textureAtlas_;
+        TextureAtlas *textureAtlas_;
         BlendFunc blendFunc_;
         BatchCommand batchCommand_;
         std::vector<Sprite*> descendants_;

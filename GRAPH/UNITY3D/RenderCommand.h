@@ -172,7 +172,7 @@ namespace GRAPH
         std::function<void()> func;
     };
 
-    class GLTextureAtlas;
+    class TextureAtlas;
     class Unity3DGLShaderSet;
 
     class BatchCommand : public RenderCommand
@@ -181,14 +181,14 @@ namespace GRAPH
         BatchCommand();
         ~BatchCommand();
 
-        void init(float globalZOrder, Unity3DGLShaderSet* shader, BlendFunc blendType, GLTextureAtlas *textureAtlas, const MATH::Matrix4& modelViewTransform, uint32_t flags);
+        void init(float globalZOrder, Unity3DGLShaderSet* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const MATH::Matrix4& modelViewTransform, uint32_t flags);
         void execute();
 
     protected:
         GLuint textureID_;
         Unity3DGLShaderSet* shader_;
         BlendFunc blendType_;
-        GLTextureAtlas *textureAtlas_;
+        TextureAtlas *textureAtlas_;
         MATH::Matrix4 matrix4_;
     };
 }

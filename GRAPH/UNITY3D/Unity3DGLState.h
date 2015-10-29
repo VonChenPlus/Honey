@@ -1,5 +1,5 @@
-#ifndef GLSTATE_H
-#define GLSTATE_H
+#ifndef UNITY3DGLSTATE_H
+#define UNITY3DGLSTATE_H
 
 #include <string>
 #include <string.h>
@@ -7,7 +7,7 @@
 
 namespace GRAPH
 {
-    class GLState
+    class Unity3DGLState
     {
     private:
         template<GLenum cap, bool init>
@@ -17,7 +17,7 @@ namespace GRAPH
             bool _value;
         public:
             BoolState() : _value(init) {
-                GLState::state_count++;
+                Unity3DGLState::state_count++;
             }
 
             inline void set(bool value) {
@@ -55,7 +55,7 @@ namespace GRAPH
             p1type p1; \
         public: \
             SavedState1_##func() : p1(p1def) { \
-                GLState::state_count++; \
+                Unity3DGLState::state_count++; \
             } \
             void set(p1type newp1) { \
                 if(newp1 != p1) { \
@@ -74,7 +74,7 @@ namespace GRAPH
             p2type p2; \
         public: \
             SavedState2_##func() : p1(p1def), p2(p2def) { \
-                GLState::state_count++; \
+                Unity3DGLState::state_count++; \
             } \
             inline void set(p1type newp1, p2type newp2) { \
                 if(newp1 != p1 || newp2 != p2) { \
@@ -95,7 +95,7 @@ namespace GRAPH
             p3type p3; \
         public: \
             SavedState3_##func() : p1(p1def), p2(p2def), p3(p3def) { \
-                GLState::state_count++; \
+                Unity3DGLState::state_count++; \
             } \
             inline void set(p1type newp1, p2type newp2, p3type newp3) { \
                 if(newp1 != p1 || newp2 != p2 || newp3 != p3) { \
@@ -118,7 +118,7 @@ namespace GRAPH
             p4type p4; \
         public: \
             SavedState4_##func() : p1(p1def), p2(p2def), p3(p3def), p4(p4def) { \
-                GLState::state_count++; \
+                Unity3DGLState::state_count++; \
             } \
             inline void set(p1type newp1, p2type newp2, p3type newp3, p4type newp4) { \
                 if(newp1 != p1 || newp2 != p2 || newp3 != p3 || newp4 != p4) { \
@@ -140,7 +140,7 @@ namespace GRAPH
         public: \
             SavedState4_##func() { \
                 for (int i = 0; i < 4; i++) {p[i] = def;} \
-                GLState::state_count++; \
+                Unity3DGLState::state_count++; \
             } \
             inline void set(const float v[4]) { \
                 if(memcmp(p,v,sizeof(float)*4)) { \
@@ -159,7 +159,7 @@ namespace GRAPH
         public: \
             SavedBind_##func_##target() { \
                 val_ = 0; \
-                GLState::state_count++; \
+                Unity3DGLState::state_count++; \
             } \
             inline void bind(GLuint val) { \
                 if (val_ != val) { \
@@ -177,11 +177,14 @@ namespace GRAPH
 
     public:
         static int state_count;
-        static GLState &DefaultState();
+        static Unity3DGLState &DefaultState();
 
         void restore();
 
         // When adding a state here, don't forget to add it to GLState::Restore() too
+        
+        // Use
+        STATE1(glUseProgram, GLuint, 0) useProgram;
 
         // Blending
         BoolState<GL_BLEND, false> blend;
@@ -235,4 +238,4 @@ namespace GRAPH
     void CheckGLExtensions();
 }
 
-#endif // GLSTATE_H
+#endif // UNITY3DGLSTATE_H

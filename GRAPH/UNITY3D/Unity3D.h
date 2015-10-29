@@ -221,15 +221,16 @@ namespace GRAPH
     class Unity3DBuffer : public Unity3DObject
     {
     public:
-        virtual void setData(const uint8 *data, size_t size) = 0;
-        virtual void subData(const uint8 *data, size_t offset, size_t size) = 0;
+        virtual void setData(const uint8 *data, uint64 size) = 0;
+        virtual void subData(const uint8 *data, uint64 offset, uint64 size) = 0;
+        virtual void bind() = 0;
     };
 
     class Unity3DTexture : public Unity3DObject
     {
     public:
         void loadFromFile(const std::string &filename, U3DImageType type = U3DImageType::DETECT);
-        void loadFromFileData(const uint8 *data, size_t dataSize, U3DImageType type = U3DImageType::DETECT);
+        void loadFromFileData(const uint8 *data, uint64 dataSize, U3DImageType type = U3DImageType::DETECT);
 
         virtual void create(U3DTextureType type, U3DImageFormat format, int width, int height, int depth, int mipLevels) = 0;
         virtual void setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8 *data) = 0;
@@ -284,6 +285,25 @@ namespace GRAPH
         bool logicEnabled;
         U3DLogicOp logicOp;
         // int colorMask;
+    };
+
+    class Unity3DContext : public Unity3DObject
+    {
+    public:
+        static Unity3DContext *CreateContext();
+
+        Unity3DContext() {}
+        virtual ~Unity3DContext() {}
+
+        virtual Unity3DBuffer *createBuffer(uint32 usageFlags) = 0;
+        virtual Unity3DShaderSet *createShaderSet(Unity3DShader *vshader, Unity3DShader *fshader) = 0;
+        virtual Unity3DVertexFormat *createVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) = 0;
+
+        // TODO: Add more sophisticated draws with buffer offsets, and multidraws.
+        virtual void draw(U3DPrimitive prim, Unity3DShaderSet *pipeline, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) = 0;
+        virtual void drawIndexed(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, Unity3DBuffer *idata, void *indices, int offset) = 0;
+        virtual void drawUp(U3DPrimitive prim, Unity3DShaderSet *pipeline, Unity3DVertexFormat *format, const void *vdata, int vertexCount) = 0;
+        virtual void clear(int mask, uint32 colorval, float depthVal, int stencilVal) = 0;
     };
 }
 

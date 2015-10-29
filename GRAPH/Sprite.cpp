@@ -3,7 +3,7 @@
 #include "GRAPH/SpriteFrame.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/UNITY3D/GLTexture.h"
-#include "GRAPH/UNITY3D/GLTextureAtlas.h"
+#include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/Renderer.h"
@@ -823,7 +823,7 @@ namespace GRAPH
         if (!tex->hasPremultipliedAlpha()) {
             blendFunc_ = BlendFunc::ALPHA_NON_PREMULTIPLIED;
         }
-        textureAtlas_ = new (std::nothrow) GLTextureAtlas();
+        textureAtlas_ = new (std::nothrow) TextureAtlas();
 
         if (capacity == 0) {
             capacity = DEFAULT_CAPACITY;
@@ -914,7 +914,7 @@ namespace GRAPH
         Node::removeChild(sprite, cleanup);
     }
 
-    void SpriteBatchNode::setTextureAtlas(GLTextureAtlas* textureAtlas) {
+    void SpriteBatchNode::setTextureAtlas(TextureAtlas* textureAtlas) {
         if (textureAtlas != textureAtlas_) {
             SAFE_RETAIN(textureAtlas);
             SAFE_RELEASE(textureAtlas_);

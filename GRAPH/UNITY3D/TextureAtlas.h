@@ -7,14 +7,14 @@ namespace GRAPH
 {
     class GLTexture;
 
-    class GLTextureAtlas : public HObject
+    class TextureAtlas : public HObject
     {
     public:
-        static GLTextureAtlas* create(const std::string& file , uint64 capacity);
-        static GLTextureAtlas* createWithTexture(GLTexture *texture, uint64 capacity);
+        static TextureAtlas* create(const std::string& file , uint64 capacity);
+        static TextureAtlas* createWithTexture(GLTexture *texture, uint64 capacity);
 
-        GLTextureAtlas();
-        virtual ~GLTextureAtlas();
+        TextureAtlas();
+        virtual ~TextureAtlas();
 
         bool initWithFile(const std::string& file, uint64 capacity);
         bool initWithTexture(GLTexture *texture, uint64 capacity);
@@ -58,8 +58,10 @@ namespace GRAPH
 
     protected:
         VertexBufferObject<V3F_C4B_T2F_Quad> vbo_;
-        Unity3DGLBuffer *glBuffer_;
-        Unity3DGLVertexFormat *glVertexFormat_;
+        Unity3DBuffer *u3dVertexBuffer_;
+        Unity3DBuffer *u3dIndexBuffer_;
+        Unity3DVertexFormat *u3dVertexFormat_;
+        Unity3DContext *u3dContext_;
         bool    dirty_;
         GLTexture* texture_;
     };
