@@ -1,7 +1,8 @@
 #ifndef GLTEXTUREATLAS_H
 #define GLTEXTUREATLAS_H
 
-#include "GRAPH/UNITY3D/Unity3DGL.h"
+#include "GRAPH/UNITY3D/Unity3D.h"
+#include "GRAPH/UNITY3D/GLCommon.h"
 
 namespace GRAPH
 {
