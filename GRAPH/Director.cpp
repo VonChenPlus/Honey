@@ -113,7 +113,7 @@ namespace GRAPH
 
     void Director::setViewPort() {
         auto winSize = getWinSize();
-        camera_->setViewport(Viewport(0, 0, winSize.width, winSize.height));
+        camera_->setViewport(U3DViewport(0, 0, winSize.width, winSize.height));
     }
 
     void Director::setAlphaBlending(bool on) {

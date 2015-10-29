@@ -41,9 +41,6 @@ namespace GRAPH
     extern  const GLchar * LabelOutline_frag;
 
     extern  const GLchar * Label_vert;
-
-    extern  const GLchar * CameraClearVert;
-    extern  const GLchar * CameraClearFrag;
 }
 
 #endif // GLSL_H

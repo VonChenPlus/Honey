@@ -2,29 +2,10 @@
 #define CAMERA_H
 
 #include "GRAPH/Node.h"
+#include "GRAPH/UNITY3D/Unity3D.h"
 
 namespace GRAPH
 {
-    struct Viewport
-    {
-        Viewport(float left, float bottom, float width, float height)
-            : left_(left)
-            , bottom_(bottom)
-            , width_(width)
-            , height_(height) {
-
-            }
-        Viewport() {
-            left_ = bottom_ = 0.f;
-            width_ = height_ = 1.0f;
-        }
-
-        float left_;
-        float bottom_;
-        float width_;
-        float height_;
-    };
-
     class Camera :public Node
     {
         friend class Scene;
@@ -65,7 +46,7 @@ namespace GRAPH
 
         void apply();
 
-        void setViewport(const Viewport& vp) { viewport_ = vp; }
+        void setViewport(const U3DViewport& vp) { viewport_ = vp; }
 
     public:
         Camera();
@@ -88,7 +69,7 @@ namespace GRAPH
         float nearPlane_;
         float farPlane_;
         mutable bool  viewProjectionDirty_;
-        Viewport viewport_;
+        U3DViewport viewport_;
     };
 }
 

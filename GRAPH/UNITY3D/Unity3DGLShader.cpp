@@ -41,7 +41,6 @@ namespace GRAPH
     const char* Unity3DGLShaderSet::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW = "ShaderLabelDFGlow";
     const char* Unity3DGLShaderSet::SHADER_NAME_LABEL_NORMAL = "ShaderLabelNormal";
     const char* Unity3DGLShaderSet::SHADER_NAME_LABEL_OUTLINE = "ShaderLabelOutline";
-    const char* Unity3DGLShaderSet::SHADER_CAMERA_CLEAR = "ShaderCameraClear";
 
     // uniform names
     const char* Unity3DGLShaderSet::UNIFORM_NAME_AMBIENT_COLOR = "_AmbientColor";
@@ -672,7 +671,6 @@ namespace GRAPH
         kShaderType_UIGrayScale,
         kShaderType_LabelNormal,
         kShaderType_LabelOutline,
-        kShaderType_CameraClear,
         kShaderType_MAX,
     };
 
@@ -765,10 +763,6 @@ namespace GRAPH
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_LabelOutline);
         programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_LABEL_OUTLINE, p));
-
-        p = new Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_CameraClear);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_CAMERA_CLEAR, p));
     }
 
     void Unity3DGLShaderCache::reloadDefaultGLShaders() {

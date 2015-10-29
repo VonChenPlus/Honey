@@ -235,6 +235,6 @@ namespace GRAPH
     }
 
     void Camera::applyViewport() {
-        glViewport(viewport_.left_, viewport_.bottom_, viewport_.width_, viewport_.height_);
+        glViewport(viewport_.TopLeftX, viewport_.TopLeftY, viewport_.Width, viewport_.Height);
     }
 }

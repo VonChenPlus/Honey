@@ -152,19 +152,6 @@ namespace GRAPH
         ARRAY2D,
     };
 
-    enum U3DImageFormat : uint8
-    {
-        IMG_UNKNOWN,
-        LUMINANCE,
-        RGBA8888,
-        RGBA4444,
-        DXT1,
-        ETC1,  // Needs simulation on many platforms
-        D16,
-        D24S8,
-        D24X8,
-    };
-
     enum U3DRenderState : uint8
     {
         CULL_MODE,
@@ -186,18 +173,21 @@ namespace GRAPH
         TYPE_UNKNOWN,
     };
 
-    enum U3DInfo
-    {
-        APINAME,
-        APIVERSION,
-        VENDOR,
-        SHADELANGVERSION,
-        RENDERER,
-    };
-
     // Binary compatible with D3D11 viewport.
     struct U3DViewport
     {
+        U3DViewport(float left, float top, float width, float height)
+            : TopLeftX(left)
+            , TopLeftY(top)
+            , Width(width)
+            , Height(height) {
+
+        }
+        U3DViewport() {
+            TopLeftX = TopLeftY = 0.f;
+            Width = Height = 1.0f;
+        }
+
         float TopLeftX;
         float TopLeftY;
         float Width;
@@ -224,25 +214,6 @@ namespace GRAPH
         virtual void setData(const uint8 *data, uint64 size) = 0;
         virtual void subData(const uint8 *data, uint64 offset, uint64 size) = 0;
         virtual void bind() = 0;
-    };
-
-    class Unity3DTexture : public Unity3DObject
-    {
-    public:
-        void loadFromFile(const std::string &filename, U3DImageType type = U3DImageType::DETECT);
-        void loadFromFileData(const uint8 *data, uint64 dataSize, U3DImageType type = U3DImageType::DETECT);
-
-        virtual void create(U3DTextureType type, U3DImageFormat format, int width, int height, int depth, int mipLevels) = 0;
-        virtual void setImageData(int x, int y, int z, int width, int height, int depth, int level, int stride, const uint8 *data) = 0;
-        virtual void autoGenMipmaps() = 0;
-        virtual void finalize(int zim_flags) = 0;  // TODO: Tidy up
-
-        int width() { return width_; }
-        int height() { return height_; }
-        int depth() { return depth_; }
-    protected:
-        std::string filename_;  // Textures that are loaded from files can reload themselves automatically.
-        int width_, height_, depth_;
     };
 
     struct Unity3DVertexComponent

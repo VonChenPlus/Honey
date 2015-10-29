@@ -120,7 +120,6 @@ namespace GRAPH
         static const char* SHADER_NAME_LABEL_OUTLINE;
         static const char* SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL;
         static const char* SHADER_NAME_LABEL_DISTANCEFIELD_GLOW;
-        static const char* SHADER_CAMERA_CLEAR;
 
         /**Ambient Color uniform.*/
         static const char* UNIFORM_NAME_AMBIENT_COLOR;
