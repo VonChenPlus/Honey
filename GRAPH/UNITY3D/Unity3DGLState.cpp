@@ -5,7 +5,7 @@ namespace GRAPH
 {
     int Unity3DGLState::state_count = 0;
 
-    Unity3DGLState &Unity3DGLState::DefaultState() {
+    Unity3DGLState &Unity3DGLState::OpenGLState() {
         static Unity3DGLState instance;
         return instance;
     }

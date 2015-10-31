@@ -251,11 +251,11 @@ namespace GRAPH
     }
 
     void Unity3DGLShaderSet::apply() {
-        Unity3DGLState::DefaultState().useProgram.set(program_);
+        Unity3DGLState::OpenGLState().useProgram.set(program_);
     }
 
     void Unity3DGLShaderSet::unApply() {
-        Unity3DGLState::DefaultState().useProgram.set(0);
+        Unity3DGLState::OpenGLState().useProgram.set(0);
     }
 
     Uniform* Unity3DGLShaderSet::getUniform(const std::string &name) {

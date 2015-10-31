@@ -6,4 +6,9 @@ namespace GRAPH
     Unity3DContext *Unity3DContext::CreateContext() {
         return new Unity3DGLContext;
     }
+
+    Unity3DContext &Unity3DContext::DefaultContext() {
+        static Unity3DGLContext instance;
+        return instance;
+    }
 }

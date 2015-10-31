@@ -94,6 +94,7 @@ namespace GRAPH
         bool operator!=(const Color4F& right) const;
         bool operator!=(const Color3B& right) const;
         bool operator!=(const Color4B& right) const;
+        operator uint32() const;
 
         bool equals(const Color4F &other) {
             return (*this == other);

@@ -7,6 +7,43 @@
 
 namespace GRAPH
 {
+    class Unity3DGLBlendState : public Unity3DBlendState
+    {
+    public:
+        bool enabled;
+        GLuint eqCol, eqAlpha;
+        GLuint srcCol, srcAlpha, dstCol, dstAlpha;
+        bool logicEnabled;
+        GLuint logicOp;
+
+        void loadDefault() override;
+        void apply() override;
+    };
+
+    static const unsigned short compToGL [] =
+    {
+        GL_NEVER,
+        GL_LESS,
+        GL_EQUAL,
+        GL_LEQUAL,
+        GL_GREATER,
+        GL_NOTEQUAL,
+        GL_GEQUAL,
+        GL_ALWAYS
+    };
+
+    class Unity3DGLDepthState : public Unity3DDepthState
+    {
+    public:
+        Unity3DGLDepthState();
+
+        void loadDefault() override;
+        void setDepthTest(bool depthTest) override;
+        void setDepthWrite(bool depthWriteEnabled) override;
+        void setDepthComp(uint32 depthComp) override;
+        void apply() override;
+    };
+
     class Unity3DGLBuffer : public Unity3DBuffer
     {
     public:
@@ -45,21 +82,24 @@ namespace GRAPH
         GL_TRIANGLES,
     };
 
-    class Unity3DGLContext : public Unity3DContext
+    class Unity3DGLContext  final : public Unity3DContext
     {
     public:
         Unity3DGLContext() {}
-        virtual ~Unity3DGLContext() {}
+        ~Unity3DGLContext() {}
 
-        virtual Unity3DBuffer *createBuffer(uint32 usageFlags) override;
-        virtual Unity3DShaderSet *createShaderSet(Unity3DShader *vshader, Unity3DShader *fshader) override;
-        virtual Unity3DVertexFormat *createVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) override;
+        Unity3DDepthState *createDepthState() override;
+        Unity3DBuffer *createBuffer(uint32 usageFlags) override;
+        Unity3DShaderSet *createShaderSet(Unity3DShader *vshader, Unity3DShader *fshader) override;
+        Unity3DVertexFormat *createVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) override;
+
+        void setDepthState(Unity3DDepthState *state);
 
         // TODO: Add more sophisticated draws with buffer offsets, and multidraws.
-        virtual void draw(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) override;
-        virtual void drawIndexed(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, Unity3DBuffer *idata, void *indices, int offset) override;
-        virtual void drawUp(U3DPrimitive prim, Unity3DVertexFormat *format, const void *vdata, int vertexCount) override;
-        virtual void clear(int mask, uint32 colorval, float depthVal, int stencilVal) override;
+        void draw(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) override;
+        void drawIndexed(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, Unity3DBuffer *idata, void *indices, int offset) override;
+        void drawUp(U3DPrimitive prim, Unity3DVertexFormat *format, const void *vdata, int vertexCount) override;
+        void clear(int mask, uint32 colorval, float depthVal, int stencilVal) override;
     };
 }
 

@@ -2,7 +2,6 @@
 #define UNITY3D_H
 
 #include <vector>
-#include <string>
 #include "BASE/HObject.h"
 #include "MATH/Matrix.h"
 
@@ -202,11 +201,23 @@ namespace GRAPH
     class Unity3DBlendState : public Unity3DObject
     {
     public:
+        virtual void loadDefault() = 0;
+        virtual void apply() = 0;
     };
 
-    class Unity3DDepthStencilState : public Unity3DObject
+    class Unity3DDepthState : public Unity3DObject
     {
     public:
+        virtual void loadDefault() = 0;
+        virtual void setDepthTest(bool depthTest) = 0;
+        virtual void setDepthWrite(bool depthWrite) = 0;
+        virtual void setDepthComp(uint32 depthComp) = 0;
+        virtual void apply() = 0;
+        
+    protected:
+        bool depthTest_;
+        bool depthWrite_;
+        uint32 depthComp_;
     };
 
     class Unity3DBuffer : public Unity3DObject
@@ -245,31 +256,22 @@ namespace GRAPH
     public:
     };
 
-    struct U3DBlendStateDesc
-    {
-        bool enabled;
-        U3DBlendEquation eqCol;
-        U3DBlendFactor srcCol;
-        U3DBlendFactor dstCol;
-        U3DBlendEquation eqAlpha;
-        U3DBlendFactor srcAlpha;
-        U3DBlendFactor dstAlpha;
-        bool logicEnabled;
-        U3DLogicOp logicOp;
-        // int colorMask;
-    };
-
     class Unity3DContext : public Unity3DObject
     {
     public:
         static Unity3DContext *CreateContext();
+        static Unity3DContext &DefaultContext();
 
         Unity3DContext() {}
         virtual ~Unity3DContext() {}
 
+        virtual Unity3DDepthState *createDepthState() = 0;
+
         virtual Unity3DBuffer *createBuffer(uint32 usageFlags) = 0;
         virtual Unity3DShaderSet *createShaderSet(Unity3DShader *vshader, Unity3DShader *fshader) = 0;
         virtual Unity3DVertexFormat *createVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) = 0;
+
+        virtual void setDepthState(Unity3DDepthState *state) = 0;
 
         // TODO: Add more sophisticated draws with buffer offsets, and multidraws.
         virtual void draw(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) = 0;

@@ -4,6 +4,46 @@
 
 namespace GRAPH
 {
+    void Unity3DGLBlendState::apply() {
+        Unity3DGLState::OpenGLState().blend.set(enabled);
+        Unity3DGLState::OpenGLState().blendEquationSeparate.set(eqCol, eqAlpha);
+        Unity3DGLState::OpenGLState().blendFuncSeparate.set(srcCol, dstCol, srcAlpha, dstAlpha);
+        Unity3DGLState::OpenGLState().colorMask.set(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+        Unity3DGLState::OpenGLState().colorLogicOp.set(logicEnabled);
+        if (logicEnabled) {
+            Unity3DGLState::OpenGLState().logicOp.set(logicOp);
+        }
+    }
+
+    Unity3DGLDepthState::Unity3DGLDepthState() {
+        loadDefault();
+    }
+
+    void Unity3DGLDepthState::loadDefault() {
+        depthTest_ = Unity3DGLState::OpenGLState().depthTest.get();
+        depthWrite_ = Unity3DGLState::OpenGLState().depthWrite.get() == GL_TRUE;
+        depthComp_ = Unity3DGLState::OpenGLState().depthFunc.get();
+    }
+
+    void Unity3DGLDepthState::setDepthTest(bool depthTest) {
+        depthTest_ = depthTest;
+    }
+
+    void Unity3DGLDepthState::setDepthWrite(bool depthWrite) {
+        depthWrite_ = depthWrite;
+    }
+
+    void Unity3DGLDepthState::setDepthComp(uint32 depthComp) {
+        depthComp_ = depthComp;
+    }
+
+    void Unity3DGLDepthState::apply() {
+        Unity3DGLState::OpenGLState().depthTest.set(depthTest_);
+        Unity3DGLState::OpenGLState().depthWrite.set(depthWrite_);
+        Unity3DGLState::OpenGLState().depthFunc.set(depthComp_);
+    }
+
     static inline void Uint32ToFloat4(uint32 u, float f[4]) {
         f[0] = ((u >> 0) & 0xFF) * (1.0f / 255.0f);
         f[1] = ((u >> 8) & 0xFF) * (1.0f / 255.0f);
@@ -46,10 +86,10 @@ namespace GRAPH
 
     void Unity3DGLBuffer::bind() {
         if (target_ == GL_ARRAY_BUFFER) {
-            Unity3DGLState::DefaultState().arrayBuffer.bind(buffer_);
+            Unity3DGLState::OpenGLState().arrayBuffer.bind(buffer_);
         }
         else {
-            Unity3DGLState::DefaultState().elementArrayBuffer.bind(buffer_);
+            Unity3DGLState::OpenGLState().elementArrayBuffer.bind(buffer_);
         }
     }
 
@@ -102,6 +142,10 @@ namespace GRAPH
         semanticsMask_ = sem;
     }
 
+    Unity3DDepthState *Unity3DGLContext::createDepthState() {
+        return new Unity3DGLDepthState();
+    }
+
     Unity3DBuffer *Unity3DGLContext::createBuffer(uint32 usageFlags) {
         return new Unity3DGLBuffer(usageFlags);
     }
@@ -122,6 +166,11 @@ namespace GRAPH
         Unity3DGLVertexFormat *vertexFormat = new Unity3DGLVertexFormat(components, stride);
         vertexFormat->compile();
         return vertexFormat;
+    }
+
+    void Unity3DGLContext::setDepthState(Unity3DDepthState *state) {
+        Unity3DGLDepthState *s = static_cast<Unity3DGLDepthState *>(state);
+        s->apply();
     }
 
     void Unity3DGLContext::draw(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) {

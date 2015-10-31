@@ -1,10 +1,7 @@
 #include <algorithm>
 #include "GRAPH/UNITY3D/Renderer.h"
-#include "GRAPH/UNITY3D/RenderState.h"
-#include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/RenderCommand.h"
-#include "MATH/Rectangle.h"
 
 namespace GRAPH
 {
@@ -18,8 +15,8 @@ namespace GRAPH
         return  a->getDepth() > b->getDepth();
     }
 
-    RenderQueue::RenderQueue() {
-
+    RenderQueue::RenderQueue()
+        : depthState_(Unity3DContext::DefaultContext().createDepthState()) {
     }
 
     void RenderQueue::push_back(RenderCommand* command) {
@@ -77,32 +74,11 @@ namespace GRAPH
     }
 
     void RenderQueue::saveRenderState() {
-        isDepthEnabled_ = RenderState::DefaultState().depthTestEnabled_;
-        isCullEnabled_ = RenderState::DefaultState().cullFaceEnabled_;
-        isDepthWrite_ = RenderState::DefaultState().depthWriteEnabled_;
+        depthState_->loadDefault();
     }
 
     void RenderQueue::restoreRenderState() {
-        if (isCullEnabled_) {
-            glEnable(GL_CULL_FACE);
-            RenderState::DefaultState().setCullFace(true);
-        }
-        else {
-            glDisable(GL_CULL_FACE);
-            RenderState::DefaultState().setCullFace(false);
-        }
-
-        if (isDepthEnabled_) {
-            glEnable(GL_DEPTH_TEST);
-            RenderState::DefaultState().setDepthTest(true);
-        }
-        else {
-            glDisable(GL_DEPTH_TEST);
-            RenderState::DefaultState().setDepthTest(false);
-        }
-
-        glDepthMask(isDepthWrite_);
-        RenderState::DefaultState().setDepthWrite(isDepthEnabled_);
+        depthState_->apply();
     }
 
     static const int DEFAULT_RENDER_QUEUE = 0;
@@ -112,7 +88,8 @@ namespace GRAPH
         , glViewAssigned_(false)
         , isRendering_(false)
         , isDepthTestFor2D_(false)
-        , u3dContext_(Unity3DContext::CreateContext()) {
+        , u3dContext_(Unity3DContext::CreateContext())
+        , depthState_(u3dContext_->createDepthState()){
         groupCommandManager_ = new (std::nothrow) GroupCommandManager(this);
         commandGroupStack_.push(DEFAULT_RENDER_QUEUE);
         RenderQueue defaultRenderQueue;
@@ -137,6 +114,7 @@ namespace GRAPH
         SAFE_DELETE_PTRARRAY(u3dIndexBuffer_, 2);
         SAFE_DELETE_PTRARRAY(u3dVertexFormat_, 2);
         SAFE_DELETE(u3dContext_);
+        SAFE_DELETE(depthState_);
     }
 
     void Renderer::initGLView() {
@@ -265,16 +243,14 @@ namespace GRAPH
         const auto& zNegQueue = queue.getSubQueue(RenderQueue::QUEUE_GROUP::GLOBALZ_NEG);
         if (zNegQueue.size() > 0) {
             if(isDepthTestFor2D_) {
-                glEnable(GL_DEPTH_TEST);
-                glDepthMask(true);
-                RenderState::DefaultState().setDepthTest(true);
-                RenderState::DefaultState().setDepthWrite(true);
+                depthState_->setDepthTest(true);
+                depthState_->setDepthWrite(true);
+                depthState_->apply();
             }
             else {
-                glDisable(GL_DEPTH_TEST);
-                glDepthMask(false);
-                RenderState::DefaultState().setDepthTest(false);
-                RenderState::DefaultState().setDepthWrite(false);
+                depthState_->setDepthTest(false);
+                depthState_->setDepthWrite(false);
+                depthState_->apply();
             }
             for (auto it = zNegQueue.cbegin(); it != zNegQueue.cend(); ++it) {
                 processRenderCommand(*it);
@@ -288,10 +264,9 @@ namespace GRAPH
         const auto& opaqueQueue = queue.getSubQueue(RenderQueue::QUEUE_GROUP::OPAQUE_3D);
         if (opaqueQueue.size() > 0) {
             //Clear depth to achieve layered rendering
-            glEnable(GL_DEPTH_TEST);
-            glDepthMask(true);
-            RenderState::DefaultState().setDepthTest(true);
-            RenderState::DefaultState().setDepthWrite(true);
+            depthState_->setDepthTest(true);
+            depthState_->setDepthWrite(true);
+            depthState_->apply();
 
             for (auto it = opaqueQueue.cbegin(); it != opaqueQueue.cend(); ++it) {
                 processRenderCommand(*it);
@@ -304,10 +279,9 @@ namespace GRAPH
         //
         const auto& transQueue = queue.getSubQueue(RenderQueue::QUEUE_GROUP::TRANSPARENT_3D);
         if (transQueue.size() > 0) {
-            glEnable(GL_DEPTH_TEST);
-            glDepthMask(false);
-            RenderState::DefaultState().setDepthTest(true);
-            RenderState::DefaultState().setDepthWrite(false);
+            depthState_->setDepthTest(true);
+            depthState_->setDepthWrite(false);
+            depthState_->apply();
 
             for (auto it = transQueue.cbegin(); it != transQueue.cend(); ++it) {
                 processRenderCommand(*it);
@@ -321,20 +295,14 @@ namespace GRAPH
         const auto& zZeroQueue = queue.getSubQueue(RenderQueue::QUEUE_GROUP::GLOBALZ_ZERO);
         if (zZeroQueue.size() > 0) {
             if(isDepthTestFor2D_) {
-                glEnable(GL_DEPTH_TEST);
-                glDepthMask(true);
-
-                RenderState::DefaultState().setDepthTest(true);
-                RenderState::DefaultState().setDepthWrite(true);
-
+                depthState_->setDepthTest(true);
+                depthState_->setDepthWrite(true);
+                depthState_->apply();
             }
             else {
-                glDisable(GL_DEPTH_TEST);
-                glDepthMask(false);
-
-                RenderState::DefaultState().setDepthTest(false);
-                RenderState::DefaultState().setDepthWrite(false);
-
+                depthState_->setDepthTest(false);
+                depthState_->setDepthWrite(false);
+                depthState_->apply();
             }
             for (auto it = zZeroQueue.cbegin(); it != zZeroQueue.cend(); ++it) {
                 processRenderCommand(*it);
@@ -383,27 +351,21 @@ namespace GRAPH
     }
 
     void Renderer::clear() {
-        //Enable Depth mask to make sure glClear clear the depth buffer correctly
-        glDepthMask(true);
-        glClearColor(clearColor_.red, clearColor_.green, clearColor_.blue, clearColor_.alpha);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glDepthMask(false);
-
-        RenderState::DefaultState().setDepthWrite(false);
+        u3dContext_->clear(U3DClear::COLOR, clearColor_, 1.0, 0);
+        depthState_->setDepthTest(false);
+        depthState_->apply();
     }
 
     void Renderer::setDepthTest(bool enable) {
         if (enable) {
-            glClearDepth(1.0f);
-            glEnable(GL_DEPTH_TEST);
-            glDepthFunc(GL_LEQUAL);
-
-            RenderState::DefaultState().setDepthTest(true);
-            RenderState::DefaultState().setDepthFunction(RenderState::DEPTH_LEQUAL);
+            u3dContext_->clear(U3DClear::DEPTH, 0, 1.0f, 0.0);
+            depthState_->setDepthTest(true);
+            depthState_->setDepthComp(LESS_EQUAL);
+            depthState_->apply();
         }
         else {
-            glDisable(GL_DEPTH_TEST);
-            RenderState::DefaultState().setDepthTest(false);
+            depthState_->setDepthTest(false);
+            depthState_->apply();
         }
 
         isDepthTestFor2D_ = enable;

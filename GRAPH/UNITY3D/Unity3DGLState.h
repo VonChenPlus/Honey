@@ -9,7 +9,7 @@ namespace GRAPH
 {
     class Unity3DGLState
     {
-    private:
+    private:        
         template<GLenum cap, bool init>
         class BoolState
         {
@@ -29,6 +29,9 @@ namespace GRAPH
                     _value = value;
                     glDisable(cap);
                 }
+            }
+            inline bool get() {
+                return _value;
             }
             inline void enable() {
                 set(true);
@@ -50,18 +53,21 @@ namespace GRAPH
             }
         };
 
-    #define STATE1(func, p1type, p1def) \
+#define STATE1(func, p1type, p1def) \
         class SavedState1_##func { \
             p1type p1; \
         public: \
             SavedState1_##func() : p1(p1def) { \
                 Unity3DGLState::state_count++; \
-            } \
+                    } \
             void set(p1type newp1) { \
                 if(newp1 != p1) { \
                     p1 = newp1; \
                     func(p1); \
-                } \
+                                } \
+                    } \
+            p1type get() { \
+                return p1; \
             } \
             void restore() { \
                 func(p1); \
@@ -177,7 +183,7 @@ namespace GRAPH
 
     public:
         static int state_count;
-        static Unity3DGLState &DefaultState();
+        static Unity3DGLState &OpenGLState();
 
         void restore();
 
@@ -233,9 +239,7 @@ namespace GRAPH
     };
 
     #undef STATE1
-    #undef STATE2    
-
-    void CheckGLExtensions();
+    #undef STATE2
 }
 
 #endif // UNITY3DGLSTATE_H

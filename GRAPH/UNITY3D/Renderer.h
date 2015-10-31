@@ -6,9 +6,6 @@
 #include "GRAPH/UNITY3D/Unity3D.h"
 #include "GRAPH/UNITY3D/GLCommon.h"
 #include "GRAPH/UNITY3D/RenderCommand.h"
-#include "BASE/Honey.h"
-#include "GRAPH/Types.h"
-#include "MATH/Size.h"
 
 namespace GRAPH
 {
@@ -34,12 +31,14 @@ namespace GRAPH
 
     public:
         RenderQueue();
+
         void push_back(RenderCommand* command);
         uint64 size() const;
         void sort();
         RenderCommand* operator[](uint64 index) const;
         void clear();
         void realloc(uint64 reserveSize);
+        
         inline std::vector<RenderCommand*>& getSubQueue(QUEUE_GROUP group) { return commands_[group]; }
         inline uint64 getSubQueueSize(QUEUE_GROUP group) const { return commands_[group].size();}
 
@@ -48,10 +47,7 @@ namespace GRAPH
 
     protected:
         std::vector<RenderCommand*> commands_[QUEUE_COUNT];
-
-        bool isCullEnabled_;
-        bool isDepthEnabled_;
-        GLboolean isDepthWrite_;
+        Unity3DDepthState *depthState_;
     };
 
     struct RenderStackElement
@@ -127,6 +123,8 @@ namespace GRAPH
         Unity3DBuffer *u3dIndexBuffer_[2];
         Unity3DVertexFormat *u3dVertexFormat_[2];
         Unity3DContext *u3dContext_;
+
+        Unity3DDepthState *depthState_;
 
         bool glViewAssigned_;
         bool isRendering_;

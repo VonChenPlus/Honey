@@ -203,6 +203,13 @@ namespace GRAPH
         return !(*this == right);
     }
 
+    Color4F::operator uint32() const {
+        return uint8(alpha * 255) << 24 
+            | uint8(blue * 255) << 16 
+            | uint8(green * 255) << 8 
+            | uint8(red * 255);
+    }
+
     const Color3B Color3B::WHITE  (255, 255, 255);
     const Color3B Color3B::YELLOW (255, 255,   0);
     const Color3B Color3B::GREEN  (  0, 255,   0);
