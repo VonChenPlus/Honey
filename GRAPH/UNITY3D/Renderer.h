@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stack>
+#include "GRAPH/UNITY3D/Unity3D.h"
 #include "GRAPH/UNITY3D/GLCommon.h"
 #include "GRAPH/UNITY3D/RenderCommand.h"
 #include "BASE/Honey.h"
@@ -93,8 +94,7 @@ namespace GRAPH
 
     protected:
         void setupBuffer();
-        void setupVBO();
-        void mapBuffers();
+
         void drawBatchedTriangles();
         void drawBatchedQuads();
 
@@ -117,7 +117,11 @@ namespace GRAPH
         std::vector<TrianglesCommand*> batchedCommands_;
         std::vector<QuadCommand*> batchQuadCommands_;
 
-        VertexBufferObject<V3F_C4B_T2F> vboArray_[2]; //0: vertex  1: indices
+        VertexBufferObject<V3F_C4B_T2F> vboArray_[2];
+        Unity3DBuffer *u3dVertexBuffer_[2];
+        Unity3DBuffer *u3dIndexBuffer_[2];
+        Unity3DVertexFormat *u3dVertexFormat_[2];
+        Unity3DContext *u3dContext_;
 
         bool glViewAssigned_;
         bool isRendering_;

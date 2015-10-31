@@ -107,7 +107,7 @@ namespace GRAPH
         memset( vbo_.u2.indexData, 0, capacity * 6 * sizeof(GLushort) );
 
         setupIndices();
-        setupVBO();
+        setupBuffer();
 
         dirty_ = true;
 
@@ -130,7 +130,7 @@ namespace GRAPH
         }
     }
 
-    void TextureAtlas::setupVBO() {
+    void TextureAtlas::setupBuffer() {
         u3dVertexBuffer_ = u3dContext_->createBuffer(VERTEXDATA | DYNAMIC);
         u3dIndexBuffer_ = u3dContext_->createBuffer(INDEXDATA);
 
@@ -294,7 +294,6 @@ namespace GRAPH
         vbo_.u2.indexData = tmpIndices;
 
         setupIndices();
-
         u3dVertexBuffer_->setData((const uint8 *) vbo_.u2.bufferData, sizeof(V3F_C4B_T2F) * vbo_.u2.bufferCapacity);
         u3dIndexBuffer_->setData((const uint8 *) vbo_.u2.indexData, sizeof(GLushort) * vbo_.u2.indexCapacity * 6);
 
@@ -364,9 +363,6 @@ namespace GRAPH
             dirty_ = false;
         }
 
-        u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_, u3dVertexBuffer_, u3dIndexBuffer_, (void *) (start * 6 * sizeof(vbo_.u2.indexData[0])), (GLsizei) numberOfQuads * 6);
-
-        Unity3DGLState::DefaultState().arrayBuffer.bind(0);
-        Unity3DGLState::DefaultState().elementArrayBuffer.bind(0);
+        u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_, u3dVertexBuffer_, u3dIndexBuffer_, (void *) (start * 6 * sizeof(GLushort)), (GLsizei) numberOfQuads * 6);
     }
 }

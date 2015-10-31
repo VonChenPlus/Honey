@@ -13,6 +13,8 @@ namespace GRAPH
     void Unity3DGLState::restore() {
         int count = 0;
 
+        useProgram.restore(); count++;
+
         blend.restore(); count++;
         blendEquationSeparate.restore(); count++;
         blendFuncSeparate.restore(); count++;

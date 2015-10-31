@@ -62,6 +62,7 @@ namespace GRAPH
                 glEnableVertexAttribArray(i);
             }
         }
+
         intptr b = (intptr) base;
         for (uint64 i = 0; i < components_.size(); i++) {
             switch (components_[i].type) {
@@ -146,6 +147,8 @@ namespace GRAPH
         fmt->apply();
 
         glDrawElements(primToGL[prim], offset, GL_UNSIGNED_SHORT, indices);
+
+        fmt->unApply();
     }
 
     void Unity3DGLContext::drawUp(U3DPrimitive prim, Unity3DShaderSet *shaderSet, Unity3DVertexFormat *format, const void *vdata, int vertexCount) {

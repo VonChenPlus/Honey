@@ -34,6 +34,7 @@ private: \
 
 #define SAFE_DELETE(p)           do { delete (p); (p) = nullptr; } while(0)
 #define SAFE_DELETE_ARRAY(p)     do { if(p) { delete[] (p); (p) = nullptr; } } while(0)
+#define SAFE_DELETE_PTRARRAY(p, _count) do { int64 count = _count - 1;  for (; count > -1; count--) delete p[count]; } while(0)
 #define SAFE_FREE(p)             do { if(p) { free(p); (p) = nullptr; } } while(0)
 
 #endif // HONEY_H

@@ -55,7 +55,7 @@ namespace GRAPH
     private:
         void renderCommand();
         void setupIndices();
-        void setupVBO();
+        void setupBuffer();
 
     protected:
         VertexBufferObject<V3F_C4B_T2F_Quad> vbo_;

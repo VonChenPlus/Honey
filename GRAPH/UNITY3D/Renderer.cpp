@@ -111,7 +111,8 @@ namespace GRAPH
         : lastMaterialID_(0)
         , glViewAssigned_(false)
         , isRendering_(false)
-        , isDepthTestFor2D_(false) {
+        , isDepthTestFor2D_(false)
+        , u3dContext_(Unity3DContext::CreateContext()) {
         groupCommandManager_ = new (std::nothrow) GroupCommandManager(this);
         commandGroupStack_.push(DEFAULT_RENDER_QUEUE);
         RenderQueue defaultRenderQueue;
@@ -132,17 +133,14 @@ namespace GRAPH
     Renderer::~Renderer() {
         renderGroups_.clear();
         groupCommandManager_->release();
-
-        for (auto &object : vboArray_) {
-            delete[] object.u2.bufferData;
-            delete[] object.u2.indexData;
-            glDeleteBuffers(2, object.u2.objectID);
-        }
+        SAFE_DELETE_PTRARRAY(u3dVertexBuffer_, 2);
+        SAFE_DELETE_PTRARRAY(u3dIndexBuffer_, 2);
+        SAFE_DELETE_PTRARRAY(u3dVertexFormat_, 2);
+        SAFE_DELETE(u3dContext_);
     }
 
     void Renderer::initGLView() {
-        for (int i = 0; i < VBO_SIZE / 4; i++)
-        {
+        for (int i = 0; i < VBO_SIZE / 4; i++) {
             vboArray_[1].u2.indexData[i * 6 + 0] = (GLushort) (i * 4 + 0);
             vboArray_[1].u2.indexData[i * 6 + 1] = (GLushort) (i * 4 + 1);
             vboArray_[1].u2.indexData[i * 6 + 2] = (GLushort) (i * 4 + 2);
@@ -156,24 +154,18 @@ namespace GRAPH
     }
 
     void Renderer::setupBuffer() {
-        setupVBO();
-    }
+        for (int index = 0; index < 2; ++index) {
+            u3dVertexBuffer_[index] = u3dContext_->createBuffer(VERTEXDATA | DYNAMIC);
+            u3dIndexBuffer_[index] = u3dContext_->createBuffer(INDEXDATA);
 
-    void Renderer::setupVBO() {
-        glGenBuffers(2, vboArray_[0].u2.objectID);
-        glGenBuffers(2, vboArray_[1].u2.objectID);
-        mapBuffers();
-    }
+            u3dVertexBuffer_[index]->setData((const uint8 *) vboArray_[index].u2.bufferData, sizeof(V3F_C4B_T2F) * vboArray_[index].u2.bufferCapacity);
+            u3dIndexBuffer_[index]->setData((const uint8 *) vboArray_[index].u2.indexData, sizeof(GLushort) * vboArray_[index].u2.indexCapacity);
 
-    void Renderer::mapBuffers() {
-        for (auto object : vboArray_) {
-            glBindBuffer(GL_ARRAY_BUFFER, object.u2.objectID[0]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(V3F_C4B_T2F) * VBO_SIZE, object.u2.bufferData, GL_DYNAMIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object.u2.objectID[1]);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * INDEX_VBO_SIZE, object.u2.indexData, GL_STATIC_DRAW);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            std::vector<Unity3DVertexComponent> vertexFormat = {
+                Unity3DVertexComponent(SEM_POSITION, FLOATx3, offsetof(V3F_C4B_T2F, vertices)),
+                Unity3DVertexComponent(SEM_COLOR0, UNORM8x4, offsetof(V3F_C4B_T2F, colors)),
+                Unity3DVertexComponent(SEM_TEXCOORD0, FLOATx2, offsetof(V3F_C4B_T2F, texCoords)) };
+            u3dVertexFormat_[index] = u3dContext_->createVertexFormat(vertexFormat, sizeof(V3F_C4B_T2F));
         }
     }
 
@@ -459,36 +451,24 @@ namespace GRAPH
             return;
         }
 
-        glBindBuffer(GL_ARRAY_BUFFER, vboArray_[0].u2.objectID[0]);
+        u3dVertexBuffer_[0]->bind();
+        u3dVertexBuffer_[0]->setData((const uint8 *) vboArray_[0].u2.bufferData, sizeof(V3F_C4B_T2F) * vboArray_[0].u2.bufferCount);
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vboArray_[0].u2.bufferData[0]) * vboArray_[0].u2.bufferCount , vboArray_[0].u2.bufferData, GL_DYNAMIC_DRAW);
+        u3dIndexBuffer_[0]->bind();
+        u3dIndexBuffer_[0]->setData((const uint8 *) vboArray_[0].u2.indexData, sizeof(GLushort) * vboArray_[0].u2.indexCount);
 
-        GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
-
-        // vertices
-        glVertexAttribPointer(SEM_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
-
-        // colors
-        glVertexAttribPointer(SEM_COLOR0, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, colors));
-
-        // tex coords
-        glVertexAttribPointer(SEM_TEXCOORD0, 2, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboArray_[0].u2.objectID[1]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(vboArray_[0].u2.indexData[0]) * vboArray_[0].u2.indexCount, vboArray_[0].u2.indexData, GL_STATIC_DRAW);
-
-        //Start drawing verties in batch
+        // Start drawing verties in batch
         for(const auto& cmd : batchedCommands_) {
             auto newMaterialID = cmd->getMaterialID();
             if(lastMaterialID_ != newMaterialID || newMaterialID == MATERIAL_ID_DO_NOT_BATCH) {
-                //Draw quads
+                // Draw quads
                 if(indexToDraw > 0) {
-                    glDrawElements(GL_TRIANGLES, (GLsizei) indexToDraw, GL_UNSIGNED_SHORT, (GLvoid*) (startIndex*sizeof(vboArray_[0].u2.indexData[0])) );
+                    u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[0], u3dVertexBuffer_[0], u3dIndexBuffer_[0], (void *)(startIndex*sizeof(GLushort)), indexToDraw);
                     startIndex += indexToDraw;
                     indexToDraw = 0;
                 }
 
-                //Use new material
+                // Use new material
                 cmd->useMaterial();
                 lastMaterialID_ = newMaterialID;
             }
@@ -498,11 +478,8 @@ namespace GRAPH
 
         //Draw any remaining triangles
         if(indexToDraw > 0) {
-            glDrawElements(GL_TRIANGLES, (GLsizei) indexToDraw, GL_UNSIGNED_SHORT, (GLvoid*) (startIndex*sizeof(vboArray_[0].u2.indexData[0])) );
+            u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[0], u3dVertexBuffer_[0], u3dIndexBuffer_[0], (void *)(startIndex*sizeof(GLushort)), indexToDraw);
         }
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         batchedCommands_.clear();
         vboArray_[0].u2.bufferCount = 0;
@@ -519,22 +496,8 @@ namespace GRAPH
             return;
         }
 
-        glBindBuffer(GL_ARRAY_BUFFER, vboArray_[1].u2.objectID[0]);
-
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vboArray_[1].u2.bufferData[0]) * vboArray_[1].u2.bufferCount * 4 , vboArray_[1].u2.bufferData, GL_DYNAMIC_DRAW);
-
-        GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
-
-        // vertices
-        glVertexAttribPointer(SEM_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, vertices));
-
-        // colors
-        glVertexAttribPointer(SEM_COLOR0, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, colors));
-
-        // tex coords
-        glVertexAttribPointer(SEM_TEXCOORD0, 2, GL_FLOAT, GL_FALSE, sizeof(V3F_C4B_T2F), (GLvoid*) offsetof(V3F_C4B_T2F, texCoords));
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboArray_[1].u2.objectID[1]);
+        u3dVertexBuffer_[1]->bind();
+        u3dVertexBuffer_[1]->setData((const uint8 *) vboArray_[1].u2.bufferData, sizeof(V3F_C4B_T2F) * vboArray_[1].u2.bufferCount * 4);
 
         //Start drawing vertices in batch
         for(const auto& cmd : batchQuadCommands_) {
@@ -543,7 +506,7 @@ namespace GRAPH
             if(lastMaterialID_ != newMaterialID || newMaterialID == MATERIAL_ID_DO_NOT_BATCH) {
                 // flush buffer
                 if(indexToDraw > 0) {
-                    glDrawElements(GL_TRIANGLES, (GLsizei) indexToDraw, GL_UNSIGNED_SHORT, (GLvoid*) (startIndex*sizeof(vboArray_[0].u2.indexData[0])) );
+                    u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[0], u3dVertexBuffer_[0], u3dIndexBuffer_[0], (void *) (startIndex*sizeof(GLushort)), indexToDraw);
                     startIndex += indexToDraw;
                     indexToDraw = 0;
                 }
@@ -561,11 +524,8 @@ namespace GRAPH
 
         //Draw any remaining quad
         if(indexToDraw > 0) {
-            glDrawElements(GL_TRIANGLES, (GLsizei) indexToDraw, GL_UNSIGNED_SHORT, (GLvoid*) (startIndex*sizeof(vboArray_[0].u2.indexData[0])) );
+            u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[0], u3dVertexBuffer_[0], u3dIndexBuffer_[0], (void *) (startIndex*sizeof(GLushort)), indexToDraw);
         }
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         batchQuadCommands_.clear();
         vboArray_[1].u2.bufferCount = 0;
