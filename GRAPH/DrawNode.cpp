@@ -9,14 +9,17 @@ namespace GRAPH
 {
     DrawNode::DrawNode() {
         blendFunc_ = BlendFunc::ALPHA_PREMULTIPLIED;
+        u3dContext_ = (Unity3DContext::CreateContext());
         memset(vboArray_, 0, sizeof(VertexBufferObject<V2F_C4B_T2F>) * 3);
     }
 
     DrawNode::~DrawNode() {
         for (auto object : vboArray_) {
             free(object.u1.bufferData);
-            glDeleteBuffers(1, &object.u1.objectID);
         }
+        SAFE_DELETE_PTRARRAY(u3dVertexBuffer_, 3);
+        SAFE_DELETE_PTRARRAY(u3dVertexFormat_, 3);
+        SAFE_DELETE(u3dContext_);
     }
 
     DrawNode* DrawNode::create() {
@@ -43,15 +46,19 @@ namespace GRAPH
 
         setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR));
 
-        ensureCapacity(0, 512);
-        ensureCapacity(1, 512);
-        ensureCapacity(2, 512);
+        for (int index = 0; index < 3; ++index) {
+            ensureCapacity(0, 512);
 
-        for (auto &object : vboArray_) {
-            glGenBuffers(1, &object.u1.objectID);
-            glBindBuffer(GL_ARRAY_BUFFER, object.u1.objectID);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(V2F_C4B_T2F)* object.u1.bufferCapacity, object.u1.bufferData, GL_STREAM_DRAW);
+            u3dVertexBuffer_[index] = u3dContext_->createBuffer(VERTEXDATA | STREAM);
+            u3dVertexBuffer_[index]->setData((const uint8 *) vboArray_[index].u1.bufferData, sizeof(V2F_C4B_T2F) * vboArray_[index].u1.bufferCapacity);
+
+            std::vector<Unity3DVertexComponent> vertexFormat = {
+                Unity3DVertexComponent(SEM_POSITION, FLOATx3, offsetof(V2F_C4B_T2F, vertices)),
+                Unity3DVertexComponent(SEM_COLOR0, UNORM8x4, offsetof(V2F_C4B_T2F, colors)),
+                Unity3DVertexComponent(SEM_TEXCOORD0, FLOATx2, offsetof(V2F_C4B_T2F, texCoords)) };
+            u3dVertexFormat_[index] = u3dContext_->createVertexFormat(vertexFormat, sizeof(V2F_C4B_T2F));
         }
+
         memset(dirty_, 0, sizeof(bool) * 3);
 
         return true;
@@ -85,23 +92,12 @@ namespace GRAPH
         GLStateCache::BlendFunc(blendFunc_.src, blendFunc_.dst);
 
         if (dirty_[0]) {
-            glBindBuffer(GL_ARRAY_BUFFER, vboArray_[0].u1.objectID);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(V2F_C4B_T2F)*vboArray_[0].u1.bufferCapacity, vboArray_[0].u1.bufferData, GL_STREAM_DRAW);
+            u3dVertexBuffer_[DEFAULT]->bind();
+            u3dVertexBuffer_[DEFAULT]->setData((const uint8 *) vboArray_[0].u1.bufferData, sizeof(V2F_C4B_T2F)*vboArray_[0].u1.bufferCapacity);
             dirty_[0] = false;
         }
 
-        GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vboArray_[0].u1.objectID);
-        // vertex
-        glVertexAttribPointer(SEM_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), (GLvoid *)offsetof(V2F_C4B_T2F, vertices));
-        // color
-        glVertexAttribPointer(SEM_COLOR0, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V2F_C4B_T2F), (GLvoid *)offsetof(V2F_C4B_T2F, colors));
-        // texcood
-        glVertexAttribPointer(SEM_TEXCOORD0, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), (GLvoid *) offsetof(V2F_C4B_T2F, texCoords));
-
-        glDrawArrays(GL_TRIANGLES, 0, vboArray_[0].u1.bufferCount);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        u3dContext_->draw(PRIM_TRIANGLES, u3dVertexFormat_[DEFAULT], u3dVertexBuffer_[DEFAULT], vboArray_[DEFAULT].u1.bufferCount, 0);
     }
 
     void DrawNode::onDrawGLLine(const MATH::Matrix4 &transform, uint32_t) {
@@ -109,25 +105,13 @@ namespace GRAPH
         u3dShader->apply();
         u3dShader->setUniformsForBuiltins(transform);
 
-        if (dirty_[2]) {
-            glBindBuffer(GL_ARRAY_BUFFER, vboArray_[2].u1.objectID);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(V2F_C4B_T2F)*vboArray_[2].u1.bufferCapacity, vboArray_[2].u1.bufferData, GL_STREAM_DRAW);
-            dirty_[2] = false;
+        if (dirty_[0]) {
+            u3dVertexBuffer_[LINE]->bind();
+            u3dVertexBuffer_[LINE]->setData((const uint8 *) vboArray_[LINE].u1.bufferData, sizeof(V2F_C4B_T2F)*vboArray_[LINE].u1.bufferCapacity);
+            dirty_[0] = false;
         }
 
-        glBindBuffer(GL_ARRAY_BUFFER, vboArray_[2].u1.objectID);
-        GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
-        // vertex
-        glVertexAttribPointer(SEM_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), (GLvoid *)offsetof(V2F_C4B_T2F, vertices));
-        // color
-        glVertexAttribPointer(SEM_COLOR0, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V2F_C4B_T2F), (GLvoid *)offsetof(V2F_C4B_T2F, colors));
-        // texcood
-        glVertexAttribPointer(SEM_TEXCOORD0, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), (GLvoid *) offsetof(V2F_C4B_T2F, texCoords));
-
-        glLineWidth(2);
-        glDrawArrays(GL_LINES, 0, vboArray_[2].u1.bufferCount);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        u3dContext_->draw(PRIM_LINES, u3dVertexFormat_[LINE], u3dVertexBuffer_[LINE], vboArray_[LINE].u1.bufferCount, 0);
     }
 
     void DrawNode::onDrawGLPoint(const MATH::Matrix4 &transform, uint32_t) {
@@ -135,21 +119,13 @@ namespace GRAPH
         u3dShader->apply();
         u3dShader->setUniformsForBuiltins(transform);
 
-        if (dirty_[1]) {
-            glBindBuffer(GL_ARRAY_BUFFER, vboArray_[1].u1.objectID);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(V2F_C4B_T2F)*vboArray_[1].u1.bufferCapacity, vboArray_[1].u1.bufferData, GL_STREAM_DRAW);
-            dirty_[1] = false;
+        if (dirty_[0]) {
+            u3dVertexBuffer_[POINT]->bind();
+            u3dVertexBuffer_[POINT]->setData((const uint8 *) vboArray_[POINT].u1.bufferData, sizeof(V2F_C4B_T2F)*vboArray_[POINT].u1.bufferCapacity);
+            dirty_[0] = false;
         }
 
-        glBindBuffer(GL_ARRAY_BUFFER, vboArray_[1].u1.objectID);
-        GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POS_COLOR_TEX);
-        glVertexAttribPointer(SEM_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), (GLvoid *)offsetof(V2F_C4B_T2F, vertices));
-        glVertexAttribPointer(SEM_COLOR0, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V2F_C4B_T2F), (GLvoid *)offsetof(V2F_C4B_T2F, colors));
-        glVertexAttribPointer(SEM_TEXCOORD0, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), (GLvoid *) offsetof(V2F_C4B_T2F, texCoords));
-
-        glDrawArrays(GL_POINTS, 0, vboArray_[1].u1.bufferCount);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        u3dContext_->draw(PRIM_POINTS, u3dVertexFormat_[POINT], u3dVertexBuffer_[POINT], vboArray_[POINT].u1.bufferCount, 0);
     }
 
     void DrawNode::drawPoint(const MATH::Vector2f& position, const float pointSize, const Color4F &color) {
@@ -374,15 +350,11 @@ namespace GRAPH
 
     void DrawNode::drawSegment(const MATH::Vector2f &from, const MATH::Vector2f &to, float radius, const Color4F &color) {
         unsigned int vertex_count = 6*3;
-        GLStateCache::EnableVertexAttribs(vertex_count);
 
         MATH::Vector2f a = from;
         MATH::Vector2f b = to;
-
-
         MATH::Vector2f n = MATH::Vector2f::normalize(MATH::Vector2f::perp(MATH::Vector2f::subtract(b, a)));
         MATH::Vector2f t = MATH::Vector2f::perp(n);
-
         MATH::Vector2f nw = MATH::Vector2f::scale(n, radius);
         MATH::Vector2f tw = MATH::Vector2f::scale(t, radius);
         MATH::Vector2f v0 = MATH::Vector2f::subtract(b, MATH::Vector2f::add(nw, tw));
@@ -393,7 +365,6 @@ namespace GRAPH
         MATH::Vector2f v5 = MATH::Vector2f::add(a, nw);
         MATH::Vector2f v6 = MATH::Vector2f::subtract(a, MATH::Vector2f::subtract(nw, tw));
         MATH::Vector2f v7 = MATH::Vector2f::add(a, MATH::Vector2f::add(nw, tw));
-
 
         V2F_C4B_T2F_Triangle *triangles = (V2F_C4B_T2F_Triangle *)(vboArray_[0].u1.bufferData + vboArray_[0].u1.bufferCount);
 

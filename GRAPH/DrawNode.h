@@ -3,6 +3,7 @@
 
 #include "GRAPH/Node.h"
 #include "GRAPH/Types.h"
+#include "GRAPH/UNITY3D/Unity3D.h"
 #include "GRAPH/UNITY3D/RenderCommand.h"
 
 namespace GRAPH
@@ -52,7 +53,16 @@ namespace GRAPH
         void ensureCapacity(int type, uint64 count);
 
     private:
+        enum
+        {
+            DEFAULT,
+            POINT,
+            LINE
+        };
         VertexBufferObject<V2F_C4B_T2F> vboArray_[3]; // default, point, line
+        Unity3DBuffer *u3dVertexBuffer_[3];
+        Unity3DVertexFormat *u3dVertexFormat_[3];
+        Unity3DContext *u3dContext_;
         bool dirty_[3];
         BlendFunc   blendFunc_;
         CustomCommand customCommand_;

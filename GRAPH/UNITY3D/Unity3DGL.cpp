@@ -17,6 +17,8 @@ namespace GRAPH
         usage_ = 0;
         if (flags & U3DBufferUsage::DYNAMIC)
             usage_ = GL_DYNAMIC_DRAW;
+        else if (flags & U3DBufferUsage::STREAM)
+            usage_ = GL_STREAM_DRAW;
         else
             usage_ = GL_STATIC_DRAW;
         knownSize_ = 0;
@@ -122,18 +124,15 @@ namespace GRAPH
         return vertexFormat;
     }
 
-    void Unity3DGLContext::draw(U3DPrimitive prim, Unity3DShaderSet *shaderSet, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) {
-        Unity3DGLShaderSet *ss = static_cast<Unity3DGLShaderSet *>(shaderSet);
+    void Unity3DGLContext::draw(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) {
         Unity3DGLBuffer *vbuf = static_cast<Unity3DGLBuffer *>(vdata);
         Unity3DGLVertexFormat *fmt = static_cast<Unity3DGLVertexFormat *>(format);
 
         vbuf->bind();
         fmt->apply();
-        ss->apply();
 
         glDrawArrays(primToGL[prim], offset, vertexCount);
 
-        ss->unApply();
         fmt->unApply();
     }
 
@@ -151,16 +150,13 @@ namespace GRAPH
         fmt->unApply();
     }
 
-    void Unity3DGLContext::drawUp(U3DPrimitive prim, Unity3DShaderSet *shaderSet, Unity3DVertexFormat *format, const void *vdata, int vertexCount) {
-        Unity3DGLShaderSet *ss = static_cast<Unity3DGLShaderSet *>(shaderSet);
+    void Unity3DGLContext::drawUp(U3DPrimitive prim, Unity3DVertexFormat *format, const void *vdata, int vertexCount) {
         Unity3DGLVertexFormat *fmt = static_cast<Unity3DGLVertexFormat *>(format);
 
         fmt->apply(vdata);
-        ss->apply();
 
         glDrawArrays(primToGL[prim], 0, vertexCount);
 
-        ss->unApply();
         fmt->unApply();
     }
 

@@ -117,6 +117,11 @@ namespace GRAPH
         std::vector<TrianglesCommand*> batchedCommands_;
         std::vector<QuadCommand*> batchQuadCommands_;
 
+        enum
+        {
+            TRIANGLES,
+            QUADS,
+        };
         VertexBufferObject<V3F_C4B_T2F> vboArray_[2];
         Unity3DBuffer *u3dVertexBuffer_[2];
         Unity3DBuffer *u3dIndexBuffer_[2];

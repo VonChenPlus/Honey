@@ -70,7 +70,8 @@ namespace GRAPH
         VERTEXDATA = 1,
         INDEXDATA = 2,
         GENERIC = 4,
-        DYNAMIC = 16,
+        DYNAMIC = 8,
+        STREAM = 16,
     };
 
     enum U3DVertexDataType : uint8
@@ -271,9 +272,9 @@ namespace GRAPH
         virtual Unity3DVertexFormat *createVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) = 0;
 
         // TODO: Add more sophisticated draws with buffer offsets, and multidraws.
-        virtual void draw(U3DPrimitive prim, Unity3DShaderSet *pipeline, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) = 0;
+        virtual void draw(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) = 0;
         virtual void drawIndexed(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, Unity3DBuffer *idata, void *indices, int offset) = 0;
-        virtual void drawUp(U3DPrimitive prim, Unity3DShaderSet *pipeline, Unity3DVertexFormat *format, const void *vdata, int vertexCount) = 0;
+        virtual void drawUp(U3DPrimitive prim, Unity3DVertexFormat *format, const void *vdata, int vertexCount) = 0;
         virtual void clear(int mask, uint32 colorval, float depthVal, int stencilVal) = 0;
     };
 }

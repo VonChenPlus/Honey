@@ -141,12 +141,12 @@ namespace GRAPH
 
     void Renderer::initGLView() {
         for (int i = 0; i < VBO_SIZE / 4; i++) {
-            vboArray_[1].u2.indexData[i * 6 + 0] = (GLushort) (i * 4 + 0);
-            vboArray_[1].u2.indexData[i * 6 + 1] = (GLushort) (i * 4 + 1);
-            vboArray_[1].u2.indexData[i * 6 + 2] = (GLushort) (i * 4 + 2);
-            vboArray_[1].u2.indexData[i * 6 + 3] = (GLushort) (i * 4 + 3);
-            vboArray_[1].u2.indexData[i * 6 + 4] = (GLushort) (i * 4 + 2);
-            vboArray_[1].u2.indexData[i * 6 + 5] = (GLushort) (i * 4 + 1);
+            vboArray_[QUADS].u2.indexData[i * 6 + 0] = (GLushort) (i * 4 + 0);
+            vboArray_[QUADS].u2.indexData[i * 6 + 1] = (GLushort) (i * 4 + 1);
+            vboArray_[QUADS].u2.indexData[i * 6 + 2] = (GLushort) (i * 4 + 2);
+            vboArray_[QUADS].u2.indexData[i * 6 + 3] = (GLushort) (i * 4 + 3);
+            vboArray_[QUADS].u2.indexData[i * 6 + 4] = (GLushort) (i * 4 + 2);
+            vboArray_[QUADS].u2.indexData[i * 6 + 5] = (GLushort) (i * 4 + 1);
         }
 
         setupBuffer();
@@ -202,7 +202,7 @@ namespace GRAPH
             auto cmd = static_cast<TrianglesCommand*>(command);
 
             //Draw batched Triangles if necessary
-            if(cmd->isSkipBatching() || vboArray_[0].u2.bufferCount + cmd->getVertexCount() > VBO_SIZE || vboArray_[0].u2.indexCount + cmd->getIndexCount() > INDEX_VBO_SIZE) {
+            if (cmd->isSkipBatching() || vboArray_[TRIANGLES].u2.bufferCount + cmd->getVertexCount() > VBO_SIZE || vboArray_[TRIANGLES].u2.indexCount + cmd->getIndexCount() > INDEX_VBO_SIZE) {
                 //Draw batched Triangles if VBO is full
                 drawBatchedTriangles();
             }
@@ -225,7 +225,7 @@ namespace GRAPH
             auto cmd = static_cast<QuadCommand*>(command);
 
             //Draw batched quads if necessary
-            if(cmd->isSkipBatching()|| (vboArray_[1].u2.bufferCount + cmd->getQuadCount()) * 4 > VBO_SIZE ) {
+            if (cmd->isSkipBatching() || (vboArray_[QUADS].u2.bufferCount + cmd->getQuadCount()) * 4 > VBO_SIZE) {
                 //Draw batched quads if VBO is full
                 drawBatchedQuads();
             }
@@ -410,11 +410,11 @@ namespace GRAPH
     }
 
     void Renderer::fillVerticesAndIndices(const TrianglesCommand* cmd) {
-        memcpy(vboArray_[0].u2.bufferData + vboArray_[0].u2.bufferCount, cmd->getVertices(), sizeof(V3F_C4B_T2F) * cmd->getVertexCount());
+        memcpy(vboArray_[TRIANGLES].u2.bufferData + vboArray_[TRIANGLES].u2.bufferCount, cmd->getVertices(), sizeof(V3F_C4B_T2F) * cmd->getVertexCount());
         const MATH::Matrix4& modelView = cmd->getModelView();
 
         for(uint64 i=0; i< cmd->getVertexCount(); ++i) {
-            V3F_C4B_T2F *q = &vboArray_[0].u2.bufferData[i + vboArray_[0].u2.bufferCount];
+            V3F_C4B_T2F *q = &vboArray_[TRIANGLES].u2.bufferData[i + vboArray_[TRIANGLES].u2.bufferCount];
             MATH::Vector3f *vec1 = (MATH::Vector3f*)&q->vertices;
             modelView.transformPoint(vec1);
         }
@@ -422,22 +422,22 @@ namespace GRAPH
         const unsigned short* indices = cmd->getIndices();
         //fill index
         for(uint64 i=0; i< cmd->getIndexCount(); ++i) {
-            vboArray_[0].u2.indexData[vboArray_[0].u2.indexCount + i] = vboArray_[0].u2.bufferCount + indices[i];
+            vboArray_[TRIANGLES].u2.indexData[vboArray_[TRIANGLES].u2.indexCount + i] = vboArray_[TRIANGLES].u2.bufferCount + indices[i];
         }
 
-        vboArray_[0].u2.bufferCount += cmd->getVertexCount();
-        vboArray_[0].u2.indexCount += cmd->getIndexCount();
+        vboArray_[TRIANGLES].u2.bufferCount += cmd->getVertexCount();
+        vboArray_[TRIANGLES].u2.indexCount += cmd->getIndexCount();
     }
 
     void Renderer::fillQuads(const QuadCommand *cmd) {
         const MATH::Matrix4& modelView = cmd->getModelView();
         const V3F_C4B_T2F* quads =  (V3F_C4B_T2F*)cmd->getQuads();
         for(uint64 i=0; i< cmd->getQuadCount() * 4; ++i) {
-            vboArray_[1].u2.bufferData[i + vboArray_[1].u2.bufferCount * 4] = quads[i];
-            modelView.transformPoint(quads[i].vertices,&(vboArray_[1].u2.bufferData[i + vboArray_[1].u2.bufferCount * 4].vertices));
+            vboArray_[QUADS].u2.bufferData[i + vboArray_[QUADS].u2.bufferCount * 4] = quads[i];
+            modelView.transformPoint(quads[i].vertices, &(vboArray_[QUADS].u2.bufferData[i + vboArray_[QUADS].u2.bufferCount * 4].vertices));
         }
 
-        vboArray_[1].u2.bufferCount += cmd->getQuadCount();
+        vboArray_[QUADS].u2.bufferCount += cmd->getQuadCount();
     }
 
     void Renderer::drawBatchedTriangles()
@@ -447,15 +447,15 @@ namespace GRAPH
         int startIndex = 0;
 
         //Upload buffer to VBO
-        if(vboArray_[0].u2.bufferCount <= 0 || vboArray_[0].u2.indexCount <= 0 || batchedCommands_.empty()) {
+        if (vboArray_[TRIANGLES].u2.bufferCount <= 0 || vboArray_[TRIANGLES].u2.indexCount <= 0 || batchedCommands_.empty()) {
             return;
         }
 
-        u3dVertexBuffer_[0]->bind();
-        u3dVertexBuffer_[0]->setData((const uint8 *) vboArray_[0].u2.bufferData, sizeof(V3F_C4B_T2F) * vboArray_[0].u2.bufferCount);
+        u3dVertexBuffer_[TRIANGLES]->bind();
+        u3dVertexBuffer_[TRIANGLES]->setData((const uint8 *) vboArray_[TRIANGLES].u2.bufferData, sizeof(V3F_C4B_T2F) * vboArray_[TRIANGLES].u2.bufferCount);
 
-        u3dIndexBuffer_[0]->bind();
-        u3dIndexBuffer_[0]->setData((const uint8 *) vboArray_[0].u2.indexData, sizeof(GLushort) * vboArray_[0].u2.indexCount);
+        u3dIndexBuffer_[TRIANGLES]->bind();
+        u3dIndexBuffer_[TRIANGLES]->setData((const uint8 *) vboArray_[TRIANGLES].u2.indexData, sizeof(GLushort) * vboArray_[TRIANGLES].u2.indexCount);
 
         // Start drawing verties in batch
         for(const auto& cmd : batchedCommands_) {
@@ -463,7 +463,7 @@ namespace GRAPH
             if(lastMaterialID_ != newMaterialID || newMaterialID == MATERIAL_ID_DO_NOT_BATCH) {
                 // Draw quads
                 if(indexToDraw > 0) {
-                    u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[0], u3dVertexBuffer_[0], u3dIndexBuffer_[0], (void *)(startIndex*sizeof(GLushort)), indexToDraw);
+                    u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[TRIANGLES], u3dVertexBuffer_[TRIANGLES], u3dIndexBuffer_[TRIANGLES], (void *) (startIndex*sizeof(GLushort)), indexToDraw);
                     startIndex += indexToDraw;
                     indexToDraw = 0;
                 }
@@ -478,12 +478,12 @@ namespace GRAPH
 
         //Draw any remaining triangles
         if(indexToDraw > 0) {
-            u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[0], u3dVertexBuffer_[0], u3dIndexBuffer_[0], (void *)(startIndex*sizeof(GLushort)), indexToDraw);
+            u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[TRIANGLES], u3dVertexBuffer_[TRIANGLES], u3dIndexBuffer_[TRIANGLES], (void *) (startIndex*sizeof(GLushort)), indexToDraw);
         }
 
         batchedCommands_.clear();
-        vboArray_[0].u2.bufferCount = 0;
-        vboArray_[0].u2.indexCount = 0;
+        vboArray_[TRIANGLES].u2.bufferCount = 0;
+        vboArray_[TRIANGLES].u2.indexCount = 0;
     }
 
     void Renderer::drawBatchedQuads() {
@@ -492,12 +492,12 @@ namespace GRAPH
         int startIndex = 0;
 
         //Upload buffer to VBO
-        if(vboArray_[1].u2.bufferCount <= 0 || batchQuadCommands_.empty()) {
+        if (vboArray_[QUADS].u2.bufferCount <= 0 || batchQuadCommands_.empty()) {
             return;
         }
 
-        u3dVertexBuffer_[1]->bind();
-        u3dVertexBuffer_[1]->setData((const uint8 *) vboArray_[1].u2.bufferData, sizeof(V3F_C4B_T2F) * vboArray_[1].u2.bufferCount * 4);
+        u3dVertexBuffer_[QUADS]->bind();
+        u3dVertexBuffer_[QUADS]->setData((const uint8 *) vboArray_[QUADS].u2.bufferData, sizeof(V3F_C4B_T2F) * vboArray_[QUADS].u2.bufferCount * 4);
 
         //Start drawing vertices in batch
         for(const auto& cmd : batchQuadCommands_) {
@@ -506,7 +506,7 @@ namespace GRAPH
             if(lastMaterialID_ != newMaterialID || newMaterialID == MATERIAL_ID_DO_NOT_BATCH) {
                 // flush buffer
                 if(indexToDraw > 0) {
-                    u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[0], u3dVertexBuffer_[0], u3dIndexBuffer_[0], (void *) (startIndex*sizeof(GLushort)), indexToDraw);
+                    u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[QUADS], u3dVertexBuffer_[QUADS], u3dIndexBuffer_[QUADS], (void *) (startIndex*sizeof(GLushort)), indexToDraw);
                     startIndex += indexToDraw;
                     indexToDraw = 0;
                 }
@@ -524,11 +524,11 @@ namespace GRAPH
 
         //Draw any remaining quad
         if(indexToDraw > 0) {
-            u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[0], u3dVertexBuffer_[0], u3dIndexBuffer_[0], (void *) (startIndex*sizeof(GLushort)), indexToDraw);
+            u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[QUADS], u3dVertexBuffer_[QUADS], u3dIndexBuffer_[QUADS], (void *) (startIndex*sizeof(GLushort)), indexToDraw);
         }
 
         batchQuadCommands_.clear();
-        vboArray_[1].u2.bufferCount = 0;
+        vboArray_[QUADS].u2.bufferCount = 0;
     }
 
     void Renderer::flush() {
@@ -541,15 +541,14 @@ namespace GRAPH
     }
 
     void Renderer::flushQuads() {
-        if(vboArray_[1].u2.bufferCount > 0) {
+        if (vboArray_[QUADS].u2.bufferCount > 0) {
             drawBatchedQuads();
             lastMaterialID_ = 0;
         }
     }
 
     void Renderer::flushTriangles() {
-        if(vboArray_[0].u2.indexCount > 0)
-        {
+        if (vboArray_[TRIANGLES].u2.indexCount > 0) {
             drawBatchedTriangles();
             lastMaterialID_ = 0;
         }

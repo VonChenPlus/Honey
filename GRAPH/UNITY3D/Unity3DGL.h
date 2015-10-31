@@ -56,9 +56,9 @@ namespace GRAPH
         virtual Unity3DVertexFormat *createVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) override;
 
         // TODO: Add more sophisticated draws with buffer offsets, and multidraws.
-        virtual void draw(U3DPrimitive prim, Unity3DShaderSet *pipeline, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) override;
+        virtual void draw(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) override;
         virtual void drawIndexed(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, Unity3DBuffer *idata, void *indices, int offset) override;
-        virtual void drawUp(U3DPrimitive prim, Unity3DShaderSet *pipeline, Unity3DVertexFormat *format, const void *vdata, int vertexCount) override;
+        virtual void drawUp(U3DPrimitive prim, Unity3DVertexFormat *format, const void *vdata, int vertexCount) override;
         virtual void clear(int mask, uint32 colorval, float depthVal, int stencilVal) override;
     };
 }
