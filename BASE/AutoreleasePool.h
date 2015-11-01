@@ -40,8 +40,10 @@ private:
     void pop();
 
     friend class AutoreleasePool;
+
 private:
     std::vector<AutoreleasePool*> releasePoolStack_;
+    static PoolManager instance;
 };
 
 #endif // HAUTORELEASEPOOL_H

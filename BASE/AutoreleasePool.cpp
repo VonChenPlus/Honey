@@ -42,8 +42,9 @@ bool AutoreleasePool::contains(HObject *object) const {
     return false;
 }
 
+PoolManager PoolManager::instance;
+
 PoolManager &PoolManager::getInstance() {
-    static PoolManager instance;
     return instance;
 }
 
