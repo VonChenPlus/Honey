@@ -88,7 +88,7 @@ namespace GRAPH
         IMAGE::PixelFormat pixelFormat_;
         int pixelsWidth_;
         int pixelsHight_;
-        GLuint name_;
+        uint32 name_;
         MATH::Sizef contentSize_;
         bool hasPremultipliedAlpha_;
         bool hasMipmaps_;

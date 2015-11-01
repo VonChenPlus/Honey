@@ -147,19 +147,15 @@ namespace GRAPH
             return ret;
         }
 
-        Label* Label::createWithSystemFont(const std::string& text, const std::string& font, float fontSize, const MATH::Sizef& dimensions, TextHAlignment hAlignment, TextVAlignment vAlignment)
-        {
+        Label* Label::createWithSystemFont(const std::string& text, const std::string& font, float fontSize, const MATH::Sizef& dimensions, TextHAlignment hAlignment, TextVAlignment vAlignment) {
             auto ret = new (std::nothrow) Label(hAlignment,vAlignment);
 
-            if (ret)
-            {
+            if (ret) {
                 ret->setSystemFontName(font);
                 ret->setSystemFontSize(fontSize);
                 ret->setDimensions(dimensions.width, dimensions.height);
                 ret->setString(text);
-
                 ret->autorelease();
-
                 return ret;
             }
 
@@ -920,8 +916,7 @@ namespace GRAPH
             }
         }
 
-        void Label::createSpriteForSystemFont(const FontDefinition& fontDef)
-        {
+        void Label::createSpriteForSystemFont(const FontDefinition& fontDef) {
             auto texture = new (std::nothrow) GLTexture;
             texture->initWithString(_utf8Text.c_str(), fontDef);
 
@@ -932,8 +927,7 @@ namespace GRAPH
             _textSprite->setAnchorPoint(MATH::Vec2fBOTTOMLEFT);
             this->setContentSize(_textSprite->getContentSize());
             texture->release();
-            if (_blendFuncDirty)
-            {
+            if (_blendFuncDirty) {
                 _textSprite->setBlendFunc(_blendFunc);
             }
 
@@ -945,12 +939,10 @@ namespace GRAPH
         void Label::createShadowSpriteForSystemFont(const FontDefinition& fontDef)
         {
             if (!fontDef.stroke.strokeEnabled && fontDef.fontFillColor == _shadowColor3B
-                && (fontDef.fontAlpha == _shadowOpacity))
-            {
+                && (fontDef.fontAlpha == _shadowOpacity)) {
                 _shadowNode = Sprite::createWithTexture(_textSprite->getTexture());
             }
-            else
-            {
+            else {
                 FontDefinition shadowFontDefinition = fontDef;
                 shadowFontDefinition.fontFillColor.red = _shadowColor3B.red;
                 shadowFontDefinition.fontFillColor.green = _shadowColor3B.green;
@@ -997,14 +989,10 @@ namespace GRAPH
             }
         }
 
-        void Label::updateContent()
-        {
-            if (_systemFontDirty)
-            {
-                if (_fontAtlas)
-                {
+        void Label::updateContent() {
+            if (_systemFontDirty) {
+                if (_fontAtlas) {
                     _batchNodes.clear();
-
                     FontAtlasCache::releaseFontAtlas(_fontAtlas);
                     _fontAtlas = nullptr;
                 }
@@ -1015,21 +1003,17 @@ namespace GRAPH
             SAFE_RELEASE_NULL(_textSprite);
             SAFE_RELEASE_NULL(_shadowNode);
 
-            if (_fontAtlas)
-            {
+            if (_fontAtlas) {
                 std::u16string utf16String;
                 UTILS::STRING::UTF8ToUTF16(_utf8Text, utf16String);
                 _utf16Text = utf16String;
-
                 computeHorizontalKernings(_utf16Text);
                 alignText();
             }
-            else
-            {
+            else {
                 auto fontDef = getFontDefinition();
                 createSpriteForSystemFont(fontDef);
-                if (_shadowEnabled)
-                {
+                if (_shadowEnabled) {
                     createShadowSpriteForSystemFont(fontDef);
                 }
             }

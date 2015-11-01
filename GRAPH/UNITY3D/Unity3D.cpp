@@ -3,10 +3,10 @@
 
 namespace GRAPH
 {
-    Unity3DCreator::RenderEngine Unity3DCreator::Engine = OPENGL;
+    Unity3DCreator::RenderEngine Unity3DCreator::EngineMode = OPENGL;
 
     Unity3DContext *Unity3DCreator::CreateContext() {
-        switch (Engine)
+        switch (EngineMode)
         {
         case OPENGL:
             return Unity3DGLCreator::CreateContext();
@@ -17,7 +17,7 @@ namespace GRAPH
     }
 
     Unity3DDepthState *Unity3DCreator::CreateDepthState() {
-        switch (Engine)
+        switch (EngineMode)
         {
         case OPENGL:
             return Unity3DGLCreator::CreateDepthState();
@@ -28,7 +28,7 @@ namespace GRAPH
     }
 
     Unity3DBuffer *Unity3DCreator::CreateBuffer(uint32 usageFlags) {
-        switch (Engine)
+        switch (EngineMode)
         {
         case OPENGL:
             return Unity3DGLCreator::CreateBuffer(usageFlags);
@@ -39,7 +39,7 @@ namespace GRAPH
     }
 
     Unity3DShaderSet *Unity3DCreator::CreateShaderSet(Unity3DShader *vshader, Unity3DShader *fshader) {
-        switch (Engine)
+        switch (EngineMode)
         {
         case OPENGL:
             return Unity3DGLCreator::CreateShaderSet(vshader, fshader);
@@ -50,7 +50,7 @@ namespace GRAPH
     }
 
     Unity3DVertexFormat *Unity3DCreator::CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) {
-        switch (Engine)
+        switch (EngineMode)
         {
         case OPENGL:
             return Unity3DGLCreator::CreateVertexFormat(components, stride);

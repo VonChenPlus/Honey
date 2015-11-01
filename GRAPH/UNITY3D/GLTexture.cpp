@@ -201,7 +201,6 @@ namespace GRAPH
                 free(outTempData);
             }
 
-            // set the premultiplied tag
             hasPremultipliedAlpha_ = image->hasPremultipliedAlpha();
 
             return true;

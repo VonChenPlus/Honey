@@ -152,6 +152,23 @@ namespace GRAPH
         ARRAY2D,
     };
 
+    enum U3DImageFormat : int8
+    {
+        AUTO,
+        BGRA8888,
+        RGBA8888,
+        RGB888,
+        RGB565,
+        A8,
+        I8,
+        AI88,
+        RGBA4444,
+        RGB5A1,
+        ETC,
+        DEFAULT = AUTO,
+        NONE = -1
+    };
+
     enum U3DRenderState : uint8
     {
         CULL_MODE,
@@ -162,15 +179,6 @@ namespace GRAPH
         NO_CULL,
         CW,
         CCW,
-    };
-
-    enum U3DImageType
-    {
-        PNG,
-        JPEG,
-        ZIM,
-        DETECT,
-        TYPE_UNKNOWN,
     };
 
     // Binary compatible with D3D11 viewport.
@@ -277,7 +285,7 @@ namespace GRAPH
             OPENGL,
             D3D
         };
-        static RenderEngine Engine;
+        static RenderEngine EngineMode;
 
         static Unity3DContext *CreateContext();
         static Unity3DDepthState *CreateDepthState();
