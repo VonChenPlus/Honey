@@ -43,8 +43,6 @@ namespace GRAPH
         };
 
     public:
-        static void setDefaultAlphaPixelFormat(IMAGE::PixelFormat format);
-        static IMAGE::PixelFormat getDefaultAlphaPixelFormat();
         typedef HData (*TextToTextureDataDef)(const char * text, const FontDefinition& textDefinition, TextAlign align, int &width, int &height, bool& hasPremultipliedAlpha);
         static TextToTextureDataDef getTextureDataForText;
 
@@ -84,28 +82,16 @@ namespace GRAPH
         int getPixelsHight() const;
         GLuint getName() const;
 
-        GLfloat getMaxS() const;
-        void setMaxS(GLfloat maxS);
-
-        GLfloat getMaxT() const;
-        void setMaxT(GLfloat maxT);
-
         MATH::Sizef getContentSize() const;
-
-        void setGLShader(Unity3DGLShaderSet* program);
-        Unity3DGLShaderSet* getU3DShader() const;
 
     protected:
         IMAGE::PixelFormat pixelFormat_;
         int pixelsWidth_;
         int pixelsHight_;
         GLuint name_;
-        GLfloat maxS_;
-        GLfloat maxT_;
         MATH::Sizef contentSize_;
         bool hasPremultipliedAlpha_;
         bool hasMipmaps_;
-        Unity3DGLShaderSet* shaderProgram_;
         bool antialiasEnabled_;
     };
 

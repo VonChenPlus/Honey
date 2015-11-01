@@ -8,7 +8,6 @@
 
 namespace GRAPH
 {
-    static IMAGE::PixelFormat g_defaultAlphaPixelFormat = IMAGE::PixelFormat::DEFAULT;
     GLTexture::TextToTextureDataDef GLTexture::getTextureDataForText = nullptr;
 
     GLTexture::GLTexture()
@@ -16,16 +15,12 @@ namespace GRAPH
         , pixelsWidth_(0)
         , pixelsHight_(0)
         , name_(0)
-        , maxS_(0.0)
-        , maxT_(0.0)
         , hasPremultipliedAlpha_(false)
         , hasMipmaps_(false)
-        , shaderProgram_(nullptr)
         , antialiasEnabled_(true) {
     }
 
     GLTexture::~GLTexture() {
-        SAFE_RELEASE(shaderProgram_);
         releaseGLTexture();
     }
 
@@ -62,32 +57,6 @@ namespace GRAPH
 
     const MATH::Sizef& GLTexture::getContentSizeInPixels() {
         return contentSize_;
-    }
-
-    GLfloat GLTexture::getMaxS() const {
-        return maxS_;
-    }
-
-    void GLTexture::setMaxS(GLfloat maxS) {
-        maxS_ = maxS;
-    }
-
-    GLfloat GLTexture::getMaxT() const {
-        return maxT_;
-    }
-
-    void GLTexture::setMaxT(GLfloat maxT) {
-        maxT_ = maxT;
-    }
-
-    Unity3DGLShaderSet* GLTexture::getU3DShader() const {
-        return shaderProgram_;
-    }
-
-    void GLTexture::setGLShader(Unity3DGLShaderSet* shaderProgram) {
-        SAFE_RETAIN(shaderProgram);
-        SAFE_RELEASE(shaderProgram_);
-        shaderProgram_ = shaderProgram;
     }
 
     bool GLTexture::hasPremultipliedAlpha() const {
@@ -180,14 +149,10 @@ namespace GRAPH
         pixelsWidth_ = pixelsWide;
         pixelsHight_ = pixelsHigh;
         pixelFormat_ = pixelFormat;
-        maxS_ = 1;
-        maxT_ = 1;
 
         hasPremultipliedAlpha_ = false;
         hasMipmaps_ = mipmapsNum > 1;
 
-        // shader
-        setGLShader(Unity3DGLShaderCache::getInstance().getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE));
         return true;
     }
 
@@ -202,7 +167,7 @@ namespace GRAPH
     }
 
     bool GLTexture::initWithImage(IMAGE::ImageObject *image) {
-        return initWithImage(image, g_defaultAlphaPixelFormat);
+        return initWithImage(image, IMAGE::PixelFormat::DEFAULT);
     }
 
     bool GLTexture::initWithImage(IMAGE::ImageObject *image, IMAGE::PixelFormat format) {
@@ -283,7 +248,7 @@ namespace GRAPH
             return false;
         }
 
-        IMAGE::PixelFormat pixelFormat = g_defaultAlphaPixelFormat;
+        IMAGE::PixelFormat pixelFormat = IMAGE::PixelFormat::DEFAULT;
         HBYTE* outTempData = nullptr;
         uint64 outTempDataLen = 0;
 
@@ -374,14 +339,6 @@ namespace GRAPH
         }
 
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    }
-
-    void GLTexture::setDefaultAlphaPixelFormat(IMAGE::PixelFormat format) {
-        g_defaultAlphaPixelFormat = format;
-    }
-
-    IMAGE::PixelFormat GLTexture::getDefaultAlphaPixelFormat() {
-        return g_defaultAlphaPixelFormat;
     }
 
     TextureCache &TextureCache::getInstance() {
