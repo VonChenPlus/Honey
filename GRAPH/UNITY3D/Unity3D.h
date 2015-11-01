@@ -259,25 +259,31 @@ namespace GRAPH
     class Unity3DContext : public Unity3DObject
     {
     public:
-        static Unity3DContext *CreateContext();
-        static Unity3DContext &DefaultContext();
-
         Unity3DContext() {}
         virtual ~Unity3DContext() {}
-
-        virtual Unity3DDepthState *createDepthState() = 0;
-
-        virtual Unity3DBuffer *createBuffer(uint32 usageFlags) = 0;
-        virtual Unity3DShaderSet *createShaderSet(Unity3DShader *vshader, Unity3DShader *fshader) = 0;
-        virtual Unity3DVertexFormat *createVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) = 0;
-
-        virtual void setDepthState(Unity3DDepthState *state) = 0;
 
         // TODO: Add more sophisticated draws with buffer offsets, and multidraws.
         virtual void draw(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) = 0;
         virtual void drawIndexed(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, Unity3DBuffer *idata, void *indices, int offset) = 0;
         virtual void drawUp(U3DPrimitive prim, Unity3DVertexFormat *format, const void *vdata, int vertexCount) = 0;
         virtual void clear(int mask, uint32 colorval, float depthVal, int stencilVal) = 0;
+    };
+
+    class Unity3DCreator : public Unity3DObject
+    {
+    public:
+        enum RenderEngine
+        {
+            OPENGL,
+            D3D
+        };
+        static RenderEngine Engine;
+
+        static Unity3DContext *CreateContext();
+        static Unity3DDepthState *CreateDepthState();
+        static Unity3DBuffer *CreateBuffer(uint32 usageFlags);
+        static Unity3DShaderSet *CreateShaderSet(Unity3DShader *vshader, Unity3DShader *fshader);
+        static Unity3DVertexFormat *CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride);
     };
 }
 

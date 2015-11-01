@@ -9,7 +9,7 @@ namespace GRAPH
 {
     DrawNode::DrawNode() {
         blendFunc_ = BlendFunc::ALPHA_PREMULTIPLIED;
-        u3dContext_ = (Unity3DContext::CreateContext());
+        u3dContext_ = (Unity3DCreator::CreateContext());
         memset(vboArray_, 0, sizeof(VertexBufferObject<V2F_C4B_T2F>) * 3);
     }
 
@@ -49,14 +49,14 @@ namespace GRAPH
         for (int index = 0; index < 3; ++index) {
             ensureCapacity(0, 512);
 
-            u3dVertexBuffer_[index] = u3dContext_->createBuffer(VERTEXDATA | STREAM);
+            u3dVertexBuffer_[index] = Unity3DCreator::CreateBuffer(VERTEXDATA | STREAM);
             u3dVertexBuffer_[index]->setData((const uint8 *) vboArray_[index].u1.bufferData, sizeof(V2F_C4B_T2F) * vboArray_[index].u1.bufferCapacity);
 
             std::vector<Unity3DVertexComponent> vertexFormat = {
                 Unity3DVertexComponent(SEM_POSITION, FLOATx3, offsetof(V2F_C4B_T2F, vertices)),
                 Unity3DVertexComponent(SEM_COLOR0, UNORM8x4, offsetof(V2F_C4B_T2F, colors)),
                 Unity3DVertexComponent(SEM_TEXCOORD0, FLOATx2, offsetof(V2F_C4B_T2F, texCoords)) };
-            u3dVertexFormat_[index] = u3dContext_->createVertexFormat(vertexFormat, sizeof(V2F_C4B_T2F));
+            u3dVertexFormat_[index] = Unity3DCreator::CreateVertexFormat(vertexFormat, sizeof(V2F_C4B_T2F));
         }
 
         memset(dirty_, 0, sizeof(bool) * 3);

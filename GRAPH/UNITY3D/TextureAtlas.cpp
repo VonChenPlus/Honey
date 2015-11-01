@@ -10,7 +10,7 @@ namespace GRAPH
         , u3dVertexBuffer_(nullptr)
         , u3dIndexBuffer_(nullptr)
         , u3dVertexFormat_(nullptr)
-        , u3dContext_(Unity3DContext::CreateContext()) {
+        , u3dContext_(Unity3DCreator::CreateContext()) {
     }
 
     TextureAtlas::~TextureAtlas() {
@@ -130,8 +130,8 @@ namespace GRAPH
     }
 
     void TextureAtlas::setupBuffer() {
-        u3dVertexBuffer_ = u3dContext_->createBuffer(VERTEXDATA | DYNAMIC);
-        u3dIndexBuffer_ = u3dContext_->createBuffer(INDEXDATA);
+        u3dVertexBuffer_ = Unity3DCreator::CreateBuffer(VERTEXDATA | DYNAMIC);
+        u3dIndexBuffer_ = Unity3DCreator::CreateBuffer(INDEXDATA);
 
         u3dVertexBuffer_->setData((const uint8 *) vbo_.u2.bufferData, sizeof(V3F_C4B_T2F) * vbo_.u2.bufferCapacity);
         u3dIndexBuffer_->setData((const uint8 *) vbo_.u2.indexData, sizeof(GLushort) * vbo_.u2.indexCapacity * 6);
@@ -140,7 +140,7 @@ namespace GRAPH
             Unity3DVertexComponent(SEM_POSITION, FLOATx3, offsetof(V3F_C4B_T2F, vertices)),
             Unity3DVertexComponent(SEM_COLOR0, UNORM8x4, offsetof(V3F_C4B_T2F, colors)),
             Unity3DVertexComponent(SEM_TEXCOORD0, FLOATx2, offsetof(V3F_C4B_T2F, texCoords)) };
-        u3dVertexFormat_ = u3dContext_->createVertexFormat(vertexFormat, sizeof(V3F_C4B_T2F));
+        u3dVertexFormat_ = Unity3DCreator::CreateVertexFormat(vertexFormat, sizeof(V3F_C4B_T2F));
     }
 
     // TextureAtlas - Update, Insert, Move & Remove

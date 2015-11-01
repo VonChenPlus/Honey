@@ -88,18 +88,21 @@ namespace GRAPH
         Unity3DGLContext() {}
         ~Unity3DGLContext() {}
 
-        Unity3DDepthState *createDepthState() override;
-        Unity3DBuffer *createBuffer(uint32 usageFlags) override;
-        Unity3DShaderSet *createShaderSet(Unity3DShader *vshader, Unity3DShader *fshader) override;
-        Unity3DVertexFormat *createVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) override;
-
-        void setDepthState(Unity3DDepthState *state);
-
         // TODO: Add more sophisticated draws with buffer offsets, and multidraws.
         void draw(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) override;
         void drawIndexed(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, Unity3DBuffer *idata, void *indices, int offset) override;
         void drawUp(U3DPrimitive prim, Unity3DVertexFormat *format, const void *vdata, int vertexCount) override;
         void clear(int mask, uint32 colorval, float depthVal, int stencilVal) override;
+    };
+
+    class Unity3DGLCreator
+    {
+    public:
+        static Unity3DContext *CreateContext();
+        static Unity3DDepthState *CreateDepthState();
+        static Unity3DBuffer *CreateBuffer(uint32 usageFlags);
+        static Unity3DShaderSet *CreateShaderSet(Unity3DShader *vshader, Unity3DShader *fshader);
+        static Unity3DVertexFormat *CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride);
     };
 }
 

@@ -16,7 +16,7 @@ namespace GRAPH
     }
 
     RenderQueue::RenderQueue()
-        : depthState_(Unity3DContext::DefaultContext().createDepthState()) {
+        : depthState_(Unity3DCreator::CreateDepthState()) {
     }
 
     void RenderQueue::push_back(RenderCommand* command) {
@@ -88,8 +88,8 @@ namespace GRAPH
         , glViewAssigned_(false)
         , isRendering_(false)
         , isDepthTestFor2D_(false)
-        , u3dContext_(Unity3DContext::CreateContext())
-        , depthState_(u3dContext_->createDepthState()){
+        , u3dContext_(Unity3DCreator::CreateContext())
+        , depthState_(Unity3DCreator::CreateDepthState()){
         groupCommandManager_ = new (std::nothrow) GroupCommandManager(this);
         commandGroupStack_.push(DEFAULT_RENDER_QUEUE);
         RenderQueue defaultRenderQueue;
@@ -133,8 +133,8 @@ namespace GRAPH
 
     void Renderer::setupBuffer() {
         for (int index = 0; index < 2; ++index) {
-            u3dVertexBuffer_[index] = u3dContext_->createBuffer(VERTEXDATA | DYNAMIC);
-            u3dIndexBuffer_[index] = u3dContext_->createBuffer(INDEXDATA);
+            u3dVertexBuffer_[index] = Unity3DCreator::CreateBuffer(VERTEXDATA | DYNAMIC);
+            u3dIndexBuffer_[index] = Unity3DCreator::CreateBuffer(INDEXDATA);
 
             u3dVertexBuffer_[index]->setData((const uint8 *) vboArray_[index].u2.bufferData, sizeof(V3F_C4B_T2F) * vboArray_[index].u2.bufferCapacity);
             u3dIndexBuffer_[index]->setData((const uint8 *) vboArray_[index].u2.indexData, sizeof(GLushort) * vboArray_[index].u2.indexCapacity);
@@ -143,7 +143,7 @@ namespace GRAPH
                 Unity3DVertexComponent(SEM_POSITION, FLOATx3, offsetof(V3F_C4B_T2F, vertices)),
                 Unity3DVertexComponent(SEM_COLOR0, UNORM8x4, offsetof(V3F_C4B_T2F, colors)),
                 Unity3DVertexComponent(SEM_TEXCOORD0, FLOATx2, offsetof(V3F_C4B_T2F, texCoords)) };
-            u3dVertexFormat_[index] = u3dContext_->createVertexFormat(vertexFormat, sizeof(V3F_C4B_T2F));
+            u3dVertexFormat_[index] = Unity3DCreator::CreateVertexFormat(vertexFormat, sizeof(V3F_C4B_T2F));
         }
     }
 

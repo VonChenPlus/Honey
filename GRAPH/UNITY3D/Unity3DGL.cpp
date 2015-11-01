@@ -142,37 +142,6 @@ namespace GRAPH
         semanticsMask_ = sem;
     }
 
-    Unity3DDepthState *Unity3DGLContext::createDepthState() {
-        return new Unity3DGLDepthState();
-    }
-
-    Unity3DBuffer *Unity3DGLContext::createBuffer(uint32 usageFlags) {
-        return new Unity3DGLBuffer(usageFlags);
-    }
-
-    Unity3DShaderSet *Unity3DGLContext::createShaderSet(Unity3DShader *vshader, Unity3DShader *fshader) {
-        if (!vshader || !fshader) {
-            throw _HException_Normal(UTILS::STRING::StringFromFormat("ShaderSet requires both a valid vertex and a fragment shader: %p %p", vshader, fshader));
-        }
-
-        Unity3DGLShaderSet *shaderSet = new Unity3DGLShaderSet(vshader, fshader);
-        shaderSet->link();
-        shaderSet->updateUniforms();
-        shaderSet->autorelease();
-        return shaderSet;
-    }
-
-    Unity3DVertexFormat *Unity3DGLContext::createVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) {
-        Unity3DGLVertexFormat *vertexFormat = new Unity3DGLVertexFormat(components, stride);
-        vertexFormat->compile();
-        return vertexFormat;
-    }
-
-    void Unity3DGLContext::setDepthState(Unity3DDepthState *state) {
-        Unity3DGLDepthState *s = static_cast<Unity3DGLDepthState *>(state);
-        s->apply();
-    }
-
     void Unity3DGLContext::draw(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, int vertexCount, int offset) {
         Unity3DGLBuffer *vbuf = static_cast<Unity3DGLBuffer *>(vdata);
         Unity3DGLVertexFormat *fmt = static_cast<Unity3DGLVertexFormat *>(format);
@@ -226,6 +195,36 @@ namespace GRAPH
             glMask |= GL_STENCIL_BUFFER_BIT;
         }
         glClear(glMask);
+    }
+
+    Unity3DContext *Unity3DGLCreator::CreateContext() {
+        return new Unity3DGLContext;
+    }
+
+    Unity3DDepthState *Unity3DGLCreator::CreateDepthState() {
+        return new Unity3DGLDepthState();
+    }
+
+    Unity3DBuffer *Unity3DGLCreator::CreateBuffer(uint32 usageFlags) {
+        return new Unity3DGLBuffer(usageFlags);
+    }
+
+    Unity3DShaderSet *Unity3DGLCreator::CreateShaderSet(Unity3DShader *vshader, Unity3DShader *fshader) {
+        if (!vshader || !fshader) {
+            throw _HException_Normal(UTILS::STRING::StringFromFormat("ShaderSet requires both a valid vertex and a fragment shader: %p %p", vshader, fshader));
+        }
+
+        Unity3DGLShaderSet *shaderSet = new Unity3DGLShaderSet(vshader, fshader);
+        shaderSet->link();
+        shaderSet->updateUniforms();
+        shaderSet->autorelease();
+        return shaderSet;
+    }
+
+    Unity3DVertexFormat *Unity3DGLCreator::CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) {
+        Unity3DGLVertexFormat *vertexFormat = new Unity3DGLVertexFormat(components, stride);
+        vertexFormat->compile();
+        return vertexFormat;
     }
 }
 
