@@ -22,7 +22,7 @@
 
 #include "UTILS/STRING/StringUtils.h"
 using UTILS::STRING::StringFromFormat;
-#include "MATH/MathDef.h"
+#include "MATH/MathDefine.h"
 
 namespace IO
 {

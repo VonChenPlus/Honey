@@ -4,7 +4,7 @@
 #include <sstream>
 #include <iomanip>
 
-#include "MATH/MathDef.h"
+#include "MATH/MathDefine.h"
 
 const HValue HValue::Null;
 

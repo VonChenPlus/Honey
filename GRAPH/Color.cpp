@@ -118,6 +118,10 @@ namespace GRAPH
         return !(*this == right);
     }
 
+    Color4B::operator uint32() {
+        return alpha << 24 | blue << 16 | green << 8 | red;
+    }
+
     Color4B Color4B::DarkenColor(Color4B color) {
         uint32 _color = color;
         return (_color & 0xFF000000) | ((_color >> 1)&0x7F7F7F);
@@ -145,6 +149,13 @@ namespace GRAPH
         if (alpha > 1.0f) alpha = 1.0f;
         color.alpha = alpha * 255;
         return color;
+    }
+
+    Color4B Color4B::PreMultiplyAlpha(Color4B color) {
+        return (color.red * (color.alpha + 1) >> 8) |
+                (color.green * (color.alpha + 1) >> 8) << 8 |
+                (color.blue * (color.alpha + 1) >> 8) << 16 |
+                color.alpha << 24;
     }
 
     Color4F::Color4F()

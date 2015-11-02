@@ -65,7 +65,7 @@ namespace GRAPH
             currentPageData_ = new unsigned char[currentPageDataSize_];
             memset(currentPageData_, 0, currentPageDataSize_);
 
-            auto  pixelFormat = IMAGE::PixelFormat::A8;
+            auto  pixelFormat = IMAGE::ImageFormat::A8;
             texture->initWithData(currentPageData_, currentPageDataSize_,
                 pixelFormat, CacheTextureWidth, CacheTextureHeight, MATH::Sizef(CacheTextureWidth,CacheTextureHeight) );
 
@@ -132,7 +132,7 @@ namespace GRAPH
         long bitmapHeight;
         FontLetterDefinition tempDef;
 
-        auto  pixelFormat = IMAGE::PixelFormat::A8;
+        auto  pixelFormat = IMAGE::ImageFormat::A8;
 
         bool existNewLetter = false;
         float startY = currentPageOrigY_;
@@ -164,7 +164,7 @@ namespace GRAPH
                         if(currentPageOrigY_ + commonLineHeight_ >= CacheTextureHeight)
                         {
                             unsigned char *data = nullptr;
-                            if(pixelFormat == IMAGE::PixelFormat::AI88)
+                            if(pixelFormat == IMAGE::ImageFormat::AI88)
                             {
                                 data = currentPageData_ + CacheTextureWidth * (int)startY * 2;
                             }
@@ -225,7 +225,7 @@ namespace GRAPH
 
         if(existNewLetter) {
             unsigned char *data = nullptr;
-            if(pixelFormat == IMAGE::PixelFormat::AI88) {
+            if(pixelFormat == IMAGE::ImageFormat::AI88) {
                 data = currentPageData_ + CacheTextureWidth * (int)startY * 2;
             }
             else {

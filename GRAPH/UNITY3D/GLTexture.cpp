@@ -4,14 +4,18 @@
 #include "GRAPH/UNITY3D/GLTexture.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
+#include "IMAGE/ImageConvert.h"
 #include "IO/FileUtils.h"
 
 namespace GRAPH
 {
+    const IMAGE::PixelFormatInfoMap PixelFormatInfoTables(TexturePixelFormatInfoTablesValue,
+                                                                         TexturePixelFormatInfoTablesValue + sizeof(TexturePixelFormatInfoTablesValue) / sizeof(TexturePixelFormatInfoTablesValue[0]));
+
     GLTexture::TextToTextureDataDef GLTexture::getTextureDataForText = nullptr;
 
     GLTexture::GLTexture()
-        : pixelFormat_(IMAGE::PixelFormat::DEFAULT)
+        : pixelFormat_(IMAGE::ImageFormat::DEFAULT)
         , pixelsWidth_(0)
         , pixelsHight_(0)
         , name_(0)
@@ -32,7 +36,7 @@ namespace GRAPH
     }
 
 
-    IMAGE::PixelFormat GLTexture::getPixelFormat() const {
+    IMAGE::ImageFormat GLTexture::getPixelFormat() const {
         return pixelFormat_;
     }
 
@@ -63,24 +67,24 @@ namespace GRAPH
         return hasPremultipliedAlpha_;
     }
 
-    bool GLTexture::initWithData(const void *data, uint64 dataLen, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef&) {
+    bool GLTexture::initWithData(const void *data, uint64 dataLen, IMAGE::ImageFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef&) {
         MipmapInfo mipmap;
         mipmap.address = (unsigned char*)data;
         mipmap.len = static_cast<int>(dataLen);
         return initWithMipmaps(&mipmap, 1, pixelFormat, pixelsWide, pixelsHigh);
     }
 
-    bool GLTexture::initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh)
+    bool GLTexture::initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, IMAGE::ImageFormat pixelFormat, int pixelsWide, int pixelsHigh)
     {
         if (mipmapsNum <= 0) {
             return false;
         }
 
-        if (IMAGE::ImageObject::getPixelFormatInfoMap().find(pixelFormat) == IMAGE::ImageObject::getPixelFormatInfoMap().end()) {
+        if (PixelFormatInfoTables.find(pixelFormat) == PixelFormatInfoTables.end()) {
             return false;
         }
 
-        const IMAGE::PixelFormatInfo& info = IMAGE::ImageObject::getPixelFormatInfoMap().at(pixelFormat);
+        const IMAGE::ImageFormatInfo& info = PixelFormatInfoTables.at(pixelFormat);
 
         //Set the row align only when mipmapsNum == 1 and the data is uncompressed
         if (mipmapsNum == 1 && !info.compressed) {
@@ -159,7 +163,7 @@ namespace GRAPH
     bool GLTexture::updateWithData(const void *data,int offsetX,int offsetY,int width,int height) {
         if (name_) {
             GLStateCache::BindTexture2D(name_);
-            const IMAGE::PixelFormatInfo& info = IMAGE::ImageObject::getPixelFormatInfoMap().at(pixelFormat_);
+            const IMAGE::ImageFormatInfo& info = PixelFormatInfoTables.at(pixelFormat_);
             glTexSubImage2D(GL_TEXTURE_2D,0,offsetX,offsetY,width,height,info.format, info.type,data);
             return true;
         }
@@ -167,10 +171,10 @@ namespace GRAPH
     }
 
     bool GLTexture::initWithImage(IMAGE::ImageObject *image) {
-        return initWithImage(image, IMAGE::PixelFormat::DEFAULT);
+        return initWithImage(image, IMAGE::ImageFormat::DEFAULT);
     }
 
-    bool GLTexture::initWithImage(IMAGE::ImageObject *image, IMAGE::PixelFormat format) {
+    bool GLTexture::initWithImage(IMAGE::ImageObject *image, IMAGE::ImageFormat format) {
         if (image == nullptr) {
             return false;
         }
@@ -180,12 +184,12 @@ namespace GRAPH
 
         unsigned char*   tempData = image->getData();
         MATH::Sizef      imageSize = MATH::Sizef((float)imageWidth, (float)imageHeight);
-        IMAGE::PixelFormat      pixelFormat = ((IMAGE::PixelFormat::NONE == format) || (IMAGE::PixelFormat::AUTO == format)) ? image->getRenderFormat() : format;
-        IMAGE::PixelFormat      renderFormat = image->getRenderFormat();
+        IMAGE::ImageFormat      pixelFormat = ((IMAGE::ImageFormat::NONE == format) || (IMAGE::ImageFormat::AUTO == format)) ? image->getRenderFormat() : format;
+        IMAGE::ImageFormat      renderFormat = image->getRenderFormat();
         uint64	         tempDataLen = image->getDataLen();
 
 
-        if (image->isCompressed()) {
+        if (PixelFormatInfoTables.at(renderFormat).compressed) {
             initWithData(tempData, tempDataLen, image->getRenderFormat(), imageWidth, imageHeight, imageSize);
             return true;
         }
@@ -247,7 +251,7 @@ namespace GRAPH
             return false;
         }
 
-        IMAGE::PixelFormat pixelFormat = IMAGE::PixelFormat::DEFAULT;
+        IMAGE::ImageFormat pixelFormat = IMAGE::ImageFormat::DEFAULT;
         HBYTE* outTempData = nullptr;
         uint64 outTempDataLen = 0;
 
@@ -265,7 +269,7 @@ namespace GRAPH
         }
 
         MATH::Sizef  imageSize = MATH::Sizef((float)imageWidth, (float)imageHeight);
-        pixelFormat = IMAGE::convertDataToFormat(outData.getBytes(), imageWidth*imageHeight*4, IMAGE::PixelFormat::RGBA8888, pixelFormat, &outTempData, &outTempDataLen);
+        pixelFormat = IMAGE::convertDataToFormat(outData.getBytes(), imageWidth*imageHeight*4, IMAGE::ImageFormat::RGBA8888, pixelFormat, &outTempData, &outTempDataLen);
 
         ret = initWithData(outTempData, outTempDataLen, pixelFormat, imageWidth, imageHeight, imageSize);
 

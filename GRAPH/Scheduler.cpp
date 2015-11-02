@@ -1,5 +1,5 @@
 #include "GRAPH/Scheduler.h"
-#include "MATH/MathDef.h"
+#include "MATH/MathDefine.h"
 
 namespace GRAPH
 {

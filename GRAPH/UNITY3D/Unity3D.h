@@ -295,4 +295,4 @@ namespace GRAPH
     };
 }
 
-#endif // THIN3D_H
+#endif // UNITY3D_H

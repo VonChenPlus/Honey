@@ -1,7 +1,7 @@
 #ifndef VECTOR4_H
 #define VECTOR4_H
 
-#include "MATH/MathDef.h"
+#include "MATH/MathDefine.h"
 
 namespace MATH
 {

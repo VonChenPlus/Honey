@@ -6,7 +6,6 @@
 #include <thread>
 #include <condition_variable>
 #include <queue>
-#include <string>
 #include <unordered_map>
 #include <functional>
 #include "BASE/HObject.h"
@@ -21,6 +20,19 @@
 namespace GRAPH
 {
     class Unity3DGLShaderSet;
+
+    const IMAGE::PixelFormatInfoMapValue TexturePixelFormatInfoTablesValue[] =
+    {
+        IMAGE::PixelFormatInfoMapValue(IMAGE::ImageFormat::BGRA8888, IMAGE::ImageFormatInfo(GL_BGRA, GL_BGRA, GL_UNSIGNED_BYTE, 32, false, true)),
+        IMAGE::PixelFormatInfoMapValue(IMAGE::ImageFormat::RGBA8888, IMAGE::ImageFormatInfo(GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, 32, false, true)),
+        IMAGE::PixelFormatInfoMapValue(IMAGE::ImageFormat::RGBA4444, IMAGE::ImageFormatInfo(GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, 16, false, true)),
+        IMAGE::PixelFormatInfoMapValue(IMAGE::ImageFormat::RGB5A1, IMAGE::ImageFormatInfo(GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, 16, false, true)),
+        IMAGE::PixelFormatInfoMapValue(IMAGE::ImageFormat::RGB565, IMAGE::ImageFormatInfo(GL_RGB, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, 16, false, false)),
+        IMAGE::PixelFormatInfoMapValue(IMAGE::ImageFormat::RGB888, IMAGE::ImageFormatInfo(GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, 24, false, false)),
+        IMAGE::PixelFormatInfoMapValue(IMAGE::ImageFormat::A8, IMAGE::ImageFormatInfo(GL_ALPHA, GL_ALPHA, GL_UNSIGNED_BYTE, 8, false, false)),
+        IMAGE::PixelFormatInfoMapValue(IMAGE::ImageFormat::I8, IMAGE::ImageFormatInfo(GL_LUMINANCE, GL_LUMINANCE, GL_UNSIGNED_BYTE, 8, false, false)),
+        IMAGE::PixelFormatInfoMapValue(IMAGE::ImageFormat::AI88, IMAGE::ImageFormatInfo(GL_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, 16, false, true)),
+    };
 
     struct MipmapInfo
     {
@@ -52,13 +64,13 @@ namespace GRAPH
 
         void releaseGLTexture();
 
-        bool initWithData(const void *data, uint64 dataLen, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef& contentSize);
-        bool initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, IMAGE::PixelFormat pixelFormat, int pixelsWide, int pixelsHigh);
+        bool initWithData(const void *data, uint64 dataLen, IMAGE::ImageFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef& contentSize);
+        bool initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, IMAGE::ImageFormat pixelFormat, int pixelsWide, int pixelsHigh);
 
         bool updateWithData(const void *data,int offsetX,int offsetY,int width,int height);
 
         bool initWithImage(IMAGE::ImageObject * image);
-        bool initWithImage(IMAGE::ImageObject * image, IMAGE::PixelFormat format);
+        bool initWithImage(IMAGE::ImageObject * image, IMAGE::ImageFormat format);
         bool initWithString(const char *text,  const std::string &fontName, float fontSize, const MATH::Sizef& dimensions = MATH::Sizef(0, 0), TextHAlignment hAlignment = TextHAlignment::CENTER, TextVAlignment vAlignment = TextVAlignment::TOP);
         bool initWithString(const char *text, const FontDefinition& textDefinition);
 
@@ -70,14 +82,14 @@ namespace GRAPH
 
         const char* getStringForFormat() const;
         unsigned int getBitsPerPixelForFormat() const;
-        unsigned int getBitsPerPixelForFormat(IMAGE::PixelFormat format) const;
+        unsigned int getBitsPerPixelForFormat(IMAGE::ImageFormat format) const;
 
         const MATH::Sizef& getContentSizeInPixels();
 
         bool hasPremultipliedAlpha() const;
         bool hasMipmaps() const;
 
-        IMAGE::PixelFormat getPixelFormat() const;
+        IMAGE::ImageFormat getPixelFormat() const;
         int getPixelsWidth() const;
         int getPixelsHight() const;
         GLuint getName() const;
@@ -85,7 +97,7 @@ namespace GRAPH
         MATH::Sizef getContentSize() const;
 
     protected:
-        IMAGE::PixelFormat pixelFormat_;
+        IMAGE::ImageFormat pixelFormat_;
         int pixelsWidth_;
         int pixelsHight_;
         uint32 name_;

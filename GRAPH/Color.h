@@ -55,9 +55,7 @@ namespace GRAPH
         bool operator!=(const Color4B& right) const;
         bool operator!=(const Color3B& right) const;
         bool operator!=(const Color4F& right) const;
-        inline operator uint32() {
-            return alpha << 24 | blue << 16 | green << 8 | red;
-        }
+        operator uint32();
 
         HBYTE red;
         HBYTE green;
@@ -69,6 +67,7 @@ namespace GRAPH
         static Color4B WhiteAlpha(float alpha);
         static Color4B BlackAlpha(float alpha);
         static Color4B ColorAlpha(Color4B, float alpha);
+        static Color4B PreMultiplyAlpha(Color4B);
 
         static const Color4B WHITE;
         static const Color4B YELLOW;
