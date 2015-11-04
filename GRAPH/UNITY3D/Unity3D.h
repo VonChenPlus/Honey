@@ -4,6 +4,7 @@
 #include <vector>
 #include "BASE/HObject.h"
 #include "IMAGE/ImageDefine.h"
+#include "IMAGE/ImageObject.h"
 
 namespace GRAPH
 {
@@ -275,16 +276,24 @@ namespace GRAPH
     {
     public:
         virtual void create(U3DTextureType type, bool antialias = true) = 0;
-        
+
         bool initWithData(const void *data, uint64 dataLen, IMAGE::ImageFormat imageFormat, uint32 imageWidth, uint32 imageHeight);
+        bool initWithImage(IMAGE::ImageObject * image);
+        bool initWithImage(IMAGE::ImageObject * image, IMAGE::ImageFormat format);
+
         virtual bool initWithMipmaps(U3DMipmap* mipmaps, int mipLevels, IMAGE::ImageFormat imageFormat, uint32 imageWidth, uint32 imageHeight) = 0;
         virtual bool updateWithData(const void *data, int offsetX, int offsetY, int width, int height) = 0;
 
         virtual void setAliasTexParameters() = 0;
         virtual void autoGenMipmaps() = 0;
 
-        virtual bool hasPremultipliedAlpha() const = 0;
+        bool hasPremultipliedAlpha() const { return premultipliedAlpha_; }
         virtual bool hasMipmaps() const = 0;
+
+        virtual const IMAGE::ImageFormatInfoMap &imageFormatInfoMap() = 0;
+
+    protected:
+        bool premultipliedAlpha_;
     };
 
     class Unity3DCreator : public Unity3DObject

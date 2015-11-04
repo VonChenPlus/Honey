@@ -65,8 +65,8 @@ namespace IMAGE
         bool alpha;
     };
 
-    typedef std::map<ImageFormat, const ImageFormatInfo> PixelFormatInfoMap;
-    typedef PixelFormatInfoMap::value_type PixelFormatInfoMapValue;
+    typedef std::map<ImageFormat, const ImageFormatInfo> ImageFormatInfoMap;
+    typedef ImageFormatInfoMap::value_type ImageFormatInfoMapValue;
 }
 
 #endif // IMAGEDEFINE_H

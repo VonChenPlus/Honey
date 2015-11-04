@@ -1,5 +1,7 @@
 #include "GRAPH/UNITY3D/Unity3D.h"
 #include "GRAPH/UNITY3D/Unity3DGL.h"
+#include "IMAGE/ImageConvert.h"
+#include "MATH/Size.h"
 
 namespace GRAPH
 {
@@ -8,6 +10,47 @@ namespace GRAPH
         mipmap.address = (unsigned char*) data;
         mipmap.length = static_cast<int>(dataLen);
         return initWithMipmaps(&mipmap, 1, imageFormat, imageWidth, imageHeight);
+    }
+
+    bool Unity3DTexture::initWithImage(IMAGE::ImageObject *image) {
+        return initWithImage(image, IMAGE::ImageFormat::DEFAULT);
+    }
+
+    bool Unity3DTexture::initWithImage(IMAGE::ImageObject *image, IMAGE::ImageFormat format) {
+        if (image == nullptr) {
+            return false;
+        }
+
+        int imageWidth = image->getWidth();
+        int imageHeight = image->getHeight();
+
+        unsigned char*   tempData = image->getData();
+        MATH::Sizef      imageSize = MATH::Sizef((float) imageWidth, (float) imageHeight);
+        IMAGE::ImageFormat      pixelFormat = ((IMAGE::ImageFormat::NONE == format) || (IMAGE::ImageFormat::AUTO == format)) ? image->getRenderFormat() : format;
+        IMAGE::ImageFormat      renderFormat = image->getRenderFormat();
+        uint64	         tempDataLen = image->getDataLen();
+
+
+        if (imageFormatInfoMap().at(renderFormat).compressed) {
+            initWithData(tempData, tempDataLen, image->getRenderFormat(), imageWidth, imageHeight);
+            return true;
+        }
+        else {
+            unsigned char* outTempData = nullptr;
+            uint64 outTempDataLen = 0;
+
+            pixelFormat = IMAGE::convertDataToFormat(tempData, tempDataLen, renderFormat, pixelFormat, &outTempData, &outTempDataLen);
+
+            initWithData(outTempData, outTempDataLen, pixelFormat, imageWidth, imageHeight);
+
+            if (outTempData != nullptr && outTempData != tempData) {
+                free(outTempData);
+            }
+
+            premultipliedAlpha_ = image->hasPremultipliedAlpha();
+
+            return true;
+        }
     }
 
     Unity3DCreator::RenderEngine Unity3DCreator::EngineMode = OPENGL;

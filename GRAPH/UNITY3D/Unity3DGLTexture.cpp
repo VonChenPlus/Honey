@@ -9,7 +9,7 @@
 
 namespace GRAPH
 {
-    const IMAGE::PixelFormatInfoMap PixelFormatInfoTables(TexturePixelFormatInfoTablesValue,
+    const IMAGE::ImageFormatInfoMap PixelFormatInfoTables(TexturePixelFormatInfoTablesValue,
                                                                          TexturePixelFormatInfoTablesValue + sizeof(TexturePixelFormatInfoTablesValue) / sizeof(TexturePixelFormatInfoTablesValue[0]));
 
     GLTexture::TextToTextureDataDef GLTexture::getTextureDataForText = nullptr;
@@ -464,6 +464,26 @@ namespace GRAPH
         GLStateCache::BindTexture2D(texture_);
         glGenerateMipmap(target_);
         hasMipmaps_ = true;
+    }
+
+    const IMAGE::ImageFormatInfoMap &Unity3DGLTexture::imageFormatInfoMap() {
+        static const IMAGE::ImageFormatInfoMapValue TexturePixelFormatInfoTablesValue [] =
+        {
+            IMAGE::ImageFormatInfoMapValue(IMAGE::ImageFormat::BGRA8888, IMAGE::ImageFormatInfo(GL_BGRA, GL_BGRA, GL_UNSIGNED_BYTE, 32, false, true)),
+            IMAGE::ImageFormatInfoMapValue(IMAGE::ImageFormat::RGBA8888, IMAGE::ImageFormatInfo(GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, 32, false, true)),
+            IMAGE::ImageFormatInfoMapValue(IMAGE::ImageFormat::RGBA4444, IMAGE::ImageFormatInfo(GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, 16, false, true)),
+            IMAGE::ImageFormatInfoMapValue(IMAGE::ImageFormat::RGB5A1, IMAGE::ImageFormatInfo(GL_RGBA, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, 16, false, true)),
+            IMAGE::ImageFormatInfoMapValue(IMAGE::ImageFormat::RGB565, IMAGE::ImageFormatInfo(GL_RGB, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, 16, false, false)),
+            IMAGE::ImageFormatInfoMapValue(IMAGE::ImageFormat::RGB888, IMAGE::ImageFormatInfo(GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, 24, false, false)),
+            IMAGE::ImageFormatInfoMapValue(IMAGE::ImageFormat::A8, IMAGE::ImageFormatInfo(GL_ALPHA, GL_ALPHA, GL_UNSIGNED_BYTE, 8, false, false)),
+            IMAGE::ImageFormatInfoMapValue(IMAGE::ImageFormat::I8, IMAGE::ImageFormatInfo(GL_LUMINANCE, GL_LUMINANCE, GL_UNSIGNED_BYTE, 8, false, false)),
+            IMAGE::ImageFormatInfoMapValue(IMAGE::ImageFormat::AI88, IMAGE::ImageFormatInfo(GL_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, 16, false, true)),
+        };
+
+        static const IMAGE::ImageFormatInfoMap ImageFormatInfoTables(TexturePixelFormatInfoTablesValue,
+            TexturePixelFormatInfoTablesValue + sizeof(TexturePixelFormatInfoTablesValue) / sizeof(TexturePixelFormatInfoTablesValue[0]));
+
+        return ImageFormatInfoTables;
     }
 
     TextureCache &TextureCache::getInstance() {
