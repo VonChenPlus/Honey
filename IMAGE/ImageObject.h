@@ -12,15 +12,6 @@ namespace IMAGE
         ImageObject();
         virtual ~ImageObject();
 
-        enum class Format
-        {
-            JPG,
-            PNG,
-            ETC,
-            RAW_DATA,
-            UNKNOWN
-        };
-
         bool initWithImageFile(const std::string& path);
         bool initWithImageData(const unsigned char *data, uint64 dataLen);
         bool initWithRawData(const unsigned char *data, uint64 dataLen, int width, int height, int bitsPerComponent, bool preMulti = false);
@@ -29,7 +20,7 @@ namespace IMAGE
         // Getters
         inline unsigned char *   getData()               { return data_; }
         inline uint64           getDataLen()            { return dataLen_; }
-        inline Format            getFileType()           {return fileType_; }
+        inline ImageType        getFileType()           { return fileType_; }
         inline ImageFormat       getRenderFormat()       { return renderFormat_; }
         inline int               getWidth()              { return width_; }
         inline int               getHeight()             { return height_; }
@@ -47,7 +38,7 @@ namespace IMAGE
         ImageObject(const ImageObject&    rImg);
         ImageObject & operator=(const ImageObject&);
 
-        Format detectFormat(const unsigned char * data, uint64 dataLen);
+        ImageType detectType(const unsigned char * data, uint64 dataLen);
         bool isPng(const unsigned char * data, uint64 dataLen);
         bool isJpg(const unsigned char * data, uint64 dataLen);
         bool isEtc(const unsigned char * data, uint64 dataLen);
@@ -57,7 +48,7 @@ namespace IMAGE
         uint64 dataLen_;
         int width_;
         int height_;
-        Format fileType_;
+        ImageType fileType_;
         ImageFormat renderFormat_;
         // false if we cann't auto detect the image is premultiplied or not.
         bool hasPremultipliedAlpha_;

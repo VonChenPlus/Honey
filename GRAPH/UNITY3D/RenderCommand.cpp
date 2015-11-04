@@ -3,7 +3,7 @@
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
-#include "GRAPH/UNITY3D/GLTexture.h"
+#include "GRAPH/UNITY3D/Unity3DGLTexture.h"
 #include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "UTILS/HASH/HashUtils.h"
 

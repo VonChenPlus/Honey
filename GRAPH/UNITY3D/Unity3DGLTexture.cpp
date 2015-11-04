@@ -1,7 +1,7 @@
 #include "BASE/HData.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/Scheduler.h"
-#include "GRAPH/UNITY3D/GLTexture.h"
+#include "GRAPH/UNITY3D/Unity3DGLTexture.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "IMAGE/ImageConvert.h"
@@ -33,19 +33,6 @@ namespace GRAPH
             GLStateCache::DeleteTexture(name_);
         }
         name_ = 0;
-    }
-
-
-    IMAGE::ImageFormat GLTexture::getPixelFormat() const {
-        return pixelFormat_;
-    }
-
-    int GLTexture::getPixelsWidth() const {
-        return pixelsWidth_;
-    }
-
-    int GLTexture::getPixelsHight() const {
-        return pixelsHight_;
     }
 
     GLuint GLTexture::getName() const {
@@ -342,6 +329,141 @@ namespace GRAPH
         }
 
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    }
+
+    Unity3DGLTexture::Unity3DGLTexture() 
+        : target_(0)
+        , texture_(0)
+        , hasMipmaps_(false)
+        , antialias_(true) {
+    }
+
+    Unity3DGLTexture::~Unity3DGLTexture() {
+        if (texture_) {
+            GLStateCache::DeleteTexture(texture_);
+        }
+        texture_ = 0;
+    }
+
+    void Unity3DGLTexture::create(U3DTextureType type, bool antialias) {
+        target_ = textureToGL[type];
+        antialias_ = antialias;
+    }
+
+    bool Unity3DGLTexture::initWithMipmaps(U3DMipmap* mipmaps, int mipLevels, IMAGE::ImageFormat imageFormat, uint32 imageWidth, uint32 imageHeight) {
+        if (mipLevels <= 0) {
+            return false;
+        }
+
+        if (PixelFormatInfoTables.find(imageFormat) == PixelFormatInfoTables.end()) {
+            return false;
+        }
+
+        const IMAGE::ImageFormatInfo& info = PixelFormatInfoTables.at(imageFormat);
+
+        //Set the row align only when mipmapsNum == 1 and the data is uncompressed
+        if (mipLevels == 1 && !info.compressed) {
+            unsigned int bytesPerRow = imageWidth * info.bpp / 8;
+
+            if (bytesPerRow % 8 == 0)
+            {
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 8);
+            }
+            else if (bytesPerRow % 4 == 0)
+            {
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+            }
+            else if (bytesPerRow % 2 == 0)
+            {
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
+            }
+            else
+            {
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            }
+        }
+        else {
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        }
+
+        if (texture_ != 0) {
+            GLStateCache::DeleteTexture(texture_);
+            texture_ = 0;
+        }
+
+        glGenTextures(1, &texture_);
+        GLStateCache::BindTexture2D(texture_);
+
+        if (mipLevels == 1) {
+            glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, antialias_ ? GL_LINEAR : GL_NEAREST);
+        }
+        else {
+            glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, antialias_ ? GL_LINEAR_MIPMAP_NEAREST : GL_NEAREST_MIPMAP_NEAREST);
+        }
+
+        glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, antialias_ ? GL_LINEAR : GL_NEAREST);
+        glTexParameteri(target_, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(target_, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        // Specify OpenGL texture image
+        int width = imageWidth;
+        int height = imageHeight;
+
+        for (int i = 0; i < mipLevels; ++i) {
+            unsigned char *data = mipmaps[i].address;
+            GLsizei datalen = mipmaps[i].length;
+
+            if (info.compressed) {
+                glCompressedTexImage2D(target_, i, info.internalFormat, (GLsizei) width, (GLsizei) height, 0, datalen, data);
+            }
+            else {
+                glTexImage2D(target_, i, info.internalFormat, (GLsizei) width, (GLsizei) height, 0, info.format, info.type, data);
+            }
+
+            width = MATH::MATH_MAX(width >> 1, 1);
+            height = MATH::MATH_MAX(height >> 1, 1);
+        }
+
+        imageFormat_ = imageFormat;
+        width_ = width;
+        height_ = height;
+        premultipliedAlpha_ = false;
+        hasMipmaps_ = mipLevels > 1;
+
+        return true;
+    }
+
+    bool Unity3DGLTexture::updateWithData(const void *data, int offsetX, int offsetY, int width, int height) {
+        if (texture_) {
+            GLStateCache::BindTexture2D(texture_);
+            const IMAGE::ImageFormatInfo& info = PixelFormatInfoTables.at(imageFormat_);
+            glTexSubImage2D(target_, 0, offsetX, offsetY, width, height, info.format, info.type, data);
+            return true;
+        }
+        return false;
+    }
+
+    void Unity3DGLTexture::setAliasTexParameters() {
+        if (texture_ == 0) {
+            return;
+        }
+
+        GLStateCache::BindTexture2D(texture_);
+
+        if (!hasMipmaps_) {
+            glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, antialias_ ? GL_NEAREST : GL_LINEAR);
+        }
+        else {
+            glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, antialias_ ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR_MIPMAP_NEAREST);
+        }
+
+        glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, antialias_ ? GL_NEAREST : GL_LINEAR);
+    }
+
+    void Unity3DGLTexture::autoGenMipmaps() {
+        GLStateCache::BindTexture2D(texture_);
+        glGenerateMipmap(target_);
+        hasMipmaps_ = true;
     }
 
     TextureCache &TextureCache::getInstance() {

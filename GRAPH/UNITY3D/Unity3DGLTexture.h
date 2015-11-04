@@ -8,10 +8,9 @@
 #include <queue>
 #include <unordered_map>
 #include <functional>
-#include "BASE/HObject.h"
 #include "BASE/HData.h"
 #include "GRAPH/Types.h"
-#include "GRAPH/UNITY3D/GLCommon.h"
+#include "GRAPH/UNITY3D/Unity3d.h"
 #include "MATH/Vector.h"
 #include "MATH/Rectangle.h"
 #include "MATH/Size.h"
@@ -65,7 +64,7 @@ namespace GRAPH
         void releaseGLTexture();
 
         bool initWithData(const void *data, uint64 dataLen, IMAGE::ImageFormat pixelFormat, int pixelsWide, int pixelsHigh, const MATH::Sizef& contentSize);
-        bool initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, IMAGE::ImageFormat pixelFormat, int pixelsWide, int pixelsHigh);
+        bool initWithMipmaps(MipmapInfo* mipmaps, int mipLevels, IMAGE::ImageFormat pixelFormat, int pixelsWide, int pixelsHigh);
 
         bool updateWithData(const void *data,int offsetX,int offsetY,int width,int height);
 
@@ -80,18 +79,11 @@ namespace GRAPH
 
         void generateMipmap();
 
-        const char* getStringForFormat() const;
-        unsigned int getBitsPerPixelForFormat() const;
-        unsigned int getBitsPerPixelForFormat(IMAGE::ImageFormat format) const;
-
         const MATH::Sizef& getContentSizeInPixels();
 
         bool hasPremultipliedAlpha() const;
         bool hasMipmaps() const;
 
-        IMAGE::ImageFormat getPixelFormat() const;
-        int getPixelsWidth() const;
-        int getPixelsHight() const;
         GLuint getName() const;
 
         MATH::Sizef getContentSize() const;
@@ -105,6 +97,48 @@ namespace GRAPH
         bool hasPremultipliedAlpha_;
         bool hasMipmaps_;
         bool antialiasEnabled_;
+    };
+
+    static const uint32 textureToGL [] =
+    {
+        GL_TEXTURE_1D,
+        GL_TEXTURE_2D,
+        GL_TEXTURE_3D,
+        GL_TEXTURE_CUBE_MAP,
+        GL_TEXTURE_1D_ARRAY,
+        GL_TEXTURE_2D_ARRAY,
+        GL_NONE
+    };
+
+    class Unity3DGLTexture final : public Unity3DTexture
+    {
+    public:
+        Unity3DGLTexture();
+        ~Unity3DGLTexture();
+
+        void create(U3DTextureType type, bool antialias = true) override;
+
+        bool initWithMipmaps(U3DMipmap* mipmaps, int mipLevels, IMAGE::ImageFormat imageFormat, uint32 imageWidth, uint32 imageHeight) override;
+        bool updateWithData(const void *data, int offsetX, int offsetY, int width, int height) override;
+
+        void setAliasTexParameters() override;
+        void autoGenMipmaps() override;
+
+        bool hasPremultipliedAlpha() const override { return premultipliedAlpha_; }
+        bool hasMipmaps() const override { return hasMipmaps_; }
+
+        int width() { return width_; }
+        int height() { return height_; }
+
+    private:
+        GLuint target_;
+        bool antialias_;
+        GLuint texture_;
+        IMAGE::ImageFormat imageFormat_;
+        int width_;
+        int height_;
+        bool hasMipmaps_;
+        bool premultipliedAlpha_;
     };
 
     class TextureCache : public HObject

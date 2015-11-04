@@ -1,5 +1,5 @@
 #include "GRAPH/UNITY3D/TextureAtlas.h"
-#include "GRAPH/UNITY3D/GLTexture.h"
+#include "GRAPH/UNITY3D/Unity3DGLTexture.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 
 namespace GRAPH

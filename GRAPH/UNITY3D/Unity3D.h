@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "BASE/HObject.h"
-#include "MATH/Matrix.h"
+#include "IMAGE/ImageDefine.h"
 
 namespace GRAPH
 {
@@ -143,30 +143,13 @@ namespace GRAPH
 
     enum U3DTextureType : uint8
     {
-        UNKNOWN,
         LINEAR1D,
         LINEAR2D,
         LINEAR3D,
         CUBE,
         ARRAY1D,
         ARRAY2D,
-    };
-
-    enum U3DImageFormat : int8
-    {
-        AUTO,
-        BGRA8888,
-        RGBA8888,
-        RGB888,
-        RGB565,
-        A8,
-        I8,
-        AI88,
-        RGBA4444,
-        RGB5A1,
-        ETC,
-        DEFAULT = AUTO,
-        NONE = -1
+        UNKNOWN,
     };
 
     enum U3DRenderState : uint8
@@ -275,6 +258,33 @@ namespace GRAPH
         virtual void drawIndexed(U3DPrimitive prim, Unity3DVertexFormat *format, Unity3DBuffer *vdata, Unity3DBuffer *idata, void *indices, int offset) = 0;
         virtual void drawUp(U3DPrimitive prim, Unity3DVertexFormat *format, const void *vdata, int vertexCount) = 0;
         virtual void clear(int mask, uint32 colorval, float depthVal, int stencilVal) = 0;
+    };
+
+    struct U3DMipmap
+    {
+        U3DMipmap()
+            : address(nullptr)
+            , length(0){
+
+        }
+        uint8* address;
+        int length;
+    };
+
+    class Unity3DTexture
+    {
+    public:
+        virtual void create(U3DTextureType type, bool antialias = true) = 0;
+        
+        bool initWithData(const void *data, uint64 dataLen, IMAGE::ImageFormat imageFormat, uint32 imageWidth, uint32 imageHeight);
+        virtual bool initWithMipmaps(U3DMipmap* mipmaps, int mipLevels, IMAGE::ImageFormat imageFormat, uint32 imageWidth, uint32 imageHeight) = 0;
+        virtual bool updateWithData(const void *data, int offsetX, int offsetY, int width, int height) = 0;
+
+        virtual void setAliasTexParameters() = 0;
+        virtual void autoGenMipmaps() = 0;
+
+        virtual bool hasPremultipliedAlpha() const = 0;
+        virtual bool hasMipmaps() const = 0;
     };
 
     class Unity3DCreator : public Unity3DObject

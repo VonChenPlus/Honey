@@ -20,18 +20,6 @@ namespace GRAPH
         void apply() override;
     };
 
-    static const unsigned short compToGL [] =
-    {
-        GL_NEVER,
-        GL_LESS,
-        GL_EQUAL,
-        GL_LEQUAL,
-        GL_GREATER,
-        GL_NOTEQUAL,
-        GL_GEQUAL,
-        GL_ALWAYS
-    };
-
     class Unity3DGLDepthState : public Unity3DDepthState
     {
     public:
@@ -75,7 +63,7 @@ namespace GRAPH
         int stride_;
     };
 
-    static const unsigned short primToGL [] =
+    static const uint32 primToGL [] =
     {
         GL_POINTS,
         GL_LINES,

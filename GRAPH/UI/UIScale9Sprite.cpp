@@ -4,7 +4,7 @@
 #include "GRAPH/SpriteFrame.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
-#include "GRAPH/UNITY3D/GLTexture.h"
+#include "GRAPH/UNITY3D/Unity3DGLTexture.h"
 
 namespace GRAPH
 {

@@ -6,7 +6,7 @@
 
 namespace IMAGE
 {
-    enum ImageFormat : int8
+    enum class ImageFormat : int8
     {
         //! auto detect the type
         AUTO,
@@ -35,6 +35,15 @@ namespace IMAGE
         DEFAULT = AUTO,
         //!
         NONE = -1
+    };
+
+    enum class ImageType : uint8
+    {
+        JPG,
+        PNG,
+        ETC,
+        RAW_DATA,
+        UNKNOWN
     };
 
     struct ImageFormatInfo {

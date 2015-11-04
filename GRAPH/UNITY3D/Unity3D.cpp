@@ -3,6 +3,13 @@
 
 namespace GRAPH
 {
+    bool Unity3DTexture::initWithData(const void *data, uint64 dataLen, IMAGE::ImageFormat imageFormat, uint32 imageWidth, uint32 imageHeight) {
+        U3DMipmap mipmap;
+        mipmap.address = (unsigned char*) data;
+        mipmap.length = static_cast<int>(dataLen);
+        return initWithMipmaps(&mipmap, 1, imageFormat, imageWidth, imageHeight);
+    }
+
     Unity3DCreator::RenderEngine Unity3DCreator::EngineMode = OPENGL;
 
     Unity3DContext *Unity3DCreator::CreateContext() {

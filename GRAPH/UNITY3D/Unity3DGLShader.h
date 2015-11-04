@@ -6,6 +6,7 @@
 #include <string>
 #include "GRAPH/UNITY3D/GLCommon.h"
 #include "GRAPH/UNITY3D/Unity3D.h"
+#include "MATH/Matrix.h"
 
 namespace GRAPH
 {

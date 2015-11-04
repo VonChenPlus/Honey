@@ -14,7 +14,7 @@ namespace IMAGE
         , dataLen_(0)
         , width_(0)
         , height_(0)
-        , fileType_(Format::UNKNOWN)
+        , fileType_(ImageType::UNKNOWN)
         , renderFormat_(ImageFormat::NONE)
         , hasPremultipliedAlpha_(true) {
 
@@ -62,16 +62,16 @@ namespace IMAGE
             unpackedData = const_cast<unsigned char*>(data);
             unpackedLen = dataLen;
 
-            fileType_ = detectFormat(unpackedData, unpackedLen);
+            fileType_ = detectType(unpackedData, unpackedLen);
 
             switch (fileType_) {
-            case Format::PNG:
+            case ImageType::PNG:
                 ret = initWithPngData(unpackedData, unpackedLen);
                 break;
-            case Format::JPG:
+            case ImageType::JPG:
                 ret = initWithJpgData(unpackedData, unpackedLen);
                 break;
-            case Format::ETC:
+            case ImageType::ETC:
                 ret = initWithETCData(unpackedData, unpackedLen);
                 break;
 
@@ -111,18 +111,18 @@ namespace IMAGE
         return memcmp(data, JPG_SOI, 2) == 0;
     }
 
-    ImageObject::Format ImageObject::detectFormat(const unsigned char * data, uint64 dataLen) {
+    ImageType ImageObject::detectType(const unsigned char * data, uint64 dataLen) {
         if (isPng(data, dataLen)) {
-            return Format::PNG;
+            return ImageType::PNG;
         }
         else if (isJpg(data, dataLen)) {
-            return Format::JPG;
+            return ImageType::JPG;
         }
         else if (isEtc(data, dataLen)) {
-            return Format::ETC;
+            return ImageType::ETC;
         }
         else {
-            return Format::UNKNOWN;
+            return ImageType::UNKNOWN;
         }
     }
 

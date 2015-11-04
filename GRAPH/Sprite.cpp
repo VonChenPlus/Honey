@@ -2,7 +2,7 @@
 #include "GRAPH/Sprite.h"
 #include "GRAPH/SpriteFrame.h"
 #include "GRAPH/Director.h"
-#include "GRAPH/UNITY3D/GLTexture.h"
+#include "GRAPH/UNITY3D/Unity3DGLTexture.h"
 #include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
@@ -409,8 +409,8 @@ namespace GRAPH
             return;
         }
 
-        float atlasWidth = (float)tex->getPixelsWidth();
-        float atlasHeight = (float)tex->getPixelsHight();
+        float atlasWidth = (float)tex->getContentSize().width;
+        float atlasHeight = (float) tex->getContentSize().height;
 
         float left, right, top, bottom;
 
