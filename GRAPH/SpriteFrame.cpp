@@ -14,14 +14,14 @@ namespace GRAPH
         return spriteFrame;
     }
 
-    SpriteFrame* SpriteFrame::createWithTexture(GLTexture *texture, const MATH::Rectf& rect) {
+    SpriteFrame* SpriteFrame::createWithTexture(Unity3DTexture *texture, const MATH::Rectf& rect) {
         SpriteFrame *spriteFrame = new (std::nothrow) SpriteFrame();
         spriteFrame->initWithTexture(texture, rect);
         spriteFrame->autorelease();
         return spriteFrame;
     }
 
-    SpriteFrame* SpriteFrame::createWithTexture(GLTexture* texture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize) {
+    SpriteFrame* SpriteFrame::createWithTexture(Unity3DTexture* texture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize) {
         SpriteFrame *spriteFrame = new (std::nothrow) SpriteFrame();
         spriteFrame->initWithTexture(texture, rect, rotated, offset, originalSize);
         spriteFrame->autorelease();
@@ -41,7 +41,7 @@ namespace GRAPH
 
     }
 
-    bool SpriteFrame::initWithTexture(GLTexture* texture, const MATH::Rectf& rect) {
+    bool SpriteFrame::initWithTexture(Unity3DTexture* texture, const MATH::Rectf& rect) {
         return initWithTexture(texture, rect, false, MATH::Vec2fZERO, rect.size);
     }
 
@@ -49,7 +49,7 @@ namespace GRAPH
         return initWithTextureFilename(filename, rect, false, MATH::Vec2fZERO, rect.size);
     }
 
-    bool SpriteFrame::initWithTexture(GLTexture* texture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize) {
+    bool SpriteFrame::initWithTexture(Unity3DTexture* texture, const MATH::Rectf& rect, bool rotated, const MATH::Vector2f& offset, const MATH::Sizef& originalSize) {
         texture_ = texture;
         if (texture) {
             texture->retain();
@@ -89,7 +89,7 @@ namespace GRAPH
         offset_ = offsets;
     }
 
-    void SpriteFrame::setTexture(GLTexture * texture) {
+    void SpriteFrame::setTexture(Unity3DTexture * texture) {
         if( texture_ != texture ) {
             SAFE_RELEASE(texture_);
             SAFE_RETAIN(texture);
@@ -97,7 +97,7 @@ namespace GRAPH
         }
     }
 
-    GLTexture* SpriteFrame::getTexture() {
+    Unity3DTexture* SpriteFrame::getTexture() {
         if( texture_ ) {
             return texture_;
         }
@@ -125,7 +125,7 @@ namespace GRAPH
         SAFE_DELETE(loadedFileNames_);
     }
 
-    void SpriteFrameCache::addSpriteFramesWithFile(const std::string& plist, GLTexture *texture) {
+    void SpriteFrameCache::addSpriteFramesWithFile(const std::string& plist, Unity3DTexture *texture) {
         if (loadedFileNames_->find(plist) != loadedFileNames_->end()) {
             return;
         }
@@ -137,13 +137,13 @@ namespace GRAPH
         loadedFileNames_->insert(plist);
     }
 
-    void SpriteFrameCache::addSpriteFramesWithFileContent(const std::string& plist_content, GLTexture *texture) {
+    void SpriteFrameCache::addSpriteFramesWithFileContent(const std::string& plist_content, Unity3DTexture *texture) {
         ValueMap dict = IO::FileUtils::getInstance().getValueMapFromData((const HBYTE *)plist_content.c_str(), static_cast<int>(plist_content.size()));
         addSpriteFramesWithDictionary(dict, texture);
     }
 
     void SpriteFrameCache::addSpriteFramesWithFile(const std::string& plist, const std::string& textureFileName) {
-        GLTexture *texture = TextureCache::getInstance().addImage(textureFileName);
+        Unity3DTexture *texture = TextureCache::getInstance().addImage(textureFileName);
 
         if (texture) {
             addSpriteFramesWithFile(plist, texture);
@@ -179,7 +179,7 @@ namespace GRAPH
                 texturePath = texturePath.append(".png");
             }
 
-            GLTexture *texture = TextureCache::getInstance().addImage(texturePath.c_str());
+            Unity3DTexture *texture = TextureCache::getInstance().addImage(texturePath.c_str());
             if (texture) {
                 addSpriteFramesWithDictionary(dict, texture);
                 loadedFileNames_->insert(plist);
@@ -187,7 +187,7 @@ namespace GRAPH
         }
     }
 
-    void SpriteFrameCache::addSpriteFramesWithDictionary(ValueMap& dictionary, GLTexture* texture) {
+    void SpriteFrameCache::addSpriteFramesWithDictionary(ValueMap& dictionary, Unity3DTexture* texture) {
         ValueMap& framesDict = dictionary["frames"].asValueMap();
         int format = 0;
         // get the format
@@ -371,7 +371,7 @@ namespace GRAPH
         spriteFrames_.erase(keysToRemove);
     }
 
-    void SpriteFrameCache::removeSpriteFramesFromTexture(GLTexture* texture) {
+    void SpriteFrameCache::removeSpriteFramesFromTexture(Unity3DTexture* texture) {
         std::vector<std::string> keysToRemove;
 
         for (auto iter = spriteFrames_.cbegin(); iter != spriteFrames_.cend(); ++iter) {

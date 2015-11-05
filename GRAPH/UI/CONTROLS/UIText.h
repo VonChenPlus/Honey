@@ -51,12 +51,6 @@ namespace GRAPH
             void setTextAreaSize(const MATH::Sizef &size);
             const MATH::Sizef& getTextAreaSize()const;
 
-            void setTextHorizontalAlignment(TextHAlignment alignment);
-            TextHAlignment getTextHorizontalAlignment()const;
-
-            void setTextVerticalAlignment(TextVAlignment alignment);
-            TextVAlignment getTextVerticalAlignment()const;
-
             void setTextColor(const Color4B color);
             const Color4B& getTextColor() const;
 

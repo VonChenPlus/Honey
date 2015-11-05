@@ -94,7 +94,7 @@ namespace GRAPH
         return area;
     }
 
-    Sprite* Sprite::createWithTexture(GLTexture *texture) {
+    Sprite* Sprite::createWithTexture(Unity3DTexture *texture) {
         Sprite *sprite = new (std::nothrow) Sprite();
         if (sprite && sprite->initWithTexture(texture)) {
             sprite->autorelease();
@@ -104,7 +104,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    Sprite* Sprite::createWithTexture(GLTexture *texture, const MATH::Rectf& rect, bool rotated) {
+    Sprite* Sprite::createWithTexture(Unity3DTexture *texture, const MATH::Rectf& rect, bool rotated) {
         Sprite *sprite = new (std::nothrow) Sprite();
         if (sprite && sprite->initWithTexture(texture, rect, rotated)) {
             sprite->autorelease();
@@ -173,14 +173,14 @@ namespace GRAPH
         return initWithTexture(nullptr, MATH::RectfZERO );
     }
 
-    bool Sprite::initWithTexture(GLTexture *texture) {
+    bool Sprite::initWithTexture(Unity3DTexture *texture) {
         MATH::Rectf rect = MATH::RectfZERO;
-        rect.size = texture->getContentSize();
+        rect.size = MATH::Sizef(texture->width(), texture->height());
 
         return initWithTexture(texture, rect);
     }
 
-    bool Sprite::initWithTexture(GLTexture *texture, const MATH::Rectf& rect) {
+    bool Sprite::initWithTexture(Unity3DTexture *texture, const MATH::Rectf& rect) {
         return initWithTexture(texture, rect, false);
     }
 
@@ -197,10 +197,10 @@ namespace GRAPH
     }
 
     bool Sprite::initWithFile(const std::string& filename) {
-        GLTexture *texture = TextureCache::getInstance().addImage(filename);
+        Unity3DTexture *texture = TextureCache::getInstance().addImage(filename);
         if (texture) {
             MATH::Rectf rect = MATH::RectfZERO;
-            rect.size = texture->getContentSize();
+            rect.size = MATH::Sizef(texture->width(), texture->height());
             return initWithTexture(texture, rect);
         }
 
@@ -208,7 +208,7 @@ namespace GRAPH
     }
 
     bool Sprite::initWithFile(const std::string &filename, const MATH::Rectf& rect) {
-        GLTexture *texture = TextureCache::getInstance().addImage(filename);
+        Unity3DTexture *texture = TextureCache::getInstance().addImage(filename);
         if (texture) {
             return initWithTexture(texture, rect);
         }
@@ -222,7 +222,7 @@ namespace GRAPH
         return true;
     }
 
-    bool Sprite::initWithTexture(GLTexture *texture, const MATH::Rectf& rect, bool rotated) {
+    bool Sprite::initWithTexture(Unity3DTexture *texture, const MATH::Rectf& rect, bool rotated) {
         bool result;
         if (Node::init()) {
             batchNode_ = nullptr;
@@ -283,16 +283,16 @@ namespace GRAPH
     #define _2x2_WHITE_IMAGE_KEY  "/_2x2_white_image"
 
     void Sprite::setTexture(const std::string &filename) {
-        GLTexture *texture = TextureCache::getInstance().addImage(filename);
+        Unity3DTexture *texture = TextureCache::getInstance().addImage(filename);
         setTexture(texture);
 
         MATH::Rectf rect = MATH::RectfZERO;
         if (texture)
-            rect.size = texture->getContentSize();
+            rect = MATH::Rectf(0, 0, texture->width(), texture->height());
         setTextureRect(rect);
     }
 
-    void Sprite::setTexture(GLTexture *texture) {
+    void Sprite::setTexture(Unity3DTexture *texture) {
         if (texture == nullptr) {
             texture = TextureCache::getInstance().getTextureForKey(_2x2_WHITE_IMAGE_KEY);
 
@@ -312,7 +312,7 @@ namespace GRAPH
         }
     }
 
-    GLTexture* Sprite::getTexture() const {
+    Unity3DTexture* Sprite::getTexture() const {
         return texture_;
     }
 
@@ -374,7 +374,7 @@ namespace GRAPH
 
         unflippedOffsetPositionFromCenter_ = spriteFrame->getOffset();
 
-        GLTexture *texture = spriteFrame->getTexture();
+        Unity3DTexture *texture = spriteFrame->getTexture();
         if (texture != texture_) {
             setTexture(texture);
         }
@@ -387,7 +387,7 @@ namespace GRAPH
         MATH::Rectf rect = frame->getRect();
 
         return (rect.equals(rect_) &&
-                frame->getTexture()->getName() == texture_->getName() &&
+                 frame->getTexture()->texture() == texture_->texture() &&
                 frame->getOffset().equals(unflippedOffsetPositionFromCenter_));
     }
 
@@ -404,13 +404,13 @@ namespace GRAPH
     }
 
     void Sprite::setTextureCoords(MATH::Rectf rect) {
-        GLTexture *tex = batchNode_ ? textureAtlas_->getTexture() : texture_;
+        Unity3DTexture *tex = batchNode_ ? textureAtlas_->getTexture() : texture_;
         if (! tex) {
             return;
         }
 
-        float atlasWidth = (float)tex->getContentSize().width;
-        float atlasHeight = (float) tex->getContentSize().height;
+        float atlasWidth = (float)tex->width();
+        float atlasHeight = (float) tex->height();
 
         float left, right, top, bottom;
 
@@ -527,7 +527,7 @@ namespace GRAPH
     }
 
     void Sprite::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags) {
-        trianglesCommand_.init(globalZOrder_, texture_->getName(), getGLShaderState(), blendFunc_, polyInfo_.triangles, transform, flags);
+        trianglesCommand_.init(globalZOrder_, texture_->texture(), getGLShaderState(), blendFunc_, polyInfo_.triangles, transform, flags);
         renderer->addCommand(&trianglesCommand_);
     }
 
@@ -803,7 +803,7 @@ namespace GRAPH
         polyInfo_ = info;
     }
 
-    SpriteBatchNode* SpriteBatchNode::createWithTexture(GLTexture* tex, uint64 capacity/* = DEFAULT_CAPACITY*/) {
+    SpriteBatchNode* SpriteBatchNode::createWithTexture(Unity3DTexture* tex, uint64 capacity/* = DEFAULT_CAPACITY*/) {
         SpriteBatchNode *batchNode = new (std::nothrow) SpriteBatchNode();
         batchNode->initWithTexture(tex, capacity);
         batchNode->autorelease();
@@ -818,7 +818,7 @@ namespace GRAPH
         return batchNode;
     }
 
-    bool SpriteBatchNode::initWithTexture(GLTexture *tex, uint64 capacity/* = DEFAULT_CAPACITY*/) {
+    bool SpriteBatchNode::initWithTexture(Unity3DTexture *tex, uint64 capacity/* = DEFAULT_CAPACITY*/) {
         blendFunc_ = BlendFunc::ALPHA_PREMULTIPLIED;
         if (!tex->hasPremultipliedAlpha()) {
             blendFunc_ = BlendFunc::ALPHA_NON_PREMULTIPLIED;
@@ -842,13 +842,13 @@ namespace GRAPH
     }
 
     bool SpriteBatchNode::init() {
-        GLTexture * texture = new (std::nothrow) GLTexture();
+        Unity3DTexture * texture = Unity3DCreator::CreateTexture();
         texture->autorelease();
         return this->initWithTexture(texture, 0);
     }
 
     bool SpriteBatchNode::initWithFile(const std::string& fileImage, uint64 capacity/* = DEFAULT_CAPACITY*/) {
-        GLTexture *texture2D = TextureCache::getInstance().addImage(fileImage);
+        Unity3DTexture *texture2D = TextureCache::getInstance().addImage(fileImage);
         return initWithTexture(texture2D, capacity);
     }
 
@@ -1201,11 +1201,11 @@ namespace GRAPH
         return blendFunc_;
     }
 
-    GLTexture* SpriteBatchNode::getTexture() const {
+    Unity3DTexture* SpriteBatchNode::getTexture() const {
         return textureAtlas_->getTexture();
     }
 
-    void SpriteBatchNode::setTexture(GLTexture *texture) {
+    void SpriteBatchNode::setTexture(Unity3DTexture *texture) {
         textureAtlas_->setTexture(texture);
         updateBlendFunc();
     }

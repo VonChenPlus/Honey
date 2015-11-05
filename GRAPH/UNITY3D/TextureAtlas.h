@@ -1,24 +1,24 @@
-#ifndef GLTEXTUREATLAS_H
-#define GLTEXTUREATLAS_H
+#ifndef TEXTUREATLAS_H
+#define TEXTUREATLAS_H
 
 #include "GRAPH/UNITY3D/Unity3D.h"
 #include "GRAPH/UNITY3D/GLCommon.h"
 
 namespace GRAPH
 {
-    class GLTexture;
+    class Unity3DTexture;
 
     class TextureAtlas : public HObject
     {
     public:
         static TextureAtlas* create(const std::string& file , uint64 capacity);
-        static TextureAtlas* createWithTexture(GLTexture *texture, uint64 capacity);
+        static TextureAtlas* createWithTexture(Unity3DTexture *texture, uint64 capacity);
 
         TextureAtlas();
         virtual ~TextureAtlas();
 
         bool initWithFile(const std::string& file, uint64 capacity);
-        bool initWithTexture(GLTexture *texture, uint64 capacity);
+        bool initWithTexture(Unity3DTexture *texture, uint64 capacity);
 
         void updateQuad(V3F_C4B_T2F_Quad* quad, uint64 index);
         void insertQuad(V3F_C4B_T2F_Quad* quad, uint64 index);
@@ -46,8 +46,8 @@ namespace GRAPH
         uint64 getTotalQuads() const;
         uint64 getCapacity() const;
 
-        GLTexture* getTexture() const;
-        void setTexture(GLTexture* texture);
+        Unity3DTexture* getTexture() const;
+        void setTexture(Unity3DTexture* texture);
 
         V3F_C4B_T2F_Quad* getQuads();
         void setQuads(V3F_C4B_T2F_Quad* quads);
@@ -64,8 +64,8 @@ namespace GRAPH
         Unity3DVertexFormat *u3dVertexFormat_;
         Unity3DContext *u3dContext_;
         bool    dirty_;
-        GLTexture* texture_;
+        Unity3DTexture* texture_;
     };
 }
 
-#endif // GLTEXTUREATLAS_H
+#endif // TEXTUREATLAS_H

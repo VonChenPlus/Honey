@@ -31,11 +31,11 @@ namespace GRAPH
         return vbo_.u2.bufferCapacity;
     }
 
-    GLTexture* TextureAtlas::getTexture() const {
+    Unity3DTexture* TextureAtlas::getTexture() const {
         return texture_;
     }
 
-    void TextureAtlas::setTexture(GLTexture * var) {
+    void TextureAtlas::setTexture(Unity3DTexture * var) {
         SAFE_RETAIN(var);
         SAFE_RELEASE(texture_);
         texture_ = var;
@@ -61,7 +61,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    TextureAtlas * TextureAtlas::createWithTexture(GLTexture *texture, uint64 capacity) {
+    TextureAtlas * TextureAtlas::createWithTexture(Unity3DTexture *texture, uint64 capacity) {
         TextureAtlas * textureAtlas = new (std::nothrow) TextureAtlas();
         if (textureAtlas && textureAtlas->initWithTexture(texture, capacity)) {
             textureAtlas->autorelease();
@@ -73,7 +73,7 @@ namespace GRAPH
 
     bool TextureAtlas::initWithFile(const std::string& file, uint64 capacity) {
         // retained in property
-        GLTexture *texture = TextureCache::getInstance().addImage(file);
+        Unity3DTexture *texture = TextureCache::getInstance().addImage(file);
 
         if (texture) {
             return initWithTexture(texture, capacity);
@@ -82,7 +82,7 @@ namespace GRAPH
         return false;
     }
 
-    bool TextureAtlas::initWithTexture(GLTexture *texture, uint64 capacity) {
+    bool TextureAtlas::initWithTexture(Unity3DTexture *texture, uint64 capacity) {
         vbo_.u2.indexCapacity = vbo_.u2.bufferCapacity = capacity;
         vbo_.u2.indexCount = vbo_.u2.bufferCount = 0;
 
@@ -354,7 +354,7 @@ namespace GRAPH
         if(!numberOfQuads)
             return;
 
-        GLStateCache::BindTexture2D(texture_->getName());
+        GLStateCache::BindTexture2D(texture_->texture());
 
         if (dirty_) {
             u3dVertexBuffer_->bind();

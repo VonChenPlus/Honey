@@ -10,7 +10,7 @@
 
 namespace GRAPH
 {
-    class GLTexture;
+    class Unity3DTexture;
     namespace UI
     {
         class Label;
@@ -70,12 +70,12 @@ namespace GRAPH
 
         bool prepareLetterDefinitions(const std::u16string& utf16String);
 
-        inline const std::unordered_map<uint64, GLTexture*>& getTextures() const{ return atlasTextures_;}
-        void  addTexture(GLTexture *texture, int slot);
+        inline const std::unordered_map<uint64, Unity3DTexture*>& getTextures() const{ return atlasTextures_;}
+        void  addTexture(Unity3DTexture *texture, int slot);
         float getCommonLineHeight() const;
         void  setCommonLineHeight(float newHeight);
 
-        GLTexture* getTexture(int slot);
+        Unity3DTexture* getTexture(int slot);
         const Font* getFont() const;
 
         void listenRendererRecreated(EventCustom *event);
@@ -84,15 +84,13 @@ namespace GRAPH
 
         void renderCharAt(unsigned char *dest,int posX, int posY, unsigned char* bitmap,long bitmapWidth,long bitmapHeight);
 
-        void setAntiAliasTexParameters();
-
         void setAliasTexParameters();
 
     protected:
         void relaseTextures();
 
     private:
-        std::unordered_map<uint64, GLTexture*> atlasTextures_;
+        std::unordered_map<uint64, Unity3DTexture*> atlasTextures_;
         std::unordered_map<unsigned short, FontLetterDefinition> letterDefinitions_;
         float commonLineHeight_;
         Font * font_;

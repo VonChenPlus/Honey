@@ -713,24 +713,6 @@ namespace GRAPH
             _pressedActionEnabled = enabled;
         }
 
-        void Button::setTitleAlignment(TextHAlignment hAlignment)
-        {
-            if (nullptr == _titleRenderer)
-            {
-                this->createTitleRenderer();
-            }
-            _titleRenderer->setAlignment(hAlignment);
-        }
-
-        void Button::setTitleAlignment(TextHAlignment hAlignment, TextVAlignment vAlignment)
-        {
-            if (nullptr == _titleRenderer)
-            {
-                this->createTitleRenderer();
-            }
-            _titleRenderer->setAlignment(hAlignment, vAlignment);
-        }
-
         void Button::setTitleText(const std::string& text)
         {
             if (text == getTitleText())
@@ -780,10 +762,6 @@ namespace GRAPH
             }
 
             _fontSize = size;
-            if (_type == FontType::SYSTEM)
-            {
-                _titleRenderer->setSystemFontSize(_fontSize);
-            }
             //we can't change font size of BMFont.
             if(FontType::BMFONT != _type)
             {
@@ -806,39 +784,9 @@ namespace GRAPH
             return _zoomScale;
         }
 
-        void Button::setTitleFontName(const std::string& fontName)
-        {
-            if(nullptr == _titleRenderer)
-            {
-                this->createTitleRenderer();
-            }
-
-            _titleRenderer->setSystemFontName(fontName);
-            if (_type == FontType::TTF)
-            {
-                _titleRenderer->requestSystemFontRefresh();
-            }
-            _titleRenderer->setSystemFontSize(_fontSize);
-            _type = FontType::SYSTEM;
-            this->updateContentSize();
-        }
-
         Label* Button::getTitleRenderer()const
         {
             return _titleRenderer;
-        }
-
-        const std::string Button::getTitleFontName() const
-        {
-            if (nullptr != _titleRenderer)
-            {
-                if (this->_type == FontType::SYSTEM)
-                {
-                    return _titleRenderer->getSystemFontName();
-                }
-            }
-
-            return "";
         }
 
         Widget* Button::createCloneInstance()
@@ -874,7 +822,6 @@ namespace GRAPH
                 if(nullptr != button->getTitleRenderer())
                 {
                     setTitleText(button->getTitleText());
-                    setTitleFontName(button->getTitleFontName());
                     setTitleFontSize(button->getTitleFontSize());
                     setTitleColor(button->getTitleColor());
                 }

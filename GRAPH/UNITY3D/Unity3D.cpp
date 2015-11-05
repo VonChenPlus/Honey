@@ -12,6 +12,35 @@ namespace GRAPH
         return initWithMipmaps(&mipmap, 1, imageFormat, imageWidth, imageHeight);
     }
 
+    bool Unity3DTexture::initWithString(const char *string, U3DStringToTexture loader, void *loaderOwner) {
+        if (loader == nullptr)
+            throw _HException_Normal("StringToTexture is NULL!");
+
+        IMAGE::ImageFormat pixelFormat = IMAGE::ImageFormat::DEFAULT;
+        HBYTE* outTempData = nullptr;
+        uint64 outTempDataLen = 0;
+
+        uint32 imageWidth;
+        uint32 imageHeight;
+        bool hasPremultipliedAlpha = false;
+        HData outData = loader(loaderOwner, string, imageWidth, imageHeight, hasPremultipliedAlpha);
+        if (outData.isNull()) {
+            return false;
+        }
+
+        MATH::Sizef  imageSize = MATH::Sizef((float) imageWidth, (float) imageHeight);
+        pixelFormat = IMAGE::convertDataToFormat(outData.getBytes(), imageWidth*imageHeight * 4, IMAGE::ImageFormat::RGBA8888, pixelFormat, &outTempData, &outTempDataLen);
+
+        bool ret = initWithData(outTempData, outTempDataLen, pixelFormat, imageWidth, imageHeight);
+
+        if (outTempData != nullptr && outTempData != outData.getBytes()) {
+            free(outTempData);
+        }
+        premultipliedAlpha_ = hasPremultipliedAlpha;
+
+        return ret;
+    }
+
     bool Unity3DTexture::initWithImage(IMAGE::ImageObject *image) {
         return initWithImage(image, IMAGE::ImageFormat::DEFAULT);
     }
@@ -104,6 +133,17 @@ namespace GRAPH
         {
         case OPENGL:
             return Unity3DGLCreator::CreateVertexFormat(components, stride);
+        default:
+            throw _HException_Normal("Unsupport Engine Mode!");
+            break;
+        }
+    }
+
+    Unity3DTexture *Unity3DCreator::CreateTexture(U3DTextureType type, bool antialias) {
+        switch (EngineMode)
+        {
+        case OPENGL:
+            return Unity3DGLCreator::CreateTexture(type, antialias);
         default:
             throw _HException_Normal("Unsupport Engine Mode!");
             break;

@@ -4,7 +4,6 @@
 #include "GRAPH/SpriteFrame.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
-#include "GRAPH/UNITY3D/Unity3DGLTexture.h"
 
 namespace GRAPH
 {
@@ -277,7 +276,7 @@ namespace GRAPH
             return _blendFunc;
         }
 
-        void Scale9Sprite::updateBlendFunc(GLTexture *texture)
+        void Scale9Sprite::updateBlendFunc(Unity3DTexture *texture)
         {
 
             // it is possible to have an untextured sprite
@@ -397,7 +396,7 @@ namespace GRAPH
             if ( rect.equals(MATH::RectfZERO) )
             {
                 // Get the texture size as original
-                MATH::Sizef textureSize = _scale9Image->getTexture()->getContentSize();
+                MATH::Sizef textureSize = MATH::Sizef(_scale9Image->getTexture()->width(), _scale9Image->getTexture()->height());
 
                 rect = MATH::Rectf(0, 0, textureSize.width, textureSize.height);
             }

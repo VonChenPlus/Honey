@@ -1,4 +1,5 @@
 #include "GRAPH/UI/CONTROLS/UIText.h"
+#include "GRAPH/Sprite.h"
 #include "IO/FileUtils.h"
 
 namespace GRAPH
@@ -107,10 +108,6 @@ namespace GRAPH
 
         void Text::setFontSize(int size)
         {
-            if (_type == Type::SYSTEM)
-            {
-                _labelRenderer->setSystemFontSize(size);
-            }
             _fontSize = size;
             updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
             _labelRendererAdaptDirty = true;
@@ -123,7 +120,6 @@ namespace GRAPH
 
         void Text::setFontName(const std::string& name)
         {
-            _labelRenderer->setSystemFontName(name);
             _type = Type::SYSTEM;
             _fontName = name;
             updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
@@ -154,26 +150,6 @@ namespace GRAPH
         const MATH::Sizef& Text::getTextAreaSize()const
         {
             return _labelRenderer->getDimensions();
-        }
-
-        void Text::setTextHorizontalAlignment(TextHAlignment alignment)
-        {
-            _labelRenderer->setHorizontalAlignment(alignment);
-        }
-
-        TextHAlignment Text::getTextHorizontalAlignment()const
-        {
-            return _labelRenderer->getHorizontalAlignment();
-        }
-
-        void Text::setTextVerticalAlignment(TextVAlignment alignment)
-        {
-            _labelRenderer->setVerticalAlignment(alignment);
-        }
-
-        TextVAlignment Text::getTextVerticalAlignment()const
-        {
-            return _labelRenderer->getVerticalAlignment();
         }
 
         void Text::setTextColor(const Color4B color)
@@ -331,8 +307,6 @@ namespace GRAPH
                 setTextColor(label->getTextColor());
                 setString(label->getString());
                 setTouchScaleChangeEnabled(label->_touchScaleChangeEnabled);
-                setTextHorizontalAlignment(label->_labelRenderer->getHorizontalAlignment());
-                setTextVerticalAlignment(label->_labelRenderer->getVerticalAlignment());
                 setTextAreaSize(label->_labelRenderer->getDimensions());
                 setContentSize(label->getContentSize());
             }

@@ -1,5 +1,6 @@
 #include "GRAPH/UNITY3D/Unity3DGL.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
+#include "GRAPH/UNITY3D/Unity3DGLTexture.h"
 #include "UTILS/STRING/StringUtils.h"
 
 namespace GRAPH
@@ -225,6 +226,12 @@ namespace GRAPH
         Unity3DGLVertexFormat *vertexFormat = new Unity3DGLVertexFormat(components, stride);
         vertexFormat->compile();
         return vertexFormat;
+    }
+
+    Unity3DTexture *Unity3DGLCreator::CreateTexture(U3DTextureType type, bool antialias) {
+        Unity3DGLTexture *texture = new Unity3DGLTexture();
+        texture->create(type, antialias);
+        return texture;
     }
 }
 

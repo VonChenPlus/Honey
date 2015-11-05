@@ -6,10 +6,10 @@
 #include "GRAPH/UNITY3D/GLShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
-#include "GRAPH/UNITY3D/Unity3DGLTexture.h"
 #include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "IO/FileUtils.h"
 #include "UTILS/STRING/UTFUtils.h"
+#include "GRAPH/Sprite.h"
 
 namespace GRAPH
 {
@@ -23,7 +23,7 @@ namespace GRAPH
                 textureAtlas_ = nullptr;
             }
 
-            static LabelLetter* createWithTexture(GLTexture *texture, const MATH::Rectf& rect, bool rotated = false)
+            static LabelLetter* createWithTexture(Unity3DTexture *texture, const MATH::Rectf& rect, bool rotated = false)
             {
                 auto letter = new (std::nothrow) LabelLetter();
                 if (letter && letter->initWithTexture(texture, rect, rotated))
@@ -135,46 +135,35 @@ namespace GRAPH
             }
         };
 
-        Label* Label::create()
-        {
+        Label* Label::create() {
             auto ret = new (std::nothrow) Label();
-
-            if (ret)
-            {
+            if (ret) {
                 ret->autorelease();
             }
 
             return ret;
         }
 
-        Label* Label::createWithSystemFont(const std::string& text, const std::string& font, float fontSize, const MATH::Sizef& dimensions, TextHAlignment hAlignment, TextVAlignment vAlignment) {
-            auto ret = new (std::nothrow) Label(hAlignment,vAlignment);
-
+        Label* Label::createWithCustomLoader(const char *string, U3DStringToTexture loader, void *loaderOwner) {
+            auto ret = new (std::nothrow) Label();
             if (ret) {
-                ret->setSystemFontName(font);
-                ret->setSystemFontSize(fontSize);
-                ret->setDimensions(dimensions.width, dimensions.height);
-                ret->setString(text);
+                ret->setString(string);
+                ret->stringToTextureLoader_ = loader;
+                ret->stringtoTextureOwner_ = loaderOwner;
                 ret->autorelease();
-                return ret;
             }
-
-            delete ret;
-            return nullptr;
+            return ret;
         }
 
-        Label::Label(TextHAlignment hAlignment /* = TextHAlignment::LEFT */,
-                     TextVAlignment vAlignment /* = TextVAlignment::TOP */)
-        : _textSprite(nullptr)
-        , _shadowNode(nullptr)
-        , _fontAtlas(nullptr)
-        , _reusedLetter(nullptr)
-        , _horizontalKernings(nullptr)
+        Label::Label()
+            : _textSprite(nullptr)
+            , _shadowNode(nullptr)
+            , _fontAtlas(nullptr)
+            , _reusedLetter(nullptr)
+            , _horizontalKernings(nullptr)
         {
             setAnchorPoint(MATH::Vec2fMIDDLE);
             reset();
-            _hAlignment = hAlignment;
-            _vAlignment = vAlignment;
         }
 
         Label::~Label()
@@ -234,8 +223,6 @@ namespace GRAPH
             _labelWidth = 0.f;
             _labelHeight = 0.f;
             _lineBreakWithoutSpaces = false;
-            _hAlignment = TextHAlignment::LEFT;
-            _vAlignment = TextVAlignment::TOP;
 
             _effectColorF = Color4F::BLACK;
             _textColor = Color4B::WHITE;
@@ -334,17 +321,6 @@ namespace GRAPH
                 std::u16string utf16String;
                 UTILS::STRING::UTF8ToUTF16(_utf8Text, utf16String);
                 _utf16Text  = utf16String;
-            }
-        }
-
-        void Label::setAlignment(TextHAlignment hAlignment,TextVAlignment vAlignment)
-        {
-            if (hAlignment != _hAlignment || vAlignment != _vAlignment)
-            {
-                _hAlignment = hAlignment;
-                _vAlignment = vAlignment;
-
-                _contentDirty = true;
             }
         }
 
@@ -675,70 +651,12 @@ namespace GRAPH
             {
                 multilineTextWrapByChar();
             }
-            computeAlignmentOffset();
 
             updateQuads();
 
             updateLabelLetters();
 
             updateColor();
-        }
-
-        void Label::computeAlignmentOffset()
-        {
-            _linesOffsetX.clear();
-            switch (_hAlignment)
-            {
-            case TextHAlignment::LEFT:
-                _linesOffsetX.assign(_numberOfLines, 0);
-                break;
-            case TextHAlignment::CENTER:
-                for (auto lineWidth : _linesWidth)
-                {
-                    _linesOffsetX.push_back((contentSize_.width - lineWidth) / 2.f);
-                }
-                break;
-            case TextHAlignment::RIGHT:
-                for (auto lineWidth : _linesWidth)
-                {
-                    _linesOffsetX.push_back(contentSize_.width - lineWidth);
-                }
-                break;
-            default:
-                break;
-            }
-
-            switch (_vAlignment)
-            {
-            case TextVAlignment::TOP:
-                _letterOffsetY = contentSize_.height;
-                break;
-            case TextVAlignment::CENTER:
-                _letterOffsetY = (contentSize_.height + _textDesiredHeight) / 2.f;
-                break;
-            case TextVAlignment::BOTTOM:
-                _letterOffsetY = _textDesiredHeight;
-                break;
-            default:
-                break;
-            }
-        }
-
-        bool Label::computeHorizontalKernings(const std::u16string& stringToRender)
-        {
-            if (_horizontalKernings)
-            {
-                delete [] _horizontalKernings;
-                _horizontalKernings = nullptr;
-            }
-
-            int letterCount = 0;
-            _horizontalKernings = _fontAtlas->getFont()->getHorizontalKerningForTextUTF16(stringToRender, letterCount);
-
-            if(!_horizontalKernings)
-                return false;
-            else
-                return true;
         }
 
         void Label::recordLetterInfo(const MATH::Vector2f& point, char16_t utf16Char, int letterIndex, int lineIndex)
@@ -844,24 +762,7 @@ namespace GRAPH
 
             if (!_systemFontDirty && !_contentDirty && _textSprite)
             {
-                auto fontDef = getFontDefinition();
-                if (_shadowNode)
-                {
-                    if (shadowColor != _shadowColor4F)
-                    {
-                        _shadowNode->release();
-                        _shadowNode = nullptr;
-                        createShadowSpriteForSystemFont(fontDef);
-                    }
-                    else
-                    {
-                        _shadowNode->setPosition(_shadowOffset.width, _shadowOffset.height);
-                    }
-                }
-                else
-                {
-                    createShadowSpriteForSystemFont(fontDef);
-                }
+                // TODO
             }
 
             _shadowColor4F.red = shadowColor.red / 255.0f;
@@ -916,65 +817,6 @@ namespace GRAPH
             }
         }
 
-        void Label::createSpriteForSystemFont(const FontDefinition& fontDef) {
-            auto texture = new (std::nothrow) GLTexture;
-            texture->initWithString(_utf8Text.c_str(), fontDef);
-
-            _textSprite = Sprite::createWithTexture(texture);
-            //set camera mask using label's camera mask, because _textSprite may be null when setting camera mask to label
-            _textSprite->setCameraMask(getCameraMask());
-            _textSprite->setGlobalZOrder(getGlobalZOrder());
-            _textSprite->setAnchorPoint(MATH::Vec2fBOTTOMLEFT);
-            this->setContentSize(_textSprite->getContentSize());
-            texture->release();
-            if (_blendFuncDirty) {
-                _textSprite->setBlendFunc(_blendFunc);
-            }
-
-            _textSprite->retain();
-            _textSprite->updateDisplayedColor(displayedColor_);
-            _textSprite->updateDisplayedOpacity(displayedOpacity_);
-        }
-
-        void Label::createShadowSpriteForSystemFont(const FontDefinition& fontDef)
-        {
-            if (!fontDef.stroke.strokeEnabled && fontDef.fontFillColor == _shadowColor3B
-                && (fontDef.fontAlpha == _shadowOpacity)) {
-                _shadowNode = Sprite::createWithTexture(_textSprite->getTexture());
-            }
-            else {
-                FontDefinition shadowFontDefinition = fontDef;
-                shadowFontDefinition.fontFillColor.red = _shadowColor3B.red;
-                shadowFontDefinition.fontFillColor.green = _shadowColor3B.green;
-                shadowFontDefinition.fontFillColor.blue = _shadowColor3B.blue;
-                shadowFontDefinition.fontAlpha = _shadowOpacity;
-
-                shadowFontDefinition.stroke.strokeColor = shadowFontDefinition.fontFillColor;
-                shadowFontDefinition.stroke.strokeAlpha = shadowFontDefinition.fontAlpha;
-
-                auto texture = new (std::nothrow) GLTexture;
-                texture->initWithString(_utf8Text.c_str(), shadowFontDefinition);
-                _shadowNode = Sprite::createWithTexture(texture);
-                texture->release();
-            }
-
-            if (_shadowNode)
-            {
-                if (_blendFuncDirty)
-                {
-                    _shadowNode->setBlendFunc(_blendFunc);
-                }
-                _shadowNode->setCameraMask(getCameraMask());
-                _shadowNode->setGlobalZOrder(getGlobalZOrder());
-                _shadowNode->setAnchorPoint(MATH::Vec2fBOTTOMLEFT);
-                _shadowNode->setPosition(_shadowOffset.width, _shadowOffset.height);
-
-                _shadowNode->retain();
-                _shadowNode->updateDisplayedColor(displayedColor_);
-                _shadowNode->updateDisplayedOpacity(displayedOpacity_);
-            }
-        }
-
         void Label::setCameraMask(unsigned short mask, bool applyChildren)
         {
             Node::setCameraMask(mask, applyChildren);
@@ -1007,15 +849,25 @@ namespace GRAPH
                 std::u16string utf16String;
                 UTILS::STRING::UTF8ToUTF16(_utf8Text, utf16String);
                 _utf16Text = utf16String;
-                computeHorizontalKernings(_utf16Text);
                 alignText();
             }
             else {
-                auto fontDef = getFontDefinition();
-                createSpriteForSystemFont(fontDef);
-                if (_shadowEnabled) {
-                    createShadowSpriteForSystemFont(fontDef);
+                auto texture = Unity3DCreator::CreateTexture();
+                texture->initWithString(_utf8Text.c_str(), stringToTextureLoader_, stringtoTextureOwner_);
+                _textSprite = Sprite::createWithTexture(texture);
+                //set camera mask using label's camera mask, because _textSprite may be null when setting camera mask to label
+                _textSprite->setCameraMask(getCameraMask());
+                _textSprite->setGlobalZOrder(getGlobalZOrder());
+                _textSprite->setAnchorPoint(MATH::Vec2fBOTTOMLEFT);
+                this->setContentSize(_textSprite->getContentSize());
+                texture->release();
+                if (_blendFuncDirty) {
+                    _textSprite->setBlendFunc(_blendFunc);
                 }
+
+                _textSprite->retain();
+                _textSprite->updateDisplayedColor(displayedColor_);
+                _textSprite->updateDisplayedOpacity(displayedOpacity_);
             }
             _contentDirty = false;
         }
@@ -1168,24 +1020,6 @@ namespace GRAPH
             else if (!_utf8Text.empty())
             {
                 draw(renderer, modelViewTransform_, flags);
-            }
-        }
-
-        void Label::setSystemFontName(const std::string& systemFont)
-        {
-            if (systemFont != _systemFont)
-            {
-                _systemFont = systemFont;
-                _systemFontDirty = true;
-            }
-        }
-
-        void Label::setSystemFontSize(float fontSize)
-        {
-            if (_systemFontSize != fontSize)
-            {
-                _systemFontSize = fontSize;
-                _systemFontDirty = true;
             }
         }
 
@@ -1458,40 +1292,6 @@ namespace GRAPH
                     break;
                 }
             }
-        }
-
-        FontDefinition Label::getFontDefinition() const
-        {
-            FontDefinition systemFontDef;
-            systemFontDef.fontName = _systemFont;
-            systemFontDef.fontSize = _systemFontSize;
-            systemFontDef.alignment = _hAlignment;
-            systemFontDef.vertAlignment = _vAlignment;
-            systemFontDef.dimensions.width = _labelWidth;
-            systemFontDef.dimensions.height = _labelHeight;
-            systemFontDef.fontFillColor.red = _textColor.red;
-            systemFontDef.fontFillColor.green = _textColor.green;
-            systemFontDef.fontFillColor.blue = _textColor.blue;
-            systemFontDef.fontAlpha = _textColor.alpha;
-            systemFontDef.shadow.shadowEnabled = false;
-
-            if (_currLabelEffect == LabelEffect::OUTLINE && _outlineSize > 0.f)
-            {
-                systemFontDef.stroke.strokeEnabled = true;
-                systemFontDef.stroke.strokeSize = _outlineSize;
-                systemFontDef.stroke.strokeColor.red = _effectColorF.red * 255;
-                systemFontDef.stroke.strokeColor.green = _effectColorF.green * 255;
-                systemFontDef.stroke.strokeColor.blue = _effectColorF.blue * 255;
-                systemFontDef.stroke.strokeAlpha = _effectColorF.alpha * 255;
-            }
-            else
-            {
-                systemFontDef.stroke.strokeEnabled = false;
-            }
-
-            systemFontDef.stroke.strokeEnabled = false;
-
-            return systemFontDef;
         }
 
         void Label::setGlobalZOrder(float globalZOrder)

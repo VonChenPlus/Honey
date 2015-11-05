@@ -8,7 +8,7 @@
 
 namespace GRAPH
 {
-    class GLTexture;
+    class Unity3DTexture;
 
     class RGBAProtocol
     {
@@ -45,8 +45,8 @@ namespace GRAPH
     public:
         virtual ~TextureProtocol() {}
 
-        virtual GLTexture* getTexture() const = 0;
-        virtual void setTexture(GLTexture *texture) = 0;
+        virtual Unity3DTexture* getTexture() const = 0;
+        virtual void setTexture(Unity3DTexture *texture) = 0;
     };
 
     class LabelProtocol

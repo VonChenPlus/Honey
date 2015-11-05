@@ -2,7 +2,9 @@
 #define UNITY3D_H
 
 #include <vector>
+#include <functional>
 #include "BASE/HObject.h"
+#include "BASE/HData.h"
 #include "IMAGE/ImageDefine.h"
 #include "IMAGE/ImageObject.h"
 
@@ -272,12 +274,16 @@ namespace GRAPH
         int length;
     };
 
-    class Unity3DTexture
+    typedef std::function<HData(void *owner, const char * string, uint32 &width, uint32 &height, bool& premultipliedAlpha)> U3DStringToTexture;
+
+    class Unity3DTexture : public Unity3DObject
     {
     public:
         virtual void create(U3DTextureType type, bool antialias = true) = 0;
 
         bool initWithData(const void *data, uint64 dataLen, IMAGE::ImageFormat imageFormat, uint32 imageWidth, uint32 imageHeight);
+        bool initWithString(const char *string, U3DStringToTexture loader = nullptr, void *loaderOwner = nullptr);
+
         bool initWithImage(IMAGE::ImageObject * image);
         bool initWithImage(IMAGE::ImageObject * image, IMAGE::ImageFormat format);
 
@@ -287,12 +293,19 @@ namespace GRAPH
         virtual void setAliasTexParameters() = 0;
         virtual void autoGenMipmaps() = 0;
 
+        uint32 texture() { return texture_;  }
+        int width() { return width_; }
+        int height() { return height_; }
+
         bool hasPremultipliedAlpha() const { return premultipliedAlpha_; }
         virtual bool hasMipmaps() const = 0;
 
         virtual const IMAGE::ImageFormatInfoMap &imageFormatInfoMap() = 0;
 
     protected:
+        uint32 texture_;
+        int width_;
+        int height_;
         bool premultipliedAlpha_;
     };
 
@@ -311,6 +324,7 @@ namespace GRAPH
         static Unity3DBuffer *CreateBuffer(uint32 usageFlags);
         static Unity3DShaderSet *CreateShaderSet(Unity3DShader *vshader, Unity3DShader *fshader);
         static Unity3DVertexFormat *CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride);
+        static Unity3DTexture *CreateTexture(U3DTextureType type = LINEAR2D, bool antialias = true);
     };
 }
 

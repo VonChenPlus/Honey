@@ -83,6 +83,8 @@ namespace GRAPH
         void clear(int mask, uint32 colorval, float depthVal, int stencilVal) override;
     };
 
+    class Unity3DGLTexture;
+
     class Unity3DGLCreator
     {
     public:
@@ -91,6 +93,7 @@ namespace GRAPH
         static Unity3DBuffer *CreateBuffer(uint32 usageFlags);
         static Unity3DShaderSet *CreateShaderSet(Unity3DShader *vshader, Unity3DShader *fshader);
         static Unity3DVertexFormat *CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride);
+        static Unity3DTexture *CreateTexture(U3DTextureType type = LINEAR2D, bool antialias = true);
     };
 }
 

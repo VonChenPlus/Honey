@@ -35,6 +35,7 @@ namespace GRAPH
     class SpriteBatchNode;
     class SpriteFrame;
     class TextureAtlas;
+    class Unity3DTexture;
 
     class Sprite : public Node, public TextureProtocol
     {
@@ -45,8 +46,8 @@ namespace GRAPH
         static Sprite* create(const std::string& filename);
         static Sprite* create(const PolygonInfo& info);
         static Sprite* create(const std::string& filename, const MATH::Rectf& rect);
-        static Sprite* createWithTexture(GLTexture *texture);
-        static Sprite* createWithTexture(GLTexture *texture, const MATH::Rectf& rect, bool rotated=false);
+        static Sprite* createWithTexture(Unity3DTexture *texture);
+        static Sprite* createWithTexture(Unity3DTexture *texture, const MATH::Rectf& rect, bool rotated = false);
         static Sprite* createWithSpriteFrame(SpriteFrame *spriteFrame);
         static Sprite* createWithSpriteFrameName(const std::string& spriteFrameName);
 
@@ -56,8 +57,8 @@ namespace GRAPH
         virtual void setBatchNode(SpriteBatchNode *spriteBatchNode);
 
         virtual void setTexture(const std::string &filename );
-        virtual void setTexture(GLTexture *texture) override;
-        virtual GLTexture* getTexture() const override;
+        virtual void setTexture(Unity3DTexture *texture) override;
+        virtual Unity3DTexture* getTexture() const override;
 
         virtual void setTextureRect(const MATH::Rectf& rect);
         virtual void setTextureRect(const MATH::Rectf& rect, bool rotated, const MATH::Sizef& untrimmedSize);
@@ -125,10 +126,10 @@ namespace GRAPH
         virtual ~Sprite();
 
         virtual bool init() override;
-        virtual bool initWithTexture(GLTexture *texture);
+        virtual bool initWithTexture(Unity3DTexture *texture);
         virtual bool initWithPolygon(const PolygonInfo& info);
-        virtual bool initWithTexture(GLTexture *texture, const MATH::Rectf& rect);
-        virtual bool initWithTexture(GLTexture *texture, const MATH::Rectf& rect, bool rotated);
+        virtual bool initWithTexture(Unity3DTexture *texture, const MATH::Rectf& rect);
+        virtual bool initWithTexture(Unity3DTexture *texture, const MATH::Rectf& rect, bool rotated);
         virtual bool initWithSpriteFrame(SpriteFrame *spriteFrame);
         virtual bool initWithSpriteFrameName(const std::string& spriteFrameName);
         virtual bool initWithFile(const std::string& filename);
@@ -152,7 +153,7 @@ namespace GRAPH
         bool                shouldBeHidden_;
         MATH::Matrix4       transformToBatch_;
         BlendFunc        blendFunc_;
-        GLTexture*       texture_;
+        Unity3DTexture*       texture_;
         SpriteFrame*     spriteFrame_;
         TrianglesCommand trianglesCommand_;
         MATH::Rectf rect_;
@@ -173,7 +174,7 @@ namespace GRAPH
         static const int DEFAULT_CAPACITY = 29;
 
     public:
-        static SpriteBatchNode* createWithTexture(GLTexture* tex, uint64 capacity = DEFAULT_CAPACITY);
+        static SpriteBatchNode* createWithTexture(Unity3DTexture* tex, uint64 capacity = DEFAULT_CAPACITY);
         static SpriteBatchNode* create(const std::string& fileImage, uint64 capacity = DEFAULT_CAPACITY);
 
         inline TextureAtlas* getTextureAtlas() { return textureAtlas_; }
@@ -192,8 +193,8 @@ namespace GRAPH
         uint64 atlasIndexForChild(Sprite *sprite, int z);
         void reorderBatch(bool reorder);
 
-        virtual GLTexture* getTexture() const override;
-        virtual void setTexture(GLTexture *texture) override;
+        virtual Unity3DTexture* getTexture() const override;
+        virtual void setTexture(Unity3DTexture *texture) override;
 
         virtual void setBlendFunc(const BlendFunc &blendFunc) override;
         virtual const BlendFunc& getBlendFunc() const override;
@@ -218,7 +219,7 @@ namespace GRAPH
         virtual ~SpriteBatchNode();
 
 
-        bool initWithTexture(GLTexture *tex, uint64 capacity = DEFAULT_CAPACITY);
+        bool initWithTexture(Unity3DTexture *tex, uint64 capacity = DEFAULT_CAPACITY);
         bool initWithFile(const std::string& fileImage, uint64 capacity = DEFAULT_CAPACITY);
         bool init() override;
 

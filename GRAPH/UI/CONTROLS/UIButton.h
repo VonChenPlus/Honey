@@ -61,10 +61,6 @@ namespace GRAPH
             Color3B getTitleColor() const;
             void setTitleFontSize(float size);
             float getTitleFontSize() const;
-            void setTitleFontName(const std::string& fontName);
-            const std::string getTitleFontName() const;
-            void setTitleAlignment(TextHAlignment hAlignment);
-            void setTitleAlignment(TextHAlignment hAlignment, TextVAlignment vAlignment);
 
             void setZoomScale(float scale);
             float getZoomScale()const;

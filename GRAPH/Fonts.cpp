@@ -56,7 +56,7 @@ namespace GRAPH
         Font* fontTTf = font_;
         if (fontTTf) {
             commonLineHeight_ = font_->getFontMaxHeight();
-            auto texture = new (std::nothrow) GLTexture;
+            auto texture = Unity3DCreator::CreateTexture();
             currentPage_ = 0;
             currentPageOrigX_ = 0;
             currentPageOrigY_ = 0;
@@ -67,7 +67,7 @@ namespace GRAPH
 
             auto  pixelFormat = IMAGE::ImageFormat::A8;
             texture->initWithData(currentPageData_, currentPageDataSize_,
-                pixelFormat, CacheTextureWidth, CacheTextureHeight, MATH::Sizef(CacheTextureWidth,CacheTextureHeight) );
+                pixelFormat, CacheTextureWidth, CacheTextureHeight);
 
             addTexture(texture,0);
             texture->release();
@@ -180,17 +180,10 @@ namespace GRAPH
                             currentPageOrigY_ = 0;
                             memset(currentPageData_, 0, currentPageDataSize_);
                             currentPage_++;
-                            auto tex = new (std::nothrow) GLTexture;
-                            if (antialiasEnabled_)
-                            {
-                                tex->setAntiAliasTexParameters();
-                            }
-                            else
-                            {
-                                tex->setAliasTexParameters();
-                            }
+                            auto tex = Unity3DCreator::CreateTexture();
+                            tex->setAliasTexParameters();
                             tex->initWithData(currentPageData_, currentPageDataSize_,
-                                pixelFormat, CacheTextureWidth, CacheTextureHeight, MATH::Sizef(CacheTextureWidth,CacheTextureHeight) );
+                                pixelFormat, CacheTextureWidth, CacheTextureHeight);
                             addTexture(tex,currentPage_);
                             tex->release();
                         }
@@ -254,12 +247,12 @@ namespace GRAPH
         }
     }
 
-    void FontAtlas::addTexture(GLTexture *texture, int slot) {
+    void FontAtlas::addTexture(Unity3DTexture *texture, int slot) {
         texture->retain();
         atlasTextures_[slot] = texture;
     }
 
-    GLTexture* FontAtlas::getTexture(int slot) {
+    Unity3DTexture* FontAtlas::getTexture(int slot) {
         return atlasTextures_[slot];
     }
 
@@ -280,15 +273,6 @@ namespace GRAPH
             antialiasEnabled_ = false;
             for (const auto & tex : atlasTextures_) {
                 tex.second->setAliasTexParameters();
-            }
-        }
-    }
-
-    void FontAtlas::setAntiAliasTexParameters() {
-        if (! antialiasEnabled_) {
-            antialiasEnabled_ = true;
-            for (const auto & tex : atlasTextures_) {
-                tex.second->setAntiAliasTexParameters();
             }
         }
     }

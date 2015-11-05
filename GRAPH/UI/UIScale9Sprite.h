@@ -136,7 +136,7 @@ namespace GRAPH
             void cleanupSlicedSprites();
             void adjustScale9ImagePosition();
             void applyBlendFunc();
-            void updateBlendFunc(GLTexture *texture);
+            void updateBlendFunc(Unity3DTexture *texture);
 
             virtual void sortAllProtectedChildren();
 

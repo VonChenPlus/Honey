@@ -5,6 +5,7 @@
 #include "GRAPH/Protocols.h"
 #include "GRAPH/Fonts.h"
 #include "GRAPH/UNITY3D/RenderCommand.h"
+#include "GRAPH/UNITY3D/Unity3D.h"
 
 namespace GRAPH
 {
@@ -26,15 +27,7 @@ namespace GRAPH
         {
         public:
             static Label* create();
-            static Label* createWithSystemFont(const std::string& text, const std::string& font, float fontSize,
-                const MATH::Sizef& dimensions = MATH::SizefZERO, TextHAlignment hAlignment = TextHAlignment::LEFT,
-                TextVAlignment vAlignment = TextVAlignment::TOP);
-
-            virtual void setSystemFontName(const std::string& font);
-            virtual const std::string& getSystemFontName() const { return _systemFont;}
-
-            virtual void setSystemFontSize(float fontSize);
-            virtual float getSystemFontSize() const { return _systemFontSize;}
+            static Label* createWithCustomLoader(const char *string, U3DStringToTexture loader = nullptr, void *loaderOwner = nullptr);
 
             virtual void requestSystemFontRefresh() { _systemFontDirty = true;}
 
@@ -52,17 +45,6 @@ namespace GRAPH
 
             virtual void disableEffect();
             virtual void disableEffect(LabelEffect effect);
-
-            void setAlignment(TextHAlignment hAlignment) { setAlignment(hAlignment,_vAlignment);}
-
-            TextHAlignment getTextAlignment() const { return _hAlignment;}
-            void setAlignment(TextHAlignment hAlignment,TextVAlignment vAlignment);
-
-            void setHorizontalAlignment(TextHAlignment hAlignment) { setAlignment(hAlignment,_vAlignment); }
-            TextHAlignment getHorizontalAlignment() const { return _hAlignment; }
-
-            void setVerticalAlignment(TextVAlignment vAlignment) { setAlignment(_hAlignment,vAlignment); }
-            TextVAlignment getVerticalAlignment() const { return _vAlignment; }
 
             void setLineBreakWithoutSpace(bool breakWithoutSpace);
 
@@ -115,9 +97,7 @@ namespace GRAPH
             virtual void setGlobalZOrder(float globalZOrder) override;
 
         public:
-            Label(TextHAlignment hAlignment = TextHAlignment::LEFT,
-              TextVAlignment vAlignment = TextVAlignment::TOP);
-
+            Label();
             virtual ~Label();
 
         protected:
@@ -144,22 +124,15 @@ namespace GRAPH
 
             void updateLabelLetters();
             virtual void alignText();
-            void computeAlignmentOffset();
-            bool computeHorizontalKernings(const std::u16string& stringToRender);
 
             void recordLetterInfo(const MATH::Vector2f& point, char16_t utf16Char, int letterIndex, int lineIndex);
             void recordPlaceholderInfo(int letterIndex, char16_t utf16Char);
 
             void updateQuads();
 
-            void createSpriteForSystemFont(const FontDefinition& fontDef);
-            void createShadowSpriteForSystemFont(const FontDefinition& fontDef);
-
             virtual void updateShaderProgram();
 
             void reset();
-
-            FontDefinition getFontDefinition() const;
 
             virtual void updateColor() override;
 
@@ -193,8 +166,6 @@ namespace GRAPH
             MATH::Sizef _labelDimensions;
             float _labelWidth;
             float _labelHeight;
-            TextHAlignment _hAlignment;
-            TextVAlignment _vAlignment;
 
             float _textDesiredHeight;
             std::vector<float> _linesWidth;
@@ -232,6 +203,9 @@ namespace GRAPH
             bool _insideBounds;
 
             bool _isOpacityModifyRGB;
+
+            U3DStringToTexture stringToTextureLoader_;
+            void *stringtoTextureOwner_;
 
             std::unordered_map<int, Sprite*> _letters;
 
