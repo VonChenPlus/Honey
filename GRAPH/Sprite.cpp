@@ -243,7 +243,7 @@ namespace GRAPH
             quad_.tl.colors = Color4B::WHITE;
             quad_.tr.colors = Color4B::WHITE;
             // shader state
-            setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
+            setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
             // update texture (calls updateBlendFunc)
             setTexture(texture);
             setTextureRect(rect, rotated, rect.size);
@@ -837,7 +837,7 @@ namespace GRAPH
 
         descendants_.reserve(capacity);
 
-        setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR));
+        setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR));
         return true;
     }
 

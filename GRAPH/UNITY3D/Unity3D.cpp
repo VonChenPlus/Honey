@@ -5,6 +5,24 @@
 
 namespace GRAPH
 {
+    const char* Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR = "ShaderPositionTextureColor";
+    const char* Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP = "ShaderPositionTextureColor_noMVP";
+    const char* Unity3DShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST = "ShaderPositionTextureColorAlphaTest";
+    const char* Unity3DShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV = "ShaderPositionTextureColorAlphaTest_NoMV";
+    const char* Unity3DShader::SHADER_NAME_POSITION_COLOR = "ShaderPositionColor";
+    const char* Unity3DShader::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE = "ShaderPositionColorTexAsPointsize";
+    const char* Unity3DShader::SHADER_NAME_POSITION_COLOR_NO_MVP = "ShaderPositionColor_noMVP";
+    const char* Unity3DShader::SHADER_NAME_POSITION_TEXTURE = "ShaderPositionTexture";
+    const char* Unity3DShader::SHADER_NAME_POSITION_TEXTURE_U_COLOR = "ShaderPositionTexture_uColor";
+    const char* Unity3DShader::SHADER_NAME_POSITION_TEXTURE_A8_COLOR = "ShaderPositionTextureA8Color";
+    const char* Unity3DShader::SHADER_NAME_POSITION_U_COLOR = "ShaderPosition_uColor";
+    const char* Unity3DShader::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR = "ShaderPositionLengthTextureColor";
+    const char* Unity3DShader::SHADER_NAME_POSITION_GRAYSCALE = "ShaderUIGrayScale";
+    const char* Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL = "ShaderLabelDFNormal";
+    const char* Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW = "ShaderLabelDFGlow";
+    const char* Unity3DShader::SHADER_NAME_LABEL_NORMAL = "ShaderLabelNormal";
+    const char* Unity3DShader::SHADER_NAME_LABEL_OUTLINE = "ShaderLabelOutline";
+
     bool Unity3DTexture::initWithData(const void *data, uint64 dataLen, IMAGE::ImageFormat imageFormat, uint32 imageWidth, uint32 imageHeight) {
         U3DMipmap mipmap;
         mipmap.address = (unsigned char*) data;

@@ -334,7 +334,7 @@ namespace GRAPH
                 MATH::Vector2f(-1, 1)
             };
 
-            auto u3dShader = Unity3DGLShaderCache::getInstance().getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_U_COLOR);
+            auto u3dShader = Unity3DGLShaderCache::getInstance().getU3DShader(Unity3DShader::SHADER_NAME_POSITION_U_COLOR);
 
             int colorLocation = u3dShader->getUniformLocation("u_color");
 

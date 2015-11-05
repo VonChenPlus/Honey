@@ -187,7 +187,7 @@ namespace GRAPH
                 updateColor();
                 setContentSize(MATH::Sizef(w, h));
 
-                setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_POSITION_COLOR_NO_MVP));
+                setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_COLOR_NO_MVP));
                 return true;
             }
             return false;

@@ -1202,14 +1202,14 @@ namespace GRAPH
         GLShaderState* Widget::getNormalGLShaderState()const
         {
             GLShaderState *glState = nullptr;
-            glState = GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
+            glState = GLShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
             return glState;
         }
 
         GLShaderState* Widget::getGrayGLShaderState()const
         {
             GLShaderState *glState = nullptr;
-            glState = GLShaderState::getOrCreateWithGLShaderName(Unity3DGLShaderSet::SHADER_NAME_POSITION_GRAYSCALE);
+            glState = GLShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_GRAYSCALE);
             return glState;
         }
 

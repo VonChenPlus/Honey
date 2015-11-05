@@ -23,25 +23,6 @@ namespace GRAPH
         }
     }
 
-    const char* Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR = "ShaderPositionTextureColor";
-    const char* Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP = "ShaderPositionTextureColor_noMVP";
-    const char* Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST = "ShaderPositionTextureColorAlphaTest";
-    const char* Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV = "ShaderPositionTextureColorAlphaTest_NoMV";
-    const char* Unity3DGLShaderSet::SHADER_NAME_POSITION_COLOR = "ShaderPositionColor";
-    const char* Unity3DGLShaderSet::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE = "ShaderPositionColorTexAsPointsize";
-    const char* Unity3DGLShaderSet::SHADER_NAME_POSITION_COLOR_NO_MVP = "ShaderPositionColor_noMVP";
-
-    const char* Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE = "ShaderPositionTexture";
-    const char* Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_U_COLOR = "ShaderPositionTexture_uColor";
-    const char* Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_A8_COLOR = "ShaderPositionTextureA8Color";
-    const char* Unity3DGLShaderSet::SHADER_NAME_POSITION_U_COLOR = "ShaderPosition_uColor";
-    const char* Unity3DGLShaderSet::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR = "ShaderPositionLengthTextureColor";
-    const char* Unity3DGLShaderSet::SHADER_NAME_POSITION_GRAYSCALE = "ShaderUIGrayScale";
-    const char* Unity3DGLShaderSet::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL = "ShaderLabelDFNormal";
-    const char* Unity3DGLShaderSet::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW = "ShaderLabelDFGlow";
-    const char* Unity3DGLShaderSet::SHADER_NAME_LABEL_NORMAL = "ShaderLabelNormal";
-    const char* Unity3DGLShaderSet::SHADER_NAME_LABEL_OUTLINE = "ShaderLabelOutline";
-
     // uniform names
     const char* Unity3DGLShaderSet::UNIFORM_NAME_AMBIENT_COLOR = "_AmbientColor";
     const char* Unity3DGLShaderSet::UNIFORM_NAME_P_MATRIX = "_PMatrix";
@@ -698,134 +679,134 @@ namespace GRAPH
     void Unity3DGLShaderCache::loadDefaultGLShaders() {
         Unity3DGLShaderSet *p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_PositionTextureColor);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_PositionTextureColor_noMVP);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_PositionTextureColorAlphaTest);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_PositionTextureColorAlphaTestNoMV);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_PositionColor);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_POSITION_COLOR, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_COLOR, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_PositionColorTextureAsPointsize);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_PositionColor_noMVP);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_POSITION_COLOR_NO_MVP, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_COLOR_NO_MVP, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_PositionTexture);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_PositionTexture_uColor);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_U_COLOR, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_U_COLOR, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_PositionTextureA8Color);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_A8_COLOR, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_A8_COLOR, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_Position_uColor);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_POSITION_U_COLOR, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_U_COLOR, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_PositionLengthTexureColor);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_LabelDistanceFieldNormal);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_LabelDistanceFieldGlow);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_UIGrayScale);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_POSITION_GRAYSCALE, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_GRAYSCALE, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_LabelNormal);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_LABEL_NORMAL, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_LABEL_NORMAL, p));
 
         p = new (std::nothrow) Unity3DGLShaderSet();
         loadDefaultGLShader(p, kShaderType_LabelOutline);
-        programs_.insert(std::make_pair(Unity3DGLShaderSet::SHADER_NAME_LABEL_OUTLINE, p));
+        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_LABEL_OUTLINE, p));
     }
 
     void Unity3DGLShaderCache::reloadDefaultGLShaders() {
-        Unity3DGLShaderSet *p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR);
+        Unity3DGLShaderSet *p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR);
         p->reset();
         loadDefaultGLShader(p, kShaderType_PositionTextureColor);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
         p->reset();
         loadDefaultGLShader(p, kShaderType_PositionTextureColor_noMVP);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST);
         p->reset();
         loadDefaultGLShader(p, kShaderType_PositionTextureColorAlphaTest);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV);
         p->reset();
         loadDefaultGLShader(p, kShaderType_PositionTextureColorAlphaTestNoMV);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_COLOR);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_COLOR);
         p->reset();
         loadDefaultGLShader(p, kShaderType_PositionColor);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE);
         p->reset();
         loadDefaultGLShader(p, kShaderType_PositionColorTextureAsPointsize);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_COLOR_NO_MVP);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_COLOR_NO_MVP);
         loadDefaultGLShader(p, kShaderType_PositionColor_noMVP);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE);
         p->reset();
         loadDefaultGLShader(p, kShaderType_PositionTexture);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_U_COLOR);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_U_COLOR);
         p->reset();
         loadDefaultGLShader(p, kShaderType_PositionTexture_uColor);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_TEXTURE_A8_COLOR);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_A8_COLOR);
         p->reset();
         loadDefaultGLShader(p, kShaderType_PositionTextureA8Color);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_U_COLOR);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_U_COLOR);
         p->reset();
         loadDefaultGLShader(p, kShaderType_Position_uColor);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR);
         p->reset();
         loadDefaultGLShader(p, kShaderType_PositionLengthTexureColor);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL);
         p->reset();
         loadDefaultGLShader(p, kShaderType_LabelDistanceFieldNormal);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW);
         p->reset();
         loadDefaultGLShader(p, kShaderType_LabelDistanceFieldGlow);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_LABEL_NORMAL);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_LABEL_NORMAL);
         p->reset();
         loadDefaultGLShader(p, kShaderType_LabelNormal);
 
-        p = getU3DShader(Unity3DGLShaderSet::SHADER_NAME_LABEL_OUTLINE);
+        p = getU3DShader(Unity3DShader::SHADER_NAME_LABEL_OUTLINE);
         p->reset();
         loadDefaultGLShader(p, kShaderType_LabelOutline);
     }
