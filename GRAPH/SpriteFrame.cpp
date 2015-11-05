@@ -3,7 +3,7 @@
 #include "IO/FileUtils.h"
 #include "UTILS/STRING/StringUtils.h"
 #include "GRAPH/Director.h"
-#include "GRAPH/UNITY3D/Unity3DGLTexture.h"
+#include "GRAPH/UNITY3D/TextureCache.h"
 
 namespace GRAPH
 {

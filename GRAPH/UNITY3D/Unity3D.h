@@ -279,7 +279,20 @@ namespace GRAPH
     class Unity3DTexture : public Unity3DObject
     {
     public:
-        virtual void create(U3DTextureType type, bool antialias = true) = 0;
+        Unity3DTexture() 
+            : texture_(0)
+            , width_(0)
+            , height_(0)
+            , premultipliedAlpha_(false) {
+        }
+
+        virtual ~Unity3DTexture() {
+            deleteTexture(texture_);
+            texture_ = 0;
+        }
+
+        virtual void create(U3DTextureType type, bool antialias = true) = 0;  
+        virtual void deleteTexture(uint32) { };
 
         bool initWithData(const void *data, uint64 dataLen, IMAGE::ImageFormat imageFormat, uint32 imageWidth, uint32 imageHeight);
         bool initWithString(const char *string, U3DStringToTexture loader = nullptr, void *loaderOwner = nullptr);

@@ -83,7 +83,42 @@ namespace GRAPH
         void clear(int mask, uint32 colorval, float depthVal, int stencilVal) override;
     };
 
-    class Unity3DGLTexture;
+    static const uint32 textureToGL [] =
+    {
+        GL_TEXTURE_1D,
+        GL_TEXTURE_2D,
+        GL_TEXTURE_3D,
+        GL_TEXTURE_CUBE_MAP,
+        GL_TEXTURE_1D_ARRAY,
+        GL_TEXTURE_2D_ARRAY,
+        GL_NONE
+    };
+
+    class Unity3DGLTexture final : public Unity3DTexture
+    {
+    public:
+        Unity3DGLTexture();
+        ~Unity3DGLTexture();
+
+        void create(U3DTextureType type, bool antialias = true) override;
+        void deleteTexture(uint32 texture) override;
+
+        bool initWithMipmaps(U3DMipmap* mipmaps, int mipLevels, IMAGE::ImageFormat imageFormat, uint32 imageWidth, uint32 imageHeight) override;
+        bool updateWithData(const void *data, int offsetX, int offsetY, int width, int height) override;
+
+        void setAliasTexParameters() override;
+        void autoGenMipmaps() override;
+
+        bool hasMipmaps() const override { return hasMipmaps_; }
+
+        const IMAGE::ImageFormatInfoMap &imageFormatInfoMap() override;
+
+    private:
+        GLuint target_;
+        bool antialias_;
+        IMAGE::ImageFormat imageFormat_;
+        bool hasMipmaps_;
+    };
 
     class Unity3DGLCreator
     {

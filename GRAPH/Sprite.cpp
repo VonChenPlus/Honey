@@ -2,7 +2,7 @@
 #include "GRAPH/Sprite.h"
 #include "GRAPH/SpriteFrame.h"
 #include "GRAPH/Director.h"
-#include "GRAPH/UNITY3D/Unity3DGLTexture.h"
+#include "GRAPH/UNITY3D/TextureCache.h"
 #include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/GLShaderState.h"
