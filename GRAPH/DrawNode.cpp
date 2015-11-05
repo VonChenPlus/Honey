@@ -1,7 +1,7 @@
-#include <vector>
 #include "GRAPH/DrawNode.h"
-#include "GRAPH/UNITY3D/Unity3DGLShader.h"
-#include "GRAPH/UNITY3D/GLShaderState.h"
+#include "GRAPH/UNITY3D/Unity3D.h"
+#include "GRAPH/UNITY3D/Unity3DShaderCache.h"
+#include "GRAPH/UNITY3D/Unity3DShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 
@@ -44,7 +44,7 @@ namespace GRAPH
     bool DrawNode::init() {
         blendFunc_ = BlendFunc::ALPHA_PREMULTIPLIED;
 
-        setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR));
+        setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR));
 
         for (int index = 0; index < 3; ++index) {
             ensureCapacity(0, 512);
@@ -101,7 +101,7 @@ namespace GRAPH
     }
 
     void DrawNode::onDrawGLLine(const MATH::Matrix4 &transform, uint32_t) {
-        auto u3dShader = Unity3DGLShaderCache::getInstance().getU3DShader(Unity3DShader::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR);
+        auto u3dShader = Unity3DShaderCache::getInstance().getU3DShader(Unity3DShader::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR);
         u3dShader->apply();
         u3dShader->setUniformsForBuiltins(transform);
 
@@ -115,7 +115,7 @@ namespace GRAPH
     }
 
     void DrawNode::onDrawGLPoint(const MATH::Matrix4 &transform, uint32_t) {
-        auto u3dShader = Unity3DGLShaderCache::getInstance().getU3DShader(Unity3DShader::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE);
+        auto u3dShader = Unity3DShaderCache::getInstance().getU3DShader(Unity3DShader::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE);
         u3dShader->apply();
         u3dShader->setUniformsForBuiltins(transform);
 

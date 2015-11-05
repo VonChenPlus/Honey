@@ -10,7 +10,7 @@
 #include "GRAPH/Component.h"
 #include "GRAPH/Camera.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
-#include "GRAPH/UNITY3D/GLShaderState.h"
+#include "GRAPH/UNITY3D/Unity3DShaderState.h"
 
 namespace GRAPH
 {
@@ -620,12 +620,12 @@ namespace GRAPH
         userObject_ = userObject;
     }
 
-    GLShaderState* Node::getGLShaderState() const
+    Unity3DShaderState* Node::getU3DShaderState() const
     {
         return glShaderState_;
     }
 
-    void Node::setGLShaderState(GLShaderState* glShaderState)
+    void Node::setU3DShaderState(Unity3DShaderState* glShaderState)
     {
         if (glShaderState != glShaderState_)
         {
@@ -635,17 +635,17 @@ namespace GRAPH
         }
     }
 
-    void Node::setGLShader(Unity3DGLShaderSet* u3dShader)
+    void Node::setU3DShader(Unity3DShaderSet* u3dShader)
     {
         if (glShaderState_ == nullptr || (glShaderState_ && glShaderState_->getU3DShader() != u3dShader))
         {
             SAFE_RELEASE(glShaderState_);
-            glShaderState_ = GLShaderState::getOrCreateWithGLShader(u3dShader);
+            glShaderState_ = Unity3DShaderState::getOrCreateWithGLShader(u3dShader);
             glShaderState_->retain();
         }
     }
 
-    Unity3DGLShaderSet * Node::getU3DShader() const
+    Unity3DShaderSet * Node::getU3DShader() const
     {
         return glShaderState_ ? glShaderState_->getU3DShader() : nullptr;
     }

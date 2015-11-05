@@ -10,22 +10,6 @@
 
 namespace GRAPH
 {
-    struct VertexAttrib
-    {
-        GLuint index;
-        GLint size;
-        GLenum type;
-        std::string name;
-    };
-
-    struct Uniform
-    {
-        GLint location;
-        GLint size;
-        GLenum type;
-        std::string name;
-    };
-
     class Unity3DGLShader : public Unity3DShader
     {
     public:
@@ -41,7 +25,7 @@ namespace GRAPH
         GLuint type_;
     };
 
-    class Unity3DGLShaderSet : public Unity3DShaderSet
+    class Unity3DGLShaderSet final : public Unity3DShaderSet
     {
     public:
         Unity3DGLShaderSet();
@@ -59,18 +43,16 @@ namespace GRAPH
         static Unity3DGLShaderSet* createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines);
         bool initWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines);
 
-        void link();
-        void apply();
-        void unApply();
+        void link() override;
+        void apply() override;
+        void unApply() override;
+        void reset() override;
 
         inline const GLuint getProgram() const { return program_; }
 
-        Uniform* getUniform(const std::string &name);
-        VertexAttrib* getVertexAttrib(const std::string &name);
-
-        GLint getAttribLocation(const std::string &attributeName) const;
-        GLint getUniformLocation(const std::string &attributeName) const;
-        void bindAttribLocation(const std::string &attributeName, GLuint index) const;
+        int32 getAttribLocation(const std::string &attributeName) const override;
+        int32 getUniformLocation(const std::string &attributeName) const override;
+        void bindAttribLocation(const std::string &attributeName, uint32 index) const override;
 
         enum
         {
@@ -136,29 +118,27 @@ namespace GRAPH
 
         void updateUniforms();
 
-        void setUniformLocationWith1i(GLint location, GLint i1);
-        void setUniformLocationWith2i(GLint location, GLint i1, GLint i2);
-        void setUniformLocationWith3i(GLint location, GLint i1, GLint i2, GLint i3);
-        void setUniformLocationWith4i(GLint location, GLint i1, GLint i2, GLint i3, GLint i4);
-        void setUniformLocationWith2iv(GLint location, GLint* ints, unsigned int numberOfArrays);
-        void setUniformLocationWith3iv(GLint location, GLint* ints, unsigned int numberOfArrays);
-        void setUniformLocationWith4iv(GLint location, GLint* ints, unsigned int numberOfArrays);
-        void setUniformLocationWith1f(GLint location, GLfloat f1);
-        void setUniformLocationWith2f(GLint location, GLfloat f1, GLfloat f2);
-        void setUniformLocationWith3f(GLint location, GLfloat f1, GLfloat f2, GLfloat f3);
-        void setUniformLocationWith4f(GLint location, GLfloat f1, GLfloat f2, GLfloat f3, GLfloat f4);
-        void setUniformLocationWith1fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays);
-        void setUniformLocationWith2fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays);
-        void setUniformLocationWith3fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays);
-        void setUniformLocationWith4fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays);
-        void setUniformLocationWithMatrix2fv(GLint location, const GLfloat* matrixArray, unsigned int numberOfMatrices);
-        void setUniformLocationWithMatrix3fv(GLint location, const GLfloat* matrixArray, unsigned int numberOfMatrices);
-        void setUniformLocationWithMatrix4fv(GLint location, const GLfloat* matrixArray, unsigned int numberOfMatrices);
+        void setUniformLocationWith1i(int location, int i1) override;
+        void setUniformLocationWith2i(int location, int i1, int i2) override;
+        void setUniformLocationWith3i(int location, int i1, int i2, int i3) override;
+        void setUniformLocationWith4i(int location, int i1, int i2, int i3, int i4) override;
+        void setUniformLocationWith2iv(int location, int* ints, unsigned int numberOfArrays) override;
+        void setUniformLocationWith3iv(int location, int* ints, unsigned int numberOfArrays) override;
+        void setUniformLocationWith4iv(int location, int* ints, unsigned int numberOfArrays) override;
+        void setUniformLocationWith1f(int location, float f1) override;
+        void setUniformLocationWith2f(int location, float f1, float f2) override;
+        void setUniformLocationWith3f(int location, float f1, float f2, float f3) override;
+        void setUniformLocationWith4f(int location, float f1, float f2, float f3, float f4) override;
+        void setUniformLocationWith1fv(int location, const float* floats, unsigned int numberOfArrays) override;
+        void setUniformLocationWith2fv(int location, const float* floats, unsigned int numberOfArrays) override;
+        void setUniformLocationWith3fv(int location, const float* floats, unsigned int numberOfArrays) override;
+        void setUniformLocationWith4fv(int location, const float* floats, unsigned int numberOfArrays) override;
+        void setUniformLocationWithMatrix2fv(int location, const float* matrixArray, unsigned int numberOfMatrices) override;
+        void setUniformLocationWithMatrix3fv(int location, const float* matrixArray, unsigned int numberOfMatrices) override;
+        void setUniformLocationWithMatrix4fv(int location, const float* matrixArray, unsigned int numberOfMatrices) override;
 
-        void setUniformsForBuiltins();
-        void setUniformsForBuiltins(const MATH::Matrix4 &modelView);
-
-        void reset();
+        void setUniformsForBuiltins() override;
+        void setUniformsForBuiltins(const MATH::Matrix4 &modelView) override;
 
     private:
         void bindPredefinedVertexAttribs();
@@ -184,34 +164,7 @@ namespace GRAPH
             BulidInUniformsFlags() { memset(this, 0, sizeof(*this)); }
         } uniformsFlags_;
 
-        std::unordered_map<std::string, Uniform> userUniforms_;
-        std::unordered_map<std::string, VertexAttrib> vertexAttribs_;
         std::unordered_map<GLint, std::pair<GLvoid*, unsigned int> > hashForUniforms_;
-
-        friend class GLShaderState;
-    };
-
-    class Unity3DGLShaderCache : public HObject
-    {
-    public:
-        Unity3DGLShaderCache();
-        ~Unity3DGLShaderCache();
-
-        static Unity3DGLShaderCache& getInstance();
-
-        void loadDefaultGLShaders();
-        void reloadDefaultGLShaders();
-
-        Unity3DGLShaderSet *getU3DShader(const std::string &key);
-
-        void addU3DShader(Unity3DGLShaderSet* program, const std::string &key);
-
-    private:
-        bool init();
-        void loadDefaultGLShader(Unity3DGLShaderSet *program, int type);
-
-    private:
-        std::unordered_map<std::string, Unity3DGLShaderSet*> programs_;
     };
 }
 

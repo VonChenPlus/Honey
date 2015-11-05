@@ -374,7 +374,30 @@ namespace GRAPH
         Unity3DGLShaderSet *shaderSet = new Unity3DGLShaderSet(vshader, fshader);
         shaderSet->link();
         shaderSet->updateUniforms();
-        shaderSet->autorelease();
+        return shaderSet;
+    }
+
+    Unity3DShaderSet *Unity3DGLCreator::CreateShaderSetWithByteArray(const std::string &vShaderByteArray, const std::string &fShaderByteArray, const std::string& compileTimeDefines) {
+        if (vShaderByteArray.empty() || fShaderByteArray.empty()) {
+            throw _HException_Normal(UTILS::STRING::StringFromFormat("ShaderSet requires both a valid vertex and a fragment ByteArray: %p %p", &vShaderByteArray, &fShaderByteArray));
+        }
+
+        Unity3DGLShaderSet *shaderSet = new Unity3DGLShaderSet();
+        shaderSet->initWithByteArrays(vShaderByteArray.c_str(), fShaderByteArray.c_str(), compileTimeDefines);
+        shaderSet->link();
+        shaderSet->updateUniforms();
+        return shaderSet;
+    }
+
+    Unity3DShaderSet *Unity3DGLCreator::CreateShaderSetWithFileName(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines) {
+        if (vShaderFilename.empty() || fShaderFilename.empty()) {
+            throw _HException_Normal(UTILS::STRING::StringFromFormat("ShaderSet requires both a valid vertex and a fragment ByteArray: %p %p", &vShaderFilename, &fShaderFilename));
+        }
+
+        Unity3DGLShaderSet *shaderSet = new Unity3DGLShaderSet();
+        shaderSet->initWithFilenames(vShaderFilename.c_str(), fShaderFilename.c_str(), compileTimeDefines);
+        shaderSet->link();
+        shaderSet->updateUniforms();
         return shaderSet;
     }
 

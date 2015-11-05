@@ -1,7 +1,7 @@
 #include "GRAPH/UNITY3D/RenderCommand.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
-#include "GRAPH/UNITY3D/GLShaderState.h"
+#include "GRAPH/UNITY3D/Unity3DShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "UTILS/HASH/HashUtils.h"
@@ -86,7 +86,7 @@ namespace GRAPH
         commandType_ = RenderCommand::Type::QUAD_COMMAND;
     }
 
-    void QuadCommand::init(float globalOrder, GLuint textureID, GLShaderState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, uint64 quadCount,
+    void QuadCommand::init(float globalOrder, GLuint textureID, Unity3DShaderState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, uint64 quadCount,
                            const MATH::Matrix4& mv, uint32_t flags) {
         RenderCommand::init(globalOrder, mv, flags);
 
@@ -110,7 +110,7 @@ namespace GRAPH
         skipBatching_ = false;
 
         if(glShaderState_->getUniformCount() == 0) {
-            int u3dShader = (int)glShaderState_->getU3DShader()->getProgram();
+            int u3dShader = (int)glShaderState_->getU3DShader();
             int intArray[4] = { u3dShader, (int)textureID_, (int)blendType_.src, (int)blendType_.dst};
 
             materialID_ = UTILS::HASH::Fletcher((const uint8*)intArray, sizeof(intArray));
@@ -140,7 +140,7 @@ namespace GRAPH
         commandType_ = RenderCommand::Type::TRIANGLES_COMMAND;
     }
 
-    void TrianglesCommand::init(float globalOrder, GLuint textureID, GLShaderState* glProgramState, BlendFunc blendType, const Triangles& triangles,const MATH::Matrix4& mv, uint32_t flags) {
+    void TrianglesCommand::init(float globalOrder, GLuint textureID, Unity3DShaderState* glProgramState, BlendFunc blendType, const Triangles& triangles,const MATH::Matrix4& mv, uint32_t flags) {
         RenderCommand::init(globalOrder, mv, flags);
 
         _triangles = triangles;
@@ -166,7 +166,7 @@ namespace GRAPH
             materialID_ = Renderer::MATERIAL_ID_DO_NOT_BATCH;
         }
         else {
-            int u3dShader = (int)glShaderState_->getU3DShader()->getProgram();
+            int u3dShader = (int)glShaderState_->getU3DShader();
             int intArray[4] = { u3dShader, (int)textureID_, (int)blendType_.src, (int)blendType_.dst};
 
             materialID_ = UTILS::HASH::Fletcher((const uint8*)intArray, sizeof(intArray));
@@ -211,7 +211,7 @@ namespace GRAPH
         shader_ = nullptr;
     }
 
-    void BatchCommand::init(float globalOrder, Unity3DGLShaderSet* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const MATH::Matrix4& modelViewTransform, uint32_t flags) {
+    void BatchCommand::init(float globalOrder, Unity3DShaderSet* shader, BlendFunc blendType, TextureAtlas *textureAtlas, const MATH::Matrix4& modelViewTransform, uint32_t flags) {
         RenderCommand::init(globalOrder, modelViewTransform, flags);
         textureID_ = textureAtlas->getTexture()->texture();
         blendType_ = blendType;

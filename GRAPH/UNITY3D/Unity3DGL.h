@@ -127,6 +127,8 @@ namespace GRAPH
         static Unity3DDepthState *CreateDepthState();
         static Unity3DBuffer *CreateBuffer(uint32 usageFlags);
         static Unity3DShaderSet *CreateShaderSet(Unity3DShader *vshader, Unity3DShader *fshader);
+        static Unity3DShaderSet *CreateShaderSetWithByteArray(const std::string &vShaderByteArray, const std::string &fShaderByteArray, const std::string& compileTimeDefines = std::string());
+        static Unity3DShaderSet *CreateShaderSetWithFileName(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines = std::string());
         static Unity3DVertexFormat *CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride);
         static Unity3DTexture *CreateTexture(U3DTextureType type = LINEAR2D, bool antialias = true);
     };

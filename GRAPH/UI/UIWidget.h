@@ -273,8 +273,8 @@ namespace GRAPH
             void  dispatchFocusEvent(Widget* widgetLoseFocus, Widget* widgetGetFocus);
 
         protected:
-            GLShaderState* getNormalGLShaderState()const;
-            GLShaderState* getGrayGLShaderState()const;
+            Unity3DShaderState* getNormalGLShaderState()const;
+            Unity3DShaderState* getGrayGLShaderState()const;
 
             virtual void onSizeChanged();
             virtual void initRenderer();

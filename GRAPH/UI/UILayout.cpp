@@ -4,7 +4,7 @@
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/RenderState.h"
 #include "MATH/AffineTransform.h"
-#include "GRAPH/UNITY3D/Unity3DGLShader.h"
+#include "GRAPH/UNITY3D/Unity3DShaderCache.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UI/UIScale9Sprite.h"
 #include "GRAPH/UI/UILayer.h"
@@ -334,7 +334,7 @@ namespace GRAPH
                 MATH::Vector2f(-1, 1)
             };
 
-            auto u3dShader = Unity3DGLShaderCache::getInstance().getU3DShader(Unity3DShader::SHADER_NAME_POSITION_U_COLOR);
+            auto u3dShader = Unity3DShaderCache::getInstance().getU3DShader(Unity3DShader::SHADER_NAME_POSITION_U_COLOR);
 
             int colorLocation = u3dShader->getUniformLocation("u_color");
 

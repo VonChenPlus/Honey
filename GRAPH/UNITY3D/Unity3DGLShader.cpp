@@ -3,7 +3,6 @@
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/Unity3DGLState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
-#include "GRAPH/UNITY3D/GLSL.h"
 #include "UTILS/RANDOM/RandomUtils.h"
 #include "UTILS/STRING/StringUtils.h"
 
@@ -239,29 +238,28 @@ namespace GRAPH
         Unity3DGLState::OpenGLState().useProgram.set(0);
     }
 
-    Uniform* Unity3DGLShaderSet::getUniform(const std::string &name) {
-        const auto itr = userUniforms_.find(name);
-        if (itr != userUniforms_.end())
-            return &itr->second;
-        return nullptr;
+    void Unity3DGLShaderSet::reset() {
+        vertShader_ = fragShader_ = 0;
+        memset(builtInUniforms_, 0, sizeof(builtInUniforms_));
+
+        program_ = 0;
+
+        for (auto e : hashForUniforms_) {
+            free(e.second.first);
+        }
+
+        hashForUniforms_.clear();
     }
 
-    VertexAttrib* Unity3DGLShaderSet::getVertexAttrib(const std::string &name) {
-        const auto itr = vertexAttribs_.find(name);
-        if (itr != vertexAttribs_.end())
-            return &itr->second;
-        return nullptr;
-    }
-
-    GLint Unity3DGLShaderSet::getAttribLocation(const std::string &attributeName) const {
+    int32 Unity3DGLShaderSet::getAttribLocation(const std::string &attributeName) const {
         return glGetAttribLocation(program_, attributeName.c_str());
     }
 
-    GLint Unity3DGLShaderSet::getUniformLocation(const std::string &attributeName) const {
+    int32 Unity3DGLShaderSet::getUniformLocation(const std::string &attributeName) const {
         return glGetUniformLocation(program_, attributeName.c_str());
     }
 
-    void Unity3DGLShaderSet::bindAttribLocation(const std::string &attributeName, GLuint index) const {
+    void Unity3DGLShaderSet::bindAttribLocation(const std::string &attributeName, uint32 index) const {
         glBindAttribLocation(program_, index, attributeName.c_str());
     }
 
@@ -307,7 +305,7 @@ namespace GRAPH
             setUniformLocationWith1i(builtInUniforms_[UNIFORM_SAMPLER3], 3);
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith1i(GLint location, GLint i1) {
+    void Unity3DGLShaderSet::setUniformLocationWith1i(int location, int i1) {
         bool updated = updateUniformLocation(location, &i1, sizeof(i1) * 1);
 
         if (updated)
@@ -316,7 +314,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith2i(GLint location, GLint i1, GLint i2) {
+    void Unity3DGLShaderSet::setUniformLocationWith2i(int location, int i1, int i2) {
         GLint ints[2] = { i1, i2 };
         bool updated = updateUniformLocation(location, ints, sizeof(ints));
 
@@ -325,7 +323,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith3i(GLint location, GLint i1, GLint i2, GLint i3) {
+    void Unity3DGLShaderSet::setUniformLocationWith3i(int location, int i1, int i2, int i3) {
         GLint ints[3] = { i1, i2, i3 };
         bool updated = updateUniformLocation(location, ints, sizeof(ints));
 
@@ -334,7 +332,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith4i(GLint location, GLint i1, GLint i2, GLint i3, GLint i4) {
+    void Unity3DGLShaderSet::setUniformLocationWith4i(int location, int i1, int i2, int i3, int i4) {
         GLint ints[4] = { i1, i2, i3, i4 };
         bool updated = updateUniformLocation(location, ints, sizeof(ints));
 
@@ -343,7 +341,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith2iv(GLint location, GLint* ints, unsigned int numberOfArrays) {
+    void Unity3DGLShaderSet::setUniformLocationWith2iv(int location, int* ints, unsigned int numberOfArrays) {
         bool updated = updateUniformLocation(location, ints, sizeof(int) * 2 * numberOfArrays);
 
         if (updated) {
@@ -351,7 +349,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith3iv(GLint location, GLint* ints, unsigned int numberOfArrays) {
+    void Unity3DGLShaderSet::setUniformLocationWith3iv(int location, int* ints, unsigned int numberOfArrays) {
         bool updated = updateUniformLocation(location, ints, sizeof(int) * 3 * numberOfArrays);
 
         if (updated) {
@@ -359,7 +357,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith4iv(GLint location, GLint* ints, unsigned int numberOfArrays) {
+    void Unity3DGLShaderSet::setUniformLocationWith4iv(int location, int* ints, unsigned int numberOfArrays) {
         bool updated = updateUniformLocation(location, ints, sizeof(int) * 4 * numberOfArrays);
 
         if (updated) {
@@ -367,7 +365,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith1f(GLint location, GLfloat f1) {
+    void Unity3DGLShaderSet::setUniformLocationWith1f(int location, float f1) {
         bool updated = updateUniformLocation(location, &f1, sizeof(f1) * 1);
 
         if (updated) {
@@ -375,8 +373,8 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith2f(GLint location, GLfloat f1, GLfloat f2) {
-        GLfloat floats[2] = { f1, f2 };
+    void Unity3DGLShaderSet::setUniformLocationWith2f(int location, float f1, float f2) {
+        float floats[2] = { f1, f2 };
         bool updated = updateUniformLocation(location, floats, sizeof(floats));
 
         if (updated) {
@@ -384,8 +382,8 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith3f(GLint location, GLfloat f1, GLfloat f2, GLfloat f3) {
-        GLfloat floats[3] = { f1, f2, f3 };
+    void Unity3DGLShaderSet::setUniformLocationWith3f(int location, float f1, float f2, float f3) {
+        float floats[3] = { f1, f2, f3 };
         bool updated = updateUniformLocation(location, floats, sizeof(floats));
 
         if (updated) {
@@ -393,8 +391,8 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith4f(GLint location, GLfloat f1, GLfloat f2, GLfloat f3, GLfloat f4) {
-        GLfloat floats[4] = { f1, f2, f3, f4 };
+    void Unity3DGLShaderSet::setUniformLocationWith4f(int location, float f1, float f2, float f3, float f4) {
+        float floats[4] = { f1, f2, f3, f4 };
         bool updated = updateUniformLocation(location, floats, sizeof(floats));
 
         if (updated) {
@@ -402,7 +400,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith1fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays) {
+    void Unity3DGLShaderSet::setUniformLocationWith1fv(int location, const float* floats, unsigned int numberOfArrays) {
         bool updated = updateUniformLocation(location, floats, sizeof(float)*numberOfArrays);
 
         if (updated) {
@@ -410,7 +408,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith2fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays) {
+    void Unity3DGLShaderSet::setUniformLocationWith2fv(int location, const float* floats, unsigned int numberOfArrays) {
         bool updated = updateUniformLocation(location, floats, sizeof(float) * 2 * numberOfArrays);
 
         if (updated) {
@@ -418,7 +416,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith3fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays) {
+    void Unity3DGLShaderSet::setUniformLocationWith3fv(int location, const float* floats, unsigned int numberOfArrays) {
         bool updated = updateUniformLocation(location, floats, sizeof(float) * 3 * numberOfArrays);
 
         if (updated) {
@@ -426,7 +424,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWith4fv(GLint location, const GLfloat* floats, unsigned int numberOfArrays) {
+    void Unity3DGLShaderSet::setUniformLocationWith4fv(int location, const float* floats, unsigned int numberOfArrays) {
         bool updated = updateUniformLocation(location, floats, sizeof(float) * 4 * numberOfArrays);
 
         if (updated) {
@@ -434,7 +432,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWithMatrix2fv(GLint location, const GLfloat* matrixArray, unsigned int numberOfMatrices) {
+    void Unity3DGLShaderSet::setUniformLocationWithMatrix2fv(int location, const float* matrixArray, unsigned int numberOfMatrices) {
         bool updated = updateUniformLocation(location, matrixArray, sizeof(float) * 4 * numberOfMatrices);
 
         if (updated) {
@@ -442,7 +440,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWithMatrix3fv(GLint location, const GLfloat* matrixArray, unsigned int numberOfMatrices) {
+    void Unity3DGLShaderSet::setUniformLocationWithMatrix3fv(int location, const float* matrixArray, unsigned int numberOfMatrices) {
         bool updated = updateUniformLocation(location, matrixArray, sizeof(float) * 9 * numberOfMatrices);
 
         if (updated) {
@@ -450,7 +448,7 @@ namespace GRAPH
         }
     }
 
-    void Unity3DGLShaderSet::setUniformLocationWithMatrix4fv(GLint location, const GLfloat* matrixArray, unsigned int numberOfMatrices) {
+    void Unity3DGLShaderSet::setUniformLocationWithMatrix4fv(int location, const float* matrixArray, unsigned int numberOfMatrices) {
         bool updated = updateUniformLocation(location, matrixArray, sizeof(float) * 16 * numberOfMatrices);
 
         if (updated) {
@@ -500,19 +498,6 @@ namespace GRAPH
             setUniformLocationWith4f(builtInUniforms_[Unity3DGLShaderSet::UNIFORM_RANDOM01], UTILS::RANDOM::RANDOM_0_1(), UTILS::RANDOM::RANDOM_0_1(), UTILS::RANDOM::RANDOM_0_1(), UTILS::RANDOM::RANDOM_0_1());
     }
 
-    void Unity3DGLShaderSet::reset() {
-        vertShader_ = fragShader_ = 0;
-        memset(builtInUniforms_, 0, sizeof(builtInUniforms_));
-
-        program_ = 0;
-
-        for (auto e : hashForUniforms_) {
-            free(e.second.first);
-        }
-
-        hashForUniforms_.clear();
-    }
-
     void Unity3DGLShaderSet::bindPredefinedVertexAttribs() {
         static const struct {
             const char *attributeName;
@@ -540,7 +525,7 @@ namespace GRAPH
         GLint length;
         glGetProgramiv(program_, GL_ACTIVE_ATTRIBUTES, &activeAttributes);
         if (activeAttributes > 0) {
-            VertexAttrib attribute;
+            U3DVertexAttrib attribute;
 
             glGetProgramiv(program_, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &length);
             if (length > 0) {
@@ -572,7 +557,7 @@ namespace GRAPH
             GLint length;
             glGetProgramiv(program_, GL_ACTIVE_UNIFORM_MAX_LENGTH, &length);
             if (length > 0) {
-                Uniform uniform;
+                U3DUniform uniform;
 
                 GLchar* uniformName = (GLchar*) alloca(length + 1);
 
@@ -631,266 +616,5 @@ namespace GRAPH
         }
 
         return updated;
-    }
-
-    enum
-    {
-        kShaderType_PositionTextureColor,
-        kShaderType_PositionTextureColor_noMVP,
-        kShaderType_PositionTextureColorAlphaTest,
-        kShaderType_PositionTextureColorAlphaTestNoMV,
-        kShaderType_PositionColor,
-        kShaderType_PositionColorTextureAsPointsize,
-        kShaderType_PositionColor_noMVP,
-        kShaderType_PositionTexture,
-        kShaderType_PositionTexture_uColor,
-        kShaderType_PositionTextureA8Color,
-        kShaderType_Position_uColor,
-        kShaderType_PositionLengthTexureColor,
-        kShaderType_LabelDistanceFieldNormal,
-        kShaderType_LabelDistanceFieldGlow,
-        kShaderType_UIGrayScale,
-        kShaderType_LabelNormal,
-        kShaderType_LabelOutline,
-        kShaderType_MAX,
-    };
-
-    Unity3DGLShaderCache& Unity3DGLShaderCache::getInstance() {
-        static Unity3DGLShaderCache instance;
-        return instance;
-    }
-
-    Unity3DGLShaderCache::Unity3DGLShaderCache()
-        : programs_() {
-        init();
-    }
-
-    Unity3DGLShaderCache::~Unity3DGLShaderCache() {
-        for (auto it = programs_.begin(); it != programs_.end(); ++it) {
-            (it->second)->release();
-        }
-    }
-
-    bool Unity3DGLShaderCache::init() {
-        loadDefaultGLShaders();
-        return true;
-    }
-
-    void Unity3DGLShaderCache::loadDefaultGLShaders() {
-        Unity3DGLShaderSet *p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_PositionTextureColor);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_PositionTextureColor_noMVP);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_PositionTextureColorAlphaTest);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_PositionTextureColorAlphaTestNoMV);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_PositionColor);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_COLOR, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_PositionColorTextureAsPointsize);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_PositionColor_noMVP);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_COLOR_NO_MVP, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_PositionTexture);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_PositionTexture_uColor);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_U_COLOR, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_PositionTextureA8Color);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_A8_COLOR, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_Position_uColor);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_U_COLOR, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_PositionLengthTexureColor);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_LabelDistanceFieldNormal);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_LabelDistanceFieldGlow);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_UIGrayScale);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_GRAYSCALE, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_LabelNormal);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_LABEL_NORMAL, p));
-
-        p = new (std::nothrow) Unity3DGLShaderSet();
-        loadDefaultGLShader(p, kShaderType_LabelOutline);
-        programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_LABEL_OUTLINE, p));
-    }
-
-    void Unity3DGLShaderCache::reloadDefaultGLShaders() {
-        Unity3DGLShaderSet *p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_PositionTextureColor);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_PositionTextureColor_noMVP);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_PositionTextureColorAlphaTest);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_ALPHA_TEST_NO_MV);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_PositionTextureColorAlphaTestNoMV);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_COLOR);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_PositionColor);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_COLOR_TEXASPOINTSIZE);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_PositionColorTextureAsPointsize);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_COLOR_NO_MVP);
-        loadDefaultGLShader(p, kShaderType_PositionColor_noMVP);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_PositionTexture);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_U_COLOR);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_PositionTexture_uColor);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_A8_COLOR);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_PositionTextureA8Color);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_U_COLOR);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_Position_uColor);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_PositionLengthTexureColor);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_LabelDistanceFieldNormal);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_LabelDistanceFieldGlow);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_LABEL_NORMAL);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_LabelNormal);
-
-        p = getU3DShader(Unity3DShader::SHADER_NAME_LABEL_OUTLINE);
-        p->reset();
-        loadDefaultGLShader(p, kShaderType_LabelOutline);
-    }
-
-    void Unity3DGLShaderCache::loadDefaultGLShader(Unity3DGLShaderSet *p, int type) {
-        switch (type) {
-        case kShaderType_PositionTextureColor:
-            p->initWithByteArrays(PositionTextureColor_vert, PositionTextureColor_frag);
-            break;
-        case kShaderType_PositionTextureColor_noMVP:
-            p->initWithByteArrays(PositionTextureColor_noMVP_vert, PositionTextureColor_noMVP_frag);
-            break;
-        case kShaderType_PositionTextureColorAlphaTest:
-            p->initWithByteArrays(PositionTextureColor_vert, PositionTextureColorAlphaTest_frag);
-            break;
-        case kShaderType_PositionTextureColorAlphaTestNoMV:
-            p->initWithByteArrays(PositionTextureColor_noMVP_vert, PositionTextureColorAlphaTest_frag);
-            break;
-        case kShaderType_PositionColor:
-            p->initWithByteArrays(PositionColor_vert, PositionColor_frag);
-            break;
-        case kShaderType_PositionColorTextureAsPointsize:
-            p->initWithByteArrays(PositionColorTextureAsPointsize_vert, PositionColor_frag);
-            break;
-        case kShaderType_PositionColor_noMVP:
-            p->initWithByteArrays(PositionTextureColor_noMVP_vert, PositionColor_frag);
-            break;
-        case kShaderType_PositionTexture:
-            p->initWithByteArrays(PositionTexture_vert, PositionTexture_frag);
-            break;
-        case kShaderType_PositionTexture_uColor:
-            p->initWithByteArrays(PositionTexture_uColor_vert, PositionTexture_uColor_frag);
-            break;
-        case kShaderType_PositionTextureA8Color:
-            p->initWithByteArrays(PositionTextureA8Color_vert, PositionTextureA8Color_frag);
-            break;
-        case kShaderType_Position_uColor:
-            p->initWithByteArrays(Position_uColor_vert, Position_uColor_frag);
-            p->bindAttribLocation("aVertex", SEM_POSITION);
-            break;
-        case kShaderType_PositionLengthTexureColor:
-            p->initWithByteArrays(PositionColorLengthTexture_vert, PositionColorLengthTexture_frag);
-            break;
-        case kShaderType_LabelDistanceFieldNormal:
-            p->initWithByteArrays(Label_vert, LabelDistanceFieldNormal_frag);
-            break;
-        case kShaderType_LabelDistanceFieldGlow:
-            p->initWithByteArrays(Label_vert, LabelDistanceFieldGlow_frag);
-            break;
-        case kShaderType_UIGrayScale:
-            p->initWithByteArrays(PositionTextureColor_noMVP_vert,
-                PositionTexture_GrayScale_frag);
-            break;
-        case kShaderType_LabelNormal:
-            p->initWithByteArrays(Label_vert, LabelNormal_frag);
-            break;
-        case kShaderType_LabelOutline:
-            p->initWithByteArrays(Label_vert, LabelOutline_frag);
-            break;
-        default:
-            return;
-        }
-
-        p->link();
-        p->updateUniforms();
-    }
-
-    Unity3DGLShaderSet* Unity3DGLShaderCache::getU3DShader(const std::string &key) {
-        auto it = programs_.find(key);
-        if (it != programs_.end())
-            return it->second;
-        return nullptr;
-    }
-
-    void Unity3DGLShaderCache::addU3DShader(Unity3DGLShaderSet* program, const std::string &key) {
-        auto prev = getU3DShader(key);
-        if (prev == program)
-            return;
-
-        programs_.erase(key);
-        SAFE_RELEASE_NULL(prev);
-
-        if (program)
-            program->retain();
-        programs_[key] = program;
     }
 }

@@ -103,8 +103,7 @@ namespace GRAPH
     Unity3DCreator::RenderEngine Unity3DCreator::EngineMode = OPENGL;
 
     Unity3DContext *Unity3DCreator::CreateContext() {
-        switch (EngineMode)
-        {
+        switch (EngineMode) {
         case OPENGL:
             return Unity3DGLCreator::CreateContext();
         default:
@@ -114,8 +113,7 @@ namespace GRAPH
     }
 
     Unity3DDepthState *Unity3DCreator::CreateDepthState() {
-        switch (EngineMode)
-        {
+        switch (EngineMode) {
         case OPENGL:
             return Unity3DGLCreator::CreateDepthState();
         default:
@@ -125,8 +123,7 @@ namespace GRAPH
     }
 
     Unity3DBuffer *Unity3DCreator::CreateBuffer(uint32 usageFlags) {
-        switch (EngineMode)
-        {
+        switch (EngineMode) {
         case OPENGL:
             return Unity3DGLCreator::CreateBuffer(usageFlags);
         default:
@@ -136,10 +133,30 @@ namespace GRAPH
     }
 
     Unity3DShaderSet *Unity3DCreator::CreateShaderSet(Unity3DShader *vshader, Unity3DShader *fshader) {
+        switch (EngineMode) {
+        case OPENGL:
+            return Unity3DGLCreator::CreateShaderSet(vshader, fshader);
+        default:
+            throw _HException_Normal("Unsupport Engine Mode!");
+            break;
+        }
+    }
+
+    Unity3DShaderSet *Unity3DCreator::CreateShaderSetWithByteArray(const std::string &vShaderByteArray, const std::string &fShaderByteArray, const std::string& compileTimeDefines) {
+        switch (EngineMode) {
+        case OPENGL:
+            return Unity3DGLCreator::CreateShaderSetWithByteArray(vShaderByteArray, fShaderByteArray, compileTimeDefines);
+        default:
+            throw _HException_Normal("Unsupport Engine Mode!");
+            break;
+        }
+    }
+
+    Unity3DShaderSet *Unity3DCreator::CreateShaderSetWithFileName(const std::string &vShaderFilename, const std::string &fShaderFilename, const std::string& compileTimeDefines) {
         switch (EngineMode)
         {
         case OPENGL:
-            return Unity3DGLCreator::CreateShaderSet(vshader, fshader);
+            return Unity3DGLCreator::CreateShaderSetWithFileName(vShaderFilename, fShaderFilename, compileTimeDefines);
         default:
             throw _HException_Normal("Unsupport Engine Mode!");
             break;

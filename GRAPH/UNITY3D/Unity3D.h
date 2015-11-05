@@ -1,12 +1,15 @@
 #ifndef UNITY3D_H
 #define UNITY3D_H
 
+#include <string>
 #include <vector>
 #include <functional>
+#include <unordered_map>
 #include "BASE/HObject.h"
 #include "BASE/HData.h"
 #include "IMAGE/ImageDefine.h"
 #include "IMAGE/ImageObject.h"
+#include "MATH/Matrix.h"
 
 namespace GRAPH
 {
@@ -240,6 +243,22 @@ namespace GRAPH
     public:
     };
 
+    struct U3DVertexAttrib
+    {
+        uint32 index;
+        int32 size;
+        uint32 type;
+        std::string name;
+    };
+
+    struct U3DUniform
+    {
+        int32 location;
+        int32 size;
+        uint32 type;
+        std::string name;
+    };
+
     class Unity3DShader : public Unity3DObject
     {
     public:
@@ -278,6 +297,56 @@ namespace GRAPH
     class Unity3DShaderSet : public Unity3DObject
     {
     public:
+        virtual void link() = 0;
+        virtual void apply() = 0;
+        virtual void unApply() = 0;
+        virtual void reset() {}
+
+        virtual int32 getAttribLocation(const std::string &attributeName) const = 0;
+        virtual int32 getUniformLocation(const std::string &attributeName) const = 0;
+        virtual void bindAttribLocation(const std::string &attributeName, uint32 index) const = 0;
+
+        virtual void setUniformLocationWith1i(int location, int i1) = 0;
+        virtual void setUniformLocationWith2i(int location, int i1, int i2) = 0;
+        virtual void setUniformLocationWith3i(int location, int i1, int i2, int i3) = 0;
+        virtual void setUniformLocationWith4i(int location, int i1, int i2, int i3, int i4) = 0;
+        virtual void setUniformLocationWith2iv(int location, int* ints, unsigned int numberOfArrays) = 0;
+        virtual void setUniformLocationWith3iv(int location, int* ints, unsigned int numberOfArrays) = 0;
+        virtual void setUniformLocationWith4iv(int location, int* ints, unsigned int numberOfArrays) = 0;
+        virtual void setUniformLocationWith1f(int location, float f1) = 0;
+        virtual void setUniformLocationWith2f(int location, float f1, float f2) = 0;
+        virtual void setUniformLocationWith3f(int location, float f1, float f2, float f3) = 0;
+        virtual void setUniformLocationWith4f(int location, float f1, float f2, float f3, float f4) = 0;
+        virtual void setUniformLocationWith1fv(int location, const float* floats, unsigned int numberOfArrays) = 0;
+        virtual void setUniformLocationWith2fv(int location, const float* floats, unsigned int numberOfArrays) = 0;
+        virtual void setUniformLocationWith3fv(int location, const float* floats, unsigned int numberOfArrays) = 0;
+        virtual void setUniformLocationWith4fv(int location, const float* floats, unsigned int numberOfArrays) = 0;
+        virtual void setUniformLocationWithMatrix2fv(int location, const float* matrixArray, unsigned int numberOfMatrices) = 0;
+        virtual void setUniformLocationWithMatrix3fv(int location, const float* matrixArray, unsigned int numberOfMatrices) = 0;
+        virtual void setUniformLocationWithMatrix4fv(int location, const float* matrixArray, unsigned int numberOfMatrices) = 0;
+
+        virtual void setUniformsForBuiltins() = 0;
+        virtual void setUniformsForBuiltins(const MATH::Matrix4 &modelView) = 0;
+
+        U3DUniform* userUniform(const std::string &name) {
+            const auto itr = userUniforms_.find(name);
+            if (itr != userUniforms_.end())
+                return &itr->second;
+            return nullptr;
+        }
+
+        U3DVertexAttrib* vertexAttrib(const std::string &name) {
+            const auto itr = vertexAttribs_.find(name);
+            if (itr != vertexAttribs_.end())
+                return &itr->second;
+            return nullptr;
+        }
+        std::unordered_map<std::string, U3DUniform> &userUniforms() { return userUniforms_;  }
+        std::unordered_map<std::string, U3DVertexAttrib> &vertexAttribs() { return vertexAttribs_; }
+
+    protected:
+        std::unordered_map<std::string, U3DUniform> userUniforms_;
+        std::unordered_map<std::string, U3DVertexAttrib> vertexAttribs_;
     };
 
     class Unity3DContext : public Unity3DObject
@@ -366,6 +435,8 @@ namespace GRAPH
         static Unity3DDepthState *CreateDepthState();
         static Unity3DBuffer *CreateBuffer(uint32 usageFlags);
         static Unity3DShaderSet *CreateShaderSet(Unity3DShader *vshader, Unity3DShader *fshader);
+        static Unity3DShaderSet *CreateShaderSetWithByteArray(const std::string &vShaderByteArray, const std::string &fShaderByteArray, const std::string& compileTimeDefines = std::string());
+        static Unity3DShaderSet *CreateShaderSetWithFileName(const std::string &vShaderFilename, const std::string &fShaderFilename, const std::string& compileTimeDefines = std::string());
         static Unity3DVertexFormat *CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride);
         static Unity3DTexture *CreateTexture(U3DTextureType type = LINEAR2D, bool antialias = true);
     };

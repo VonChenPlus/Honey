@@ -1,27 +1,23 @@
 #ifndef GLSHADERSTATE_H
 #define GLSHADERSTATE_H
 
-#include <string>
-#include <functional>
-#include <unordered_map>
-#include "BASE/HObject.h"
-#include "MATH/Matrix.h"
 #include "GRAPH/UNITY3D/GLCommon.h"
+#include "GRAPH/UNITY3D/Unity3D.h"
 
 namespace GRAPH
 {
-    struct Uniform;
-    struct VertexAttrib;
-    class Unity3DGLShaderSet;
+    struct U3DUniform;
+    struct U3DVertexAttrib;
+    class Unity3DShaderSet;
 
     class UniformValue
     {
-        friend class Unity3DGLShaderSet;
-        friend class GLShaderState;
+        friend class Unity3DShaderSet;
+        friend class Unity3DShaderState;
 
     public:
         UniformValue();
-        UniformValue(Uniform *uniform, Unity3DGLShaderSet* u3dShader);
+        UniformValue(U3DUniform *uniform, Unity3DShaderSet* u3dShader);
         ~UniformValue();
 
         void setFloat(float value);
@@ -35,7 +31,7 @@ namespace GRAPH
         void setVec4v(uint64 size, const MATH::Vector4f* pointer);
         void setMat4(const MATH::Matrix4& value);
 
-        void setCallback(const std::function<void(Unity3DGLShaderSet*, Uniform*)> &callback);
+        void setCallback(const std::function<void(Unity3DShaderSet*, U3DUniform*)> &callback);
         void setTexture(GLuint textureId, GLuint textureUnit);
 
         void apply();
@@ -47,8 +43,8 @@ namespace GRAPH
             CALLBACK_FN     // CALLBACK is already defined in windows, can't use it.
         };
 
-        Uniform* uniform_;
-        Unity3DGLShaderSet* u3dShader_;
+        U3DUniform* uniform_;
+        Unity3DShaderSet* u3dShader_;
         Type type_;
 
         union U{
@@ -78,7 +74,7 @@ namespace GRAPH
                 const float* pointer;
                 GLsizei size;
             } v4f;
-            std::function<void(Unity3DGLShaderSet*, Uniform*)> *callback;
+            std::function<void(Unity3DShaderSet*, U3DUniform*)> *callback;
 
             U() { memset( this, 0, sizeof(*this) ); }
             ~U(){}
@@ -91,19 +87,19 @@ namespace GRAPH
 
     class VertexAttribValue
     {
-        friend class GLShaderState;
+        friend class Unity3DShaderState;
 
     public:
-        VertexAttribValue(VertexAttrib *vertexAttrib);
+        VertexAttribValue(U3DVertexAttrib *vertexAttrib);
         VertexAttribValue();
         ~VertexAttribValue();
 
         void setPointer(GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid *pointer);
-        void setCallback(const std::function<void(VertexAttrib*)> &callback);
+        void setCallback(const std::function<void(U3DVertexAttrib*)> &callback);
         void apply();
 
     protected:
-        VertexAttrib* vertexAttrib_;
+        U3DVertexAttrib* vertexAttrib_;
         bool useCallback_;
         bool enabled_;
 
@@ -115,7 +111,7 @@ namespace GRAPH
                 GLsizei stride;
                 GLvoid *pointer;
             } pointer;
-            std::function<void(VertexAttrib*)> *callback;
+            std::function<void(U3DVertexAttrib*)> *callback;
 
             U() { memset( this, 0, sizeof(*this) ); }
             ~U(){}
@@ -126,25 +122,25 @@ namespace GRAPH
         } value_;
     };
 
-    class GLShaderState : public HObject
+    class Unity3DShaderState : public HObject
     {
-        friend class GLShaderStateCache;
+        friend class Unity3DShaderStateCache;
     public:
-        static GLShaderState* create(Unity3DGLShaderSet* u3dShader);
-        static GLShaderState* getOrCreateWithGLShader(Unity3DGLShaderSet* u3dShader);
-        static GLShaderState* getOrCreateWithGLShaderName(const std::string& glShaderName );
-        static GLShaderState* getOrCreateWithShaders(const std::string& vertexShader, const std::string& fragShader, const std::string& compileTimeDefines);
+        static Unity3DShaderState* create(Unity3DShaderSet* u3dShader);
+        static Unity3DShaderState* getOrCreateWithGLShader(Unity3DShaderSet* u3dShader);
+        static Unity3DShaderState* getOrCreateWithGLShaderName(const std::string& glShaderName );
+        static Unity3DShaderState* getOrCreateWithShaders(const std::string& vertexShader, const std::string& fragShader, const std::string& compileTimeDefines);
 
         void apply(const MATH::Matrix4& modelView);
         void applyU3DShader(const MATH::Matrix4& modelView);
         void applyAttributes(bool applyAttribFlags = true);
         void applyUniforms();
 
-        void setGLShader(Unity3DGLShaderSet* u3dShader);
-        Unity3DGLShaderSet* getU3DShader() const { return u3dShader_; }
+        void setGLShader(Unity3DShaderSet* u3dShader);
+        Unity3DShaderSet* getU3DShader() const { return u3dShader_; }
         uint32_t getVertexAttribsFlags() const;
         uint64 getVertexAttribCount() const;
-        void setVertexAttribCallback(const std::string& name, const std::function<void(VertexAttrib*)> &callback);
+        void setVertexAttribCallback(const std::string& name, const std::function<void(U3DVertexAttrib*)> &callback);
         void setVertexAttribPointer(const std::string& name, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid *pointer);
         uint64 getUniformCount() const { return uniforms_.size(); }
 
@@ -158,7 +154,7 @@ namespace GRAPH
         void setUniformVec4(const std::string& uniformName, const MATH::Vector4f& value);
         void setUniformVec4v(const std::string& uniformName, uint64 size, const MATH::Vector4f* pointer);
         void setUniformMat4(const std::string& uniformName, const MATH::Matrix4& value);
-        void setUniformCallback(const std::string& uniformName, const std::function<void(Unity3DGLShaderSet*, Uniform*)> &callback);
+        void setUniformCallback(const std::string& uniformName, const std::function<void(Unity3DShaderSet*, U3DUniform*)> &callback);
         void setUniformTexture(const std::string& uniformName, GLuint textureId);
 
         void setUniformInt(GLint uniformLocation, int value);
@@ -171,13 +167,13 @@ namespace GRAPH
         void setUniformVec4(GLint uniformLocation, const MATH::Vector4f& value);
         void setUniformVec4v(GLint uniformLocation, uint64 size, const MATH::Vector4f* pointer);
         void setUniformMat4(GLint uniformLocation, const MATH::Matrix4& value);
-        void setUniformCallback(GLint uniformLocation, const std::function<void(Unity3DGLShaderSet*, Uniform*)> &callback);
+        void setUniformCallback(GLint uniformLocation, const std::function<void(Unity3DShaderSet*, U3DUniform*)> &callback);
         void setUniformTexture(GLint uniformLocation, GLuint textureId);
 
     protected:
-        GLShaderState();
-        ~GLShaderState();
-        bool init(Unity3DGLShaderSet* program);
+        Unity3DShaderState();
+        ~Unity3DShaderState();
+        bool init(Unity3DShaderSet* program);
         void resetGLShader();
         void updateUniformsAndAttributes();
         VertexAttribValue* getVertexAttribValue(const std::string& attributeName);
@@ -192,24 +188,24 @@ namespace GRAPH
         std::unordered_map<std::string, int> boundTextureUnits_;
         int textureUnitIndex_;
         uint32_t vertexAttribsFlags_;
-        Unity3DGLShaderSet* u3dShader_;
+        Unity3DShaderSet* u3dShader_;
     };
 
-    class GLShaderStateCache
+    class Unity3DShaderStateCache
     {
     public:
-        static GLShaderStateCache& getInstance();
+        static Unity3DShaderStateCache& getInstance();
 
-        GLShaderState* getGLShaderState(Unity3DGLShaderSet* program);
+        Unity3DShaderState* getGLShaderState(Unity3DShaderSet* program);
         void removeAllGLShaderState();
         void removeUnusedGLShaderState();
 
     protected:
-        GLShaderStateCache();
-        ~GLShaderStateCache();
+        Unity3DShaderStateCache();
+        ~Unity3DShaderStateCache();
 
     private:
-        HObjectMap<Unity3DGLShaderSet*, GLShaderState*> glShaderStates_;
+        HObjectMap<Unity3DShaderSet*, Unity3DShaderState*> glShaderStates_;
     };
 }
 

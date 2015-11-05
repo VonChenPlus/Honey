@@ -116,7 +116,7 @@ namespace GRAPH
             void computeStringNumLines();
 
             void onDraw(const MATH::Matrix4& transform, bool transformUpdated);
-            void onDrawShadow(Unity3DGLShaderSet* u3dShader);
+            void onDrawShadow(Unity3DShaderSet* u3dShader);
             void drawSelf(Renderer* renderer, uint32_t flags);
 
             bool multilineTextWrapByChar();

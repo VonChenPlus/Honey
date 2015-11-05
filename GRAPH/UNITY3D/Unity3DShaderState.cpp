@@ -1,5 +1,5 @@
-#include "GLShaderState.h"
-#include "GRAPH/UNITY3D/Unity3DGLShader.h"
+#include "GRAPH/UNITY3D/Unity3DShaderState.h"
+#include "GRAPH/UNITY3D/Unity3DShaderCache.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 
 namespace GRAPH
@@ -10,7 +10,7 @@ namespace GRAPH
         , type_(Type::VALUE) {
     }
 
-    UniformValue::UniformValue(Uniform *uniform, Unity3DGLShaderSet* u3dShader)
+    UniformValue::UniformValue(U3DUniform *uniform, Unity3DShaderSet* u3dShader)
         : uniform_(uniform)
         , u3dShader_(u3dShader)
         , type_(Type::VALUE) {
@@ -89,11 +89,11 @@ namespace GRAPH
         }
     }
 
-    void UniformValue::setCallback(const std::function<void(Unity3DGLShaderSet*, Uniform*)> &callback) {
+    void UniformValue::setCallback(const std::function<void(Unity3DShaderSet*, U3DUniform*)> &callback) {
         if (type_ == Type::CALLBACK_FN)
             delete value_.callback;
 
-        value_.callback = new std::function<void(Unity3DGLShaderSet*, Uniform*)>();
+        value_.callback = new std::function<void(Unity3DShaderSet*, U3DUniform*)>();
         *value_.callback = callback;
 
         type_ = Type::CALLBACK_FN;
@@ -167,7 +167,7 @@ namespace GRAPH
         , enabled_(false) {
     }
 
-    VertexAttribValue::VertexAttribValue(VertexAttrib *vertexAttrib)
+    VertexAttribValue::VertexAttribValue(U3DVertexAttrib *vertexAttrib)
         : vertexAttrib_(vertexAttrib)
         , useCallback_(false)
         , enabled_(false) {
@@ -194,8 +194,8 @@ namespace GRAPH
         }
     }
 
-    void VertexAttribValue::setCallback(const std::function<void(VertexAttrib*)> &callback) {
-        value_.callback = new std::function<void(VertexAttrib*)>();
+    void VertexAttribValue::setCallback(const std::function<void(U3DVertexAttrib*)> &callback) {
+        value_.callback = new std::function<void(U3DVertexAttrib*)>();
         *value_.callback = callback;
         useCallback_ = true;
         enabled_ = true;
@@ -210,9 +210,9 @@ namespace GRAPH
         enabled_ = true;
     }
 
-    GLShaderState* GLShaderState::create(Unity3DGLShaderSet *u3dShader) {
-        GLShaderState* ret = nullptr;
-        ret = new (std::nothrow) GLShaderState();
+    Unity3DShaderState* Unity3DShaderState::create(Unity3DShaderSet *u3dShader) {
+        Unity3DShaderState* ret = nullptr;
+        ret = new (std::nothrow) Unity3DShaderState();
         if(ret && ret->init(u3dShader))
         {
             ret->autorelease();
@@ -222,52 +222,52 @@ namespace GRAPH
         return nullptr;
     }
 
-    GLShaderState* GLShaderState::getOrCreateWithGLShaderName(const std::string& glShaderName ) {
-        Unity3DGLShaderSet *u3dShader = Unity3DGLShaderCache::getInstance().getU3DShader(glShaderName);
+    Unity3DShaderState* Unity3DShaderState::getOrCreateWithGLShaderName(const std::string& glShaderName ) {
+        Unity3DShaderSet *u3dShader = Unity3DShaderCache::getInstance().getU3DShader(glShaderName);
         if( u3dShader )
             return getOrCreateWithGLShader(u3dShader);
 
         return nullptr;
     }
 
-    GLShaderState* GLShaderState::getOrCreateWithGLShader(Unity3DGLShaderSet *u3dShader) {
-        GLShaderState* ret = GLShaderStateCache::getInstance().getGLShaderState(u3dShader);
+    Unity3DShaderState* Unity3DShaderState::getOrCreateWithGLShader(Unity3DShaderSet *u3dShader) {
+        Unity3DShaderState* ret = Unity3DShaderStateCache::getInstance().getGLShaderState(u3dShader);
         return ret;
     }
 
-    GLShaderState* GLShaderState::getOrCreateWithShaders(const std::string& vertexShader, const std::string& fragShader, const std::string& compileTimeDefines) {
+    Unity3DShaderState* Unity3DShaderState::getOrCreateWithShaders(const std::string& vertexShader, const std::string& fragShader, const std::string& compileTimeDefines) {
         const std::string key = vertexShader + "+" + fragShader + "+" + compileTimeDefines;
-        auto u3dShader = Unity3DGLShaderCache::getInstance().getU3DShader(key);
+        auto u3dShader = Unity3DShaderCache::getInstance().getU3DShader(key);
 
         if (!u3dShader) {
-            u3dShader = Unity3DGLShaderSet::createWithFilenames(vertexShader, fragShader, compileTimeDefines);
-            Unity3DGLShaderCache::getInstance().addU3DShader(u3dShader, key);
+            u3dShader = Unity3DCreator::CreateShaderSetWithFileName(vertexShader, fragShader, compileTimeDefines);
+            Unity3DShaderCache::getInstance().addU3DShader(u3dShader, key);
         }
 
         return create(u3dShader);
     }
 
-    GLShaderState::GLShaderState()
+    Unity3DShaderState::Unity3DShaderState()
         : uniformAttributeValueDirty_(true)
         , textureUnitIndex_(4)  // first 4 textures unites are reserved for _Texture0-3
         , vertexAttribsFlags_(0)
         , u3dShader_(nullptr) {
     }
 
-    GLShaderState::~GLShaderState() {
+    Unity3DShaderState::~Unity3DShaderState() {
         SAFE_RELEASE(u3dShader_);
     }
 
-    bool GLShaderState::init(Unity3DGLShaderSet* u3dShader) {
+    bool Unity3DShaderState::init(Unity3DShaderSet* u3dShader) {
         u3dShader_ = u3dShader;
         u3dShader_->retain();
 
-        for(auto &attrib : u3dShader_->vertexAttribs_) {
+        for(auto &attrib : u3dShader_->vertexAttribs()) {
             VertexAttribValue value(&attrib.second);
             attributes_[attrib.first] = value;
         }
 
-        for(auto &uniform : u3dShader_->userUniforms_) {
+        for(auto &uniform : u3dShader_->userUniforms()) {
             UniformValue value(&uniform.second, u3dShader_);
             uniforms_[uniform.second.location] = value;
             uniformsByName_[uniform.first] = uniform.second.location;
@@ -276,7 +276,7 @@ namespace GRAPH
         return true;
     }
 
-    void GLShaderState::resetGLShader() {
+    void Unity3DShaderState::resetGLShader() {
         SAFE_RELEASE(u3dShader_);
         u3dShader_ = nullptr;
         uniforms_.clear();
@@ -284,21 +284,21 @@ namespace GRAPH
         textureUnitIndex_ = 1;
     }
 
-    void GLShaderState::apply(const MATH::Matrix4& modelView) {
+    void Unity3DShaderState::apply(const MATH::Matrix4& modelView) {
         applyU3DShader(modelView);
         applyAttributes();
         applyUniforms();
     }
 
-    void GLShaderState::updateUniformsAndAttributes() {
+    void Unity3DShaderState::updateUniformsAndAttributes() {
         if(uniformAttributeValueDirty_) {
             for(auto& uniformLocation : uniformsByName_) {
-                uniforms_[uniformLocation.second].uniform_ = u3dShader_->getUniform(uniformLocation.first);
+                uniforms_[uniformLocation.second].uniform_ = u3dShader_->userUniform(uniformLocation.first);
             }
 
             vertexAttribsFlags_ = 0;
             for(auto& attributeValue : attributes_) {
-                attributeValue.second.vertexAttrib_ = u3dShader_->getVertexAttrib(attributeValue.first);;
+                attributeValue.second.vertexAttrib_ = u3dShader_->vertexAttrib(attributeValue.first);;
                 if(attributeValue.second.enabled_)
                     vertexAttribsFlags_ |= 1 << attributeValue.second.vertexAttrib_->index;
             }
@@ -308,13 +308,13 @@ namespace GRAPH
         }
     }
 
-    void GLShaderState::applyU3DShader(const MATH::Matrix4& modelView) {
+    void Unity3DShaderState::applyU3DShader(const MATH::Matrix4& modelView) {
         updateUniformsAndAttributes();
         u3dShader_->apply();
         u3dShader_->setUniformsForBuiltins(modelView);
     }
 
-    void GLShaderState::applyAttributes(bool applyAttribFlags) {
+    void Unity3DShaderState::applyAttributes(bool applyAttribFlags) {
         updateUniformsAndAttributes();
         if(vertexAttribsFlags_) {
             if (applyAttribFlags)
@@ -324,29 +324,29 @@ namespace GRAPH
             }
         }
     }
-    void GLShaderState::applyUniforms() {
+    void Unity3DShaderState::applyUniforms() {
         updateUniformsAndAttributes();
         for(auto& uniform : uniforms_) {
             uniform.second.apply();
         }
     }
 
-    void GLShaderState::setGLShader(Unity3DGLShaderSet *u3dShader) {
+    void Unity3DShaderState::setGLShader(Unity3DShaderSet *u3dShader) {
         if( u3dShader_ != u3dShader) {
             resetGLShader();
             init(u3dShader);
         }
     }
 
-    uint32_t GLShaderState::getVertexAttribsFlags() const {
+    uint32_t Unity3DShaderState::getVertexAttribsFlags() const {
         return vertexAttribsFlags_;
     }
 
-    uint64 GLShaderState::getVertexAttribCount() const {
+    uint64 Unity3DShaderState::getVertexAttribCount() const {
         return attributes_.size();
     }
 
-    UniformValue* GLShaderState::getUniformValue(GLint uniformLocation) {
+    UniformValue* Unity3DShaderState::getUniformValue(GLint uniformLocation) {
         updateUniformsAndAttributes();
         const auto itr = uniforms_.find(uniformLocation);
         if (itr != uniforms_.end())
@@ -354,7 +354,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    UniformValue* GLShaderState::getUniformValue(const std::string& name) {
+    UniformValue* Unity3DShaderState::getUniformValue(const std::string& name) {
         updateUniformsAndAttributes();
         const auto itr = uniformsByName_.find(name);
         if (itr != uniformsByName_.end())
@@ -362,7 +362,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    VertexAttribValue* GLShaderState::getVertexAttribValue(const std::string& name) {
+    VertexAttribValue* Unity3DShaderState::getVertexAttribValue(const std::string& name) {
         updateUniformsAndAttributes();
         const auto itr = attributes_.find(name);
         if( itr != attributes_.end())
@@ -370,7 +370,7 @@ namespace GRAPH
         return nullptr;
     }
 
-    void GLShaderState::setVertexAttribCallback(const std::string& name, const std::function<void(VertexAttrib*)> &callback) {
+    void Unity3DShaderState::setVertexAttribCallback(const std::string& name, const std::function<void(U3DVertexAttrib*)> &callback) {
         VertexAttribValue *v = getVertexAttribValue(name);
         if(v) {
             v->setCallback(callback);
@@ -378,7 +378,7 @@ namespace GRAPH
         }
     }
 
-    void GLShaderState::setVertexAttribPointer(const std::string& name, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid *pointer) {
+    void Unity3DShaderState::setVertexAttribPointer(const std::string& name, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid *pointer) {
         auto v = getVertexAttribValue(name);
         if(v) {
             v->setPointer(size, type, normalized, stride, pointer);
@@ -386,140 +386,140 @@ namespace GRAPH
         }
     }
 
-    void GLShaderState::setUniformCallback(const std::string& uniformName, const std::function<void(Unity3DGLShaderSet*, Uniform*)> &callback) {
+    void Unity3DShaderState::setUniformCallback(const std::string& uniformName, const std::function<void(Unity3DShaderSet*, U3DUniform*)> &callback) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setCallback(callback);
     }
 
-    void GLShaderState::setUniformCallback(GLint uniformLocation, const std::function<void(Unity3DGLShaderSet*, Uniform*)> &callback) {
+    void Unity3DShaderState::setUniformCallback(GLint uniformLocation, const std::function<void(Unity3DShaderSet*, U3DUniform*)> &callback) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setCallback(callback);
     }
 
-    void GLShaderState::setUniformFloat(const std::string& uniformName, float value) {
+    void Unity3DShaderState::setUniformFloat(const std::string& uniformName, float value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setFloat(value);
     }
 
-    void GLShaderState::setUniformFloat(GLint uniformLocation, float value) {
+    void Unity3DShaderState::setUniformFloat(GLint uniformLocation, float value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setFloat(value);
     }
 
-    void GLShaderState::setUniformInt(const std::string& uniformName, int value) {
+    void Unity3DShaderState::setUniformInt(const std::string& uniformName, int value) {
         auto v = getUniformValue(uniformName);
         if(v)
             v->setInt(value);
     }
 
-    void GLShaderState::setUniformInt(GLint uniformLocation, int value) {
+    void Unity3DShaderState::setUniformInt(GLint uniformLocation, int value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setInt(value);
 
     }
 
-    void GLShaderState::setUniformFloatv(const std::string& uniformName, uint64 size, const float* pointer) {
+    void Unity3DShaderState::setUniformFloatv(const std::string& uniformName, uint64 size, const float* pointer) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setFloatv(size, pointer);
     }
 
-    void GLShaderState::setUniformFloatv(GLint uniformLocation, uint64 size, const float* pointer) {
+    void Unity3DShaderState::setUniformFloatv(GLint uniformLocation, uint64 size, const float* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setFloatv(size, pointer);
     }
 
-    void GLShaderState::setUniformVec2(const std::string& uniformName, const MATH::Vector2f& value) {
+    void Unity3DShaderState::setUniformVec2(const std::string& uniformName, const MATH::Vector2f& value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec2(value);
     }
 
-    void GLShaderState::setUniformVec2(GLint uniformLocation, const MATH::Vector2f& value) {
+    void Unity3DShaderState::setUniformVec2(GLint uniformLocation, const MATH::Vector2f& value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec2(value);
     }
 
-    void GLShaderState::setUniformVec2v(const std::string& uniformName, uint64 size, const MATH::Vector2f* pointer) {
+    void Unity3DShaderState::setUniformVec2v(const std::string& uniformName, uint64 size, const MATH::Vector2f* pointer) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec2v(size, pointer);
     }
 
-    void GLShaderState::setUniformVec2v(GLint uniformLocation, uint64 size, const MATH::Vector2f* pointer) {
+    void Unity3DShaderState::setUniformVec2v(GLint uniformLocation, uint64 size, const MATH::Vector2f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec2v(size, pointer);
     }
 
-    void GLShaderState::setUniformVec3(const std::string& uniformName, const MATH::Vector3f& value) {
+    void Unity3DShaderState::setUniformVec3(const std::string& uniformName, const MATH::Vector3f& value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec3(value);
     }
 
-    void GLShaderState::setUniformVec3(GLint uniformLocation, const MATH::Vector3f& value) {
+    void Unity3DShaderState::setUniformVec3(GLint uniformLocation, const MATH::Vector3f& value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec3(value);
     }
 
-    void GLShaderState::setUniformVec3v(const std::string& uniformName, uint64 size, const MATH::Vector3f* pointer) {
+    void Unity3DShaderState::setUniformVec3v(const std::string& uniformName, uint64 size, const MATH::Vector3f* pointer) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec3v(size, pointer);
     }
 
-    void GLShaderState::setUniformVec3v(GLint uniformLocation, uint64 size, const MATH::Vector3f* pointer) {
+    void Unity3DShaderState::setUniformVec3v(GLint uniformLocation, uint64 size, const MATH::Vector3f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec3v(size, pointer);
     }
 
-    void GLShaderState::setUniformVec4(const std::string& uniformName, const MATH::Vector4f& value) {
+    void Unity3DShaderState::setUniformVec4(const std::string& uniformName, const MATH::Vector4f& value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec4(value);
     }
 
-    void GLShaderState::setUniformVec4(GLint uniformLocation, const MATH::Vector4f& value) {
+    void Unity3DShaderState::setUniformVec4(GLint uniformLocation, const MATH::Vector4f& value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec4(value);
     }
 
-    void GLShaderState::setUniformVec4v(const std::string& uniformName, uint64 size, const MATH::Vector4f* value) {
+    void Unity3DShaderState::setUniformVec4v(const std::string& uniformName, uint64 size, const MATH::Vector4f* value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec4v(size, value);
     }
 
-    void GLShaderState::setUniformVec4v(GLint uniformLocation, uint64 size, const MATH::Vector4f* pointer) {
+    void Unity3DShaderState::setUniformVec4v(GLint uniformLocation, uint64 size, const MATH::Vector4f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec4v(size, pointer);
     }
 
-    void GLShaderState::setUniformMat4(const std::string& uniformName, const MATH::Matrix4& value) {
+    void Unity3DShaderState::setUniformMat4(const std::string& uniformName, const MATH::Matrix4& value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setMat4(value);
     }
 
-    void GLShaderState::setUniformMat4(GLint uniformLocation, const MATH::Matrix4& value) {
+    void Unity3DShaderState::setUniformMat4(GLint uniformLocation, const MATH::Matrix4& value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setMat4(value);
     }
 
-    void GLShaderState::setUniformTexture(const std::string& uniformName, GLuint textureId) {
+    void Unity3DShaderState::setUniformTexture(const std::string& uniformName, GLuint textureId) {
         auto v = getUniformValue(uniformName);
         if (v) {
             if (boundTextureUnits_.find(uniformName) != boundTextureUnits_.end()) {
@@ -532,7 +532,7 @@ namespace GRAPH
         }
     }
 
-    void GLShaderState::setUniformTexture(GLint uniformLocation, GLuint textureId) {
+    void Unity3DShaderState::setUniformTexture(GLint uniformLocation, GLuint textureId) {
         auto v = getUniformValue(uniformLocation);
         if (v) {
             if (boundTextureUnits_.find(v->uniform_->name) != boundTextureUnits_.end()) {
@@ -545,25 +545,25 @@ namespace GRAPH
         }
     }
 
-    GLShaderStateCache::GLShaderStateCache() {
+    Unity3DShaderStateCache::Unity3DShaderStateCache() {
     }
 
-    GLShaderStateCache::~GLShaderStateCache() {
+    Unity3DShaderStateCache::~Unity3DShaderStateCache() {
         glShaderStates_.clear();
     }
 
-    GLShaderStateCache& GLShaderStateCache::getInstance() {
-        static GLShaderStateCache instance;
+    Unity3DShaderStateCache& Unity3DShaderStateCache::getInstance() {
+        static Unity3DShaderStateCache instance;
         return instance;
     }
 
-    GLShaderState* GLShaderStateCache::getGLShaderState(Unity3DGLShaderSet* u3dShader) {
+    Unity3DShaderState* Unity3DShaderStateCache::getGLShaderState(Unity3DShaderSet* u3dShader) {
         const auto& itr = glShaderStates_.find(u3dShader);
         if (itr != glShaderStates_.end()) {
             return itr->second;
         }
 
-        auto ret = new (std::nothrow) GLShaderState;
+        auto ret = new (std::nothrow) Unity3DShaderState;
         if(ret && ret->init(u3dShader)) {
             glShaderStates_.insert(u3dShader, ret);
             ret->release();
@@ -574,7 +574,7 @@ namespace GRAPH
         return ret;
     }
 
-    void GLShaderStateCache::removeUnusedGLShaderState() {
+    void Unity3DShaderStateCache::removeUnusedGLShaderState() {
         for( auto it=glShaderStates_.cbegin(); it != glShaderStates_.cend(); /* nothing */) {
             auto value = it->second;
             if( value->getReferenceCount() == 1 ) {
@@ -586,7 +586,7 @@ namespace GRAPH
         }
     }
 
-    void GLShaderStateCache::removeAllGLShaderState() {
+    void Unity3DShaderStateCache::removeAllGLShaderState() {
         glShaderStates_.clear();
     }
 }

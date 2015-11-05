@@ -3,7 +3,7 @@
 #include "GRAPH/Sprite.h"
 #include "GRAPH/EventDispatcher.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
-#include "GRAPH/UNITY3D/GLShaderState.h"
+#include "GRAPH/UNITY3D/Unity3DShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/TextureAtlas.h"
@@ -247,31 +247,31 @@ namespace GRAPH
             {
             case LabelEffect::NORMAL:
                 if (_useDistanceField)
-                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL));
+                    setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL));
                 else if (_useA8Shader)
-                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_NORMAL));
+                    setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_NORMAL));
                 else if (_shadowEnabled)
-                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR));
+                    setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR));
                 else
-                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
+                    setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
 
                 break;
             case LabelEffect::OUTLINE:
-                setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_OUTLINE));
-                _uniformEffectColor = glGetUniformLocation(getU3DShader()->getProgram(), "u_effectColor");
+                setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_OUTLINE));
+                _uniformEffectColor = getU3DShader()->getUniformLocation("u_effectColor");
                 break;
             case LabelEffect::GLOW:
                 if (_useDistanceField)
                 {
-                    setGLShaderState(GLShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW));
-                    _uniformEffectColor = glGetUniformLocation(getU3DShader()->getProgram(), "u_effectColor");
+                    setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW));
+                    _uniformEffectColor = getU3DShader()->getUniformLocation("u_effectColor");
                 }
                 break;
             default:
                 return;
             }
 
-            _uniformTextColor = glGetUniformLocation(getU3DShader()->getProgram(), "u_textColor");
+            _uniformTextColor = getU3DShader()->getUniformLocation("u_textColor");
         }
 
         void Label::setFontAtlas(FontAtlas* atlas,bool distanceFieldEnabled /* = false */, bool useA8Shader /* = false */)
@@ -871,7 +871,7 @@ namespace GRAPH
             _contentDirty = false;
         }
 
-        void Label::onDrawShadow(Unity3DGLShaderSet* u3dShader)
+        void Label::onDrawShadow(Unity3DShaderSet* u3dShader)
         {
             Color3B oldColor = realColor_;
             GLubyte oldOPacity = displayedOpacity_;
