@@ -9,7 +9,6 @@
 #include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "IO/FileUtils.h"
 #include "UTILS/STRING/UTFUtils.h"
-#include "GRAPH/Sprite.h"
 
 namespace GRAPH
 {

@@ -1,5 +1,4 @@
 #include "GRAPH/UI/CONTROLS/UIText.h"
-#include "GRAPH/Sprite.h"
 #include "IO/FileUtils.h"
 
 namespace GRAPH
