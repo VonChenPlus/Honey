@@ -2,7 +2,6 @@
 #include "GRAPH/Director.h"
 #include "GRAPH/Scheduler.h"
 #include "GRAPH/UNITY3D/TextureCache.h"
-#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "IMAGE/ImageConvert.h"
 #include "IO/FileUtils.h"
 

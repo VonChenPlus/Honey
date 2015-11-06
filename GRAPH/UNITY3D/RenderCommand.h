@@ -104,7 +104,7 @@ namespace GRAPH
         inline GLuint getTextureID() const { return textureID_; }
         inline V3F_C4B_T2F_Quad* getQuads() const { return quads_; }
         inline uint64 getQuadCount() const { return quadsCount_; }
-        inline ShaderState* getGLShaderState() const { return glShaderState_; }
+        inline ShaderState* getShaderState() const { return shaderState_; }
         inline BlendFunc getBlendType() const { return blendType_; }
         inline const MATH::Matrix4& getModelView() const { return matrix4_; }
 
@@ -113,7 +113,7 @@ namespace GRAPH
 
         uint32_t materialID_;
         GLuint textureID_;
-        ShaderState* glShaderState_;
+        ShaderState* shaderState_;
         BlendFunc blendType_;
         V3F_C4B_T2F_Quad* quads_;
         uint64 quadsCount_;
@@ -143,7 +143,7 @@ namespace GRAPH
         inline uint64 getIndexCount() const { return _triangles.indexCount; }
         inline const V3F_C4B_T2F* getVertices() const { return _triangles.verts; }
         inline const unsigned short* getIndices() const { return _triangles.indices; }
-        inline ShaderState* getGLShaderState() const { return glShaderState_; }
+        inline ShaderState* getShaderState() const { return shaderState_; }
         inline BlendFunc getBlendType() const { return blendType_; }
         inline const MATH::Matrix4& getModelView() const { return matrix4_; }
 
@@ -152,7 +152,7 @@ namespace GRAPH
 
         uint32_t materialID_;
         GLuint textureID_;
-        ShaderState* glShaderState_;
+        ShaderState* shaderState_;
         BlendFunc blendType_;
         Triangles _triangles;
         MATH::Matrix4 matrix4_;

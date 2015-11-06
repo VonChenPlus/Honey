@@ -49,18 +49,17 @@ namespace GRAPH
         uint64 knownSize_;
     };
 
-    class Unity3DGLVertexFormat : public Unity3DVertexFormat
+    class Unity3DGLVertexFormat final : public Unity3DVertexFormat
     {
     public:
-        Unity3DGLVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride);
-        void apply(const void *base = nullptr);
-        void unApply();
+        Unity3DGLVertexFormat(const Unity3DVertexComponent &component);
+        Unity3DGLVertexFormat(const std::vector<Unity3DVertexComponent> &components);
+        void apply(const void *base = nullptr) override;
+        void unApply() override;
         void compile();
 
-    private:
-        std::vector<Unity3DVertexComponent> components_;
+    protected:
         int semanticsMask_;
-        int stride_;
     };
 
     static const uint32 primToGL [] =
@@ -129,7 +128,8 @@ namespace GRAPH
         static Unity3DShaderSet *CreateShaderSet(Unity3DShader *vshader, Unity3DShader *fshader);
         static Unity3DShaderSet *CreateShaderSetWithByteArray(const std::string &vShaderByteArray, const std::string &fShaderByteArray, const std::string& compileTimeDefines = std::string());
         static Unity3DShaderSet *CreateShaderSetWithFileName(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines = std::string());
-        static Unity3DVertexFormat *CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride);
+        static Unity3DVertexFormat *CreateVertexFormat(const Unity3DVertexComponent &component);
+        static Unity3DVertexFormat *CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components);
         static Unity3DTexture *CreateTexture(U3DTextureType type = LINEAR2D, bool antialias = true);
     };
 }

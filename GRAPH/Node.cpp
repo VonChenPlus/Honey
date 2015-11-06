@@ -9,7 +9,6 @@
 #include "GRAPH/EventDispatcher.h"
 #include "GRAPH/Component.h"
 #include "GRAPH/Camera.h"
-#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/ShaderState.h"
 
 namespace GRAPH
@@ -118,7 +117,7 @@ namespace GRAPH
         , hashOfName_(0)
         , userData_(nullptr)
         , userObject_(nullptr)
-        , glShaderState_(nullptr)
+        , shaderState_(nullptr)
         , orderOfArrival_(0)
         , running_(false)
         , visible_(true)
@@ -155,7 +154,7 @@ namespace GRAPH
 
     Node::~Node() {
         SAFE_RELEASE_NULL(userObject_);
-        SAFE_RELEASE_NULL(glShaderState_);
+        SAFE_RELEASE_NULL(shaderState_);
 
         for (auto& child : children_) {
             child->parent_ = nullptr;
@@ -622,32 +621,32 @@ namespace GRAPH
 
     ShaderState* Node::getU3DShaderState() const
     {
-        return glShaderState_;
+        return shaderState_;
     }
 
-    void Node::setU3DShaderState(ShaderState* glShaderState)
+    void Node::setU3DShaderState(ShaderState* shaderState)
     {
-        if (glShaderState != glShaderState_)
+        if (shaderState != shaderState_)
         {
-            SAFE_RELEASE(glShaderState_);
-            glShaderState_ = glShaderState;
-            SAFE_RETAIN(glShaderState_);
+            SAFE_RELEASE(shaderState_);
+            shaderState_ = shaderState;
+            SAFE_RETAIN(shaderState_);
         }
     }
 
     void Node::setU3DShader(Unity3DShaderSet* u3dShader)
     {
-        if (glShaderState_ == nullptr || (glShaderState_ && glShaderState_->getU3DShader() != u3dShader))
+        if (shaderState_ == nullptr || (shaderState_ && shaderState_->getU3DShader() != u3dShader))
         {
-            SAFE_RELEASE(glShaderState_);
-            glShaderState_ = ShaderState::getOrCreateWithGLShader(u3dShader);
-            glShaderState_->retain();
+            SAFE_RELEASE(shaderState_);
+            shaderState_ = ShaderState::getOrCreateWithShader(u3dShader);
+            shaderState_->retain();
         }
     }
 
     Unity3DShaderSet * Node::getU3DShader() const
     {
-        return glShaderState_ ? glShaderState_->getU3DShader() : nullptr;
+        return shaderState_ ? shaderState_->getU3DShader() : nullptr;
     }
 
     MATH::Rectf Node::getBoundingBox() const

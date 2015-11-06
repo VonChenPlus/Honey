@@ -1,7 +1,6 @@
 #include <stdarg.h>
 #include "GRAPH/UI/UILayer.h"
 #include "GRAPH/Director.h"
-#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/ShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
@@ -187,7 +186,7 @@ namespace GRAPH
                 updateColor();
                 setContentSize(MATH::Sizef(w, h));
 
-                setU3DShaderState(ShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_COLOR_NO_MVP));
+                setU3DShaderState(ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_POSITION_COLOR_NO_MVP));
                 return true;
             }
             return false;

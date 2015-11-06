@@ -161,7 +161,7 @@ namespace GRAPH
         virtual void setU3DShader(Unity3DShaderSet *u3dShader);
 
         ShaderState *getU3DShaderState() const;
-        virtual void setU3DShaderState(ShaderState *glShaderState);
+        virtual void setU3DShaderState(ShaderState *shaderState);
 
         virtual bool isRunning() const;
 
@@ -363,7 +363,7 @@ namespace GRAPH
         void *userData_;
         HObject *userObject_;
 
-        ShaderState *glShaderState_;
+        ShaderState *shaderState_;
 
         int orderOfArrival_;
 

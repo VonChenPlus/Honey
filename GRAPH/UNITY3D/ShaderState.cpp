@@ -17,15 +17,10 @@ namespace GRAPH
     }
 
     UniformValue::~UniformValue() {
-        if (type_ == Type::CALLBACK_FN)
-            delete value_.callback;
     }
 
     void UniformValue::apply() {
-        if (type_ == Type::CALLBACK_FN) {
-            (*value_.callback)(u3dShader_, uniform_);
-        }
-        else if (type_ == Type::POINTER) {
+        if (type_ == Type::POINTER) {
             switch (uniform_->type) {
                 case GL_FLOAT:
                     u3dShader_->setUniformLocationWith1fv(uniform_->location, value_.floatv.pointer, value_.floatv.size);
@@ -87,16 +82,6 @@ namespace GRAPH
                     break;
             }
         }
-    }
-
-    void UniformValue::setCallback(const std::function<void(Unity3DShaderSet*, U3DUniform*)> &callback) {
-        if (type_ == Type::CALLBACK_FN)
-            delete value_.callback;
-
-        value_.callback = new std::function<void(Unity3DShaderSet*, U3DUniform*)>();
-        *value_.callback = callback;
-
-        type_ = Type::CALLBACK_FN;
     }
 
     void UniformValue::setTexture(GLuint textureId, GLuint textureUnit) {
@@ -162,51 +147,37 @@ namespace GRAPH
     }
 
     VertexAttribValue::VertexAttribValue()
-        : vertexAttrib_(nullptr)
-        , useCallback_(false)
+        : vertexFormat_(nullptr)
         , enabled_(false) {
     }
 
     VertexAttribValue::VertexAttribValue(U3DVertexAttrib *vertexAttrib)
         : vertexAttrib_(vertexAttrib)
-        , useCallback_(false)
+        , vertexFormat_(nullptr)
         , enabled_(false) {
+        vertexFormat_ = Unity3DCreator::CreateVertexFormat(Unity3DVertexComponent((U3DSemantic) vertexAttrib->index, CUSTOM));
     }
 
     VertexAttribValue::~VertexAttribValue() {
-        if (useCallback_)
-            delete value_.callback;
+        SAFE_RELEASE(vertexFormat_);
     }
 
     void VertexAttribValue::apply() {
         if(enabled_) {
-            if(useCallback_) {
-                (*value_.callback)(vertexAttrib_);
-            }
-            else {
-                glVertexAttribPointer(vertexAttrib_->index,
-                                      value_.pointer.size,
-                                      value_.pointer.type,
-                                      value_.pointer.normalized,
-                                      value_.pointer.stride,
-                                      value_.pointer.pointer);
-            }
+            vertexFormat_->apply();
         }
     }
 
-    void VertexAttribValue::setCallback(const std::function<void(U3DVertexAttrib*)> &callback) {
-        value_.callback = new std::function<void(U3DVertexAttrib*)>();
-        *value_.callback = callback;
-        useCallback_ = true;
-        enabled_ = true;
-    }
+    void VertexAttribValue::setPointer(uint8 size, U3DVertexDataType type, bool normalized, int stride, intptr pointer) {
+        if (vertexFormat_->components().size() != 1) {
+            throw _HException_Normal("UnException VertexFormat Component Number!");
+        }
 
-    void VertexAttribValue::setPointer(GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid *pointer) {
-        value_.pointer.size = size;
-        value_.pointer.type = type;
-        value_.pointer.normalized = normalized;
-        value_.pointer.stride = stride;
-        value_.pointer.pointer = pointer;
+        vertexFormat_->components()[0].size = size;
+        vertexFormat_->components()[0].type = type;
+        vertexFormat_->components()[0].normalized = normalized;
+        vertexFormat_->components()[0].stride = stride;
+        vertexFormat_->components()[0].offset = pointer;
         enabled_ = true;
     }
 
@@ -222,16 +193,16 @@ namespace GRAPH
         return nullptr;
     }
 
-    ShaderState* ShaderState::getOrCreateWithGLShaderName(const std::string& glShaderName ) {
-        Unity3DShaderSet *u3dShader = ShaderCache::getInstance().getU3DShader(glShaderName);
+    ShaderState* ShaderState::getOrCreateWithShaderName(const std::string& shaderName ) {
+        Unity3DShaderSet *u3dShader = ShaderCache::getInstance().getU3DShader(shaderName);
         if( u3dShader )
-            return getOrCreateWithGLShader(u3dShader);
+            return getOrCreateWithShader(u3dShader);
 
         return nullptr;
     }
 
-    ShaderState* ShaderState::getOrCreateWithGLShader(Unity3DShaderSet *u3dShader) {
-        ShaderState* ret = ShaderStateCache::getInstance().getGLShaderState(u3dShader);
+    ShaderState* ShaderState::getOrCreateWithShader(Unity3DShaderSet *u3dShader) {
+        ShaderState* ret = ShaderStateCache::getInstance().getShaderState(u3dShader);
         return ret;
     }
 
@@ -250,7 +221,6 @@ namespace GRAPH
     ShaderState::ShaderState()
         : uniformAttributeValueDirty_(true)
         , textureUnitIndex_(4)  // first 4 textures unites are reserved for _Texture0-3
-        , vertexAttribsFlags_(0)
         , u3dShader_(nullptr) {
     }
 
@@ -276,7 +246,7 @@ namespace GRAPH
         return true;
     }
 
-    void ShaderState::resetGLShader() {
+    void ShaderState::resetU3DShader() {
         SAFE_RELEASE(u3dShader_);
         u3dShader_ = nullptr;
         uniforms_.clear();
@@ -296,15 +266,11 @@ namespace GRAPH
                 uniforms_[uniformLocation.second].uniform_ = u3dShader_->userUniform(uniformLocation.first);
             }
 
-            vertexAttribsFlags_ = 0;
             for(auto& attributeValue : attributes_) {
-                attributeValue.second.vertexAttrib_ = u3dShader_->vertexAttrib(attributeValue.first);;
-                if(attributeValue.second.enabled_)
-                    vertexAttribsFlags_ |= 1 << attributeValue.second.vertexAttrib_->index;
+                attributeValue.second.vertexAttrib_ = u3dShader_->vertexAttrib(attributeValue.first);
             }
 
             uniformAttributeValueDirty_ = false;
-
         }
     }
 
@@ -314,14 +280,10 @@ namespace GRAPH
         u3dShader_->setUniformsForBuiltins(modelView);
     }
 
-    void ShaderState::applyAttributes(bool applyAttribFlags) {
+    void ShaderState::applyAttributes() {
         updateUniformsAndAttributes();
-        if(vertexAttribsFlags_) {
-            if (applyAttribFlags)
-                GLStateCache::EnableVertexAttribs(vertexAttribsFlags_);
-            for(auto &attribute : attributes_) {
-                attribute.second.apply();
-            }
+        for(auto &attribute : attributes_) {
+            attribute.second.apply();
         }
     }
     void ShaderState::applyUniforms() {
@@ -331,22 +293,14 @@ namespace GRAPH
         }
     }
 
-    void ShaderState::setGLShader(Unity3DShaderSet *u3dShader) {
+    void ShaderState::setU3DShader(Unity3DShaderSet *u3dShader) {
         if( u3dShader_ != u3dShader) {
-            resetGLShader();
+            resetU3DShader();
             init(u3dShader);
         }
     }
 
-    uint32_t ShaderState::getVertexAttribsFlags() const {
-        return vertexAttribsFlags_;
-    }
-
-    uint64 ShaderState::getVertexAttribCount() const {
-        return attributes_.size();
-    }
-
-    UniformValue* ShaderState::getUniformValue(GLint uniformLocation) {
+    UniformValue* ShaderState::getUniformValue(int32 uniformLocation) {
         updateUniformsAndAttributes();
         const auto itr = uniforms_.find(uniformLocation);
         if (itr != uniforms_.end())
@@ -370,32 +324,11 @@ namespace GRAPH
         return nullptr;
     }
 
-    void ShaderState::setVertexAttribCallback(const std::string& name, const std::function<void(U3DVertexAttrib*)> &callback) {
-        VertexAttribValue *v = getVertexAttribValue(name);
-        if(v) {
-            v->setCallback(callback);
-            vertexAttribsFlags_ |= 1 << v->vertexAttrib_->index;
-        }
-    }
-
-    void ShaderState::setVertexAttribPointer(const std::string& name, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid *pointer) {
+    void ShaderState::setVertexAttribPointer(const std::string& name, uint8 size, U3DVertexDataType type, bool normalized, int stride, intptr pointer) {
         auto v = getVertexAttribValue(name);
         if(v) {
             v->setPointer(size, type, normalized, stride, pointer);
-            vertexAttribsFlags_ |= 1 << v->vertexAttrib_->index;
         }
-    }
-
-    void ShaderState::setUniformCallback(const std::string& uniformName, const std::function<void(Unity3DShaderSet*, U3DUniform*)> &callback) {
-        auto v = getUniformValue(uniformName);
-        if (v)
-            v->setCallback(callback);
-    }
-
-    void ShaderState::setUniformCallback(GLint uniformLocation, const std::function<void(Unity3DShaderSet*, U3DUniform*)> &callback) {
-        auto v = getUniformValue(uniformLocation);
-        if (v)
-            v->setCallback(callback);
     }
 
     void ShaderState::setUniformFloat(const std::string& uniformName, float value) {
@@ -404,7 +337,7 @@ namespace GRAPH
             v->setFloat(value);
     }
 
-    void ShaderState::setUniformFloat(GLint uniformLocation, float value) {
+    void ShaderState::setUniformFloat(int32 uniformLocation, float value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setFloat(value);
@@ -416,7 +349,7 @@ namespace GRAPH
             v->setInt(value);
     }
 
-    void ShaderState::setUniformInt(GLint uniformLocation, int value) {
+    void ShaderState::setUniformInt(int32 uniformLocation, int value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setInt(value);
@@ -429,7 +362,7 @@ namespace GRAPH
             v->setFloatv(size, pointer);
     }
 
-    void ShaderState::setUniformFloatv(GLint uniformLocation, uint64 size, const float* pointer) {
+    void ShaderState::setUniformFloatv(int32 uniformLocation, uint64 size, const float* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setFloatv(size, pointer);
@@ -441,7 +374,7 @@ namespace GRAPH
             v->setVec2(value);
     }
 
-    void ShaderState::setUniformVec2(GLint uniformLocation, const MATH::Vector2f& value) {
+    void ShaderState::setUniformVec2(int32 uniformLocation, const MATH::Vector2f& value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec2(value);
@@ -453,7 +386,7 @@ namespace GRAPH
             v->setVec2v(size, pointer);
     }
 
-    void ShaderState::setUniformVec2v(GLint uniformLocation, uint64 size, const MATH::Vector2f* pointer) {
+    void ShaderState::setUniformVec2v(int32 uniformLocation, uint64 size, const MATH::Vector2f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec2v(size, pointer);
@@ -465,7 +398,7 @@ namespace GRAPH
             v->setVec3(value);
     }
 
-    void ShaderState::setUniformVec3(GLint uniformLocation, const MATH::Vector3f& value) {
+    void ShaderState::setUniformVec3(int32 uniformLocation, const MATH::Vector3f& value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec3(value);
@@ -477,7 +410,7 @@ namespace GRAPH
             v->setVec3v(size, pointer);
     }
 
-    void ShaderState::setUniformVec3v(GLint uniformLocation, uint64 size, const MATH::Vector3f* pointer) {
+    void ShaderState::setUniformVec3v(int32 uniformLocation, uint64 size, const MATH::Vector3f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec3v(size, pointer);
@@ -489,7 +422,7 @@ namespace GRAPH
             v->setVec4(value);
     }
 
-    void ShaderState::setUniformVec4(GLint uniformLocation, const MATH::Vector4f& value) {
+    void ShaderState::setUniformVec4(int32 uniformLocation, const MATH::Vector4f& value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec4(value);
@@ -501,7 +434,7 @@ namespace GRAPH
             v->setVec4v(size, value);
     }
 
-    void ShaderState::setUniformVec4v(GLint uniformLocation, uint64 size, const MATH::Vector4f* pointer) {
+    void ShaderState::setUniformVec4v(int32 uniformLocation, uint64 size, const MATH::Vector4f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec4v(size, pointer);
@@ -513,7 +446,7 @@ namespace GRAPH
             v->setMat4(value);
     }
 
-    void ShaderState::setUniformMat4(GLint uniformLocation, const MATH::Matrix4& value) {
+    void ShaderState::setUniformMat4(int32 uniformLocation, const MATH::Matrix4& value) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setMat4(value);
@@ -532,7 +465,7 @@ namespace GRAPH
         }
     }
 
-    void ShaderState::setUniformTexture(GLint uniformLocation, GLuint textureId) {
+    void ShaderState::setUniformTexture(int32 uniformLocation, GLuint textureId) {
         auto v = getUniformValue(uniformLocation);
         if (v) {
             if (boundTextureUnits_.find(v->uniform_->name) != boundTextureUnits_.end()) {
@@ -549,7 +482,7 @@ namespace GRAPH
     }
 
     ShaderStateCache::~ShaderStateCache() {
-        glShaderStates_.clear();
+        shaderStates_.clear();
     }
 
     ShaderStateCache& ShaderStateCache::getInstance() {
@@ -557,15 +490,15 @@ namespace GRAPH
         return instance;
     }
 
-    ShaderState* ShaderStateCache::getGLShaderState(Unity3DShaderSet* u3dShader) {
-        const auto& itr = glShaderStates_.find(u3dShader);
-        if (itr != glShaderStates_.end()) {
+    ShaderState* ShaderStateCache::getShaderState(Unity3DShaderSet* u3dShader) {
+        const auto& itr = shaderStates_.find(u3dShader);
+        if (itr != shaderStates_.end()) {
             return itr->second;
         }
 
         auto ret = new (std::nothrow) ShaderState;
         if(ret && ret->init(u3dShader)) {
-            glShaderStates_.insert(u3dShader, ret);
+            shaderStates_.insert(u3dShader, ret);
             ret->release();
             return ret;
         }
@@ -574,11 +507,11 @@ namespace GRAPH
         return ret;
     }
 
-    void ShaderStateCache::removeUnusedGLShaderState() {
-        for( auto it=glShaderStates_.cbegin(); it != glShaderStates_.cend(); /* nothing */) {
+    void ShaderStateCache::removeUnusedShaderState() {
+        for( auto it=shaderStates_.cbegin(); it != shaderStates_.cend(); /* nothing */) {
             auto value = it->second;
             if( value->getReferenceCount() == 1 ) {
-                glShaderStates_.erase(it++);
+                shaderStates_.erase(it++);
             }
             else {
                 ++it;
@@ -586,7 +519,7 @@ namespace GRAPH
         }
     }
 
-    void ShaderStateCache::removeAllGLShaderState() {
-        glShaderStates_.clear();
+    void ShaderStateCache::removeAllShaderState() {
+        shaderStates_.clear();
     }
 }

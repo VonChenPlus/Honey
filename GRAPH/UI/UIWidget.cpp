@@ -3,7 +3,6 @@
 #include "GRAPH/EventListener.h"
 #include "GRAPH/EventDispatcher.h"
 #include "GRAPH/EventDispatcher.h"
-#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/ShaderState.h"
 #include "GRAPH/UI/UILayout.h"
 
@@ -1199,17 +1198,17 @@ namespace GRAPH
             }
         }
 
-        ShaderState* Widget::getNormalGLShaderState()const
+        ShaderState* Widget::getNormalShaderState()const
         {
             ShaderState *glState = nullptr;
-            glState = ShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
+            glState = ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
             return glState;
         }
 
-        ShaderState* Widget::getGrayGLShaderState()const
+        ShaderState* Widget::getGrayShaderState()const
         {
             ShaderState *glState = nullptr;
-            glState = ShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_GRAYSCALE);
+            glState = ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_POSITION_GRAYSCALE);
             return glState;
         }
 

@@ -79,13 +79,14 @@ namespace GRAPH
         STREAM = 16,
     };
 
-    enum U3DVertexDataType : uint8
+    enum U3DVertexDataType : uint32
     {
         INVALID,
         FLOATx2,
         FLOATx3,
         FLOATx4,
         UNORM8x4,
+        CUSTOM,
     };
 
     enum U3DSemantic : int
@@ -227,20 +228,33 @@ namespace GRAPH
 
     struct Unity3DVertexComponent
     {
-        Unity3DVertexComponent() : type(U3DVertexDataType::INVALID), semantic(255), offset(255) {}
-        Unity3DVertexComponent(U3DSemantic semantic, U3DVertexDataType dataType, uint8 offset) {
-            this->semantic = semantic;
+        Unity3DVertexComponent() : semantic(255), type(U3DVertexDataType::INVALID), size(0), offset(0), stride(0), normalized(false) {}
+        Unity3DVertexComponent(U3DSemantic semantic, U3DVertexDataType dataType, int stride = 0, intptr offset = 0) {
             this->type = dataType;
+            this->semantic = semantic;
+            this->stride = stride;
             this->offset = offset;
+            this->size = 0;
+            this->normalized = false;
         }
-        U3DVertexDataType type;
         uint8 semantic;
-        uint8 offset;
+        U3DVertexDataType type;
+        uint8 size;
+        intptr offset;
+        int stride;
+        bool normalized;
     };
 
     class Unity3DVertexFormat : public Unity3DObject
     {
     public:
+        virtual void apply(const void *base = nullptr) = 0;
+        virtual void unApply() = 0;
+
+        std::vector<Unity3DVertexComponent> &components() { return components_; }
+
+    protected:
+        std::vector<Unity3DVertexComponent> components_;
     };
 
     struct U3DVertexAttrib
@@ -437,7 +451,8 @@ namespace GRAPH
         static Unity3DShaderSet *CreateShaderSet(Unity3DShader *vshader, Unity3DShader *fshader);
         static Unity3DShaderSet *CreateShaderSetWithByteArray(const std::string &vShaderByteArray, const std::string &fShaderByteArray, const std::string& compileTimeDefines = std::string());
         static Unity3DShaderSet *CreateShaderSetWithFileName(const std::string &vShaderFilename, const std::string &fShaderFilename, const std::string& compileTimeDefines = std::string());
-        static Unity3DVertexFormat *CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride);
+        static Unity3DVertexFormat *CreateVertexFormat(const Unity3DVertexComponent &component);
+        static Unity3DVertexFormat *CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components);
         static Unity3DTexture *CreateTexture(U3DTextureType type = LINEAR2D, bool antialias = true);
     };
 }

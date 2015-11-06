@@ -308,8 +308,7 @@ namespace GRAPH
     void Unity3DGLShaderSet::setUniformLocationWith1i(int location, int i1) {
         bool updated = updateUniformLocation(location, &i1, sizeof(i1) * 1);
 
-        if (updated)
-        {
+        if (updated) {
             glUniform1i((GLint) location, i1);
         }
     }
@@ -546,6 +545,7 @@ namespace GRAPH
         else {
             GLchar ErrorLog[1024];
             glGetProgramInfoLog(program_, sizeof(ErrorLog), NULL, ErrorLog);
+            throw _HException_(UTILS::STRING::StringFromFormat(ErrorLog), HException::GRAPH);
         }
     }
 
@@ -584,6 +584,7 @@ namespace GRAPH
         else {
             GLchar ErrorLog[1024];
             glGetProgramInfoLog(program_, sizeof(ErrorLog), NULL, ErrorLog);
+            throw _HException_(UTILS::STRING::StringFromFormat(ErrorLog), HException::GRAPH);
         }
     }
 

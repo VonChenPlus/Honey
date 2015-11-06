@@ -95,9 +95,12 @@ namespace GRAPH
         }
     }
 
-    Unity3DGLVertexFormat::Unity3DGLVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) {
+    Unity3DGLVertexFormat::Unity3DGLVertexFormat(const Unity3DVertexComponent &component) {
+        components_.push_back(component);
+    }
+
+    Unity3DGLVertexFormat::Unity3DGLVertexFormat(const std::vector<Unity3DVertexComponent> &components) {
         components_ = components;
-        stride_ = stride;
     }
 
     void Unity3DGLVertexFormat::apply(const void *base) {
@@ -111,19 +114,21 @@ namespace GRAPH
         for (uint64 i = 0; i < components_.size(); i++) {
             switch (components_[i].type) {
             case FLOATx2:
-                glVertexAttribPointer(components_[i].semantic, 2, GL_FLOAT, GL_FALSE, stride_, (void *) (b + (intptr) components_[i].offset));
+                glVertexAttribPointer(components_[i].semantic, 2, GL_FLOAT, GL_FALSE, components_[i].stride, (void *) (b + (intptr) components_[i].offset));
                 break;
             case FLOATx3:
-                glVertexAttribPointer(components_[i].semantic, 3, GL_FLOAT, GL_FALSE, stride_, (void *) (b + (intptr) components_[i].offset));
+                glVertexAttribPointer(components_[i].semantic, 3, GL_FLOAT, GL_FALSE, components_[i].stride, (void *) (b + (intptr) components_[i].offset));
                 break;
             case FLOATx4:
-                glVertexAttribPointer(components_[i].semantic, 4, GL_FLOAT, GL_FALSE, stride_, (void *) (b + (intptr) components_[i].offset));
+                glVertexAttribPointer(components_[i].semantic, 4, GL_FLOAT, GL_FALSE, components_[i].stride, (void *) (b + (intptr) components_[i].offset));
                 break;
             case UNORM8x4:
-                glVertexAttribPointer(components_[i].semantic, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride_, (void *) (b + (intptr) components_[i].offset));
+                glVertexAttribPointer(components_[i].semantic, 4, GL_UNSIGNED_BYTE, GL_TRUE, components_[i].stride, (void *) (b + (intptr) components_[i].offset));
                 break;
             case INVALID:
                 throw _HException_Normal("Unity3DGLVertexFormat: Invalid component type applied");
+            default:
+                glVertexAttribPointer(components_[i].semantic, components_[i].size, components_[i].type, components_[i].normalized, components_[i].stride, (void *) (b + (intptr) components_[i].offset));
             }
         }
     }
@@ -401,8 +406,14 @@ namespace GRAPH
         return shaderSet;
     }
 
-    Unity3DVertexFormat *Unity3DGLCreator::CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) {
-        Unity3DGLVertexFormat *vertexFormat = new Unity3DGLVertexFormat(components, stride);
+    Unity3DVertexFormat *Unity3DGLCreator::CreateVertexFormat(const Unity3DVertexComponent &component) {
+        Unity3DGLVertexFormat *vertexFormat = new Unity3DGLVertexFormat(component);
+        vertexFormat->compile();
+        return vertexFormat;
+    }
+
+    Unity3DVertexFormat *Unity3DGLCreator::CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components) {
+        Unity3DGLVertexFormat *vertexFormat = new Unity3DGLVertexFormat(components);
         vertexFormat->compile();
         return vertexFormat;
     }

@@ -284,8 +284,8 @@ namespace GRAPH
             _backGroundBoxDisabledRenderer->setVisible(false);
             _frontCrossDisabledRenderer->setVisible(false);
 
-            _backGroundBoxRenderer->setU3DShaderState(this->getNormalGLShaderState());
-            _frontCrossRenderer->setU3DShaderState(this->getNormalGLShaderState());
+            _backGroundBoxRenderer->setU3DShaderState(this->getNormalShaderState());
+            _frontCrossRenderer->setU3DShaderState(this->getNormalShaderState());
 
 
             _backGroundBoxRenderer->setScale(_backgroundTextureScaleX, _backgroundTextureScaleY);
@@ -301,8 +301,8 @@ namespace GRAPH
 
         void AbstractCheckButton::onPressStateChangedToPressed()
         {
-            _backGroundBoxRenderer->setU3DShaderState(this->getNormalGLShaderState());
-            _frontCrossRenderer->setU3DShaderState(this->getNormalGLShaderState());
+            _backGroundBoxRenderer->setU3DShaderState(this->getNormalShaderState());
+            _frontCrossRenderer->setU3DShaderState(this->getNormalShaderState());
 
             if (!_isBackgroundSelectedTextureLoaded)
             {
@@ -325,8 +325,8 @@ namespace GRAPH
             if (!_isBackgroundDisabledTextureLoaded
                 || !_isFrontCrossDisabledTextureLoaded)
             {
-                _backGroundBoxRenderer->setU3DShaderState(this->getGrayGLShaderState());
-                _frontCrossRenderer->setU3DShaderState(this->getGrayGLShaderState());
+                _backGroundBoxRenderer->setU3DShaderState(this->getGrayShaderState());
+                _frontCrossRenderer->setU3DShaderState(this->getGrayShaderState());
             }
             else
             {

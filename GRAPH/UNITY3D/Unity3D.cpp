@@ -153,8 +153,7 @@ namespace GRAPH
     }
 
     Unity3DShaderSet *Unity3DCreator::CreateShaderSetWithFileName(const std::string &vShaderFilename, const std::string &fShaderFilename, const std::string& compileTimeDefines) {
-        switch (EngineMode)
-        {
+        switch (EngineMode) {
         case OPENGL:
             return Unity3DGLCreator::CreateShaderSetWithFileName(vShaderFilename, fShaderFilename, compileTimeDefines);
         default:
@@ -163,11 +162,20 @@ namespace GRAPH
         }
     }
 
-    Unity3DVertexFormat *Unity3DCreator::CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components, int stride) {
-        switch (EngineMode)
-        {
+    Unity3DVertexFormat *Unity3DCreator::CreateVertexFormat(const Unity3DVertexComponent &component) {
+        switch (EngineMode) {
         case OPENGL:
-            return Unity3DGLCreator::CreateVertexFormat(components, stride);
+            return Unity3DGLCreator::CreateVertexFormat(component);
+        default:
+            throw _HException_Normal("Unsupport Engine Mode!");
+            break;
+        }
+    }
+
+    Unity3DVertexFormat *Unity3DCreator::CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components) {
+        switch (EngineMode) {
+        case OPENGL:
+            return Unity3DGLCreator::CreateVertexFormat(components);
         default:
             throw _HException_Normal("Unsupport Engine Mode!");
             break;

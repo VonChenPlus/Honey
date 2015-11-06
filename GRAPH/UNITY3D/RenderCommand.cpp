@@ -1,6 +1,5 @@
 #include "GRAPH/UNITY3D/RenderCommand.h"
 #include "GRAPH/UNITY3D/Renderer.h"
-#include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/ShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/TextureAtlas.h"
@@ -79,7 +78,7 @@ namespace GRAPH
     QuadCommand::QuadCommand()
         :materialID_(0)
         ,textureID_(0)
-        ,glShaderState_(nullptr)
+        ,shaderState_(nullptr)
         ,blendType_(BlendFunc::DISABLE)
         ,quads_(nullptr)
         ,quadsCount_(0) {
@@ -95,10 +94,10 @@ namespace GRAPH
 
         matrix4_ = mv;
 
-        if( textureID_ != textureID || blendType_.src != blendType.src || blendType_.dst != blendType.dst || glShaderState_ != shader) {
+        if( textureID_ != textureID || blendType_.src != blendType.src || blendType_.dst != blendType.dst || shaderState_ != shader) {
             textureID_ = textureID;
             blendType_ = blendType;
-            glShaderState_ = shader;
+            shaderState_ = shader;
             generateMaterialID();
         }
     }
@@ -109,8 +108,8 @@ namespace GRAPH
     void QuadCommand::generateMaterialID() {
         skipBatching_ = false;
 
-        if(glShaderState_->getUniformCount() == 0) {
-            int intArray[4] = { reinterpret_cast<int>(glShaderState_->getU3DShader()), (int) textureID_, (int) blendType_.src, (int) blendType_.dst };
+        if(shaderState_->getUniformCount() == 0) {
+            int intArray[4] = { reinterpret_cast<int>(shaderState_->getU3DShader()), (int) textureID_, (int) blendType_.src, (int) blendType_.dst };
 
             materialID_ = UTILS::HASH::Fletcher((const uint8*)intArray, sizeof(intArray));
         }
@@ -127,14 +126,14 @@ namespace GRAPH
         //set blend mode
         GLStateCache::BlendFunc(blendType_.src, blendType_.dst);
 
-        glShaderState_->applyU3DShader(matrix4_);
-        glShaderState_->applyUniforms();
+        shaderState_->applyU3DShader(matrix4_);
+        shaderState_->applyUniforms();
     }
 
     TrianglesCommand::TrianglesCommand()
         :materialID_(0)
         ,textureID_(0)
-        ,glShaderState_(nullptr)
+        ,shaderState_(nullptr)
         ,blendType_(BlendFunc::DISABLE) {
         commandType_ = RenderCommand::Type::TRIANGLES_COMMAND;
     }
@@ -149,10 +148,10 @@ namespace GRAPH
         }
         matrix4_ = mv;
 
-        if( textureID_ != textureID || blendType_.src != blendType.src || blendType_.dst != blendType.dst || glShaderState_ != glProgramState) {
+        if( textureID_ != textureID || blendType_.src != blendType.src || blendType_.dst != blendType.dst || shaderState_ != glProgramState) {
             textureID_ = textureID;
             blendType_ = blendType;
-            glShaderState_ = glProgramState;
+            shaderState_ = glProgramState;
             generateMaterialID();
         }
     }
@@ -161,11 +160,11 @@ namespace GRAPH
     }
 
     void TrianglesCommand::generateMaterialID() {
-        if(glShaderState_->getUniformCount() > 0) {
+        if(shaderState_->getUniformCount() > 0) {
             materialID_ = Renderer::MATERIAL_ID_DO_NOT_BATCH;
         }
         else {
-            int intArray[4] = { reinterpret_cast<int>(glShaderState_->getU3DShader()), (int) textureID_, (int) blendType_.src, (int) blendType_.dst };
+            int intArray[4] = { reinterpret_cast<int>(shaderState_->getU3DShader()), (int) textureID_, (int) blendType_.src, (int) blendType_.dst };
 
             materialID_ = UTILS::HASH::Fletcher((const uint8*)intArray, sizeof(intArray));
         }
@@ -176,7 +175,7 @@ namespace GRAPH
         GLStateCache::BindTexture2D(textureID_);
         //set blend mode
         GLStateCache::BlendFunc(blendType_.src, blendType_.dst);
-        glShaderState_->apply(matrix4_);
+        shaderState_->apply(matrix4_);
     }
 
     CustomCommand::CustomCommand()
