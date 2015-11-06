@@ -1,5 +1,5 @@
-#ifndef GLSHADERSTATE_H
-#define GLSHADERSTATE_H
+#ifndef SHADERSTATE_H
+#define SHADERSTATE_H
 
 #include "GRAPH/UNITY3D/GLCommon.h"
 #include "GRAPH/UNITY3D/Unity3D.h"
@@ -13,7 +13,7 @@ namespace GRAPH
     class UniformValue
     {
         friend class Unity3DShaderSet;
-        friend class Unity3DShaderState;
+        friend class ShaderState;
 
     public:
         UniformValue();
@@ -87,7 +87,7 @@ namespace GRAPH
 
     class VertexAttribValue
     {
-        friend class Unity3DShaderState;
+        friend class ShaderState;
 
     public:
         VertexAttribValue(U3DVertexAttrib *vertexAttrib);
@@ -122,14 +122,14 @@ namespace GRAPH
         } value_;
     };
 
-    class Unity3DShaderState : public HObject
+    class ShaderState : public HObject
     {
-        friend class Unity3DShaderStateCache;
+        friend class ShaderStateCache;
     public:
-        static Unity3DShaderState* create(Unity3DShaderSet* u3dShader);
-        static Unity3DShaderState* getOrCreateWithGLShader(Unity3DShaderSet* u3dShader);
-        static Unity3DShaderState* getOrCreateWithGLShaderName(const std::string& glShaderName );
-        static Unity3DShaderState* getOrCreateWithShaders(const std::string& vertexShader, const std::string& fragShader, const std::string& compileTimeDefines);
+        static ShaderState* create(Unity3DShaderSet* u3dShader);
+        static ShaderState* getOrCreateWithGLShader(Unity3DShaderSet* u3dShader);
+        static ShaderState* getOrCreateWithGLShaderName(const std::string& glShaderName );
+        static ShaderState* getOrCreateWithShaders(const std::string& vertexShader, const std::string& fragShader, const std::string& compileTimeDefines);
 
         void apply(const MATH::Matrix4& modelView);
         void applyU3DShader(const MATH::Matrix4& modelView);
@@ -171,8 +171,8 @@ namespace GRAPH
         void setUniformTexture(GLint uniformLocation, GLuint textureId);
 
     protected:
-        Unity3DShaderState();
-        ~Unity3DShaderState();
+        ShaderState();
+        ~ShaderState();
         bool init(Unity3DShaderSet* program);
         void resetGLShader();
         void updateUniformsAndAttributes();
@@ -191,22 +191,22 @@ namespace GRAPH
         Unity3DShaderSet* u3dShader_;
     };
 
-    class Unity3DShaderStateCache
+    class ShaderStateCache
     {
     public:
-        static Unity3DShaderStateCache& getInstance();
+        static ShaderStateCache& getInstance();
 
-        Unity3DShaderState* getGLShaderState(Unity3DShaderSet* program);
+        ShaderState* getGLShaderState(Unity3DShaderSet* program);
         void removeAllGLShaderState();
         void removeUnusedGLShaderState();
 
     protected:
-        Unity3DShaderStateCache();
-        ~Unity3DShaderStateCache();
+        ShaderStateCache();
+        ~ShaderStateCache();
 
     private:
-        HObjectMap<Unity3DShaderSet*, Unity3DShaderState*> glShaderStates_;
+        HObjectMap<Unity3DShaderSet*, ShaderState*> glShaderStates_;
     };
 }
 
-#endif // GLSHADERSTATE_H
+#endif // SHADERSTATE_H

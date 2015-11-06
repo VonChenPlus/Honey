@@ -10,7 +10,7 @@
 #include "GRAPH/Component.h"
 #include "GRAPH/Camera.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
-#include "GRAPH/UNITY3D/Unity3DShaderState.h"
+#include "GRAPH/UNITY3D/ShaderState.h"
 
 namespace GRAPH
 {
@@ -620,12 +620,12 @@ namespace GRAPH
         userObject_ = userObject;
     }
 
-    Unity3DShaderState* Node::getU3DShaderState() const
+    ShaderState* Node::getU3DShaderState() const
     {
         return glShaderState_;
     }
 
-    void Node::setU3DShaderState(Unity3DShaderState* glShaderState)
+    void Node::setU3DShaderState(ShaderState* glShaderState)
     {
         if (glShaderState != glShaderState_)
         {
@@ -640,7 +640,7 @@ namespace GRAPH
         if (glShaderState_ == nullptr || (glShaderState_ && glShaderState_->getU3DShader() != u3dShader))
         {
             SAFE_RELEASE(glShaderState_);
-            glShaderState_ = Unity3DShaderState::getOrCreateWithGLShader(u3dShader);
+            glShaderState_ = ShaderState::getOrCreateWithGLShader(u3dShader);
             glShaderState_->retain();
         }
     }

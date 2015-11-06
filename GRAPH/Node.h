@@ -21,7 +21,7 @@ namespace GRAPH
     class Renderer;
     class Director;
     class Unity3DShaderSet;
-    class Unity3DShaderState;
+    class ShaderState;
     class Component;
     class ComponentContainer;
     class Camera;
@@ -160,8 +160,8 @@ namespace GRAPH
         Unity3DShaderSet* getU3DShader() const;
         virtual void setU3DShader(Unity3DShaderSet *u3dShader);
 
-        Unity3DShaderState *getU3DShaderState() const;
-        virtual void setU3DShaderState(Unity3DShaderState *glShaderState);
+        ShaderState *getU3DShaderState() const;
+        virtual void setU3DShaderState(ShaderState *glShaderState);
 
         virtual bool isRunning() const;
 
@@ -363,7 +363,7 @@ namespace GRAPH
         void *userData_;
         HObject *userObject_;
 
-        Unity3DShaderState *glShaderState_;
+        ShaderState *glShaderState_;
 
         int orderOfArrival_;
 

@@ -1,4 +1,4 @@
-#include "GRAPH/UNITY3D/Unity3DShaderCache.h"
+#include "GRAPH/UNITY3D/ShaderCache.h"
 #include "GRAPH/UNITY3D/GLSL.h"
 
 namespace GRAPH
@@ -25,29 +25,29 @@ namespace GRAPH
         kShaderType_MAX,
     };
 
-    Unity3DShaderCache& Unity3DShaderCache::getInstance() {
-        static Unity3DShaderCache instance;
+    ShaderCache& ShaderCache::getInstance() {
+        static ShaderCache instance;
         return instance;
     }
 
-    Unity3DShaderCache::Unity3DShaderCache()
+    ShaderCache::ShaderCache()
         : programs_() {
         init();
     }
 
-    Unity3DShaderCache::~Unity3DShaderCache() {
+    ShaderCache::~ShaderCache() {
         for (auto it = programs_.begin(); it != programs_.end(); ++it) {
             (it->second)->release();
         }
         programs_.clear();
     }
 
-    bool Unity3DShaderCache::init() {
+    bool ShaderCache::init() {
         loadDefaultShaders();
         return true;
     }
 
-    void Unity3DShaderCache::loadDefaultShaders() {
+    void ShaderCache::loadDefaultShaders() {
         Unity3DShaderSet *p = Unity3DCreator::CreateShaderSetWithByteArray(PositionTextureColor_vert, PositionTextureColor_frag);
         programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR, p));
 
@@ -102,14 +102,14 @@ namespace GRAPH
         programs_.insert(std::make_pair(Unity3DShader::SHADER_NAME_LABEL_OUTLINE, p));
     }
 
-    Unity3DShaderSet* Unity3DShaderCache::getU3DShader(const std::string &key) {
+    Unity3DShaderSet* ShaderCache::getU3DShader(const std::string &key) {
         auto it = programs_.find(key);
         if (it != programs_.end())
             return it->second;
         return nullptr;
     }
 
-    void Unity3DShaderCache::addU3DShader(Unity3DShaderSet* program, const std::string &key) {
+    void ShaderCache::addU3DShader(Unity3DShaderSet* program, const std::string &key) {
         auto prev = getU3DShader(key);
         if (prev == program)
             return;

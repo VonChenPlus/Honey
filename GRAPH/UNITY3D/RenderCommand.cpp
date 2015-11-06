@@ -1,7 +1,7 @@
 #include "GRAPH/UNITY3D/RenderCommand.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
-#include "GRAPH/UNITY3D/Unity3DShaderState.h"
+#include "GRAPH/UNITY3D/ShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "UTILS/HASH/HashUtils.h"
@@ -86,7 +86,7 @@ namespace GRAPH
         commandType_ = RenderCommand::Type::QUAD_COMMAND;
     }
 
-    void QuadCommand::init(float globalOrder, GLuint textureID, Unity3DShaderState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, uint64 quadCount,
+    void QuadCommand::init(float globalOrder, GLuint textureID, ShaderState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, uint64 quadCount,
                            const MATH::Matrix4& mv, uint32_t flags) {
         RenderCommand::init(globalOrder, mv, flags);
 
@@ -140,7 +140,7 @@ namespace GRAPH
         commandType_ = RenderCommand::Type::TRIANGLES_COMMAND;
     }
 
-    void TrianglesCommand::init(float globalOrder, GLuint textureID, Unity3DShaderState* glProgramState, BlendFunc blendType, const Triangles& triangles,const MATH::Matrix4& mv, uint32_t flags) {
+    void TrianglesCommand::init(float globalOrder, GLuint textureID, ShaderState* glProgramState, BlendFunc blendType, const Triangles& triangles,const MATH::Matrix4& mv, uint32_t flags) {
         RenderCommand::init(globalOrder, mv, flags);
 
         _triangles = triangles;

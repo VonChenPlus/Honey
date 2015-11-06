@@ -1,17 +1,17 @@
-#ifndef UNITYSHADERCACHE_H
-#define UNITYSHADERCACHE_H
+#ifndef SHADERCACHE_H
+#define SHADERCACHE_H
 
 #include "GRAPH/UNITY3D/Unity3D.h"
 
 namespace GRAPH
 {
-    class Unity3DShaderCache : public HObject
+    class ShaderCache : public HObject
     {
     public:
-        Unity3DShaderCache();
-        ~Unity3DShaderCache();
+        ShaderCache();
+        ~ShaderCache();
 
-        static Unity3DShaderCache& getInstance();
+        static ShaderCache& getInstance();
 
         void loadDefaultShaders();
 
@@ -27,4 +27,4 @@ namespace GRAPH
     };
 }
 
-#endif // UNITYSHADERCACHE_H
+#endif // SHADERCACHE_H

@@ -5,7 +5,7 @@
 #include "GRAPH/UNITY3D/TextureCache.h"
 #include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
-#include "GRAPH/UNITY3D/Unity3DShaderState.h"
+#include "GRAPH/UNITY3D/ShaderState.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 
 namespace GRAPH
@@ -243,7 +243,7 @@ namespace GRAPH
             quad_.tl.colors = Color4B::WHITE;
             quad_.tr.colors = Color4B::WHITE;
             // shader state
-            setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
+            setU3DShaderState(ShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
             // update texture (calls updateBlendFunc)
             setTexture(texture);
             setTextureRect(rect, rotated, rect.size);
@@ -837,7 +837,7 @@ namespace GRAPH
 
         descendants_.reserve(capacity);
 
-        setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR));
+        setU3DShaderState(ShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR));
         return true;
     }
 

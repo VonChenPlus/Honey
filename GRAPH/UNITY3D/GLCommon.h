@@ -116,13 +116,11 @@ namespace GRAPH
         union
         {
             struct {
-                GLuint objectID;
                 uint64 bufferCapacity;
                 uint64 bufferCount;
                 T *bufferData;
             } u1;
             struct{
-                GLuint objectID[2];
                 uint64 bufferCapacity;
                 uint64 bufferCount;
                 T *bufferData;

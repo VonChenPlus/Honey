@@ -3,7 +3,7 @@
 #include "GRAPH/Sprite.h"
 #include "GRAPH/EventDispatcher.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
-#include "GRAPH/UNITY3D/Unity3DShaderState.h"
+#include "GRAPH/UNITY3D/ShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/TextureAtlas.h"
@@ -247,23 +247,23 @@ namespace GRAPH
             {
             case LabelEffect::NORMAL:
                 if (_useDistanceField)
-                    setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL));
+                    setU3DShaderState(ShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL));
                 else if (_useA8Shader)
-                    setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_NORMAL));
+                    setU3DShaderState(ShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_NORMAL));
                 else if (_shadowEnabled)
-                    setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR));
+                    setU3DShaderState(ShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR));
                 else
-                    setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
+                    setU3DShaderState(ShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
 
                 break;
             case LabelEffect::OUTLINE:
-                setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_OUTLINE));
+                setU3DShaderState(ShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_OUTLINE));
                 _uniformEffectColor = getU3DShader()->getUniformLocation("u_effectColor");
                 break;
             case LabelEffect::GLOW:
                 if (_useDistanceField)
                 {
-                    setU3DShaderState(Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW));
+                    setU3DShaderState(ShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW));
                     _uniformEffectColor = getU3DShader()->getUniformLocation("u_effectColor");
                 }
                 break;

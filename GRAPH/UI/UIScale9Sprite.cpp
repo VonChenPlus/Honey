@@ -3,7 +3,7 @@
 #include "GRAPH/Director.h"
 #include "GRAPH/SpriteFrame.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
-#include "GRAPH/UNITY3D/Unity3DShaderState.h"
+#include "GRAPH/UNITY3D/ShaderState.h"
 
 namespace GRAPH
 {
@@ -919,17 +919,17 @@ namespace GRAPH
 
         void Scale9Sprite::setState(Scale9Sprite::State state)
         {
-            Unity3DShaderState *glState = nullptr;
+            ShaderState *glState = nullptr;
             switch (state)
             {
             case State::NORMAL:
             {
-                glState = Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
+                glState = ShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
             }
             break;
             case State::GRAY:
             {
-                glState = Unity3DShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_GRAYSCALE);
+                glState = ShaderState::getOrCreateWithGLShaderName(Unity3DShader::SHADER_NAME_POSITION_GRAYSCALE);
             }
             default:
                 break;
