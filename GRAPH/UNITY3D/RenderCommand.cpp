@@ -109,7 +109,7 @@ namespace GRAPH
         skipBatching_ = false;
 
         if(shaderState_->getUniformCount() == 0) {
-            int intArray[4] = { reinterpret_cast<int>(shaderState_->getU3DShader()), (int) textureID_, (int) blendType_.src, (int) blendType_.dst };
+            int intArray[4] = { shaderState_->getU3DShader()->name(), (int) textureID_, (int) blendType_.src, (int) blendType_.dst };
 
             materialID_ = UTILS::HASH::Fletcher((const uint8*)intArray, sizeof(intArray));
         }
@@ -164,7 +164,7 @@ namespace GRAPH
             materialID_ = Renderer::MATERIAL_ID_DO_NOT_BATCH;
         }
         else {
-            int intArray[4] = { reinterpret_cast<int>(shaderState_->getU3DShader()), (int) textureID_, (int) blendType_.src, (int) blendType_.dst };
+            int intArray[4] = { shaderState_->getU3DShader()->name(), (int) textureID_, (int) blendType_.src, (int) blendType_.dst };
 
             materialID_ = UTILS::HASH::Fletcher((const uint8*)intArray, sizeof(intArray));
         }

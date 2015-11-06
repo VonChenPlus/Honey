@@ -211,6 +211,10 @@ namespace GRAPH
         return initWithByteArrays(vertexSource.c_str(), fragmentSource.c_str(), compileTimeDefines);
     }
 
+    int Unity3DGLShaderSet::name() {
+        return (int) program_;
+    }
+
     void Unity3DGLShaderSet::link() {
         program_ = glCreateProgram();
         glAttachShader(program_, vertShader_->getShader());

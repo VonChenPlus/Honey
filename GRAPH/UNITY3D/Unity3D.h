@@ -311,6 +311,7 @@ namespace GRAPH
     class Unity3DShaderSet : public Unity3DObject
     {
     public:
+        virtual int name() = 0;
         virtual void link() = 0;
         virtual void apply() = 0;
         virtual void unApply() = 0;

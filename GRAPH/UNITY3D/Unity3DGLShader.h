@@ -43,6 +43,7 @@ namespace GRAPH
         static Unity3DGLShaderSet* createWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines);
         bool initWithFilenames(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines);
 
+        int name() override;
         void link() override;
         void apply() override;
         void unApply() override;
