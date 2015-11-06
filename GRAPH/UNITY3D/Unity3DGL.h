@@ -52,14 +52,26 @@ namespace GRAPH
     class Unity3DGLVertexFormat final : public Unity3DVertexFormat
     {
     public:
-        Unity3DGLVertexFormat(const Unity3DVertexComponent &component);
-        Unity3DGLVertexFormat(const std::vector<Unity3DVertexComponent> &components);
+        Unity3DGLVertexFormat(const U3DVertexComponent &component);
+        Unity3DGLVertexFormat(const std::vector<U3DVertexComponent> &components);
         void apply(const void *base = nullptr) override;
         void unApply() override;
         void compile();
 
     protected:
         int semanticsMask_;
+    };
+
+    class Unity3DGLUniformFormat final : public Unity3DUniformFormat
+    {
+    public:
+        Unity3DGLUniformFormat(Unity3DShaderSet *u3dShader, const U3DuniformComponent &component);
+
+        void applyArray() override;
+        void applyValue() override;
+
+    private:
+        Unity3DShaderSet *u3dShader_;
     };
 
     static const uint32 primToGL [] =
@@ -128,8 +140,9 @@ namespace GRAPH
         static Unity3DShaderSet *CreateShaderSet(Unity3DShader *vshader, Unity3DShader *fshader);
         static Unity3DShaderSet *CreateShaderSetWithByteArray(const std::string &vShaderByteArray, const std::string &fShaderByteArray, const std::string& compileTimeDefines = std::string());
         static Unity3DShaderSet *CreateShaderSetWithFileName(const std::string& vShaderFilename, const std::string& fShaderFilename, const std::string& compileTimeDefines = std::string());
-        static Unity3DVertexFormat *CreateVertexFormat(const Unity3DVertexComponent &component);
-        static Unity3DVertexFormat *CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components);
+        static Unity3DVertexFormat *CreateVertexFormat(const U3DVertexComponent &component);
+        static Unity3DVertexFormat *CreateVertexFormat(const std::vector<U3DVertexComponent> &components);
+        static Unity3DUniformFormat *CreateUniformFormat(Unity3DShaderSet * u3dShader, const U3DuniformComponent &component);
         static Unity3DTexture *CreateTexture(U3DTextureType type = LINEAR2D, bool antialias = true);
     };
 }

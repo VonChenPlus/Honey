@@ -162,7 +162,7 @@ namespace GRAPH
         }
     }
 
-    Unity3DVertexFormat *Unity3DCreator::CreateVertexFormat(const Unity3DVertexComponent &component) {
+    Unity3DVertexFormat *Unity3DCreator::CreateVertexFormat(const U3DVertexComponent &component) {
         switch (EngineMode) {
         case OPENGL:
             return Unity3DGLCreator::CreateVertexFormat(component);
@@ -172,7 +172,7 @@ namespace GRAPH
         }
     }
 
-    Unity3DVertexFormat *Unity3DCreator::CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components) {
+    Unity3DVertexFormat *Unity3DCreator::CreateVertexFormat(const std::vector<U3DVertexComponent> &components) {
         switch (EngineMode) {
         case OPENGL:
             return Unity3DGLCreator::CreateVertexFormat(components);
@@ -182,9 +182,18 @@ namespace GRAPH
         }
     }
 
+    Unity3DUniformFormat *Unity3DCreator::CreateUniformFormat(Unity3DShaderSet * u3dShader, const U3DuniformComponent &component) {
+        switch (EngineMode) {
+        case OPENGL:
+            return Unity3DGLCreator::CreateUniformFormat(u3dShader, component);
+        default:
+            throw _HException_Normal("Unsupport Engine Mode!");
+            break;
+        }
+    }
+
     Unity3DTexture *Unity3DCreator::CreateTexture(U3DTextureType type, bool antialias) {
-        switch (EngineMode)
-        {
+        switch (EngineMode) {
         case OPENGL:
             return Unity3DGLCreator::CreateTexture(type, antialias);
         default:

@@ -136,10 +136,10 @@ namespace GRAPH
         u3dVertexBuffer_->setData((const uint8 *) vbo_.u2.bufferData, sizeof(V3F_C4B_T2F) * vbo_.u2.bufferCapacity);
         u3dIndexBuffer_->setData((const uint8 *) vbo_.u2.indexData, sizeof(GLushort) * vbo_.u2.indexCapacity * 6);
 
-        std::vector<Unity3DVertexComponent> vertexFormat = { 
-            Unity3DVertexComponent(SEM_POSITION, FLOATx3, sizeof(V3F_C4B_T2F), offsetof(V3F_C4B_T2F, vertices)),
-            Unity3DVertexComponent(SEM_COLOR0, UNORM8x4, sizeof(V3F_C4B_T2F), offsetof(V3F_C4B_T2F, colors)),
-            Unity3DVertexComponent(SEM_TEXCOORD0, FLOATx2, sizeof(V3F_C4B_T2F), offsetof(V3F_C4B_T2F, texCoords)) };
+        std::vector<U3DVertexComponent> vertexFormat = { 
+            U3DVertexComponent(SEM_POSITION, FLOATx3, sizeof(V3F_C4B_T2F), offsetof(V3F_C4B_T2F, vertices)),
+            U3DVertexComponent(SEM_COLOR0, UNORM8x4, sizeof(V3F_C4B_T2F), offsetof(V3F_C4B_T2F, colors)),
+            U3DVertexComponent(SEM_TEXCOORD0, FLOATx2, sizeof(V3F_C4B_T2F), offsetof(V3F_C4B_T2F, texCoords)) };
         u3dVertexFormat_ = Unity3DCreator::CreateVertexFormat(vertexFormat);
     }
 

@@ -1,15 +1,10 @@
 #ifndef SHADERSTATE_H
 #define SHADERSTATE_H
 
-#include "GRAPH/UNITY3D/GLCommon.h"
 #include "GRAPH/UNITY3D/Unity3D.h"
 
 namespace GRAPH
 {
-    struct U3DUniform;
-    struct U3DVertexAttrib;
-    class Unity3DShaderSet;
-
     class UniformValue
     {
         friend class Unity3DShaderSet;
@@ -22,16 +17,16 @@ namespace GRAPH
 
         void setFloat(float value);
         void setInt(int value);
-        void setFloatv(uint64 size, const float* pointer);
+        void setFloatv(int32 size, const float* pointer);
         void setVec2(const MATH::Vector2f& value);
-        void setVec2v(uint64 size, const MATH::Vector2f* pointer);
+        void setVec2v(int32 size, const MATH::Vector2f* pointer);
         void setVec3(const MATH::Vector3f& value);
-        void setVec3v(uint64 size, const MATH::Vector3f* pointer);
+        void setVec3v(int32 size, const MATH::Vector3f* pointer);
         void setVec4(const MATH::Vector4f& value);
-        void setVec4v(uint64 size, const MATH::Vector4f* pointer);
+        void setVec4v(int32 size, const MATH::Vector4f* pointer);
         void setMat4(const MATH::Matrix4& value);
 
-        void setTexture(GLuint textureId, GLuint textureUnit);
+        void setTexture(uint32 textureId, uint32 textureUnit);
 
         void apply();
 
@@ -42,45 +37,8 @@ namespace GRAPH
         };
 
         U3DUniform* uniform_;
-        Unity3DShaderSet* u3dShader_;
+        Unity3DUniformFormat *uniformForamt_;
         Type type_;
-
-        union U{
-            float floatValue;
-            int intValue;
-            float v2Value[2];
-            float v3Value[3];
-            float v4Value[4];
-            float matrixValue[16];
-            struct {
-                GLuint textureId;
-                GLuint textureUnit;
-            } tex;
-            struct {
-                const float* pointer;
-                GLsizei size;
-            } floatv;
-            struct {
-                const float* pointer;
-                GLsizei size;
-            } v2f;
-            struct {
-                const float* pointer;
-                GLsizei size;
-            } v3f;
-            struct {
-                const float* pointer;
-                GLsizei size;
-            } v4f;
-            std::function<void(Unity3DShaderSet*, U3DUniform*)> *callback;
-
-            U() { memset( this, 0, sizeof(*this) ); }
-            ~U(){}
-            U& operator=( const U& other ) {
-                memcpy(this, &other, sizeof(*this));
-                return *this;
-            }
-        } value_;
     };
 
     class VertexAttribValue
@@ -88,7 +46,7 @@ namespace GRAPH
         friend class ShaderState;
 
     public:
-        VertexAttribValue(U3DVertexAttrib *vertexAttrib);
+        VertexAttribValue(uint8 semantic);
         VertexAttribValue();
         ~VertexAttribValue();
 
@@ -96,7 +54,6 @@ namespace GRAPH
         void apply();
 
     protected:
-        U3DVertexAttrib *vertexAttrib_;
         Unity3DVertexFormat *vertexFormat_;
         bool enabled_;
     };
@@ -124,27 +81,27 @@ namespace GRAPH
 
         void setUniformInt(const std::string& uniformName, int value);
         void setUniformFloat(const std::string& uniformName, float value);
-        void setUniformFloatv(const std::string& uniformName, uint64 size, const float* pointer);
+        void setUniformFloatv(const std::string& uniformName, int32 size, const float* pointer);
         void setUniformVec2(const std::string& uniformName, const MATH::Vector2f& value);
-        void setUniformVec2v(const std::string& uniformName, uint64 size, const MATH::Vector2f* pointer);
+        void setUniformVec2v(const std::string& uniformName, int32 size, const MATH::Vector2f* pointer);
         void setUniformVec3(const std::string& uniformName, const MATH::Vector3f& value);
-        void setUniformVec3v(const std::string& uniformName, uint64 size, const MATH::Vector3f* pointer);
+        void setUniformVec3v(const std::string& uniformName, int32 size, const MATH::Vector3f* pointer);
         void setUniformVec4(const std::string& uniformName, const MATH::Vector4f& value);
-        void setUniformVec4v(const std::string& uniformName, uint64 size, const MATH::Vector4f* pointer);
+        void setUniformVec4v(const std::string& uniformName, int32 size, const MATH::Vector4f* pointer);
         void setUniformMat4(const std::string& uniformName, const MATH::Matrix4& value);
-        void setUniformTexture(const std::string& uniformName, GLuint textureId);
+        void setUniformTexture(const std::string& uniformName, uint32 textureId);
 
         void setUniformInt(int32 uniformLocation, int value);
         void setUniformFloat(int32 uniformLocation, float value);
-        void setUniformFloatv(int32 uniformLocation, uint64 size, const float* pointer);
+        void setUniformFloatv(int32 uniformLocation, int32 size, const float* pointer);
         void setUniformVec2(int32 uniformLocation, const MATH::Vector2f& value);
-        void setUniformVec2v(int32 uniformLocation, uint64 size, const MATH::Vector2f* pointer);
+        void setUniformVec2v(int32 uniformLocation, int32 size, const MATH::Vector2f* pointer);
         void setUniformVec3(int32 uniformLocation, const MATH::Vector3f& value);
-        void setUniformVec3v(int32 uniformLocation, uint64 size, const MATH::Vector3f* pointer);
+        void setUniformVec3v(int32 uniformLocation, int32 size, const MATH::Vector3f* pointer);
         void setUniformVec4(int32 uniformLocation, const MATH::Vector4f& value);
-        void setUniformVec4v(int32 uniformLocation, uint64 size, const MATH::Vector4f* pointer);
+        void setUniformVec4v(int32 uniformLocation, int32 size, const MATH::Vector4f* pointer);
         void setUniformMat4(int32 uniformLocation, const MATH::Matrix4& value);
-        void setUniformTexture(int32 uniformLocation, GLuint textureId);
+        void setUniformTexture(int32 uniformLocation, uint32 textureId);
 
     protected:
         ShaderState();

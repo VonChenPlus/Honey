@@ -1,148 +1,93 @@
 #include "GRAPH/UNITY3D/ShaderState.h"
 #include "GRAPH/UNITY3D/ShaderCache.h"
-#include "GRAPH/UNITY3D/GLStateCache.h"
 
 namespace GRAPH
 {
     UniformValue::UniformValue()
-        : uniform_(nullptr)
-        , u3dShader_(nullptr)
+        : uniformForamt_(nullptr)
         , type_(Type::VALUE) {
     }
 
     UniformValue::UniformValue(U3DUniform *uniform, Unity3DShaderSet* u3dShader)
         : uniform_(uniform)
-        , u3dShader_(u3dShader)
+        , uniformForamt_(Unity3DCreator::CreateUniformFormat(u3dShader, U3DuniformComponent(uniform->location, uniform->type)))
         , type_(Type::VALUE) {
     }
 
     UniformValue::~UniformValue() {
+        SAFE_RELEASE(uniformForamt_);
     }
 
     void UniformValue::apply() {
+        uniformForamt_->component().location = uniform_->location;
+        uniformForamt_->component().type = uniform_->type;
         if (type_ == Type::POINTER) {
-            switch (uniform_->type) {
-                case GL_FLOAT:
-                    u3dShader_->setUniformLocationWith1fv(uniform_->location, value_.floatv.pointer, value_.floatv.size);
-                    break;
-
-                case GL_FLOAT_VEC2:
-                    u3dShader_->setUniformLocationWith2fv(uniform_->location, value_.v2f.pointer, value_.v2f.size);
-                    break;
-
-                case GL_FLOAT_VEC3:
-                    u3dShader_->setUniformLocationWith3fv(uniform_->location, value_.v3f.pointer, value_.v3f.size);
-                    break;
-
-                case GL_FLOAT_VEC4:
-                    u3dShader_->setUniformLocationWith4fv(uniform_->location, value_.v4f.pointer, value_.v4f.size);
-                    break;
-
-                default:
-                    break;
-            }
+            uniformForamt_->applyArray();
         }
         else{
-            switch (uniform_->type) {
-                case GL_SAMPLER_2D:
-                    u3dShader_->setUniformLocationWith1i(uniform_->location, value_.tex.textureUnit);
-                    GLStateCache::BindTexture2DN(value_.tex.textureUnit, value_.tex.textureId);
-                    break;
-
-                case GL_SAMPLER_CUBE:
-                    u3dShader_->setUniformLocationWith1i(uniform_->location, value_.tex.textureUnit);
-                    GLStateCache::BindTextureN(value_.tex.textureUnit, value_.tex.textureId, GL_TEXTURE_CUBE_MAP);
-                    break;
-
-                case GL_INT:
-                    u3dShader_->setUniformLocationWith1i(uniform_->location, value_.intValue);
-                    break;
-
-                case GL_FLOAT:
-                    u3dShader_->setUniformLocationWith1f(uniform_->location, value_.floatValue);
-                    break;
-
-                case GL_FLOAT_VEC2:
-                    u3dShader_->setUniformLocationWith2f(uniform_->location, value_.v2Value[0], value_.v2Value[1]);
-                    break;
-
-                case GL_FLOAT_VEC3:
-                    u3dShader_->setUniformLocationWith3f(uniform_->location, value_.v3Value[0], value_.v3Value[1], value_.v3Value[2]);
-                    break;
-
-                case GL_FLOAT_VEC4:
-                    u3dShader_->setUniformLocationWith4f(uniform_->location, value_.v4Value[0], value_.v4Value[1], value_.v4Value[2], value_.v4Value[3]);
-                    break;
-
-                case GL_FLOAT_MAT4:
-                    u3dShader_->setUniformLocationWithMatrix4fv(uniform_->location, (GLfloat*)&value_.matrixValue, 1);
-                    break;
-
-                default:
-                    break;
-            }
+            uniformForamt_->applyValue();
         }
     }
 
-    void UniformValue::setTexture(GLuint textureId, GLuint textureUnit) {
-        value_.tex.textureId = textureId;
-        value_.tex.textureUnit = textureUnit;
+    void UniformValue::setTexture(uint32 textureId, uint32 textureUnit) {
+        uniformForamt_->component().value.tex.textureId = textureId;
+        uniformForamt_->component().value.tex.textureUnit = textureUnit;
         type_ = Type::VALUE;
     }
 
     void UniformValue::setInt(int value) {
-        value_.intValue = value;
+        uniformForamt_->component().value.intValue = value;
         type_ = Type::VALUE;
     }
 
     void UniformValue::setFloat(float value) {
-        value_.floatValue = value;
+        uniformForamt_->component().value.floatValue = value;
         type_ = Type::VALUE;
     }
 
-    void UniformValue::setFloatv(uint64 size, const float* pointer) {
-        value_.floatv.pointer = (const float*)pointer;
-        value_.floatv.size = (GLsizei)size;
+    void UniformValue::setFloatv(int32 size, const float* pointer) {
+        uniformForamt_->component().value.floatv.pointer = (const float*) pointer;
+        uniformForamt_->component().value.floatv.size = size;
         type_ = Type::POINTER;
     }
 
     void UniformValue::setVec2(const MATH::Vector2f& value) {
-        memcpy(value_.v2Value, &value, sizeof(value_.v2Value));
+        memcpy(uniformForamt_->component().value.v2Value, &value, sizeof(uniformForamt_->component().value.v2Value));
         type_ = Type::VALUE;
     }
 
-    void UniformValue::setVec2v(uint64 size, const MATH::Vector2f* pointer) {
-        value_.v2f.pointer = (const float*)pointer;
-        value_.v2f.size = (GLsizei)size;
+    void UniformValue::setVec2v(int32 size, const MATH::Vector2f* pointer) {
+        uniformForamt_->component().value.v2f.pointer = (const float*) pointer;
+        uniformForamt_->component().value.v2f.size = size;
         type_ = Type::POINTER;
     }
 
     void UniformValue::setVec3(const MATH::Vector3f& value) {
-        memcpy(value_.v3Value, &value, sizeof(value_.v3Value));
+        memcpy(uniformForamt_->component().value.v3Value, &value, sizeof(uniformForamt_->component().value.v3Value));
         type_ = Type::VALUE;
 
     }
 
-    void UniformValue::setVec3v(uint64 size, const MATH::Vector3f* pointer) {
-        value_.v3f.pointer = (const float*)pointer;
-        value_.v3f.size = (GLsizei)size;
+    void UniformValue::setVec3v(int32 size, const MATH::Vector3f* pointer) {
+        uniformForamt_->component().value.v3f.pointer = (const float*) pointer;
+        uniformForamt_->component().value.v3f.size = size;
         type_ = Type::POINTER;
 
     }
 
     void UniformValue::setVec4(const MATH::Vector4f& value) {
-        memcpy(value_.v4Value, &value, sizeof(value_.v4Value));
+        memcpy(uniformForamt_->component().value.v4Value, &value, sizeof(uniformForamt_->component().value.v4Value));
         type_ = Type::VALUE;
     }
 
-    void UniformValue::setVec4v(uint64 size, const MATH::Vector4f* pointer) {
-        value_.v4f.pointer = (const float*)pointer;
-        value_.v4f.size = (GLsizei)size;
+    void UniformValue::setVec4v(int32 size, const MATH::Vector4f* pointer) {
+        uniformForamt_->component().value.v4f.pointer = (const float*) pointer;
+        uniformForamt_->component().value.v4f.size = size;
         type_ = Type::POINTER;
     }
 
     void UniformValue::setMat4(const MATH::Matrix4& value) {
-        memcpy(value_.matrixValue, &value, sizeof(value_.matrixValue));
+        memcpy(uniformForamt_->component().value.matrixValue, &value, sizeof(uniformForamt_->component().value.matrixValue));
         type_ = Type::VALUE;
     }
 
@@ -151,11 +96,10 @@ namespace GRAPH
         , enabled_(false) {
     }
 
-    VertexAttribValue::VertexAttribValue(U3DVertexAttrib *vertexAttrib)
-        : vertexAttrib_(vertexAttrib)
-        , vertexFormat_(nullptr)
+    VertexAttribValue::VertexAttribValue(uint8 semantic)
+        : vertexFormat_(nullptr)
         , enabled_(false) {
-        vertexFormat_ = Unity3DCreator::CreateVertexFormat(Unity3DVertexComponent((U3DSemantic) vertexAttrib->index, CUSTOM));
+        vertexFormat_ = Unity3DCreator::CreateVertexFormat(U3DVertexComponent((U3DSemantic) semantic, CUSTOM));
     }
 
     VertexAttribValue::~VertexAttribValue() {
@@ -172,7 +116,7 @@ namespace GRAPH
         if (vertexFormat_->components().size() != 1) {
             throw _HException_Normal("UnException VertexFormat Component Number!");
         }
-
+          
         vertexFormat_->components()[0].size = size;
         vertexFormat_->components()[0].type = type;
         vertexFormat_->components()[0].normalized = normalized;
@@ -233,7 +177,7 @@ namespace GRAPH
         u3dShader_->retain();
 
         for(auto &attrib : u3dShader_->vertexAttribs()) {
-            VertexAttribValue value(&attrib.second);
+            VertexAttribValue value(attrib.second.semantic);
             attributes_[attrib.first] = value;
         }
 
@@ -267,7 +211,7 @@ namespace GRAPH
             }
 
             for(auto& attributeValue : attributes_) {
-                attributeValue.second.vertexAttrib_ = u3dShader_->vertexAttrib(attributeValue.first);
+                attributeValue.second.vertexFormat_->components()[0].semantic = u3dShader_->vertexAttrib(attributeValue.first)->semantic;
             }
 
             uniformAttributeValueDirty_ = false;
@@ -356,13 +300,13 @@ namespace GRAPH
 
     }
 
-    void ShaderState::setUniformFloatv(const std::string& uniformName, uint64 size, const float* pointer) {
+    void ShaderState::setUniformFloatv(const std::string& uniformName, int32 size, const float* pointer) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setFloatv(size, pointer);
     }
 
-    void ShaderState::setUniformFloatv(int32 uniformLocation, uint64 size, const float* pointer) {
+    void ShaderState::setUniformFloatv(int32 uniformLocation, int32 size, const float* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setFloatv(size, pointer);
@@ -380,13 +324,13 @@ namespace GRAPH
             v->setVec2(value);
     }
 
-    void ShaderState::setUniformVec2v(const std::string& uniformName, uint64 size, const MATH::Vector2f* pointer) {
+    void ShaderState::setUniformVec2v(const std::string& uniformName, int32 size, const MATH::Vector2f* pointer) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec2v(size, pointer);
     }
 
-    void ShaderState::setUniformVec2v(int32 uniformLocation, uint64 size, const MATH::Vector2f* pointer) {
+    void ShaderState::setUniformVec2v(int32 uniformLocation, int32 size, const MATH::Vector2f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec2v(size, pointer);
@@ -404,13 +348,13 @@ namespace GRAPH
             v->setVec3(value);
     }
 
-    void ShaderState::setUniformVec3v(const std::string& uniformName, uint64 size, const MATH::Vector3f* pointer) {
+    void ShaderState::setUniformVec3v(const std::string& uniformName, int32 size, const MATH::Vector3f* pointer) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec3v(size, pointer);
     }
 
-    void ShaderState::setUniformVec3v(int32 uniformLocation, uint64 size, const MATH::Vector3f* pointer) {
+    void ShaderState::setUniformVec3v(int32 uniformLocation, int32 size, const MATH::Vector3f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec3v(size, pointer);
@@ -428,13 +372,13 @@ namespace GRAPH
             v->setVec4(value);
     }
 
-    void ShaderState::setUniformVec4v(const std::string& uniformName, uint64 size, const MATH::Vector4f* value) {
+    void ShaderState::setUniformVec4v(const std::string& uniformName, int32 size, const MATH::Vector4f* value) {
         auto v = getUniformValue(uniformName);
         if (v)
             v->setVec4v(size, value);
     }
 
-    void ShaderState::setUniformVec4v(int32 uniformLocation, uint64 size, const MATH::Vector4f* pointer) {
+    void ShaderState::setUniformVec4v(int32 uniformLocation, int32 size, const MATH::Vector4f* pointer) {
         auto v = getUniformValue(uniformLocation);
         if (v)
             v->setVec4v(size, pointer);
@@ -452,7 +396,7 @@ namespace GRAPH
             v->setMat4(value);
     }
 
-    void ShaderState::setUniformTexture(const std::string& uniformName, GLuint textureId) {
+    void ShaderState::setUniformTexture(const std::string& uniformName, uint32 textureId) {
         auto v = getUniformValue(uniformName);
         if (v) {
             if (boundTextureUnits_.find(uniformName) != boundTextureUnits_.end()) {
@@ -465,7 +409,7 @@ namespace GRAPH
         }
     }
 
-    void ShaderState::setUniformTexture(int32 uniformLocation, GLuint textureId) {
+    void ShaderState::setUniformTexture(int32 uniformLocation, uint32 textureId) {
         auto v = getUniformValue(uniformLocation);
         if (v) {
             if (boundTextureUnits_.find(v->uniform_->name) != boundTextureUnits_.end()) {

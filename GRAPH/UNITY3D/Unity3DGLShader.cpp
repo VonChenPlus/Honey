@@ -541,7 +541,7 @@ namespace GRAPH
                     attribute.name = std::string(attribName);
 
                     // Query the pre-assigned attribute location
-                    attribute.index = glGetAttribLocation(program_, attribName);
+                    attribute.semantic = (uint8)glGetAttribLocation(program_, attribName);
                     vertexAttribs_[attribute.name] = attribute;
                 }
             }

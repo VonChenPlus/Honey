@@ -95,11 +95,80 @@ namespace GRAPH
         }
     }
 
-    Unity3DGLVertexFormat::Unity3DGLVertexFormat(const Unity3DVertexComponent &component) {
+    Unity3DGLUniformFormat::Unity3DGLUniformFormat(Unity3DShaderSet *u3dShader, const U3DuniformComponent &component) {
+        u3dShader_ = u3dShader;
+        component_ = component;
+    }
+
+    void Unity3DGLUniformFormat::applyArray() {
+        switch (component_.type) {
+        case GL_FLOAT:
+            u3dShader_->setUniformLocationWith1fv(component_.location, component_.value.floatv.pointer, component_.value.floatv.size);
+            break;
+
+        case GL_FLOAT_VEC2:
+            u3dShader_->setUniformLocationWith2fv(component_.location, component_.value.v2f.pointer, component_.value.v2f.size);
+            break;
+
+        case GL_FLOAT_VEC3:
+            u3dShader_->setUniformLocationWith3fv(component_.location, component_.value.v3f.pointer, component_.value.v3f.size);
+            break;
+
+        case GL_FLOAT_VEC4:
+            u3dShader_->setUniformLocationWith4fv(component_.location, component_.value.v4f.pointer, component_.value.v4f.size);
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    void Unity3DGLUniformFormat::applyValue() {
+        switch (component_.type) {
+        case GL_SAMPLER_2D:
+            u3dShader_->setUniformLocationWith1i(component_.location, component_.value.tex.textureUnit);
+            GLStateCache::BindTexture2DN(component_.value.tex.textureUnit, component_.value.tex.textureId);
+            break;
+
+        case GL_SAMPLER_CUBE:
+            u3dShader_->setUniformLocationWith1i(component_.location, component_.value.tex.textureUnit);
+            GLStateCache::BindTextureN(component_.value.tex.textureUnit, component_.value.tex.textureId, GL_TEXTURE_CUBE_MAP);
+            break;
+
+        case GL_INT:
+            u3dShader_->setUniformLocationWith1i(component_.location, component_.value.intValue);
+            break;
+
+        case GL_FLOAT:
+            u3dShader_->setUniformLocationWith1f(component_.location, component_.value.floatValue);
+            break;
+
+        case GL_FLOAT_VEC2:
+            u3dShader_->setUniformLocationWith2f(component_.location, component_.value.v2Value[0], component_.value.v2Value[1]);
+            break;
+
+        case GL_FLOAT_VEC3:
+            u3dShader_->setUniformLocationWith3f(component_.location, component_.value.v3Value[0], component_.value.v3Value[1], component_.value.v3Value[2]);
+            break;
+
+        case GL_FLOAT_VEC4:
+            u3dShader_->setUniformLocationWith4f(component_.location, component_.value.v4Value[0], component_.value.v4Value[1], component_.value.v4Value[2], component_.value.v4Value[3]);
+            break;
+
+        case GL_FLOAT_MAT4:
+            u3dShader_->setUniformLocationWithMatrix4fv(component_.location, (GLfloat*) &component_.value.matrixValue, 1);
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    Unity3DGLVertexFormat::Unity3DGLVertexFormat(const U3DVertexComponent &component) {
         components_.push_back(component);
     }
 
-    Unity3DGLVertexFormat::Unity3DGLVertexFormat(const std::vector<Unity3DVertexComponent> &components) {
+    Unity3DGLVertexFormat::Unity3DGLVertexFormat(const std::vector<U3DVertexComponent> &components) {
         components_ = components;
     }
 
@@ -406,16 +475,20 @@ namespace GRAPH
         return shaderSet;
     }
 
-    Unity3DVertexFormat *Unity3DGLCreator::CreateVertexFormat(const Unity3DVertexComponent &component) {
+    Unity3DVertexFormat *Unity3DGLCreator::CreateVertexFormat(const U3DVertexComponent &component) {
         Unity3DGLVertexFormat *vertexFormat = new Unity3DGLVertexFormat(component);
         vertexFormat->compile();
         return vertexFormat;
     }
 
-    Unity3DVertexFormat *Unity3DGLCreator::CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components) {
+    Unity3DVertexFormat *Unity3DGLCreator::CreateVertexFormat(const std::vector<U3DVertexComponent> &components) {
         Unity3DGLVertexFormat *vertexFormat = new Unity3DGLVertexFormat(components);
         vertexFormat->compile();
         return vertexFormat;
+    }
+
+    Unity3DUniformFormat *Unity3DGLCreator::CreateUniformFormat(Unity3DShaderSet * u3dShader, const U3DuniformComponent &component) {
+        return new Unity3DGLUniformFormat(u3dShader, component);
     }
 
     Unity3DTexture *Unity3DGLCreator::CreateTexture(U3DTextureType type, bool antialias) {

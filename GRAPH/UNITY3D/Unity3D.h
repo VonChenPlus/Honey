@@ -2,6 +2,7 @@
 #define UNITY3D_H
 
 #include <string>
+#include <string.h>
 #include <vector>
 #include <functional>
 #include <unordered_map>
@@ -171,7 +172,6 @@ namespace GRAPH
         CCW,
     };
 
-    // Binary compatible with D3D11 viewport.
     struct U3DViewport
     {
         U3DViewport(float left, float top, float width, float height)
@@ -226,16 +226,23 @@ namespace GRAPH
         virtual void bind() = 0;
     };
 
-    struct Unity3DVertexComponent
+    struct U3DVertexAttrib
     {
-        Unity3DVertexComponent() : semantic(255), type(U3DVertexDataType::INVALID), size(0), offset(0), stride(0), normalized(false) {}
-        Unity3DVertexComponent(U3DSemantic semantic, U3DVertexDataType dataType, int stride = 0, intptr offset = 0) {
+        uint8 semantic;
+        int32 size;
+        uint32 type;
+        std::string name;
+    };
+
+    struct U3DVertexComponent
+    {
+        U3DVertexComponent() { memset(this, 0, sizeof(*this)); }
+        U3DVertexComponent(U3DSemantic semantic, U3DVertexDataType dataType, int stride = 0, intptr offset = 0) {
+            memset(this, 0, sizeof(*this));
             this->type = dataType;
             this->semantic = semantic;
             this->stride = stride;
             this->offset = offset;
-            this->size = 0;
-            this->normalized = false;
         }
         uint8 semantic;
         U3DVertexDataType type;
@@ -251,18 +258,10 @@ namespace GRAPH
         virtual void apply(const void *base = nullptr) = 0;
         virtual void unApply() = 0;
 
-        std::vector<Unity3DVertexComponent> &components() { return components_; }
+        std::vector<U3DVertexComponent> &components() { return components_; }
 
     protected:
-        std::vector<Unity3DVertexComponent> components_;
-    };
-
-    struct U3DVertexAttrib
-    {
-        uint32 index;
-        int32 size;
-        uint32 type;
-        std::string name;
+        std::vector<U3DVertexComponent> components_;
     };
 
     struct U3DUniform
@@ -271,6 +270,66 @@ namespace GRAPH
         int32 size;
         uint32 type;
         std::string name;
+    };
+
+    struct U3DuniformComponent
+    {
+        U3DuniformComponent() { memset(this, 0, sizeof(*this)); }
+        U3DuniformComponent(int32 location, uint32 type) {
+            memset(this, 0, sizeof(*this));
+            this->location = location;
+            this->type = type;
+        }
+        ~U3DuniformComponent(){}
+        U3DuniformComponent& operator=(const U3DuniformComponent& other) {
+            memcpy(this, &other, sizeof(*this));
+            return *this;
+        }
+
+        int32 location;
+        uint32 type;
+
+        union U
+        {
+            float floatValue;
+            int intValue;
+            float v2Value[2];
+            float v3Value[3];
+            float v4Value[4];
+            float matrixValue[16];
+            struct {
+                uint32 textureId;
+                uint32 textureUnit;
+            } tex;
+            struct {
+                const float* pointer;
+                int32 size;
+            } floatv;
+            struct {
+                const float* pointer;
+                int32 size;
+            } v2f;
+            struct {
+                const float* pointer;
+                int32 size;
+            } v3f;
+            struct {
+                const float* pointer;
+                int32 size;
+            } v4f;
+        } value;
+    };
+
+    class Unity3DUniformFormat : public Unity3DObject
+    {
+    public:
+        virtual void applyArray() = 0;
+        virtual void applyValue() = 0;
+
+        U3DuniformComponent &component() { return component_; }
+
+    protected:
+        U3DuniformComponent component_;
     };
 
     class Unity3DShader : public Unity3DObject
@@ -356,6 +415,7 @@ namespace GRAPH
                 return &itr->second;
             return nullptr;
         }
+
         std::unordered_map<std::string, U3DUniform> &userUniforms() { return userUniforms_;  }
         std::unordered_map<std::string, U3DVertexAttrib> &vertexAttribs() { return vertexAttribs_; }
 
@@ -452,8 +512,9 @@ namespace GRAPH
         static Unity3DShaderSet *CreateShaderSet(Unity3DShader *vshader, Unity3DShader *fshader);
         static Unity3DShaderSet *CreateShaderSetWithByteArray(const std::string &vShaderByteArray, const std::string &fShaderByteArray, const std::string& compileTimeDefines = std::string());
         static Unity3DShaderSet *CreateShaderSetWithFileName(const std::string &vShaderFilename, const std::string &fShaderFilename, const std::string& compileTimeDefines = std::string());
-        static Unity3DVertexFormat *CreateVertexFormat(const Unity3DVertexComponent &component);
-        static Unity3DVertexFormat *CreateVertexFormat(const std::vector<Unity3DVertexComponent> &components);
+        static Unity3DVertexFormat *CreateVertexFormat(const U3DVertexComponent &component);
+        static Unity3DVertexFormat *CreateVertexFormat(const std::vector<U3DVertexComponent> &components);
+        static Unity3DUniformFormat *CreateUniformFormat(Unity3DShaderSet * u3dShader, const U3DuniformComponent &component);
         static Unity3DTexture *CreateTexture(U3DTextureType type = LINEAR2D, bool antialias = true);
     };
 }
