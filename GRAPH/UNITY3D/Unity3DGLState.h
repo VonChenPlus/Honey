@@ -237,6 +237,10 @@ namespace GRAPH
 
         STATEBIND(glBindBuffer, GL_ARRAY_BUFFER) arrayBuffer;
         STATEBIND(glBindBuffer, GL_ELEMENT_ARRAY_BUFFER) elementArrayBuffer;
+
+        static void BindTexture2D(GLuint textureId);
+        static void BindTexture2DN(GLuint textureUnit, GLuint textureId);
+        static void BindTextureN(GLuint textureUnit, GLuint textureId, GLuint textureType = GL_TEXTURE_2D);
     };
 
     #undef STATE1

@@ -122,7 +122,7 @@ namespace GRAPH
 
     void QuadCommand::useMaterial() const {
         //Set texture
-        GLStateCache::BindTexture2D(textureID_);
+        Unity3DGLState::BindTexture2D(textureID_);
 
         //set blend mode
         Unity3DGLState::OpenGLState().blendFunc.set(blendType_.src, blendType_.dst);
@@ -173,7 +173,7 @@ namespace GRAPH
 
     void TrianglesCommand::useMaterial() const {
         //Set texture
-        GLStateCache::BindTexture2D(textureID_);
+        Unity3DGLState::BindTexture2D(textureID_);
         //set blend mode
         Unity3DGLState::OpenGLState().blendFunc.set(blendType_.src, blendType_.dst);
         shaderState_->apply(matrix4_);
@@ -224,7 +224,7 @@ namespace GRAPH
     void BatchCommand::execute() {
         shader_->apply();
         shader_->setUniformsForBuiltins(matrix4_);
-        GLStateCache::BindTexture2D(textureID_);
+        Unity3DGLState::BindTexture2D(textureID_);
         Unity3DGLState::OpenGLState().blendFunc.set(blendType_.src, blendType_.dst);
 
         // Draw

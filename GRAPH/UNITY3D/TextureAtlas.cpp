@@ -1,5 +1,6 @@
 #include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "GRAPH/UNITY3D/TextureCache.h"
+#include "GRAPH/UNITY3D/Unity3DGLState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 
 namespace GRAPH
@@ -354,7 +355,7 @@ namespace GRAPH
         if(!numberOfQuads)
             return;
 
-        GLStateCache::BindTexture2D(texture_->texture());
+        Unity3DGLState::BindTexture2D(texture_->texture());
 
         if (dirty_) {
             u3dVertexBuffer_->bind();

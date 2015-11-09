@@ -26,12 +26,6 @@ namespace GRAPH
         static void Invalidate(void);
 
         static void EnableVertexAttribs(uint32_t flags);
-
-        static void BindTexture2D(GLuint textureId);
-        static void BindTexture2DN(GLuint textureUnit, GLuint textureId);
-        static void BindTextureN(GLuint textureUnit, GLuint textureId, GLuint textureType = GL_TEXTURE_2D);
-        static void DeleteTexture(GLuint textureId);
-        static void ActiveTexture(GLenum texture);
     };
 }
 
