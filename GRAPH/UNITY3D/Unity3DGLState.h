@@ -193,7 +193,8 @@ namespace GRAPH
         STATE1(glUseProgram, GLuint, 0) useProgram;
 
         // Blending
-        BoolState<GL_BLEND, false> blend;
+        BoolState<GL_BLEND, true> blend;
+        STATE2(glBlendFunc, GLenum, GLenum, GL_ONE, GL_ZERO) blendFunc;
         STATE4(glBlendFuncSeparate, GLenum, GLenum, GLenum, GLenum, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) blendFuncSeparate;
 
         // On OpenGL ES, using minmax blend requires glBlendEquationEXT (in theory at least but I don't think it's true in practice)

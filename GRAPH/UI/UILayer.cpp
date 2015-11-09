@@ -2,6 +2,7 @@
 #include "GRAPH/UI/UILayer.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/UNITY3D/ShaderState.h"
+#include "GRAPH/UNITY3D/Unity3DGLState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 
@@ -266,7 +267,7 @@ namespace GRAPH
             glVertexAttribPointer(SEM_POSITION, 3, GL_FLOAT, GL_FALSE, 0, _noMVPVertices);
             glVertexAttribPointer(SEM_COLOR0, 4, GL_FLOAT, GL_FALSE, 0, _squareColors);
 
-            GLStateCache::BlendFunc( _blendFunc.src, _blendFunc.dst );
+            Unity3DGLState::OpenGLState().blendFunc.set(_blendFunc.src, _blendFunc.dst);
 
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }

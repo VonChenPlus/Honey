@@ -3,6 +3,7 @@
 #include "GRAPH/Sprite.h"
 #include "GRAPH/EventDispatcher.h"
 #include "GRAPH/UNITY3D/ShaderState.h"
+#include "GRAPH/UNITY3D/Unity3DGLState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/TextureAtlas.h"
@@ -895,7 +896,7 @@ namespace GRAPH
         {
             auto u3dShader = getU3DShader();
             u3dShader->apply();
-            GLStateCache::BlendFunc(_blendFunc.src, _blendFunc.dst);
+            Unity3DGLState::OpenGLState().blendFunc.set(_blendFunc.src, _blendFunc.dst);
 
             if (_shadowEnabled)
             {

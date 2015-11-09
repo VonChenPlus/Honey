@@ -116,8 +116,8 @@ namespace GRAPH
     private:
         bool uniformAttributeValueDirty_;
         std::unordered_map<std::string, int32> uniformsByName_;
-        std::unordered_map<int32, UniformValue> uniforms_;
-        std::unordered_map<std::string, VertexAttribValue> attributes_;
+        std::unordered_map<int32, UniformValue *> uniforms_;
+        std::unordered_map<std::string, VertexAttribValue *> attributes_;
         std::unordered_map<std::string, int> boundTextureUnits_;
         int textureUnitIndex_;
         Unity3DShaderSet* u3dShader_;

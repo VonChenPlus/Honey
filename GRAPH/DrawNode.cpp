@@ -2,6 +2,7 @@
 #include "GRAPH/UNITY3D/Unity3D.h"
 #include "GRAPH/UNITY3D/ShaderCache.h"
 #include "GRAPH/UNITY3D/ShaderState.h"
+#include "GRAPH/UNITY3D/Unity3DGLState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 
@@ -89,7 +90,7 @@ namespace GRAPH
         u3dShader->apply();
         u3dShader->setUniformsForBuiltins(transform);
 
-        GLStateCache::BlendFunc(blendFunc_.src, blendFunc_.dst);
+        Unity3DGLState::OpenGLState().blendFunc.set(blendFunc_.src, blendFunc_.dst);
 
         if (dirty_[0]) {
             u3dVertexBuffer_[DEFAULT]->bind();

@@ -66,11 +66,7 @@ namespace GRAPH
 
         inline Projection getProjection() { return projection_; }
         void setProjection(Projection projection);
-
         void setViewPort();
-
-        void setAlphaBlending(bool on);
-        void setDepthTest(bool on);
 
         void pushMatrix(MATRIX_STACK_TYPE type);
         void popMatrix(MATRIX_STACK_TYPE type);

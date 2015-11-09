@@ -9,6 +9,7 @@
 #include "GRAPH/Scene.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
+#include "GRAPH/UNITY3D/Unity3DGLState.h"
 #include "UTILS/TIME/TimeUtils.h"
 
 namespace GRAPH
@@ -39,10 +40,10 @@ namespace GRAPH
     }
 
     Director::~Director(void) {
-        SAFE_DELETE(scheduler_);
-        SAFE_DELETE(actionManager_);
-        SAFE_DELETE(eventDispatcher_);
-        SAFE_DELETE(renderer_);
+        SAFE_RELEASE(scheduler_);
+        SAFE_RELEASE(actionManager_);
+        SAFE_RELEASE(eventDispatcher_);
+        SAFE_RELEASE(renderer_);
         SAFE_RELEASE(camera_);
     }
 
@@ -65,8 +66,7 @@ namespace GRAPH
     }
 
     void Director::setGLDefaultValues() {
-        setAlphaBlending(true);
-        setDepthTest(false);
+        Unity3DGLState::OpenGLState().restore();
         setProjection(projection_);
     }
 
@@ -113,19 +113,6 @@ namespace GRAPH
     void Director::setViewPort() {
         auto winSize = getWinSize();
         camera_->setViewport(U3DViewport(0, 0, winSize.width, winSize.height));
-    }
-
-    void Director::setAlphaBlending(bool on) {
-        if (on) {
-            GLStateCache::BlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        }
-        else {
-            GLStateCache::BlendFunc(GL_ONE, GL_ZERO);
-        }
-    }
-
-    void Director::setDepthTest(bool on) {
-        renderer_->setDepthTest(on);
     }
 
     void Director::initMatrixStack() {

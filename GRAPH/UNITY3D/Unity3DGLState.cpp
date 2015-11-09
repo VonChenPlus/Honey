@@ -17,6 +17,7 @@ namespace GRAPH
 
         blend.restore(); count++;
         blendEquationSeparate.restore(); count++;
+        blendFunc.restore(); count++;
         blendFuncSeparate.restore(); count++;
         blendColor.restore(); count++;
 

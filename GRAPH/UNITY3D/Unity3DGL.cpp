@@ -289,7 +289,7 @@ namespace GRAPH
     }
 
     void Unity3DGLTexture::deleteTexture(uint32 texture) {
-        GLStateCache::DeleteTexture(texture);
+        glDeleteTextures(1, &texture);
     }
 
     bool Unity3DGLTexture::initWithMipmaps(U3DMipmap* mipmaps, int mipLevels, IMAGE::ImageFormat imageFormat, uint32 imageWidth, uint32 imageHeight) {
@@ -329,7 +329,7 @@ namespace GRAPH
         }
 
         if (texture_ != 0) {
-            GLStateCache::DeleteTexture(texture_);
+            glDeleteTextures(1, &texture_);
             texture_ = 0;
         }
 

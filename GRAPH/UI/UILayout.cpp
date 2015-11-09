@@ -2,7 +2,7 @@
 #include "GRAPH/DrawNode.h"
 #include "GRAPH/Director.h"
 #include "GRAPH/UNITY3D/Renderer.h"
-#include "GRAPH/UNITY3D/RenderState.h"
+#include "GRAPH/UNITY3D/Unity3DGLState.h"
 #include "MATH/AffineTransform.h"
 #include "GRAPH/UNITY3D/ShaderCache.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
@@ -305,7 +305,7 @@ namespace GRAPH
             glGetBooleanv(GL_DEPTH_WRITEMASK, &_currentDepthWriteMask);
 
             glDepthMask(GL_FALSE);
-            RenderState::DefaultState().setDepthWrite(false);
+            Unity3DGLState::OpenGLState().depthWrite.set(false);
 
             glStencilFunc(GL_NEVER, mask_layer, mask_layer);
             glStencilOp(GL_ZERO, GL_KEEP, GL_KEEP);
@@ -356,7 +356,7 @@ namespace GRAPH
         void Layout::onAfterDrawStencil()
         {
             glDepthMask(_currentDepthWriteMask);
-            RenderState::DefaultState().setDepthWrite(_currentDepthWriteMask != 0);
+            Unity3DGLState::OpenGLState().depthWrite.set(_currentDepthWriteMask != 0);
 
             glStencilFunc(GL_EQUAL, _mask_layer_le, _mask_layer_le);
 

@@ -2,6 +2,7 @@
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/ShaderState.h"
 #include "GRAPH/UNITY3D/GLStateCache.h"
+#include "GRAPH/UNITY3D/Unity3DGLState.h"
 #include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "UTILS/HASH/HashUtils.h"
 
@@ -124,7 +125,7 @@ namespace GRAPH
         GLStateCache::BindTexture2D(textureID_);
 
         //set blend mode
-        GLStateCache::BlendFunc(blendType_.src, blendType_.dst);
+        Unity3DGLState::OpenGLState().blendFunc.set(blendType_.src, blendType_.dst);
 
         shaderState_->applyU3DShader(matrix4_);
         shaderState_->applyUniforms();
@@ -174,7 +175,7 @@ namespace GRAPH
         //Set texture
         GLStateCache::BindTexture2D(textureID_);
         //set blend mode
-        GLStateCache::BlendFunc(blendType_.src, blendType_.dst);
+        Unity3DGLState::OpenGLState().blendFunc.set(blendType_.src, blendType_.dst);
         shaderState_->apply(matrix4_);
     }
 
@@ -224,7 +225,7 @@ namespace GRAPH
         shader_->apply();
         shader_->setUniformsForBuiltins(matrix4_);
         GLStateCache::BindTexture2D(textureID_);
-        GLStateCache::BlendFunc(blendType_.src, blendType_.dst);
+        Unity3DGLState::OpenGLState().blendFunc.set(blendType_.src, blendType_.dst);
 
         // Draw
         textureAtlas_->drawQuads();

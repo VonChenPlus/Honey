@@ -25,12 +25,6 @@ namespace GRAPH
     public:
         static void Invalidate(void);
 
-        static void UseProgram(GLuint program);
-        static void DeleteProgram(GLuint program);
-
-        static void BlendFunc(GLenum sfactor, GLenum dfactor);
-        static void BlendResetToCache(void);
-
         static void EnableVertexAttribs(uint32_t flags);
 
         static void BindTexture2D(GLuint textureId);

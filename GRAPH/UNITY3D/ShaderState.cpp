@@ -170,6 +170,12 @@ namespace GRAPH
 
     ShaderState::~ShaderState() {
         SAFE_RELEASE(u3dShader_);
+        for (auto vertex : attributes_) {
+            delete vertex.second;
+        }
+        for (auto uniform : uniforms_) {
+            delete uniform.second;
+        }
     }
 
     bool ShaderState::init(Unity3DShaderSet* u3dShader) {
@@ -177,13 +183,11 @@ namespace GRAPH
         u3dShader_->retain();
 
         for(auto &attrib : u3dShader_->vertexAttribs()) {
-            VertexAttribValue value(attrib.second.semantic);
-            attributes_[attrib.first] = value;
+            attributes_[attrib.first] = new VertexAttribValue(attrib.second.semantic);
         }
 
         for(auto &uniform : u3dShader_->userUniforms()) {
-            UniformValue value(&uniform.second, u3dShader_);
-            uniforms_[uniform.second.location] = value;
+            uniforms_[uniform.second.location] = new  UniformValue(&uniform.second, u3dShader_);
             uniformsByName_[uniform.first] = uniform.second.location;
         }
 
@@ -194,7 +198,7 @@ namespace GRAPH
         SAFE_RELEASE(u3dShader_);
         u3dShader_ = nullptr;
         uniforms_.clear();
-        attributes_.clear();
+        attributes_.clear(); 
         textureUnitIndex_ = 1;
     }
 
@@ -207,11 +211,11 @@ namespace GRAPH
     void ShaderState::updateUniformsAndAttributes() {
         if(uniformAttributeValueDirty_) {
             for(auto& uniformLocation : uniformsByName_) {
-                uniforms_[uniformLocation.second].uniform_ = u3dShader_->userUniform(uniformLocation.first);
+                uniforms_[uniformLocation.second]->uniform_ = u3dShader_->userUniform(uniformLocation.first);
             }
 
             for(auto& attributeValue : attributes_) {
-                attributeValue.second.vertexFormat_->components()[0].semantic = u3dShader_->vertexAttrib(attributeValue.first)->semantic;
+                attributeValue.second->vertexFormat_->components()[0].semantic = u3dShader_->vertexAttrib(attributeValue.first)->semantic;
             }
 
             uniformAttributeValueDirty_ = false;
@@ -227,13 +231,13 @@ namespace GRAPH
     void ShaderState::applyAttributes() {
         updateUniformsAndAttributes();
         for(auto &attribute : attributes_) {
-            attribute.second.apply();
+            attribute.second->apply();
         }
     }
     void ShaderState::applyUniforms() {
         updateUniformsAndAttributes();
         for(auto& uniform : uniforms_) {
-            uniform.second.apply();
+            uniform.second->apply();
         }
     }
 
@@ -248,7 +252,7 @@ namespace GRAPH
         updateUniformsAndAttributes();
         const auto itr = uniforms_.find(uniformLocation);
         if (itr != uniforms_.end())
-            return &itr->second;
+            return itr->second;
         return nullptr;
     }
 
@@ -256,7 +260,7 @@ namespace GRAPH
         updateUniformsAndAttributes();
         const auto itr = uniformsByName_.find(name);
         if (itr != uniformsByName_.end())
-            return &uniforms_[itr->second];
+            return uniforms_[itr->second];
         return nullptr;
     }
 
@@ -264,7 +268,7 @@ namespace GRAPH
         updateUniformsAndAttributes();
         const auto itr = attributes_.find(name);
         if( itr != attributes_.end())
-            return &itr->second;
+            return itr->second;
         return nullptr;
     }
 
