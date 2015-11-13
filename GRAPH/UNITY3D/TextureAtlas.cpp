@@ -1,7 +1,6 @@
 #include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "GRAPH/UNITY3D/TextureCache.h"
 #include "GRAPH/UNITY3D/Unity3DGLState.h"
-#include "GRAPH/UNITY3D/GLStateCache.h"
 
 namespace GRAPH
 {
@@ -17,10 +16,10 @@ namespace GRAPH
     TextureAtlas::~TextureAtlas() {
         SAFE_FREE(vbo_.u2.bufferData);
         SAFE_FREE(vbo_.u2.indexData);
-        SAFE_DELETE(u3dVertexBuffer_);
-        SAFE_DELETE(u3dIndexBuffer_);
-        SAFE_DELETE(u3dVertexFormat_);
-        SAFE_DELETE(u3dContext_);
+        SAFE_RELEASE(u3dVertexBuffer_);
+        SAFE_RELEASE(u3dIndexBuffer_);
+        SAFE_RELEASE(u3dVertexFormat_);
+        SAFE_RELEASE(u3dContext_);
         SAFE_RELEASE(texture_);
     }
 

@@ -8,7 +8,6 @@
 #include "GRAPH/RenderView.h"
 #include "GRAPH/Scene.h"
 #include "GRAPH/UNITY3D/Renderer.h"
-#include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Unity3DGLState.h"
 #include "UTILS/TIME/TimeUtils.h"
 

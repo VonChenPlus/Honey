@@ -79,6 +79,8 @@ namespace GRAPH
         GL_POINTS,
         GL_LINES,
         GL_TRIANGLES,
+        GL_TRIANGLE_STRIP,
+        GL_TRIANGLE_FAN
     };
 
     class Unity3DGLContext  final : public Unity3DContext

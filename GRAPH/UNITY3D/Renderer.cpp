@@ -112,8 +112,8 @@ namespace GRAPH
         SAFE_DELETE_PTRARRAY(u3dVertexBuffer_, 2);
         SAFE_DELETE_PTRARRAY(u3dIndexBuffer_, 2);
         SAFE_DELETE_PTRARRAY(u3dVertexFormat_, 2);
-        SAFE_DELETE(u3dContext_);
-        SAFE_DELETE(depthState_);
+        SAFE_RELEASE(u3dContext_);
+        SAFE_RELEASE(depthState_);
     }
 
     void Renderer::initGLView() {

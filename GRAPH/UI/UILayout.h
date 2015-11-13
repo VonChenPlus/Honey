@@ -5,6 +5,7 @@
 #include "GRAPH/Component.h"
 #include "GRAPH/UNITY3D/RenderCommand.h"
 #include "GRAPH/UI/UIWidget.h"
+#include "GRAPH/UNITY3D/Unity3D.h"
 
 namespace GRAPH
 {
@@ -32,7 +33,6 @@ namespace GRAPH
 
         class Layout : public Widget, public LayoutProtocol
         {
-
             DECLARE_CLASS_GUI_INFO
 
         public:
@@ -258,6 +258,8 @@ namespace GRAPH
             bool _loopFocus;
             bool _passFocusToChild;
             bool _isFocusPassing;
+            Unity3DVertexFormat *u3dVertexFormat_;
+            Unity3DContext *u3dContext_;
         };
 
         class HBox : public Layout

@@ -1,7 +1,6 @@
 #include "GRAPH/UNITY3D/RenderCommand.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 #include "GRAPH/UNITY3D/ShaderState.h"
-#include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Unity3DGLState.h"
 #include "GRAPH/UNITY3D/TextureAtlas.h"
 #include "UTILS/HASH/HashUtils.h"

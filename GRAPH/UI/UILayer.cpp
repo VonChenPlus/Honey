@@ -3,7 +3,6 @@
 #include "GRAPH/Director.h"
 #include "GRAPH/UNITY3D/ShaderState.h"
 #include "GRAPH/UNITY3D/Unity3DGLState.h"
-#include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 
 namespace GRAPH
@@ -104,10 +103,13 @@ namespace GRAPH
         {
             // default blend function
             _blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
+            u3dContext_ = Unity3DCreator::CreateContext();
         }
 
         LayerColor::~LayerColor()
         {
+            SAFE_RELEASE(u3dVertexFormat_);
+            SAFE_RELEASE(u3dContext_);
         }
 
         /// blendFunc getter
@@ -165,11 +167,8 @@ namespace GRAPH
             return initWithColor(Color4B(0,0,0,0), s.width, s.height);
         }
 
-        bool LayerColor::initWithColor(const Color4B& color, GLfloat w, GLfloat h)
-        {
-            if (Layer::init())
-            {
-
+        bool LayerColor::initWithColor(const Color4B& color, GLfloat w, GLfloat h) {
+            if (Layer::init()) {
                 // default blend function
                 _blendFunc = BlendFunc::ALPHA_NON_PREMULTIPLIED;
 
@@ -178,14 +177,18 @@ namespace GRAPH
                 displayedColor_.blue = realColor_.blue = color.blue;
                 displayedOpacity_ = realOpacity_ = color.alpha;
 
-                for (uint64 i = 0; i<sizeof(_squareVertices) / sizeof( _squareVertices[0]); i++ )
-                {
+                for (uint64 i = 0; i<sizeof(_squareVertices) / sizeof( _squareVertices[0]); i++ ) {
                     _squareVertices[i].x = 0.0f;
                     _squareVertices[i].y = 0.0f;
                 }
 
                 updateColor();
                 setContentSize(MATH::Sizef(w, h));
+
+                std::vector<U3DVertexComponent> vertexFormat = {
+                    U3DVertexComponent(SEM_POSITION, FLOATx3, 0, intptr(_noMVPVertices)),
+                    U3DVertexComponent(SEM_COLOR0, FLOATx4, 0, intptr(_squareColors)) };
+                u3dVertexFormat_ = Unity3DCreator::CreateVertexFormat(vertexFormat);
 
                 setU3DShaderState(ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_POSITION_COLOR_NO_MVP));
                 return true;
@@ -253,23 +256,12 @@ namespace GRAPH
             }
         }
 
-        void LayerColor::onDraw(const MATH::Matrix4& transform, uint32_t)
-        {
+        void LayerColor::onDraw(const MATH::Matrix4& transform, uint32_t) {
             getU3DShader()->apply();
             getU3DShader()->setUniformsForBuiltins(transform);
 
-            GLStateCache::EnableVertexAttribs(VERTEX_ATTRIB_FLAG_POSITION | VERTEX_ATTRIB_FLAG_COLOR );
-
-            //
-            // Attributes
-            //
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glVertexAttribPointer(SEM_POSITION, 3, GL_FLOAT, GL_FALSE, 0, _noMVPVertices);
-            glVertexAttribPointer(SEM_COLOR0, 4, GL_FLOAT, GL_FALSE, 0, _squareColors);
-
             Unity3DGLState::OpenGLState().blendFunc.set(_blendFunc.src, _blendFunc.dst);
-
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            u3dContext_->drawUp(PRIM_TRIANGLESGL_STRIP, u3dVertexFormat_, 0, 4);
         }
 
         //

@@ -4,6 +4,7 @@
 #include "GRAPH/Node.h"
 #include "GRAPH/Protocols.h"
 #include "GRAPH/UNITY3D/RenderCommand.h"
+#include "GRAPH/UNITY3D/Unity3D.h"
 #include "GRAPH/Event.h"
 
 namespace GRAPH
@@ -248,6 +249,9 @@ namespace GRAPH
             Color4F  _squareColors[4];
             CustomCommand _customCommand;
             MATH::Vector3f _noMVPVertices[4];
+            Unity3DVertexFormat *u3dVertexFormat_;
+            Unity3DContext *u3dContext_;
+
         private:
             DISALLOW_COPY_AND_ASSIGN(LayerColor)
 

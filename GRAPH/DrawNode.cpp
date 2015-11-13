@@ -3,7 +3,6 @@
 #include "GRAPH/UNITY3D/ShaderCache.h"
 #include "GRAPH/UNITY3D/ShaderState.h"
 #include "GRAPH/UNITY3D/Unity3DGLState.h"
-#include "GRAPH/UNITY3D/GLStateCache.h"
 #include "GRAPH/UNITY3D/Renderer.h"
 
 namespace GRAPH
@@ -20,7 +19,7 @@ namespace GRAPH
         }
         SAFE_DELETE_PTRARRAY(u3dVertexBuffer_, 3);
         SAFE_DELETE_PTRARRAY(u3dVertexFormat_, 3);
-        SAFE_DELETE(u3dContext_);
+        SAFE_RELEASE(u3dContext_);
     }
 
     DrawNode* DrawNode::create() {

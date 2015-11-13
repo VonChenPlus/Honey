@@ -2,7 +2,6 @@
 #include "GRAPH/Director.h"
 #include "GRAPH/UNITY3D/Unity3DGLShader.h"
 #include "GRAPH/UNITY3D/Unity3DGLState.h"
-#include "GRAPH/UNITY3D/GLStateCache.h"
 #include "UTILS/RANDOM/RandomUtils.h"
 #include "UTILS/STRING/StringUtils.h"
 

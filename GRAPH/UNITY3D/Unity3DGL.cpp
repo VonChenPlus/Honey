@@ -244,6 +244,8 @@ namespace GRAPH
     }
 
     void Unity3DGLContext::drawUp(U3DPrimitive prim, Unity3DVertexFormat *format, const void *vdata, int vertexCount) {
+        Unity3DGLState::OpenGLState().arrayBuffer.bind(0);
+
         Unity3DGLVertexFormat *fmt = static_cast<Unity3DGLVertexFormat *>(format);
 
         fmt->apply(vdata);

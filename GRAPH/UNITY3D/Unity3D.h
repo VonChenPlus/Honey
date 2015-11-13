@@ -109,6 +109,8 @@ namespace GRAPH
         PRIM_POINTS,
         PRIM_LINES,
         PRIM_TRIANGLES,
+        PRIM_TRIANGLESGL_STRIP,
+        PRIM_TRIANGLE_FAN,
     };
 
     enum U3DVertexShaderPreset : int
