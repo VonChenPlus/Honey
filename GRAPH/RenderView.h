@@ -62,8 +62,6 @@ namespace GRAPH
         virtual MATH::Vector2f getVisibleOrigin() const;
         virtual MATH::Rectf getVisibleRect() const;
 
-        void setScissorInPoints(float x , float y , float w , float h);
-
         virtual void setDesignResolutionSize(float width, float height, ResolutionPolicy resolutionPolicy);
         virtual const MATH::Sizef&  getDesignResolutionSize() const;
 

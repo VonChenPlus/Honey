@@ -385,7 +385,7 @@ namespace GRAPH
         {
             MATH::Rectf clippingRect = getClippingRect();
             glEnable(GL_SCISSOR_TEST);
-            Director::getInstance().getRenderView()->setScissorInPoints(clippingRect.origin.x, clippingRect.origin.y, clippingRect.size.width, clippingRect.size.height);
+            // TODO
         }
 
         void Layout::onAfterVisitScissor()

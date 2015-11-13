@@ -4,7 +4,6 @@
 #include <vector>
 #include <stack>
 #include "GRAPH/UNITY3D/Unity3D.h"
-#include "GRAPH/UNITY3D/GLCommon.h"
 #include "GRAPH/UNITY3D/RenderCommand.h"
 
 namespace GRAPH
