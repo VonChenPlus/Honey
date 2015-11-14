@@ -1,5 +1,6 @@
 #include "GRAPH/Camera.h"
 #include "GRAPH/Director.h"
+#include "GRAPH/UNITY3D/Unity3DGLState.h"
 
 namespace GRAPH
 {
@@ -115,7 +116,7 @@ namespace GRAPH
             }
             case Projection::_3D: {
                 float zeye = Director::getInstance().getZEye();
-                initPerspective(60, (GLfloat)size.width / size.height, 10, zeye + size.height / 2.0f);
+                initPerspective(60, (float)size.width / size.height, 10, zeye + size.height / 2.0f);
                 MATH::Vector3f eye(size.width/2, size.height/2.0f, zeye), center(size.width/2, size.height/2, 0.0f), up(0.0f, 1.0f, 0.0f);
                 setPosition3D(eye);
                 lookAt(center, up);
@@ -235,6 +236,6 @@ namespace GRAPH
     }
 
     void Camera::applyViewport() {
-        glViewport(viewport_.TopLeftX, viewport_.TopLeftY, viewport_.Width, viewport_.Height);
+        Unity3DGLState::OpenGLState().viewport.set(viewport_.TopLeftX, viewport_.TopLeftY, viewport_.Width, viewport_.Height);
     }
 }

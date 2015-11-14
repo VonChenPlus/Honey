@@ -1,9 +1,10 @@
 #include "Types.h"
+#include "GRAPH/UNITY3D/Unity3D.h"
 
 namespace GRAPH
 {
-    const BlendFunc BlendFunc::DISABLE = { GL_ONE, GL_ZERO };
-    const BlendFunc BlendFunc::ALPHA_PREMULTIPLIED = { GL_ONE, GL_ONE_MINUS_SRC_ALPHA };
-    const BlendFunc BlendFunc::ALPHA_NON_PREMULTIPLIED = { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA };
-    const BlendFunc BlendFunc::ADDITIVE = { GL_SRC_ALPHA, GL_ONE };
+    const BlendFunc BlendFunc::DISABLE = { ONE, ZERO };
+    const BlendFunc BlendFunc::ALPHA_PREMULTIPLIED = { ONE, ONE_MINUS_SRC_ALPHA };
+    const BlendFunc BlendFunc::ALPHA_NON_PREMULTIPLIED = { SRC_ALPHA, ONE_MINUS_SRC_ALPHA };
+    const BlendFunc BlendFunc::ADDITIVE = { SRC_ALPHA, ONE };
 }

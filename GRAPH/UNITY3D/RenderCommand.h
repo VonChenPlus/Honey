@@ -96,12 +96,12 @@ namespace GRAPH
         QuadCommand();
         ~QuadCommand();
 
-        void init(float globalOrder, GLuint textureID, ShaderState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, uint64 quadCount,
+        void init(float globalOrder, uint32 textureID, ShaderState* shader, const BlendFunc& blendType, V3F_C4B_T2F_Quad* quads, uint64 quadCount,
                   const MATH::Matrix4& mv, uint32_t flags);
 
         void useMaterial() const;
         inline uint32_t getMaterialID() const { return materialID_; }
-        inline GLuint getTextureID() const { return textureID_; }
+        inline uint32 getTextureID() const { return textureID_; }
         inline V3F_C4B_T2F_Quad* getQuads() const { return quads_; }
         inline uint64 getQuadCount() const { return quadsCount_; }
         inline ShaderState* getShaderState() const { return shaderState_; }
@@ -112,7 +112,7 @@ namespace GRAPH
         void generateMaterialID();
 
         uint32_t materialID_;
-        GLuint textureID_;
+        uint32 textureID_;
         ShaderState* shaderState_;
         BlendFunc blendType_;
         V3F_C4B_T2F_Quad* quads_;
@@ -134,10 +134,10 @@ namespace GRAPH
         TrianglesCommand();
         ~TrianglesCommand();
 
-        void init(float globalOrder, GLuint textureID, ShaderState* glProgramState, BlendFunc blendType, const Triangles& triangles,const MATH::Matrix4& mv, uint32_t flags);
+        void init(float globalOrder, uint32 textureID, ShaderState* glProgramState, BlendFunc blendType, const Triangles& triangles, const MATH::Matrix4& mv, uint32_t flags);
         void useMaterial() const;
         inline uint32_t getMaterialID() const { return materialID_; }
-        inline GLuint getTextureID() const { return textureID_; }
+        inline uint32 getTextureID() const { return textureID_; }
         inline const Triangles& getTriangles() const { return _triangles; }
         inline uint64 getVertexCount() const { return _triangles.vertCount; }
         inline uint64 getIndexCount() const { return _triangles.indexCount; }
@@ -151,7 +151,7 @@ namespace GRAPH
         void generateMaterialID();
 
         uint32_t materialID_;
-        GLuint textureID_;
+        uint32 textureID_;
         ShaderState* shaderState_;
         BlendFunc blendType_;
         Triangles _triangles;
@@ -185,7 +185,7 @@ namespace GRAPH
         void execute();
 
     protected:
-        GLuint textureID_;
+        uint32 textureID_;
         Unity3DShaderSet* shader_;
         BlendFunc blendType_;
         TextureAtlas *textureAtlas_;

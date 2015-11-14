@@ -80,8 +80,8 @@ namespace GRAPH
             const Color3B& getBackGroundStartColor()const;
             const Color3B& getBackGroundEndColor()const;
 
-            void setBackGroundColorOpacity(GLubyte opacity);
-            GLubyte getBackGroundColorOpacity()const;
+            void setBackGroundColorOpacity(uint8 opacity);
+            uint8 getBackGroundColorOpacity()const;
 
             void setBackGroundColorVector(const MATH::Vector2f &vector);
             const MATH::Vector2f& getBackGroundColorVector()const;
@@ -89,8 +89,8 @@ namespace GRAPH
             void setBackGroundImageColor(const Color3B& color);
             const Color3B& getBackGroundImageColor()const;
 
-            void setBackGroundImageOpacity(GLubyte opacity);
-            GLubyte getBackGroundImageOpacity()const;
+            void setBackGroundImageOpacity(uint8 opacity);
+            uint8 getBackGroundImageOpacity()const;
 
             void removeBackGroundImage();
 
@@ -160,10 +160,6 @@ namespace GRAPH
             virtual MATH::Sizef getLayoutContentSize()const override;
             virtual const HObjectVector<Node*>& getLayoutElements()const override;
 
-            void onBeforeVisitStencil();
-            void onAfterDrawStencil();
-            void onAfterVisitStencil();
-
             void drawFullScreenQuadClearStencil();
 
             void onBeforeVisitScissor();
@@ -210,7 +206,7 @@ namespace GRAPH
             TextureResType _bgImageTexType;
             MATH::Sizef _backGroundImageTextureSize;
             Color3B _backGroundImageColor;
-            GLubyte _backGroundImageOpacity;
+            uint8 _backGroundImageOpacity;
 
             LayerColor* _colorRender;
             LayerGradient* _gradientRender;
@@ -218,7 +214,7 @@ namespace GRAPH
             Color3B _gStartColor;
             Color3B _gEndColor;
             MATH::Vector2f _alongVector;
-            GLubyte _cOpacity;
+            uint8 _cOpacity;
 
             bool _clippingEnabled;
             Type _layoutType;
@@ -229,28 +225,7 @@ namespace GRAPH
             Layout* _clippingParent;
             bool _clippingRectDirty;
 
-            GLboolean _currentStencilEnabled;
-            GLuint _currentStencilWriteMask;
-            GLenum _currentStencilFunc;
-            GLint _currentStencilRef;
-            GLuint _currentStencilValueMask;
-            GLenum _currentStencilFail;
-            GLenum _currentStencilPassDepthFail;
-            GLenum _currentStencilPassDepthPass;
-            GLboolean _currentDepthWriteMask;
-
-            GLboolean _currentAlphaTestEnabled;
-            GLenum _currentAlphaTestFunc;
-            GLclampf _currentAlphaTestRef;
-
-
-            GLint _mask_layer_le;
             GroupCommand _groupCommand;
-            CustomCommand _beforeVisitCmdStencil;
-            CustomCommand _afterDrawStencilCmd;
-            CustomCommand _afterVisitCmdStencil;
-            CustomCommand _beforeVisitCmdScissor;
-            CustomCommand _afterVisitCmdScissor;
 
             bool _doLayoutDirty;
             bool _isInterceptTouch;

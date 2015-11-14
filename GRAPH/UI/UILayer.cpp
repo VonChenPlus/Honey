@@ -422,24 +422,24 @@ namespace GRAPH
             return _endColor;
         }
 
-        void LayerGradient::setStartOpacity(GLubyte o)
+        void LayerGradient::setStartOpacity(uint8 o)
         {
             _startOpacity = o;
             updateColor();
         }
 
-        GLubyte LayerGradient::getStartOpacity() const
+        uint8 LayerGradient::getStartOpacity() const
         {
             return _startOpacity;
         }
 
-        void LayerGradient::setEndOpacity(GLubyte o)
+        void LayerGradient::setEndOpacity(uint8 o)
         {
             _endOpacity = o;
             updateColor();
         }
 
-        GLubyte LayerGradient::getEndOpacity() const
+        uint8 LayerGradient::getEndOpacity() const
         {
             return _endOpacity;
         }

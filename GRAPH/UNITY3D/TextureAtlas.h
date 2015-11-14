@@ -1,8 +1,8 @@
 #ifndef TEXTUREATLAS_H
 #define TEXTUREATLAS_H
 
+#include "GRAPH/Types.h"
 #include "GRAPH/UNITY3D/Unity3D.h"
-#include "GRAPH/UNITY3D/GLCommon.h"
 
 namespace GRAPH
 {

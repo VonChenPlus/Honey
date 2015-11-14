@@ -82,7 +82,7 @@ namespace GRAPH
             virtual bool isOpacityModifyRGB() const override { return _isOpacityModifyRGB; }
             virtual void setOpacityModifyRGB(bool isOpacityModifyRGB) override;
             virtual void updateDisplayedColor(const Color3B& parentColor) override;
-            virtual void updateDisplayedOpacity(GLubyte parentOpacity) override;
+            virtual void updateDisplayedOpacity(uint8 parentOpacity) override;
 
             virtual const MATH::Sizef& getContentSize() const override;
             virtual MATH::Rectf getBoundingBox() const override;
@@ -182,8 +182,8 @@ namespace GRAPH
             QuadCommand _quadCommand;
             CustomCommand _customCommand;
             MATH::Matrix4  _shadowTransform;
-            GLuint _uniformEffectColor;
-            GLuint _uniformTextColor;
+            uint32 _uniformEffectColor;
+            uint32 _uniformTextColor;
             bool _useDistanceField;
             bool _useA8Shader;
 
@@ -193,7 +193,7 @@ namespace GRAPH
 
             Color4F _shadowColor4F;
             Color3B _shadowColor3B;
-            GLubyte _shadowOpacity;
+            uint8 _shadowOpacity;
             float _shadowBlurRadius;
 
             bool _clipEnabled;

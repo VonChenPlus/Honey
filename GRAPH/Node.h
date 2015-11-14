@@ -3,7 +3,6 @@
 
 #include <functional>
 #include "BASE/HObject.h"
-#include "GRAPH/UNITY3D/GLCommon.h"
 #include "GRAPH/Color.h"
 #include "MATH/Vector.h"
 #include "MATH/Quaternion.h"
@@ -250,10 +249,10 @@ namespace GRAPH
         virtual void removeAllComponents();
 
         // overrides
-        virtual GLubyte getOpacity() const;
-        virtual GLubyte getDisplayedOpacity() const;
-        virtual void setOpacity(GLubyte opacity);
-        virtual void updateDisplayedOpacity(GLubyte parentOpacity);
+        virtual uint8 getOpacity() const;
+        virtual uint8 getDisplayedOpacity() const;
+        virtual void setOpacity(uint8 opacity);
+        virtual void updateDisplayedOpacity(uint8 parentOpacity);
         virtual bool isCascadeOpacityEnabled() const;
         virtual void setCascadeOpacityEnabled(bool cascadeOpacityEnabled);
 
@@ -384,8 +383,8 @@ namespace GRAPH
 
         ComponentContainer *componentContainer_;
 
-        GLubyte		displayedOpacity_;
-        GLubyte     realOpacity_;
+        uint8		displayedOpacity_;
+        uint8     realOpacity_;
         Color3B	    displayedColor_;
         Color3B     realColor_;
         bool		cascadeColorEnabled_;
@@ -436,7 +435,7 @@ namespace GRAPH
         virtual void onExit() override;
         virtual void onExitTransitionDidStart() override;
 
-        virtual void updateDisplayedOpacity(GLubyte parentOpacity) override;
+        virtual void updateDisplayedOpacity(uint8 parentOpacity) override;
         virtual void updateDisplayedColor(const Color3B& parentColor) override;
         virtual void disableCascadeColor() override;
         virtual void disableCascadeOpacity()override;

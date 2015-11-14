@@ -105,7 +105,7 @@ namespace GRAPH
             virtual void onExit() override;
             virtual void onExitTransitionDidStart() override;
 
-            virtual void updateDisplayedOpacity(GLubyte parentOpacity) override;
+            virtual void updateDisplayedOpacity(uint8 parentOpacity) override;
             virtual void updateDisplayedColor(const Color3B& parentColor) override;
             virtual void disableCascadeColor() override;
             virtual void disableCascadeOpacity() override;

@@ -66,7 +66,7 @@ namespace GRAPH
         return rect.contains(MATH::Vector2f(P.x, P.y));
     }
 
-    void CGAffineToGL(const MATH::AffineTransform& t, GLfloat *m)
+    void CGAffineToGL(const MATH::AffineTransform& t, float *m)
     {
         // | m[0] m[4] m[8]  m[12] |     | m11 m21 m31 m41 |     | a c 0 tx |
         // | m[1] m[5] m[9]  m[13] |     | m12 m22 m32 m42 |     | b d 0 ty |
@@ -79,7 +79,7 @@ namespace GRAPH
         m[1] = t.b; m[5] = t.d; m[13] = t.ty;
     }
 
-    void GLToCGAffine(const GLfloat *m, MATH::AffineTransform *t)
+    void GLToCGAffine(const float *m, MATH::AffineTransform *t)
     {
         t->a = m[0]; t->c = m[4]; t->tx = m[12];
         t->b = m[1]; t->d = m[5]; t->ty = m[13];
@@ -1545,24 +1545,24 @@ namespace GRAPH
             child->updateTransform();
     }
 
-    GLubyte Node::getOpacity(void) const
+    uint8 Node::getOpacity(void) const
     {
         return realOpacity_;
     }
 
-    GLubyte Node::getDisplayedOpacity() const
+    uint8 Node::getDisplayedOpacity() const
     {
         return displayedOpacity_;
     }
 
-    void Node::setOpacity(GLubyte opacity)
+    void Node::setOpacity(uint8 opacity)
     {
         displayedOpacity_ = realOpacity_ = opacity;
 
         updateCascadeOpacity();
     }
 
-    void Node::updateDisplayedOpacity(GLubyte parentOpacity)
+    void Node::updateDisplayedOpacity(uint8 parentOpacity)
     {
         displayedOpacity_ = realOpacity_ * parentOpacity/255.0;
         updateColor();
@@ -1602,7 +1602,7 @@ namespace GRAPH
 
     void Node::updateCascadeOpacity()
     {
-        GLubyte parentOpacity = 255;
+        uint8 parentOpacity = 255;
 
         if (parent_ != nullptr && parent_->isCascadeOpacityEnabled())
         {
@@ -1955,7 +1955,7 @@ namespace GRAPH
             child->onExit();
     }
 
-    void ProtectedNode::updateDisplayedOpacity(GLubyte parentOpacity)
+    void ProtectedNode::updateDisplayedOpacity(uint8 parentOpacity)
     {
         displayedOpacity_ = realOpacity_ * parentOpacity/255.0;
         updateColor();

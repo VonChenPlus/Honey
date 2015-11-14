@@ -145,10 +145,10 @@ namespace GRAPH
             //
             // Overrides
             //
-            virtual GLubyte getOpacity() const override { return Layer::getOpacity(); }
-            virtual GLubyte getDisplayedOpacity() const override { return Layer::getDisplayedOpacity(); }
-            virtual void setOpacity(GLubyte opacity) override { return Layer::setOpacity(opacity); }
-            virtual void updateDisplayedOpacity(GLubyte parentOpacity) override { return Layer::updateDisplayedOpacity(parentOpacity); }
+            virtual uint8 getOpacity() const override { return Layer::getOpacity(); }
+            virtual uint8 getDisplayedOpacity() const override { return Layer::getDisplayedOpacity(); }
+            virtual void setOpacity(uint8 opacity) override { return Layer::setOpacity(opacity); }
+            virtual void updateDisplayedOpacity(uint8 parentOpacity) override { return Layer::updateDisplayedOpacity(parentOpacity); }
             virtual bool isCascadeOpacityEnabled() const override { return Layer::isCascadeOpacityEnabled(); }
             virtual void setCascadeOpacityEnabled(bool cascadeOpacityEnabled) override { return Layer::setCascadeOpacityEnabled(cascadeOpacityEnabled); }
 
@@ -185,7 +185,7 @@ namespace GRAPH
              * @param height The height of layer.
              * @return An autoreleased LayerColor object.
              */
-            static LayerColor * create(const Color4B& color, GLfloat width, GLfloat height);
+            static LayerColor * create(const Color4B& color, float width, float height);
             /** Creates a Layer with color. Width and height are the window size.
              *
              * @param color The color of layer.
@@ -197,19 +197,19 @@ namespace GRAPH
              *
              * @param w The width of layer.
              */
-            void changeWidth(GLfloat w);
+            void changeWidth(float w);
             /** Change height in Points.
              *
              * @param h The height of layer.
              */
-            void changeHeight(GLfloat h);
+            void changeHeight(float h);
             /** Change width and height in Points.
              *
              * @param w The width of layer.
              * @param h The Height of layer.
             @since v0.8
             */
-            void changeWidthAndHeight(GLfloat w ,GLfloat h);
+            void changeWidthAndHeight(float w ,float h);
 
             //
             // Overrides
@@ -236,7 +236,7 @@ namespace GRAPH
             virtual ~LayerColor();
 
             bool init() override;
-            bool initWithColor(const Color4B& color, GLfloat width, GLfloat height);
+            bool initWithColor(const Color4B& color, float width, float height);
             bool initWithColor(const Color4B& color);
 
         protected:
@@ -321,23 +321,23 @@ namespace GRAPH
              *
              * @param startOpacity The start opacity, from 0 to 255.
              */
-            void setStartOpacity( GLubyte startOpacity );
+            void setStartOpacity( uint8 startOpacity );
             /** Returns the start opacity of the gradient.
              *
              * @return The start opacity.
              */
-            GLubyte getStartOpacity() const;
+            uint8 getStartOpacity() const;
 
             /** Returns the end opacity of the gradient.
              *
              * @param endOpacity The end opacity, from 0 to 255.
              */
-            void setEndOpacity( GLubyte endOpacity );
+            void setEndOpacity( uint8 endOpacity );
             /** Returns the end opacity of the gradient.
              *
              * @return The end opacity.
              */
-            GLubyte getEndOpacity() const;
+            uint8 getEndOpacity() const;
 
             /** Sets the directional vector that will be used for the gradient.
             The default value is vertical direction (0,-1).
@@ -373,8 +373,8 @@ namespace GRAPH
 
             Color3B _startColor;
             Color3B _endColor;
-            GLubyte _startOpacity;
-            GLubyte _endOpacity;
+            uint8 _startOpacity;
+            uint8 _endOpacity;
             MATH::Vector2f   _alongVector;
             bool    _compressedInterpolation;
         };

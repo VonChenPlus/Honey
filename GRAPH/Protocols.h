@@ -17,9 +17,9 @@ namespace GRAPH
         virtual void setColor(const Color3B& color) = 0;
         virtual const Color3B& getColor() const = 0;
         virtual const Color3B& getDisplayedColor() const = 0;
-        virtual GLubyte getDisplayedOpacity() const = 0;
-        virtual GLubyte getOpacity() const = 0;
-        virtual void setOpacity(GLubyte opacity) = 0;
+        virtual uint8 getDisplayedOpacity() const = 0;
+        virtual uint8 getOpacity() const = 0;
+        virtual void setOpacity(uint8 opacity) = 0;
         virtual void setOpacityModifyRGB(bool value) = 0;
         virtual bool isOpacityModifyRGB() const = 0;
         virtual bool isCascadeColorEnabled() const = 0;
@@ -27,7 +27,7 @@ namespace GRAPH
         virtual void updateDisplayedColor(const Color3B& color) = 0;
         virtual bool isCascadeOpacityEnabled() const = 0;
         virtual void setCascadeOpacityEnabled(bool cascadeOpacityEnabled) = 0;
-        virtual void updateDisplayedOpacity(GLubyte opacity) = 0;
+        virtual void updateDisplayedOpacity(uint8 opacity) = 0;
     };
 
     class BlendProtocol

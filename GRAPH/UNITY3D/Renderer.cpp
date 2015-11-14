@@ -99,7 +99,7 @@ namespace GRAPH
         for (auto &object : vboArray_) {
             object.u2.bufferData = new V3F_C4B_T2F[VBO_SIZE];
             object.u2.bufferCapacity = VBO_SIZE;
-            object.u2.indexData = new GLushort[INDEX_VBO_SIZE];
+            object.u2.indexData = new uint16[INDEX_VBO_SIZE];
             object.u2.indexCapacity = INDEX_VBO_SIZE;
         }
 
@@ -118,12 +118,12 @@ namespace GRAPH
 
     void Renderer::initGLView() {
         for (int i = 0; i < VBO_SIZE / 4; i++) {
-            vboArray_[QUADS].u2.indexData[i * 6 + 0] = (GLushort) (i * 4 + 0);
-            vboArray_[QUADS].u2.indexData[i * 6 + 1] = (GLushort) (i * 4 + 1);
-            vboArray_[QUADS].u2.indexData[i * 6 + 2] = (GLushort) (i * 4 + 2);
-            vboArray_[QUADS].u2.indexData[i * 6 + 3] = (GLushort) (i * 4 + 3);
-            vboArray_[QUADS].u2.indexData[i * 6 + 4] = (GLushort) (i * 4 + 2);
-            vboArray_[QUADS].u2.indexData[i * 6 + 5] = (GLushort) (i * 4 + 1);
+            vboArray_[QUADS].u2.indexData[i * 6 + 0] = (uint16) (i * 4 + 0);
+            vboArray_[QUADS].u2.indexData[i * 6 + 1] = (uint16) (i * 4 + 1);
+            vboArray_[QUADS].u2.indexData[i * 6 + 2] = (uint16) (i * 4 + 2);
+            vboArray_[QUADS].u2.indexData[i * 6 + 3] = (uint16) (i * 4 + 3);
+            vboArray_[QUADS].u2.indexData[i * 6 + 4] = (uint16) (i * 4 + 2);
+            vboArray_[QUADS].u2.indexData[i * 6 + 5] = (uint16) (i * 4 + 1);
         }
 
         setupBuffer();
@@ -136,7 +136,7 @@ namespace GRAPH
             u3dIndexBuffer_[index] = Unity3DCreator::CreateBuffer(INDEXDATA);
 
             u3dVertexBuffer_[index]->setData((const uint8 *) vboArray_[index].u2.bufferData, sizeof(V3F_C4B_T2F) * vboArray_[index].u2.bufferCapacity);
-            u3dIndexBuffer_[index]->setData((const uint8 *) vboArray_[index].u2.indexData, sizeof(GLushort) * vboArray_[index].u2.indexCapacity);
+            u3dIndexBuffer_[index]->setData((const uint8 *) vboArray_[index].u2.indexData, sizeof(uint16) * vboArray_[index].u2.indexCapacity);
 
             std::vector<U3DVertexComponent> vertexFormat = {
                 U3DVertexComponent(SEM_POSITION, FLOATx3, sizeof(V3F_C4B_T2F), offsetof(V3F_C4B_T2F, vertices)),
@@ -416,7 +416,7 @@ namespace GRAPH
         u3dVertexBuffer_[TRIANGLES]->setData((const uint8 *) vboArray_[TRIANGLES].u2.bufferData, sizeof(V3F_C4B_T2F) * vboArray_[TRIANGLES].u2.bufferCount);
 
         u3dIndexBuffer_[TRIANGLES]->bind();
-        u3dIndexBuffer_[TRIANGLES]->setData((const uint8 *) vboArray_[TRIANGLES].u2.indexData, sizeof(GLushort) * vboArray_[TRIANGLES].u2.indexCount);
+        u3dIndexBuffer_[TRIANGLES]->setData((const uint8 *) vboArray_[TRIANGLES].u2.indexData, sizeof(uint16) * vboArray_[TRIANGLES].u2.indexCount);
 
         // Start drawing verties in batch
         for(const auto& cmd : batchedCommands_) {
@@ -424,7 +424,7 @@ namespace GRAPH
             if(lastMaterialID_ != newMaterialID || newMaterialID == MATERIAL_ID_DO_NOT_BATCH) {
                 // Draw quads
                 if(indexToDraw > 0) {
-                    u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[TRIANGLES], u3dVertexBuffer_[TRIANGLES], u3dIndexBuffer_[TRIANGLES], (void *) (startIndex*sizeof(GLushort)), indexToDraw);
+                    u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[TRIANGLES], u3dVertexBuffer_[TRIANGLES], u3dIndexBuffer_[TRIANGLES], (void *) (startIndex*sizeof(uint16)), indexToDraw);
                     startIndex += indexToDraw;
                     indexToDraw = 0;
                 }
@@ -439,7 +439,7 @@ namespace GRAPH
 
         //Draw any remaining triangles
         if(indexToDraw > 0) {
-            u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[TRIANGLES], u3dVertexBuffer_[TRIANGLES], u3dIndexBuffer_[TRIANGLES], (void *) (startIndex*sizeof(GLushort)), indexToDraw);
+            u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[TRIANGLES], u3dVertexBuffer_[TRIANGLES], u3dIndexBuffer_[TRIANGLES], (void *) (startIndex*sizeof(uint16)), indexToDraw);
         }
 
         batchedCommands_.clear();
@@ -467,7 +467,7 @@ namespace GRAPH
             if(lastMaterialID_ != newMaterialID || newMaterialID == MATERIAL_ID_DO_NOT_BATCH) {
                 // flush buffer
                 if(indexToDraw > 0) {
-                    u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[QUADS], u3dVertexBuffer_[QUADS], u3dIndexBuffer_[QUADS], (void *) (startIndex*sizeof(GLushort)), indexToDraw);
+                    u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[QUADS], u3dVertexBuffer_[QUADS], u3dIndexBuffer_[QUADS], (void *) (startIndex*sizeof(uint16)), indexToDraw);
                     startIndex += indexToDraw;
                     indexToDraw = 0;
                 }
@@ -485,7 +485,7 @@ namespace GRAPH
 
         //Draw any remaining quad
         if(indexToDraw > 0) {
-            u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[QUADS], u3dVertexBuffer_[QUADS], u3dIndexBuffer_[QUADS], (void *) (startIndex*sizeof(GLushort)), indexToDraw);
+            u3dContext_->drawIndexed(PRIM_TRIANGLES, u3dVertexFormat_[QUADS], u3dVertexBuffer_[QUADS], u3dIndexBuffer_[QUADS], (void *) (startIndex*sizeof(uint16)), indexToDraw);
         }
 
         batchQuadCommands_.clear();

@@ -346,7 +346,7 @@ namespace GRAPH
                                             const MATH::Sizef &originalSize,
                                             const MATH::Rectf& capInsets)
         {
-            GLubyte opacity = getOpacity();
+            uint8 opacity = getOpacity();
             Color3B color = getColor();
 
             // Release old sprites
@@ -1287,7 +1287,7 @@ namespace GRAPH
             }
         }
 
-        void Scale9Sprite::updateDisplayedOpacity(GLubyte parentOpacity)
+        void Scale9Sprite::updateDisplayedOpacity(uint8 parentOpacity)
         {
             displayedOpacity_ = realOpacity_ * parentOpacity/255.0;
             updateColor();

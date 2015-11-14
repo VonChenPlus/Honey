@@ -47,18 +47,6 @@ namespace GRAPH
         _clippingRect(MATH::RectfZERO),
         _clippingParent(nullptr),
         _clippingRectDirty(true),
-        _currentStencilEnabled(GL_FALSE),
-        _currentStencilWriteMask(~0),
-        _currentStencilFunc(GL_ALWAYS),
-        _currentStencilRef(0),
-        _currentStencilValueMask(~0),
-        _currentStencilFail(GL_KEEP),
-        _currentStencilPassDepthFail(GL_KEEP),
-        _currentStencilPassDepthPass(GL_KEEP),
-        _currentDepthWriteMask(GL_TRUE),
-        _currentAlphaTestEnabled(GL_FALSE),
-        _currentAlphaTestFunc(GL_ALWAYS),
-        _currentAlphaTestRef(1),
         _doLayoutDirty(true),
         _isInterceptTouch(false),
         _loopFocus(false),
@@ -234,16 +222,6 @@ namespace GRAPH
 
             renderer->pushGroup(_groupCommand.getRenderQueueID());
 
-            _beforeVisitCmdStencil.init(globalZOrder_);
-            _beforeVisitCmdStencil.func = std::bind(&Layout::onBeforeVisitStencil, this);
-            renderer->addCommand(&_beforeVisitCmdStencil);
-
-            _clippingStencil->visit(renderer, modelViewTransform_, flags);
-
-            _afterDrawStencilCmd.init(globalZOrder_);
-            _afterDrawStencilCmd.func = std::bind(&Layout::onAfterDrawStencil, this);
-            renderer->addCommand(&_afterDrawStencilCmd);
-
             int i = 0;      // used by _children
             int j = 0;      // used by _protectedChildren
 
@@ -287,49 +265,9 @@ namespace GRAPH
             for(auto it=children_.cbegin()+i; it != children_.cend(); ++it)
                 (*it)->visit(renderer, modelViewTransform_, flags);
 
-
-            _afterVisitCmdStencil.init(globalZOrder_);
-            _afterVisitCmdStencil.func = std::bind(&Layout::onAfterVisitStencil, this);
-            renderer->addCommand(&_afterVisitCmdStencil);
-
             renderer->popGroup();
 
             Director::getInstance().popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-        }
-
-        void Layout::onBeforeVisitStencil()
-        {
-            s_layer++;
-            GLint mask_layer = 0x1 << s_layer;
-            GLint mask_layer_l = mask_layer - 1;
-            _mask_layer_le = mask_layer | mask_layer_l;
-            _currentStencilEnabled = glIsEnabled(GL_STENCIL_TEST);
-            glGetIntegerv(GL_STENCIL_WRITEMASK, (GLint *)&_currentStencilWriteMask);
-            glGetIntegerv(GL_STENCIL_FUNC, (GLint *)&_currentStencilFunc);
-            glGetIntegerv(GL_STENCIL_REF, &_currentStencilRef);
-            glGetIntegerv(GL_STENCIL_VALUE_MASK, (GLint *)&_currentStencilValueMask);
-            glGetIntegerv(GL_STENCIL_FAIL, (GLint *)&_currentStencilFail);
-            glGetIntegerv(GL_STENCIL_PASS_DEPTH_FAIL, (GLint *)&_currentStencilPassDepthFail);
-            glGetIntegerv(GL_STENCIL_PASS_DEPTH_PASS, (GLint *)&_currentStencilPassDepthPass);
-
-            glEnable(GL_STENCIL_TEST);
-
-            glStencilMask(mask_layer);
-
-            glGetBooleanv(GL_DEPTH_WRITEMASK, &_currentDepthWriteMask);
-
-            glDepthMask(GL_FALSE);
-            Unity3DGLState::OpenGLState().depthWrite.set(false);
-
-            glStencilFunc(GL_NEVER, mask_layer, mask_layer);
-            glStencilOp(GL_ZERO, GL_KEEP, GL_KEEP);
-
-
-            this->drawFullScreenQuadClearStencil();
-
-            glStencilFunc(GL_NEVER, mask_layer, mask_layer);
-
-            glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
         }
 
         void Layout::drawFullScreenQuadClearStencil()
@@ -356,31 +294,6 @@ namespace GRAPH
             Director::getInstance().popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
         }
 
-        void Layout::onAfterDrawStencil()
-        {
-            glDepthMask(_currentDepthWriteMask);
-            Unity3DGLState::OpenGLState().depthWrite.set(_currentDepthWriteMask != 0);
-
-            glStencilFunc(GL_EQUAL, _mask_layer_le, _mask_layer_le);
-
-            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        }
-
-
-        void Layout::onAfterVisitStencil()
-        {
-            glStencilFunc(_currentStencilFunc, _currentStencilRef, _currentStencilValueMask);
-
-            glStencilOp(_currentStencilFail, _currentStencilPassDepthFail, _currentStencilPassDepthPass);
-
-            glStencilMask(_currentStencilWriteMask);
-            if (!_currentStencilEnabled)
-            {
-                glDisable(GL_STENCIL_TEST);
-            }
-            s_layer--;
-        }
-
         void Layout::onBeforeVisitScissor()
         {
             MATH::Rectf clippingRect = getClippingRect();
@@ -395,15 +308,9 @@ namespace GRAPH
 
         void Layout::scissorClippingVisit(Renderer *renderer, const MATH::Matrix4& parentTransform, uint32_t parentFlags)
         {
-            _beforeVisitCmdScissor.init(globalZOrder_);
-            _beforeVisitCmdScissor.func = std::bind(&Layout::onBeforeVisitScissor, this);
-            renderer->addCommand(&_beforeVisitCmdScissor);
-
-            ProtectedNode::visit(renderer, parentTransform, parentFlags);
-
-            _afterVisitCmdScissor.init(globalZOrder_);
-            _afterVisitCmdScissor.func = std::bind(&Layout::onAfterVisitScissor, this);
-            renderer->addCommand(&_afterVisitCmdScissor);
+            UNUSED(renderer);
+            UNUSED(parentTransform);
+            UNUSED(parentFlags);
         }
 
         void Layout::setClippingEnabled(bool able)
@@ -813,7 +720,7 @@ namespace GRAPH
             return _gEndColor;
         }
 
-        void Layout::setBackGroundColorOpacity(GLubyte opacity)
+        void Layout::setBackGroundColorOpacity(uint8 opacity)
         {
             _cOpacity = opacity;
             switch (_colorType)
@@ -831,7 +738,7 @@ namespace GRAPH
             }
         }
 
-        GLubyte Layout::getBackGroundColorOpacity()const
+        uint8 Layout::getBackGroundColorOpacity()const
         {
             return _cOpacity;
         }
@@ -856,7 +763,7 @@ namespace GRAPH
             updateBackGroundImageColor();
         }
 
-        void Layout::setBackGroundImageOpacity(GLubyte opacity)
+        void Layout::setBackGroundImageOpacity(uint8 opacity)
         {
             _backGroundImageOpacity = opacity;
             updateBackGroundImageOpacity();
@@ -867,7 +774,7 @@ namespace GRAPH
             return _backGroundImageColor;
         }
 
-        GLubyte Layout::getBackGroundImageOpacity()const
+        uint8 Layout::getBackGroundImageOpacity()const
         {
             return _backGroundImageOpacity;
         }
