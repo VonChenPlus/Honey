@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stack>
+#include "GRAPH/Types.h"
 #include "GRAPH/UNITY3D/Unity3D.h"
 #include "GRAPH/UNITY3D/RenderCommand.h"
 
