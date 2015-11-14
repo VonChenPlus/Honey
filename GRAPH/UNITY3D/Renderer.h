@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <stack>
-#include "GRAPH/Types.h"
 #include "GRAPH/UNITY3D/Unity3D.h"
 #include "GRAPH/UNITY3D/RenderCommand.h"
 
@@ -129,7 +128,7 @@ namespace GRAPH
         bool glViewAssigned_;
         bool isRendering_;
         bool isDepthTestFor2D_;
-        uint32_t lastMaterialID_;
+        uint32 lastMaterialID_;
     };
 }
 

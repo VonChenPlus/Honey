@@ -20,14 +20,5 @@ typedef char GLchar;
 #include <GL/gl.h>
 #endif
 #endif
-
-#include "MATH/Vector.h"
-#include "GRAPH/Color.h"
-
-namespace GRAPH
-{
-    
-}
-
 #endif // GLCOMMON_H
 

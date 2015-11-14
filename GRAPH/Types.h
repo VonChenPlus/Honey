@@ -1,6 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <stddef.h>
 #include "MATH/Vector.h"
 #include "MATH/Size.h"
 #include "GRAPH/Color.h"
