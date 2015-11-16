@@ -354,7 +354,7 @@ namespace GRAPH
         if(!numberOfQuads)
             return;
 
-        Unity3DGLState::BindTexture2D(texture_->texture());
+        Unity3DGLState::OpenGLState().texture2d.set(texture_->texture());
 
         if (dirty_) {
             u3dVertexBuffer_->bind();

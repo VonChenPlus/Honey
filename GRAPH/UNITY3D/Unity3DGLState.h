@@ -53,7 +53,7 @@ namespace GRAPH
             }
         };
 
-#define STATE1(func, p1type, p1def) \
+        #define STATE1(func, p1type, p1def) \
         class SavedState1_##func { \
             p1type p1; \
         public: \
@@ -74,7 +74,7 @@ namespace GRAPH
             } \
         }
 
-    #define STATE2(func, p1type, p2type, p1def, p2def) \
+        #define STATE2(func, p1type, p2type, p1def, p2def) \
         class SavedState2_##func { \
             p1type p1; \
             p2type p2; \
@@ -94,7 +94,7 @@ namespace GRAPH
             } \
         }
 
-    #define STATE3(func, p1type, p2type, p3type, p1def, p2def, p3def) \
+        #define STATE3(func, p1type, p2type, p3type, p1def, p2def, p3def) \
         class SavedState3_##func { \
             p1type p1; \
             p2type p2; \
@@ -140,7 +140,7 @@ namespace GRAPH
             } \
         }
 
-    #define STATEFLOAT4(func, def) \
+        #define STATEFLOAT4(func, def) \
         class SavedState4_##func { \
             float p[4]; \
         public: \
@@ -159,12 +159,12 @@ namespace GRAPH
             } \
         }
 
-    #define STATEBIND(func, target) \
+        #define STATEBIND(func, target, pdef) \
         class SavedBind_##func_##target { \
             GLuint val_; \
         public: \
             SavedBind_##func_##target() { \
-                val_ = 0; \
+                val_ = pdef; \
                 Unity3DGLState::state_count++; \
             } \
             inline void bind(GLuint val) { \
@@ -178,6 +178,25 @@ namespace GRAPH
             } \
             inline void restore() { \
                 func(target, val_); \
+            } \
+        }
+
+        #define SAVETEXUTER(target) \
+        class SaveState_Texture##target { \
+            STATE1(glActiveTexture, GLuint, -1) state1; \
+            STATEBIND(glBindTexture, target, -1) state2; \
+        public: \
+            SaveState_Texture##target() { \
+                Unity3DGLState::state_count--; \
+            } \
+            \
+            inline void set(GLuint newp2, GLuint newp1 = 0) { \
+                state1.set(newp1); \
+                state2.bind(newp2); \
+            } \
+            inline void restore() { \
+                state1.restore(); \
+                state2.restore(); \
             } \
         }
 
@@ -235,12 +254,11 @@ namespace GRAPH
         STATE3(glStencilFunc, GLenum, GLint, GLuint, GL_ALWAYS, 0, 0xFF) stencilFunc;
         STATE1(glStencilMask, GLuint, 0xFF) stencilMask;
 
-        STATEBIND(glBindBuffer, GL_ARRAY_BUFFER) arrayBuffer;
-        STATEBIND(glBindBuffer, GL_ELEMENT_ARRAY_BUFFER) elementArrayBuffer;
+        STATEBIND(glBindBuffer, GL_ARRAY_BUFFER, 0) arrayBuffer;
+        STATEBIND(glBindBuffer, GL_ELEMENT_ARRAY_BUFFER, 0) elementArrayBuffer;
 
-        static void BindTexture2D(GLuint textureId);
-        static void BindTexture2DN(GLuint textureUnit, GLuint textureId);
-        static void BindTextureN(GLuint textureUnit, GLuint textureId, GLuint textureType = GL_TEXTURE_2D);
+        SAVETEXUTER(GL_TEXTURE_2D) texture2d;
+        SAVETEXUTER(GL_TEXTURE_CUBE_MAP) texturecubemap;
     };
 
     #undef STATE1

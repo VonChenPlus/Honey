@@ -126,12 +126,12 @@ namespace GRAPH
         switch (component_.type) {
         case GL_SAMPLER_2D:
             u3dShader_->setUniformLocationWith1i(component_.location, component_.value.tex.textureUnit);
-            Unity3DGLState::BindTexture2DN(component_.value.tex.textureUnit, component_.value.tex.textureId);
+            Unity3DGLState::OpenGLState().texture2d.set(component_.value.tex.textureId, component_.value.tex.textureUnit);
             break;
 
         case GL_SAMPLER_CUBE:
             u3dShader_->setUniformLocationWith1i(component_.location, component_.value.tex.textureUnit);
-            Unity3DGLState::BindTextureN(component_.value.tex.textureUnit, component_.value.tex.textureId, GL_TEXTURE_CUBE_MAP);
+            Unity3DGLState::OpenGLState().texturecubemap.set(component_.value.tex.textureId, component_.value.tex.textureUnit);
             break;
 
         case GL_INT:
@@ -335,7 +335,7 @@ namespace GRAPH
         }
 
         glGenTextures(1, &texture_);
-        Unity3DGLState::BindTexture2D(texture_);
+        Unity3DGLState::OpenGLState().texture2d.set(texture_);
 
         if (mipLevels == 1) {
             glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, antialias_ ? GL_LINEAR : GL_NEAREST);
@@ -378,7 +378,7 @@ namespace GRAPH
 
     bool Unity3DGLTexture::updateWithData(const void *data, int offsetX, int offsetY, int width, int height) {
         if (texture_) {
-            Unity3DGLState::BindTexture2D(texture_);
+            Unity3DGLState::OpenGLState().texture2d.set(texture_);
             const IMAGE::ImageFormatInfo& info = imageFormatInfoMap().at(imageFormat_);
             glTexSubImage2D(target_, 0, offsetX, offsetY, width, height, info.format, info.type, data);
             return true;
@@ -391,7 +391,7 @@ namespace GRAPH
             return;
         }
 
-        Unity3DGLState::BindTexture2D(texture_);
+        Unity3DGLState::OpenGLState().texture2d.set(texture_);
 
         if (!hasMipmaps_) {
             glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, antialias_ ? GL_NEAREST : GL_LINEAR);
@@ -404,7 +404,7 @@ namespace GRAPH
     }
 
     void Unity3DGLTexture::autoGenMipmaps() {
-        Unity3DGLState::BindTexture2D(texture_);
+        Unity3DGLState::OpenGLState().texture2d.set(texture_);
         glGenerateMipmap(target_);
         hasMipmaps_ = true;
     }

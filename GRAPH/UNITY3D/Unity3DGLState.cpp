@@ -49,30 +49,11 @@ namespace GRAPH
         arrayBuffer.restore(); count++;
         elementArrayBuffer.restore(); count++;
 
+        texture2d.restore(); count++;
+        texturecubemap.restore(); count++;
+
         if (count != state_count) {
             throw _HException_Normal("OpenGLState::Restore is missing some states");
-        }
-    }
-
-    static GLuint    s_currentBoundTexture[16] = { (GLuint) -1, (GLuint) -1, (GLuint) -1, (GLuint) -1, (GLuint) -1, (GLuint) -1, (GLuint) -1, (GLuint) -1, (GLuint) -1, (GLuint) -1, (GLuint) -1, (GLuint) -1, (GLuint) -1, (GLuint) -1, (GLuint) -1, (GLuint) -1, };
-
-    void Unity3DGLState::BindTexture2D(GLuint textureId) {
-        BindTexture2DN(0, textureId);
-    }
-
-    void Unity3DGLState::BindTexture2DN(GLuint textureUnit, GLuint textureId) {
-        if (s_currentBoundTexture[textureUnit] != textureId) {
-            s_currentBoundTexture[textureUnit] = textureId;
-            glActiveTexture(GL_TEXTURE0 + textureUnit);
-            glBindTexture(GL_TEXTURE_2D, textureId);
-        }
-    }
-
-    void Unity3DGLState::BindTextureN(GLuint textureUnit, GLuint textureId, GLuint textureType/* = GL_TEXTURE_2D*/) {
-        if (s_currentBoundTexture[textureUnit] != textureId) {
-            s_currentBoundTexture[textureUnit] = textureId;
-            glActiveTexture(GL_TEXTURE0 + textureUnit);
-            glBindTexture(textureType, textureId);
         }
     }
 }

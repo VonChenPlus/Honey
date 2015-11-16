@@ -4,13 +4,11 @@
 
 namespace GRAPH
 {
-    static bool compareRenderCommand(RenderCommand* a, RenderCommand* b)
-    {
+    static bool CompareRenderCommand(RenderCommand* a, RenderCommand* b) {
         return a->getGlobalOrder() < b->getGlobalOrder();
     }
 
-    static bool compare3DCommand(RenderCommand* a, RenderCommand* b)
-    {
+    static bool Compare3DCommand(RenderCommand* a, RenderCommand* b) {
         return  a->getDepth() > b->getDepth();
     }
 
@@ -42,9 +40,9 @@ namespace GRAPH
 
     void RenderQueue::sort() {
         // Don't sort _queue0, it already comes sorted
-        std::sort(std::begin(commands_[QUEUE_GROUP::TRANSPARENT_3D]), std::end(commands_[QUEUE_GROUP::TRANSPARENT_3D]), compare3DCommand);
-        std::sort(std::begin(commands_[QUEUE_GROUP::GLOBALZ_NEG]), std::end(commands_[QUEUE_GROUP::GLOBALZ_NEG]), compareRenderCommand);
-        std::sort(std::begin(commands_[QUEUE_GROUP::GLOBALZ_POS]), std::end(commands_[QUEUE_GROUP::GLOBALZ_POS]), compareRenderCommand);
+        std::sort(std::begin(commands_[QUEUE_GROUP::TRANSPARENT_3D]), std::end(commands_[QUEUE_GROUP::TRANSPARENT_3D]), Compare3DCommand);
+        std::sort(std::begin(commands_[QUEUE_GROUP::GLOBALZ_NEG]), std::end(commands_[QUEUE_GROUP::GLOBALZ_NEG]), CompareRenderCommand);
+        std::sort(std::begin(commands_[QUEUE_GROUP::GLOBALZ_POS]), std::end(commands_[QUEUE_GROUP::GLOBALZ_POS]), CompareRenderCommand);
     }
 
     RenderCommand* RenderQueue::operator[](uint64 index) const {
