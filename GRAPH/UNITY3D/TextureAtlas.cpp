@@ -117,15 +117,15 @@ namespace GRAPH
         if (vbo_.u2.indexCapacity == 0)
             return;
 
-        for( int i=0; i < vbo_.u2.indexCapacity; i++) {
-            vbo_.u2.indexData[i*6+0] = i*4+0;
-            vbo_.u2.indexData[i*6+1] = i*4+1;
-            vbo_.u2.indexData[i*6+2] = i*4+2;
+        for( uint64 index=0; index < vbo_.u2.indexCapacity; index++) {
+            vbo_.u2.indexData[index*6+0] = index*4+0;
+            vbo_.u2.indexData[index*6+1] = index*4+1;
+            vbo_.u2.indexData[index*6+2] = index*4+2;
 
             // inverted index. issue #179
-            vbo_.u2.indexData[i*6+3] = i*4+3;
-            vbo_.u2.indexData[i*6+4] = i*4+2;
-            vbo_.u2.indexData[i*6+5] = i*4+1;
+            vbo_.u2.indexData[index*6+3] = index*4+3;
+            vbo_.u2.indexData[index*6+4] = index*4+2;
+            vbo_.u2.indexData[index*6+5] = index*4+1;
         }
     }
 

@@ -744,7 +744,7 @@ namespace GRAPH
             return;
         }
 
-        uint64 index = children_.getIndex(child);
+        int64 index = children_.getIndex(child);
         if( index != -1 )
             this->detachChild( child, index, cleanup );
     }
@@ -883,12 +883,12 @@ namespace GRAPH
         director_->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
         director_->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, modelViewTransform_);
 
-        int i = 0;
+        uint64 index = 0;
 
         if(!children_.empty()) {
             sortAllChildren();
-            for( ; i < children_.size(); i++ ) {
-                auto node = children_.at(i);
+            for( ; index < children_.size(); index++ ) {
+                auto node = children_.at(index);
 
                 if (node && node->localZOrder_ < 0)
                     node->visit(renderer, modelViewTransform_, flags);
@@ -898,7 +898,7 @@ namespace GRAPH
 
             this->draw(renderer, modelViewTransform_, flags);
 
-            for(auto it=children_.cbegin()+i; it != children_.cend(); ++it)
+            for(auto it=children_.cbegin()+index; it != children_.cend(); ++it)
                 (*it)->visit(renderer, modelViewTransform_, flags);
         }
         else {
@@ -1527,7 +1527,7 @@ namespace GRAPH
             return;
         }
 
-        uint64 index = protectedChildren_.getIndex(child);
+        int64 index = protectedChildren_.getIndex(child);
         if( index != -1 ) {
             if (running_) {
                 child->onExitTransitionDidStart();
@@ -1603,8 +1603,8 @@ namespace GRAPH
         director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
         director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, modelViewTransform_);
 
-        int i = 0;      // used by _children
-        int j = 0;      // used by _protectedChildren
+        uint64 i = 0;      // used by _children
+        uint64 j = 0;      // used by _protectedChildren
 
         sortAllChildren();
         sortAllProtectedChildren();

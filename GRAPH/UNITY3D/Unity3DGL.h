@@ -128,9 +128,9 @@ namespace GRAPH
 
     private:
         GLuint target_;
+        bool hasMipmaps_;
         bool antialias_;
         IMAGE::ImageFormat imageFormat_;
-        bool hasMipmaps_;
     };
 
     class Unity3DGLCreator

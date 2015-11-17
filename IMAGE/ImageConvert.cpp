@@ -262,7 +262,7 @@ namespace IMAGE
     void convertI8ToRGB565(const unsigned char* data, uint64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
-        for (int i = 0; i < dataLen; ++i)
+        for (uint64 i = 0; i < dataLen; ++i)
         {
             *out16++ = (data[i] & 0x00F8) << 8    //R
                 | (data[i] & 0x00FC) << 3         //G
@@ -312,7 +312,7 @@ namespace IMAGE
     void convertI8ToRGB5A1(const unsigned char* data, uint64 dataLen, unsigned char* outData)
     {
         unsigned short* out16 = (unsigned short*)outData;
-        for (int i = 0; i < dataLen; ++i)
+        for (uint64 i = 0; i < dataLen; ++i)
         {
             *out16++ = (data[i] & 0x00F8) << 8    //R
                 | (data[i] & 0x00F8) << 3         //G

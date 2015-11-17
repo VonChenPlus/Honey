@@ -139,7 +139,7 @@ namespace GRAPH
                                     const std::string& cross,
                                     TextureResType texType = TextureResType::LOCAL);
 
-            void addEventListener(const ccCheckBoxCallback& callback);
+            void addEventListener(const CheckBoxCallback& callback);
 
         protected:
             virtual void releaseUpEvent() override;

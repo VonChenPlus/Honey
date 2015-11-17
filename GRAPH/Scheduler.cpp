@@ -20,7 +20,7 @@ namespace GRAPH
         delay_ = delay;
         useDelay_ = (delay_ > 0.0f) ? true : false;
         repeat_ = repeat;
-        runForever_ = (repeat_ == -1) ? true : false;
+        runForever_ = (repeat_ == MATH::MATH_UINT32_MAX()) ? true : false;
     }
 
     void Timer::update(float dt) {

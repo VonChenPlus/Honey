@@ -77,8 +77,8 @@ namespace GRAPH
 
         inline bool isTextureRectRotated() const { return rectRotated_; }
 
-        inline uint64 getAtlasIndex() const { return atlasIndex_; }
-        inline void setAtlasIndex(uint64 atlasIndex) { atlasIndex_ = atlasIndex; }
+        inline int64 getAtlasIndex() const { return atlasIndex_; }
+        inline void setAtlasIndex(int64 atlasIndex) { atlasIndex_ = atlasIndex; }
 
         inline const MATH::Rectf& getTextureRect() const { return rect_; }
 
@@ -146,7 +146,7 @@ namespace GRAPH
         virtual void setDirtyRecursively(bool value);
 
         TextureAtlas*       textureAtlas_;
-        uint64             atlasIndex_;
+        int64             atlasIndex_;
         SpriteBatchNode*    batchNode_;
         bool                dirty_;
         bool                recursiveDirty_;
@@ -212,7 +212,7 @@ namespace GRAPH
         virtual void draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags) override;
 
         void insertQuadFromSprite(Sprite *sprite, uint64 index);
-        SpriteBatchNode * addSpriteWithoutQuad(Sprite *child, int z, int aTag);
+        SpriteBatchNode * addSpriteWithoutQuad(Sprite *child, int64 z, int aTag);
 
     public:
         SpriteBatchNode();

@@ -159,7 +159,7 @@ namespace GRAPH
     {
         HObjectArray *actions;
         Node *target;
-        int actionIndex;
+        int64 actionIndex;
         Action *currentAction;
         bool currentActionSalvaged;
         bool paused;
@@ -191,7 +191,7 @@ namespace GRAPH
         void update(float dt);
 
     protected:
-        void removeActionAtIndex(uint64 index, ActionEntry *element);
+        void removeActionAtIndex(int64 index, ActionEntry *element);
         void deleteHashElement(ActionEntry *element);
         void actionAllocWithHashElement(ActionEntry *element);
 

@@ -81,12 +81,12 @@ namespace GRAPH
     static const int DEFAULT_RENDER_QUEUE = 0;
 
     Renderer::Renderer()
-        : lastMaterialID_(0)
+        : u3dContext_(Unity3DCreator::CreateContext())
+        , depthState_(Unity3DCreator::CreateDepthState())
         , glViewAssigned_(false)
         , isRendering_(false)
         , isDepthTestFor2D_(false)
-        , u3dContext_(Unity3DCreator::CreateContext())
-        , depthState_(Unity3DCreator::CreateDepthState()){
+        , lastMaterialID_(0) {
         groupCommandManager_ = new (std::nothrow) GroupCommandManager(this);
         commandGroupStack_.push(DEFAULT_RENDER_QUEUE);
         RenderQueue defaultRenderQueue;

@@ -158,15 +158,15 @@ namespace GRAPH
     void EventDispatcher::visitTarget(HObject* node, bool isRootNode) {
         dynamic_cast<Node *>(node)->sortAllChildren();
 
-        int i = 0;
+        uint64 index = 0;
         auto& children = dynamic_cast<Node *>(node)->getChildren();
 
         auto childrenCount = children.size();
 
         if(childrenCount > 0) {
             HObject* child = nullptr;
-            for( ; i < childrenCount; i++ ) {
-                child = children.at(i);
+            for( ; index < childrenCount; index++ ) {
+                child = children.at(index);
 
                 if ( child && dynamic_cast<Node *>(child)->getLocalZOrder() < 0 )
                     visitTarget(child, false);
@@ -178,8 +178,8 @@ namespace GRAPH
                 globalZOrderNodeMap_[dynamic_cast<Node *>(node)->getGlobalZOrder()].push_back(node);
             }
 
-            for( ; i < childrenCount; i++ ) {
-                child = children.at(i);
+            for( ; index < childrenCount; index++ ) {
+                child = children.at(index);
                 if (child)
                     visitTarget(child, false);
             }

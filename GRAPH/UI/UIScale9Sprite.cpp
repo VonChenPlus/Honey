@@ -1037,8 +1037,8 @@ namespace GRAPH
             Director::getInstance().pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
             Director::getInstance().loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, modelViewTransform_);
 
-            int i = 0;      // used by _children
-            int j = 0;      // used by _protectedChildren
+            uint64 i = 0;      // used by _children
+            uint64 j = 0;      // used by _protectedChildren
 
             sortAllChildren();
             sortAllProtectedChildren();

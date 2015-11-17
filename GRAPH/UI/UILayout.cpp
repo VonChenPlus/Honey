@@ -47,12 +47,12 @@ namespace GRAPH
         _clippingRect(MATH::RectfZERO),
         _clippingParent(nullptr),
         _clippingRectDirty(true),
+        _groupCommand(Director::getInstance().getRenderer()),
         _doLayoutDirty(true),
         _isInterceptTouch(false),
         _loopFocus(false),
         _passFocusToChild(true),
         _isFocusPassing(false),
-        _groupCommand(Director::getInstance().getRenderer()),
         u3dContext_(Unity3DCreator::CreateContext())
         {
             //no-op
@@ -222,8 +222,8 @@ namespace GRAPH
 
             renderer->pushGroup(_groupCommand.getRenderQueueID());
 
-            int i = 0;      // used by _children
-            int j = 0;      // used by _protectedChildren
+            uint64 i = 0;      // used by _children
+            uint64 j = 0;      // used by _protectedChildren
 
             sortAllChildren();
             sortAllProtectedChildren();
@@ -296,7 +296,6 @@ namespace GRAPH
 
         void Layout::onBeforeVisitScissor()
         {
-            MATH::Rectf clippingRect = getClippingRect();
             glEnable(GL_SCISSOR_TEST);
             // TODO
         }
@@ -1087,7 +1086,7 @@ namespace GRAPH
             {
                 return this->findFirstFocusEnabledWidgetIndex();
             }
-            int index = 0;
+            uint64 index = 0;
             uint64 count = this->getChildren().size();
 
             float distance = MATH::MATH_FLOAT_MAX();
@@ -1133,7 +1132,7 @@ namespace GRAPH
             {
                 return this->findFirstFocusEnabledWidgetIndex();
             }
-            int index = 0;
+            uint64 index = 0;
             uint64 count = this->getChildren().size();
 
             float distance = -MATH::MATH_FLOAT_MAX();
@@ -1344,7 +1343,7 @@ namespace GRAPH
 
             if (nullptr == widget)
             {
-                int begin = 0;
+                uint64 begin = 0;
                 while (begin < oldIndex)
                 {
                     Widget* firstChild = dynamic_cast<Widget*>(children_.at(begin));
@@ -1365,7 +1364,7 @@ namespace GRAPH
         Widget* Layout::getPreviousFocusedWidget(FocusDirection direction, Widget *current)
         {
             Widget *nextWidget = nullptr;
-            uint64 previousWidgetPos = children_.getIndex(current);
+            int64 previousWidgetPos = children_.getIndex(current);
             previousWidgetPos = previousWidgetPos - 1;
             if (previousWidgetPos >= 0)
             {

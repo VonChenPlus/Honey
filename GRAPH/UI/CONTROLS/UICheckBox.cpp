@@ -658,7 +658,7 @@ namespace GRAPH
 
         }
 
-        void CheckBox::addEventListener(const ccCheckBoxCallback& callback)
+        void CheckBox::addEventListener(const CheckBoxCallback& callback)
         {
             _checkBoxEventCallback = callback;
         }

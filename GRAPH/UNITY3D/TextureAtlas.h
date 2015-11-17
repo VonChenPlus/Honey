@@ -58,13 +58,13 @@ namespace GRAPH
         void setupBuffer();
 
     protected:
+        bool    dirty_;
+        Unity3DTexture* texture_;
         VertexBufferObject<V3F_C4B_T2F_Quad> vbo_;
         Unity3DBuffer *u3dVertexBuffer_;
         Unity3DBuffer *u3dIndexBuffer_;
         Unity3DVertexFormat *u3dVertexFormat_;
         Unity3DContext *u3dContext_;
-        bool    dirty_;
-        Unity3DTexture* texture_;
     };
 }
 

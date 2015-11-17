@@ -46,7 +46,6 @@ namespace GRAPH
             return false;
         }
 
-        MATH::Sizef  imageSize = MATH::Sizef((float) imageWidth, (float) imageHeight);
         pixelFormat = IMAGE::convertDataToFormat(outData.getBytes(), imageWidth*imageHeight * 4, IMAGE::ImageFormat::RGBA8888, pixelFormat, &outTempData, &outTempDataLen);
 
         bool ret = initWithData(outTempData, outTempDataLen, pixelFormat, imageWidth, imageHeight);
@@ -72,7 +71,6 @@ namespace GRAPH
         int imageHeight = image->getHeight();
 
         unsigned char*   tempData = image->getData();
-        MATH::Sizef      imageSize = MATH::Sizef((float) imageWidth, (float) imageHeight);
         IMAGE::ImageFormat      pixelFormat = ((IMAGE::ImageFormat::NONE == format) || (IMAGE::ImageFormat::AUTO == format)) ? image->getRenderFormat() : format;
         IMAGE::ImageFormat      renderFormat = image->getRenderFormat();
         uint64	         tempDataLen = image->getDataLen();

@@ -977,7 +977,7 @@ namespace GRAPH
             {
                 sortAllChildren();
 
-                int i = 0;
+                uint64 i = 0;
                 // draw children zOrder < 0
                 for (; i < children_.size(); i++)
                 {
@@ -1232,7 +1232,7 @@ namespace GRAPH
                 quads = textureAtlas->getQuads();
                 auto count = textureAtlas->getTotalQuads();
 
-                for (int index = 0; index < count; ++index)
+                for (uint64 index = 0; index < count; ++index)
                 {
                     quads[index].bl.colors = color4;
                     quads[index].br.colors = color4;

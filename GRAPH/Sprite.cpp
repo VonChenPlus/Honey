@@ -10,16 +10,15 @@
 namespace GRAPH
 {
     PolygonInfo::PolygonInfo()
-        : isVertsOwner(true)
-        , rect(MATH::RectfZERO) {
+        : rect(MATH::RectfZERO)
+        , isVertsOwner(true) {
         triangles.verts = nullptr;
         triangles.indices = nullptr;
         triangles.vertCount = 0;
         triangles.indexCount = 0;
     }
 
-    PolygonInfo::PolygonInfo(const PolygonInfo& other) :
-        isVertsOwner(true) {
+    PolygonInfo::PolygonInfo(const PolygonInfo& other) {
         isVertsOwner = other.isVertsOwner;
         rect = other.rect;
         triangles.verts = new V3F_C4B_T2F[other.triangles.vertCount];
@@ -84,7 +83,7 @@ namespace GRAPH
         float area = 0;
         V3F_C4B_T2F *verts = triangles.verts;
         unsigned short *indices = triangles.indices;
-        for (int i = 0; i < triangles.indexCount; i += 3) {
+        for (uint64 i = 0; i < triangles.indexCount; i += 3) {
             auto A = verts[indices[i]].vertices;
             auto B = verts[indices[i + 1]].vertices;
             auto C = verts[indices[i + 2]].vertices;
@@ -1235,7 +1234,7 @@ namespace GRAPH
         sprite->updateTransform();
     }
 
-    SpriteBatchNode *SpriteBatchNode::addSpriteWithoutQuad(Sprite*child, int z, int aTag) {
+    SpriteBatchNode *SpriteBatchNode::addSpriteWithoutQuad(Sprite*child, int64 z, int aTag) {
         child->setAtlasIndex(z);
 
         auto it = descendants_.begin();
