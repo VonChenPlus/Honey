@@ -1031,8 +1031,7 @@ namespace GRAPH
     }
 
     void EventDispatcher::removeEventListenersForType(EventListener::Type listenerType) {
-        if (listenerType == EventListener::Type::TOUCH_ONE_BY_ONE)
-        {
+        if (listenerType == EventListener::Type::TOUCH_ONE_BY_ONE) {
             removeEventListenersForListenerID(EventListenerTouchOneByOne::LISTENER_ID);
         }
         else if (listenerType == EventListener::Type::TOUCH_ALL_AT_ONCE) {

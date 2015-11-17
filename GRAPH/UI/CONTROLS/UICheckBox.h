@@ -123,7 +123,7 @@ namespace GRAPH
                 UNSELECTED
             };
 
-            typedef std::function<void(HObject*,CheckBox::EventType)> ccCheckBoxCallback;
+            typedef std::function<void(HObject*,CheckBox::EventType)> CheckBoxCallback;
 
             CheckBox();
             virtual ~CheckBox();
@@ -152,7 +152,7 @@ namespace GRAPH
         protected:
             HObject*       _checkBoxEventListener;
             SEL_SelectedStateEvent    _checkBoxEventSelector;
-            ccCheckBoxCallback _checkBoxEventCallback;
+            CheckBoxCallback _checkBoxEventCallback;
         };
     }
 }

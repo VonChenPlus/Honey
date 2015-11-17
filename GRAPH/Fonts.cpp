@@ -137,39 +137,31 @@ namespace GRAPH
         bool existNewLetter = false;
         float startY = currentPageOrigY_;
 
-        for (uint64 i = 0; i < length; ++i)
-        {
+        for (uint64 i = 0; i < length; ++i) {
             auto outIterator = letterDefinitions_.find(utf16String[i]);
 
-            if (outIterator == letterDefinitions_.end())
-            {
+            if (outIterator == letterDefinitions_.end()) {
                 existNewLetter = true;
 
                 auto bitmap = fontTTf->getGlyphBitmap(utf16String[i],bitmapWidth,bitmapHeight);
-                if (bitmap)
-                {
+                if (bitmap) {
                     tempDef.letteCharUTF16   = utf16String[i];
                     tempDef.width            = bitmapWidth + letterPadding_;
                     tempDef.height           = bitmapHeight + letterPadding_;
 
-                    if (bitmapHeight > currLineHeight_)
-                    {
+                    if (bitmapHeight > currLineHeight_) {
                         currLineHeight_ = bitmapHeight + 1;
                     }
-                    if (currentPageOrigX_ + tempDef.width > CacheTextureWidth)
-                    {
+                    if (currentPageOrigX_ + tempDef.width > CacheTextureWidth) {
                         currentPageOrigY_ += currLineHeight_;
                         currLineHeight_ = 0;
                         currentPageOrigX_ = 0;
-                        if(currentPageOrigY_ + commonLineHeight_ >= CacheTextureHeight)
-                        {
+                        if(currentPageOrigY_ + commonLineHeight_ >= CacheTextureHeight) {
                             unsigned char *data = nullptr;
-                            if(pixelFormat == IMAGE::ImageFormat::AI88)
-                            {
+                            if(pixelFormat == IMAGE::ImageFormat::AI88) {
                                 data = currentPageData_ + CacheTextureWidth * (int)startY * 2;
                             }
-                            else
-                            {
+                            else {
                                 data = currentPageData_ + CacheTextureWidth * (int)startY;
                             }
                             atlasTextures_[currentPage_]->updateWithData(data, 0, startY,
@@ -285,12 +277,10 @@ namespace GRAPH
         }
     }
 
-    std::string FontAtlasCache::generateFontName(const std::string& fontFileName, int size, GlyphCollection theGlyphs, bool useDistanceField)
-    {
+    std::string FontAtlasCache::generateFontName(const std::string& fontFileName, int size, GlyphCollection theGlyphs, bool useDistanceField) {
         std::string tempName(fontFileName);
 
-        switch (theGlyphs)
-        {
+        switch (theGlyphs) {
             case GlyphCollection::DYNAMIC:
                 tempName.append("_DYNAMIC_");
             break;
@@ -306,17 +296,12 @@ namespace GRAPH
         return  tempName.append(UTILS::STRING::StringFromInt(size));
     }
 
-    bool FontAtlasCache::releaseFontAtlas(FontAtlas *atlas)
-    {
-        if (nullptr != atlas)
-        {
-            for( auto &item: atlasMap_ )
-            {
-                if ( item.second == atlas )
-                {
-                    if (atlas->getReferenceCount() == 1)
-                    {
-                      atlasMap_.erase(item.first);
+    bool FontAtlasCache::releaseFontAtlas(FontAtlas *atlas) {
+        if (nullptr != atlas) {
+            for( auto &item: atlasMap_ ) {
+                if ( item.second == atlas ) {
+                    if (atlas->getReferenceCount() == 1) {
+                        atlasMap_.erase(item.first);
                     }
 
                     atlas->release();

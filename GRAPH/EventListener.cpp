@@ -29,59 +29,48 @@ namespace GRAPH
     {
     }
 
-    EventListenerCustom* EventListenerCustom::create(const std::string& eventName, const std::function<void(EventCustom*)>& callback)
-    {
+    EventListenerCustom* EventListenerCustom::create(const std::string& eventName, const std::function<void(EventCustom*)>& callback) {
         EventListenerCustom* ret = new (std::nothrow) EventListenerCustom();
-        if (ret && ret->init(eventName, callback))
-        {
+        if (ret && ret->init(eventName, callback)) {
             ret->autorelease();
         }
-        else
-        {
+        else {
             SAFE_DELETE(ret);
         }
         return ret;
     }
 
-    bool EventListenerCustom::init(const ListenerID& listenerId, const std::function<void(EventCustom*)>& callback)
-    {
+    bool EventListenerCustom::init(const ListenerID& listenerId, const std::function<void(EventCustom*)>& callback) {
         bool ret = false;
 
         onCustomEvent = callback;
 
         auto listener = [this](Event* event){
-            if (onCustomEvent != nullptr)
-            {
+            if (onCustomEvent != nullptr) {
                 onCustomEvent(static_cast<EventCustom*>(event));
             }
         };
 
-        if (EventListener::init(EventListener::Type::CUSTOM, listenerId, listener))
-        {
+        if (EventListener::init(EventListener::Type::CUSTOM, listenerId, listener)) {
             ret = true;
         }
         return ret;
     }
 
-    EventListenerCustom* EventListenerCustom::clone()
-    {
+    EventListenerCustom* EventListenerCustom::clone() {
         EventListenerCustom* ret = new (std::nothrow) EventListenerCustom();
-        if (ret && ret->init(listenerID_, onCustomEvent))
-        {
+        if (ret && ret->init(listenerID_, onCustomEvent)) {
             ret->autorelease();
         }
-        else
-        {
+        else {
             SAFE_DELETE(ret);
         }
         return ret;
     }
 
-    bool EventListenerCustom::checkAvailable()
-    {
+    bool EventListenerCustom::checkAvailable() {
         bool ret = false;
-        if (EventListener::checkAvailable() && onCustomEvent != nullptr)
-        {
+        if (EventListener::checkAvailable() && onCustomEvent != nullptr) {
             ret = true;
         }
         return ret;
@@ -154,8 +143,7 @@ namespace GRAPH
         if (ret && ret->init()) {
             ret->autorelease();
         }
-        else
-        {
+        else {
             SAFE_DELETE(ret);
         }
         return ret;
@@ -356,8 +344,7 @@ namespace GRAPH
         if (ret && ret->init()) {
             ret->autorelease();
         }
-        else
-        {
+        else {
             SAFE_DELETE(ret);
         }
         return ret;
@@ -442,8 +429,7 @@ namespace GRAPH
             ret->onTouchesEnded = onTouchesEnded;
             ret->onTouchesCancelled = onTouchesCancelled;
         }
-        else
-        {
+        else {
             SAFE_DELETE(ret);
         }
         return ret;
