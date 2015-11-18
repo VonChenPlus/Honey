@@ -34,19 +34,15 @@ namespace GRAPH
                 return nullptr;
             }
 
-            static LabelLetter* create()
-            {
+            static LabelLetter* create() {
                 LabelLetter *pRet = new(std::nothrow) LabelLetter();
-                if (pRet && pRet->init())
-                {
+                if (pRet && pRet->init()) {
                     pRet->autorelease();
                     return pRet;
                 }
-                else
-                {
+                else {
                     delete pRet;
-                    pRet = NULL;
-                    return NULL;
+                    return nullptr;
                 }
             }
 

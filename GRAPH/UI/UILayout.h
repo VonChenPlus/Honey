@@ -198,41 +198,41 @@ namespace GRAPH
             bool checkFocusEnabledChild()const;
 
         protected:
-            bool _backGroundScale9Enabled;
-            Scale9Sprite* _backGroundImage;
-            std::string _backGroundImageFileName;
-            MATH::Rectf _backGroundImageCapInsets;
-            BackGroundColorType _colorType;
-            TextureResType _bgImageTexType;
-            MATH::Sizef _backGroundImageTextureSize;
-            Color3B _backGroundImageColor;
-            uint8 _backGroundImageOpacity;
+            bool backGroundScale9Enabled_;
+            Scale9Sprite* backGroundImage_;
+            std::string backGroundImageFileName_;
+            MATH::Rectf backGroundImageCapInsets_;
+            BackGroundColorType colorType_;
+            TextureResType bgImageTexType_;
+            MATH::Sizef backGroundImageTextureSize_;
+            Color3B backGroundImageColor_;
+            uint8 backGroundImageOpacity_;
 
-            LayerColor* _colorRender;
-            LayerGradient* _gradientRender;
-            Color3B _cColor;
-            Color3B _gStartColor;
-            Color3B _gEndColor;
-            MATH::Vector2f _alongVector;
-            uint8 _cOpacity;
+            LayerColor* colorRender_;
+            LayerGradient* gradientRender_;
+            Color3B cColor_;
+            Color3B gStartColor_;
+            Color3B gEndColor_;
+            MATH::Vector2f alongVector_;
+            uint8 cOpacity_;
 
-            bool _clippingEnabled;
-            Type _layoutType;
-            ClippingType _clippingType;
-            DrawNode* _clippingStencil;
-            bool _scissorRectDirty;
-            MATH::Rectf _clippingRect;
-            Layout* _clippingParent;
-            bool _clippingRectDirty;
+            bool clippingEnabled_;
+            Type layoutType_;
+            ClippingType clippingType_;
+            DrawNode* clippingStencil_;
+            bool scissorRectDirty_;
+            MATH::Rectf clippingRect_;
+            Layout* clippingParent_;
+            bool clippingRectDirty_;
 
-            GroupCommand _groupCommand;
+            GroupCommand groupCommand_;
 
-            bool _doLayoutDirty;
-            bool _isInterceptTouch;
+            bool doLayoutDirty_;
+            bool isInterceptTouch_;
 
-            bool _loopFocus;
-            bool _passFocusToChild;
-            bool _isFocusPassing;
+            bool loopFocus_;
+            bool passFocusToChild_;
+            bool isFocusPassing_;
             Unity3DVertexFormat *u3dVertexFormat_;
             Unity3DContext *u3dContext_;
         };
@@ -275,7 +275,6 @@ namespace GRAPH
             static RelativeBox* create(const MATH::Sizef& size);
 
         public:
-            //initializes state of widget.
             virtual bool init() override;
             virtual bool initWithSize(const MATH::Sizef& size);
         };
@@ -317,11 +316,11 @@ namespace GRAPH
         {
         private:
             RelativeLayoutManager()
-            :_unlayoutChildCount(0),
-            _widget(nullptr),
-            _finalPositionX(0.0f),
-            _finalPositionY(0.0f),
-            _relativeWidgetLP(nullptr)
+            :unlayoutChildCount_(0),
+            widget_(nullptr),
+            finalPositionX_(0.0f),
+            finalPositionY_(0.0f),
+            relativeWidgetLP_(nullptr)
             {}
             virtual ~RelativeLayoutManager(){}
             static RelativeLayoutManager* create();
@@ -332,165 +331,161 @@ namespace GRAPH
             bool caculateFinalPositionWithRelativeWidget(LayoutProtocol *layout);
             void caculateFinalPositionWithRelativeAlign();
 
-            uint64 _unlayoutChildCount;
-            HObjectVector<Widget*> _widgetChildren;
-            Widget* _widget;
-            float _finalPositionX;
-            float _finalPositionY;
+            uint64 unlayoutChildCount_;
+            HObjectVector<Widget*> widgetChildren_;
+            Widget* widget_;
+            float finalPositionX_;
+            float finalPositionY_;
 
-            RelativeLayoutParameter* _relativeWidgetLP;
+            RelativeLayoutParameter* relativeWidgetLP_;
 
             friend class Layout;
         };
 
         #define __LAYOUT_COMPONENT_NAME "__ui_layout"
         class LayoutComponent : public Component
-            {
-            public:
-                LayoutComponent();
-                ~LayoutComponent();
+        {
+        public:
+            LayoutComponent();
+            ~LayoutComponent();
 
-                virtual bool init()override;
+            virtual bool init()override;
 
-                static LayoutComponent* create()
-                {
-                    LayoutComponent *pRet = new(std::nothrow) LayoutComponent();
-                    if (pRet && pRet->init())
-                    {
-                        pRet->autorelease();
-                        return pRet;
-                    }
-                    else
-                    {
-                        delete pRet;
-                        pRet = NULL;
-                        return NULL;
-                    }
+            static LayoutComponent* create() {
+                LayoutComponent *pRet = new(std::nothrow) LayoutComponent();
+                if (pRet && pRet->init()) {
+                    pRet->autorelease();
+                    return pRet;
                 }
+                else {
+                    delete pRet;
+                    return nullptr;
+                }
+            }
 
-                static LayoutComponent* bindLayoutComponent(Node* node);
+            static LayoutComponent* bindLayoutComponent(Node* node);
 
-                enum class HorizontalEdge
-                {
-                    None,
-                    Left,
-                    Right,
-                    Center
-                };
-
-                enum class VerticalEdge
-                {
-                    None,
-                    Bottom,
-                    Top,
-                    Center
-                };
-
-                void setUsingPercentContentSize(bool isUsed);
-                bool getUsingPercentContentSize()const;
-
-                void setPercentContentSize(const MATH::Vector2f &percent);
-                MATH::Vector2f getPercentContentSize()const;
-
-                const MATH::Vector2f& getAnchorPosition()const;
-                void setAnchorPosition(const MATH::Vector2f& point);
-
-                const MATH::Vector2f& getPosition()const;
-                void setPosition(const MATH::Vector2f& position);
-
-                bool isPositionPercentXEnabled()const;
-                void setPositionPercentXEnabled(bool isUsed);
-
-                float getPositionPercentX()const;
-                void setPositionPercentX(float percentMargin);
-
-                bool isPositionPercentYEnabled()const;
-                void setPositionPercentYEnabled(bool isUsed);
-
-                float getPositionPercentY()const;
-                void setPositionPercentY(float percentMargin);
-
-                HorizontalEdge getHorizontalEdge()const;
-                void setHorizontalEdge(HorizontalEdge hEage);
-
-                VerticalEdge getVerticalEdge()const;
-                void setVerticalEdge(VerticalEdge vEage);
-
-                float getLeftMargin()const;
-                void setLeftMargin(float margin);
-
-                float getRightMargin()const;
-                void setRightMargin(float margin);
-
-                float getTopMargin()const;
-                void setTopMargin(float margin);
-
-                float getBottomMargin()const;
-                void setBottomMargin(float margin);
-
-                const MATH::Sizef& getSize()const;
-                void setSize(const MATH::Sizef& size);
-
-                bool isPercentWidthEnabled()const;
-                void setPercentWidthEnabled(bool isUsed);
-
-                float getSizeWidth()const;
-                void setSizeWidth(float width);
-
-                float getPercentWidth()const;
-                void setPercentWidth(float percentWidth);
-
-                bool isPercentHeightEnabled()const;
-                void setPercentHeightEnabled(bool isUsed);
-
-                float getSizeHeight()const;
-                void setSizeHeight(float height);
-
-                float getPercentHeight()const;
-                void setPercentHeight(float percentHeight);
-
-                bool isStretchWidthEnabled()const;
-                void setStretchWidthEnabled(bool isUsed);
-
-                bool isStretchHeightEnabled()const;
-                void setStretchHeightEnabled(bool isUsed);
-
-                void setPercentOnlyEnabled(bool enable);
-
-                void setActiveEnabled(bool enable);
-
-                void refreshLayout();
-
-            protected:
-                Node* getOwnerParent();
-                void refreshHorizontalMargin();
-                void refreshVerticalMargin();
-            protected:
-                HorizontalEdge  _horizontalEdge;
-                VerticalEdge    _verticalEdge;
-
-                float           _leftMargin;
-                float           _rightMargin;
-                float           _bottomMargin;
-                float           _topMargin;
-
-                bool            _usingPositionPercentX;
-                float           _positionPercentX;
-                bool            _usingPositionPercentY;
-                float           _positionPercentY;
-
-                bool            _usingStretchWidth;
-                bool            _usingStretchHeight;
-
-                float           _percentWidth;
-                bool            _usingPercentWidth;
-
-                float           _percentHeight;
-                bool            _usingPercentHeight;
-
-                bool            _actived;
-                bool            _isPercentOnly;
+            enum class HorizontalEdge
+            {
+                None,
+                Left,
+                Right,
+                Center
             };
+
+            enum class VerticalEdge
+            {
+                None,
+                Bottom,
+                Top,
+                Center
+            };
+
+            void setUsingPercentContentSize(bool isUsed);
+            bool getUsingPercentContentSize()const;
+
+            void setPercentContentSize(const MATH::Vector2f &percent);
+            MATH::Vector2f getPercentContentSize()const;
+
+            const MATH::Vector2f& getAnchorPosition()const;
+            void setAnchorPosition(const MATH::Vector2f& point);
+
+            const MATH::Vector2f& getPosition()const;
+            void setPosition(const MATH::Vector2f& position);
+
+            bool isPositionPercentXEnabled()const;
+            void setPositionPercentXEnabled(bool isUsed);
+
+            float getPositionPercentX()const;
+            void setPositionPercentX(float percentMargin);
+
+            bool isPositionPercentYEnabled()const;
+            void setPositionPercentYEnabled(bool isUsed);
+
+            float getPositionPercentY()const;
+            void setPositionPercentY(float percentMargin);
+
+            HorizontalEdge getHorizontalEdge()const;
+            void setHorizontalEdge(HorizontalEdge hEage);
+
+            VerticalEdge getVerticalEdge()const;
+            void setVerticalEdge(VerticalEdge vEage);
+
+            float getLeftMargin()const;
+            void setLeftMargin(float margin);
+
+            float getRightMargin()const;
+            void setRightMargin(float margin);
+
+            float getTopMargin()const;
+            void setTopMargin(float margin);
+
+            float getBottomMargin()const;
+            void setBottomMargin(float margin);
+
+            const MATH::Sizef& getSize()const;
+            void setSize(const MATH::Sizef& size);
+
+            bool isPercentWidthEnabled()const;
+            void setPercentWidthEnabled(bool isUsed);
+
+            float getSizeWidth()const;
+            void setSizeWidth(float width);
+
+            float getPercentWidth()const;
+            void setPercentWidth(float percentWidth);
+
+            bool isPercentHeightEnabled()const;
+            void setPercentHeightEnabled(bool isUsed);
+
+            float getSizeHeight()const;
+            void setSizeHeight(float height);
+
+            float getPercentHeight()const;
+            void setPercentHeight(float percentHeight);
+
+            bool isStretchWidthEnabled()const;
+            void setStretchWidthEnabled(bool isUsed);
+
+            bool isStretchHeightEnabled()const;
+            void setStretchHeightEnabled(bool isUsed);
+
+            void setPercentOnlyEnabled(bool enable);
+
+            void setActiveEnabled(bool enable);
+
+            void refreshLayout();
+
+        protected:
+            Node* getOwnerParent();
+            void refreshHorizontalMargin();
+            void refreshVerticalMargin();
+        protected:
+            HorizontalEdge  horizontalEdge_;
+            VerticalEdge    verticalEdge_;
+
+            float           leftMargin_;
+            float           rightMargin_;
+            float           bottomMargin_;
+            float           topMargin_;
+
+            bool            usingPositionPercentX_;
+            float           positionPercentX_;
+            bool            usingPositionPercentY_;
+            float           positionPercentY_;
+
+            bool            usingStretchWidth_;
+            bool            usingStretchHeight_;
+
+            float           percentWidth_;
+            bool            usingPercentWidth_;
+
+            float           percentHeight_;
+            bool            usingPercentHeight_;
+
+            bool            actived_;
+            bool            isPercentOnly_;
+        };
     }
 }
     

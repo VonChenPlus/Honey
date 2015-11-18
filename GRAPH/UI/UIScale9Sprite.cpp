@@ -89,7 +89,7 @@ namespace GRAPH
 
         bool Scale9Sprite::init()
         {
-            return this->init(NULL, MATH::RectfZERO, MATH::RectfZERO);
+            return this->init(nullptr, MATH::RectfZERO, MATH::RectfZERO);
         }
 
         bool Scale9Sprite::init(Sprite* sprite, const MATH::Rectf& rect, const MATH::Rectf& capInsets)
@@ -150,7 +150,7 @@ namespace GRAPH
                 return pReturn;
             }
             SAFE_DELETE(pReturn);
-            return NULL;
+            return nullptr;
         }
 
         Scale9Sprite* Scale9Sprite::create(const std::string& file,
@@ -164,7 +164,7 @@ namespace GRAPH
                 return pReturn;
             }
             SAFE_DELETE(pReturn);
-            return NULL;
+            return nullptr;
         }
 
 
@@ -177,7 +177,7 @@ namespace GRAPH
                 return pReturn;
             }
             SAFE_DELETE(pReturn);
-            return NULL;
+            return nullptr;
         }
 
 
@@ -192,7 +192,7 @@ namespace GRAPH
                 return pReturn;
             }
             SAFE_DELETE(pReturn);
-            return NULL;
+            return nullptr;
         }
 
 
@@ -205,7 +205,7 @@ namespace GRAPH
                 return pReturn;
             }
             SAFE_DELETE(pReturn);
-            return NULL;
+            return nullptr;
         }
 
         void Scale9Sprite::cleanupSlicedSprites()
@@ -912,23 +912,23 @@ namespace GRAPH
                 return pReturn;
             }
             SAFE_DELETE(pReturn);
-            return NULL;
+            return nullptr;
         }
 
 
         void Scale9Sprite::setState(Scale9Sprite::State state)
         {
-            ShaderState *glState = nullptr;
+            ShaderState *shaderState = nullptr;
             switch (state)
             {
             case State::NORMAL:
             {
-                glState = ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
+                shaderState = ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);
             }
             break;
             case State::GRAY:
             {
-                glState = ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_POSITION_GRAYSCALE);
+                shaderState = ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_POSITION_GRAYSCALE);
             }
             default:
                 break;
@@ -936,24 +936,17 @@ namespace GRAPH
 
             if (nullptr != _scale9Image)
             {
-                _scale9Image->setU3DShaderState(glState);
+                _scale9Image->setU3DShaderState(shaderState);
             }
 
             if (_scale9Enabled)
             {
                 for (auto& sp : _protectedChildren)
                 {
-                    sp->setU3DShaderState(glState);
+                    sp->setU3DShaderState(shaderState);
                 }
             }
         }
-
-    /** sets the opacity.
-        @warning If the the texture has premultiplied alpha then, the R, G and B channels will be modifed.
-        Values goes from 0 to 255, where 255 means fully opaque.
-    */
-
-
 
         void Scale9Sprite::updateCapInset()
         {

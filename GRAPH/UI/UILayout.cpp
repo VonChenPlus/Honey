@@ -23,36 +23,36 @@ namespace GRAPH
         IMPLEMENT_CLASS_GUI_INFO(Layout)
 
         Layout::Layout():
-        _backGroundScale9Enabled(false),
-        _backGroundImage(nullptr),
-        _backGroundImageFileName(""),
-        _backGroundImageCapInsets(MATH::RectfZERO),
-        _colorType(BackGroundColorType::NONE),
-        _bgImageTexType(TextureResType::LOCAL),
-        _backGroundImageTextureSize(MATH::SizefZERO),
-        _backGroundImageColor(Color3B::WHITE),
-        _backGroundImageOpacity(255),
-        _colorRender(nullptr),
-        _gradientRender(nullptr),
-        _cColor(Color3B::WHITE),
-        _gStartColor(Color3B::WHITE),
-        _gEndColor(Color3B::WHITE),
-        _alongVector(MATH::Vector2f(0.0f, -1.0f)),
-        _cOpacity(255),
-        _clippingEnabled(false),
-        _layoutType(Type::TABSOLUTE),
-        _clippingType(ClippingType::STENCIL),
-        _clippingStencil(nullptr),
-        _scissorRectDirty(false),
-        _clippingRect(MATH::RectfZERO),
-        _clippingParent(nullptr),
-        _clippingRectDirty(true),
-        _groupCommand(Director::getInstance().getRenderer()),
-        _doLayoutDirty(true),
-        _isInterceptTouch(false),
-        _loopFocus(false),
-        _passFocusToChild(true),
-        _isFocusPassing(false),
+        backGroundScale9Enabled_(false),
+        backGroundImage_(nullptr),
+        backGroundImageFileName_(""),
+        backGroundImageCapInsets_(MATH::RectfZERO),
+        colorType_(BackGroundColorType::NONE),
+        bgImageTexType_(TextureResType::LOCAL),
+        backGroundImageTextureSize_(MATH::SizefZERO),
+        backGroundImageColor_(Color3B::WHITE),
+        backGroundImageOpacity_(255),
+        colorRender_(nullptr),
+        gradientRender_(nullptr),
+        cColor_(Color3B::WHITE),
+        gStartColor_(Color3B::WHITE),
+        gEndColor_(Color3B::WHITE),
+        alongVector_(MATH::Vector2f(0.0f, -1.0f)),
+        cOpacity_(255),
+        clippingEnabled_(false),
+        layoutType_(Type::TABSOLUTE),
+        clippingType_(ClippingType::STENCIL),
+        clippingStencil_(nullptr),
+        scissorRectDirty_(false),
+        clippingRect_(MATH::RectfZERO),
+        clippingParent_(nullptr),
+        clippingRectDirty_(true),
+        groupCommand_(Director::getInstance().getRenderer()),
+        doLayoutDirty_(true),
+        isInterceptTouch_(false),
+        loopFocus_(false),
+        passFocusToChild_(true),
+        isFocusPassing_(false),
         u3dContext_(Unity3DCreator::CreateContext())
         {
             //no-op
@@ -60,7 +60,7 @@ namespace GRAPH
 
         Layout::~Layout()
         {
-            SAFE_RELEASE(_clippingStencil);
+            SAFE_RELEASE(clippingStencil_);
             SAFE_RELEASE(u3dVertexFormat_);
             SAFE_RELEASE(u3dContext_);
         }
@@ -68,20 +68,20 @@ namespace GRAPH
         void Layout::onEnter()
         {
             Widget::onEnter();
-            if (_clippingStencil)
+            if (clippingStencil_)
             {
-                _clippingStencil->onEnter();
+                clippingStencil_->onEnter();
             }
-            _doLayoutDirty = true;
-            _clippingRectDirty = true;
+            doLayoutDirty_ = true;
+            clippingRectDirty_ = true;
         }
 
         void Layout::onExit()
         {
             Widget::onExit();
-            if (_clippingStencil)
+            if (clippingStencil_)
             {
-                _clippingStencil->onExit();
+                clippingStencil_->onExit();
             }
         }
 
@@ -138,7 +138,7 @@ namespace GRAPH
                 supplyTheLayoutParameterLackToChild(static_cast<Widget*>(child));
             }
             Widget::addChild(child, zOrder, tag);
-            _doLayoutDirty = true;
+            doLayoutDirty_ = true;
         }
 
         void Layout::addChild(Node* child, int zOrder, const std::string &name)
@@ -147,30 +147,30 @@ namespace GRAPH
                 supplyTheLayoutParameterLackToChild(static_cast<Widget*>(child));
             }
             Widget::addChild(child, zOrder, name);
-            _doLayoutDirty = true;
+            doLayoutDirty_ = true;
         }
 
         void Layout::removeChild(Node *child, bool cleanup)
         {
             Widget::removeChild(child, cleanup);
-            _doLayoutDirty = true;
+            doLayoutDirty_ = true;
         }
 
         void Layout::removeAllChildren()
         {
             Widget::removeAllChildren();
-            _doLayoutDirty = true;
+            doLayoutDirty_ = true;
         }
 
         void Layout::removeAllChildrenWithCleanup(bool cleanup)
         {
             Widget::removeAllChildrenWithCleanup(cleanup);
-            _doLayoutDirty = true;
+            doLayoutDirty_ = true;
         }
 
         bool Layout::isClippingEnabled()const
         {
-            return _clippingEnabled;
+            return clippingEnabled_;
         }
 
         void Layout::visit(Renderer *renderer, const MATH::Matrix4 &parentTransform, uint32_t parentFlags)
@@ -183,9 +183,9 @@ namespace GRAPH
             adaptRenderers();
             doLayout();
 
-            if (_clippingEnabled)
+            if (clippingEnabled_)
             {
-                switch (_clippingType)
+                switch (clippingType_)
                 {
                     case ClippingType::STENCIL:
                         stencilClippingVisit(renderer, parentTransform, parentFlags);
@@ -217,10 +217,10 @@ namespace GRAPH
             Director::getInstance().loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, modelViewTransform_);
             //Add group command
 
-            _groupCommand.init(globalZOrder_);
-            renderer->addCommand(&_groupCommand);
+            groupCommand_.init(globalZOrder_);
+            renderer->addCommand(&groupCommand_);
 
-            renderer->pushGroup(_groupCommand.getRenderQueueID());
+            renderer->pushGroup(groupCommand_.getRenderQueueID());
 
             uint64 i = 0;      // used by _children
             uint64 j = 0;      // used by _protectedChildren
@@ -314,12 +314,12 @@ namespace GRAPH
 
         void Layout::setClippingEnabled(bool able)
         {
-            if (able == _clippingEnabled)
+            if (able == clippingEnabled_)
             {
                 return;
             }
-            _clippingEnabled = able;
-            switch (_clippingType)
+            clippingEnabled_ = able;
+            switch (clippingType_)
             {
                 case ClippingType::STENCIL:
                     if (able)
@@ -330,22 +330,22 @@ namespace GRAPH
                             glGetIntegerv(GL_STENCIL_BITS, &g_sStencilBits);
                             once = false;
                         }
-                        _clippingStencil = DrawNode::create();
+                        clippingStencil_ = DrawNode::create();
                         if (running_)
                         {
-                            _clippingStencil->onEnter();
+                            clippingStencil_->onEnter();
                         }
-                        _clippingStencil->retain();
+                        clippingStencil_->retain();
                         setStencilClippingSize(contentSize_);
                     }
                     else
                     {
                         if (running_)
                         {
-                            _clippingStencil->onExit();
+                            clippingStencil_->onExit();
                         }
-                        _clippingStencil->release();
-                        _clippingStencil = nullptr;
+                        clippingStencil_->release();
+                        clippingStencil_ = nullptr;
                     }
                     break;
                 default:
@@ -355,24 +355,24 @@ namespace GRAPH
 
         void Layout::setClippingType(ClippingType type)
         {
-            if (type == _clippingType)
+            if (type == clippingType_)
             {
                 return;
             }
             bool clippingEnabled = isClippingEnabled();
             setClippingEnabled(false);
-            _clippingType = type;
+            clippingType_ = type;
             setClippingEnabled(clippingEnabled);
         }
 
         Layout::ClippingType Layout::getClippingType()const
         {
-            return _clippingType;
+            return clippingType_;
         }
 
         void Layout::setStencilClippingSize(const MATH::Sizef &)
         {
-            if (_clippingEnabled && _clippingType == ClippingType::STENCIL)
+            if (clippingEnabled_ && clippingType_ == ClippingType::STENCIL)
             {
                 MATH::Vector2f rect[4];
                 // rect[0].setZero(); Zero default
@@ -380,14 +380,14 @@ namespace GRAPH
                 rect[2].set(contentSize_.width, contentSize_.height);
                 rect[3].set(0.0f, contentSize_.height);
                 Color4F green(0.0f, 1.0f, 0.0f, 1.0f);
-                _clippingStencil->clear();
-                _clippingStencil->drawPolygon(rect, 4, green, 0, green);
+                clippingStencil_->clear();
+                clippingStencil_->drawPolygon(rect, 4, green, 0, green);
             }
         }
 
         const MATH::Rectf& Layout::getClippingRect()
         {
-            if (_clippingRectDirty)
+            if (clippingRectDirty_)
             {
                 MATH::Vector2f worldPos = convertToWorldSpace(MATH::Vec2fZERO);
                 MATH::AffineTransform t = getNodeToWorldAffineTransform();
@@ -403,15 +403,15 @@ namespace GRAPH
                     {
                         if (parent->isClippingEnabled())
                         {
-                            _clippingParent = parent;
+                            clippingParent_ = parent;
                             break;
                         }
                     }
                 }
 
-                if (_clippingParent)
+                if (clippingParent_)
                 {
-                    parentClippingRect = _clippingParent->getClippingRect();
+                    parentClippingRect = clippingParent_->getClippingRect();
                     float finalX = worldPos.x - (scissorWidth * anchorPoint_.x);
                     float finalY = worldPos.y - (scissorHeight * anchorPoint_.y);
                     float finalWidth = scissorWidth;
@@ -447,66 +447,66 @@ namespace GRAPH
                     {
                         finalHeight = 0.0f;
                     }
-                    _clippingRect.origin.x = finalX;
-                    _clippingRect.origin.y = finalY;
-                    _clippingRect.size.width = finalWidth;
-                    _clippingRect.size.height = finalHeight;
+                    clippingRect_.origin.x = finalX;
+                    clippingRect_.origin.y = finalY;
+                    clippingRect_.size.width = finalWidth;
+                    clippingRect_.size.height = finalHeight;
                 }
                 else
                 {
-                    _clippingRect.origin.x = worldPos.x - (scissorWidth * anchorPoint_.x);
-                    _clippingRect.origin.y = worldPos.y - (scissorHeight * anchorPoint_.y);
-                    _clippingRect.size.width = scissorWidth;
-                    _clippingRect.size.height = scissorHeight;
+                    clippingRect_.origin.x = worldPos.x - (scissorWidth * anchorPoint_.x);
+                    clippingRect_.origin.y = worldPos.y - (scissorHeight * anchorPoint_.y);
+                    clippingRect_.size.width = scissorWidth;
+                    clippingRect_.size.height = scissorHeight;
                 }
-                _clippingRectDirty = false;
+                clippingRectDirty_ = false;
             }
-            return _clippingRect;
+            return clippingRect_;
         }
 
         void Layout::onSizeChanged()
         {
             Widget::onSizeChanged();
             setStencilClippingSize(contentSize_);
-            _doLayoutDirty = true;
-            _clippingRectDirty = true;
-            if (_backGroundImage)
+            doLayoutDirty_ = true;
+            clippingRectDirty_ = true;
+            if (backGroundImage_)
             {
-                _backGroundImage->setPosition(contentSize_.width/2.0f, contentSize_.height/2.0f);
-                if (_backGroundScale9Enabled && _backGroundImage)
+                backGroundImage_->setPosition(contentSize_.width/2.0f, contentSize_.height/2.0f);
+                if (backGroundScale9Enabled_ && backGroundImage_)
                 {
-                    _backGroundImage->setPreferredSize(contentSize_);
+                    backGroundImage_->setPreferredSize(contentSize_);
                 }
             }
-            if (_colorRender)
+            if (colorRender_)
             {
-                _colorRender->setContentSize(contentSize_);
+                colorRender_->setContentSize(contentSize_);
             }
-            if (_gradientRender)
+            if (gradientRender_)
             {
-                _gradientRender->setContentSize(contentSize_);
+                gradientRender_->setContentSize(contentSize_);
             }
         }
 
         void Layout::setBackGroundImageScale9Enabled(bool able)
         {
-            if (_backGroundScale9Enabled == able)
+            if (backGroundScale9Enabled_ == able)
             {
                 return;
             }
-            _backGroundScale9Enabled = able;
-            if (nullptr == _backGroundImage)
+            backGroundScale9Enabled_ = able;
+            if (nullptr == backGroundImage_)
             {
                 addBackGroundImage();
-                setBackGroundImage(_backGroundImageFileName,_bgImageTexType);
+                setBackGroundImage(backGroundImageFileName_,bgImageTexType_);
             }
-            _backGroundImage->setScale9Enabled(_backGroundScale9Enabled);
-            setBackGroundImageCapInsets(_backGroundImageCapInsets);
+            backGroundImage_->setScale9Enabled(backGroundScale9Enabled_);
+            setBackGroundImageCapInsets(backGroundImageCapInsets_);
         }
 
         bool Layout::isBackGroundImageScale9Enabled()const
         {
-            return _backGroundScale9Enabled;
+            return backGroundScale9Enabled_;
         }
 
         void Layout::setBackGroundImage(const std::string& fileName,TextureResType texType)
@@ -515,46 +515,46 @@ namespace GRAPH
             {
                 return;
             }
-            if (_backGroundImage == nullptr)
+            if (backGroundImage_ == nullptr)
             {
                 addBackGroundImage();
-                _backGroundImage->setScale9Enabled(_backGroundScale9Enabled);
+                backGroundImage_->setScale9Enabled(backGroundScale9Enabled_);
             }
-            _backGroundImageFileName = fileName;
-            _bgImageTexType = texType;
+            backGroundImageFileName_ = fileName;
+            bgImageTexType_ = texType;
 
-            switch (_bgImageTexType)
+            switch (bgImageTexType_)
             {
                 case TextureResType::LOCAL:
-                    _backGroundImage->initWithFile(fileName);
+                    backGroundImage_->initWithFile(fileName);
                     break;
                 case TextureResType::PLIST:
-                    _backGroundImage->initWithSpriteFrameName(fileName);
+                    backGroundImage_->initWithSpriteFrameName(fileName);
                     break;
                 default:
                     break;
             }
-            if (_backGroundScale9Enabled) {
-                _backGroundImage->setPreferredSize(contentSize_);
+            if (backGroundScale9Enabled_) {
+                backGroundImage_->setPreferredSize(contentSize_);
             }
 
-            _backGroundImageTextureSize = _backGroundImage->getContentSize();
-            _backGroundImage->setPosition(contentSize_.width/2.0f, contentSize_.height/2.0f);
+            backGroundImageTextureSize_ = backGroundImage_->getContentSize();
+            backGroundImage_->setPosition(contentSize_.width/2.0f, contentSize_.height/2.0f);
             updateBackGroundImageRGBA();
         }
 
         void Layout::setBackGroundImageCapInsets(const MATH::Rectf &capInsets)
         {
-            _backGroundImageCapInsets = capInsets;
-            if (_backGroundScale9Enabled && _backGroundImage)
+            backGroundImageCapInsets_ = capInsets;
+            if (backGroundScale9Enabled_ && backGroundImage_)
             {
-                _backGroundImage->setCapInsets(capInsets);
+                backGroundImage_->setCapInsets(capInsets);
             }
         }
 
         const MATH::Rectf& Layout::getBackGroundImageCapInsets()const
         {
-            return _backGroundImageCapInsets;
+            return backGroundImageCapInsets_;
         }
 
         void Layout::supplyTheLayoutParameterLackToChild(Widget *child)
@@ -563,7 +563,7 @@ namespace GRAPH
             {
                 return;
             }
-            switch (_layoutType)
+            switch (layoutType_)
             {
                 case Type::TABSOLUTE:
                     break;
@@ -593,83 +593,83 @@ namespace GRAPH
 
         void Layout::addBackGroundImage()
         {
-            _backGroundImage = Scale9Sprite::create();
-            _backGroundImage->setScale9Enabled(false);
+            backGroundImage_ = Scale9Sprite::create();
+            backGroundImage_->setScale9Enabled(false);
 
-            addProtectedChild(_backGroundImage, BACKGROUNDIMAGE_Z, -1);
+            addProtectedChild(backGroundImage_, BACKGROUNDIMAGE_Z, -1);
 
-            _backGroundImage->setPosition(contentSize_.width/2.0f, contentSize_.height/2.0f);
+            backGroundImage_->setPosition(contentSize_.width/2.0f, contentSize_.height/2.0f);
         }
 
         void Layout::removeBackGroundImage()
         {
-            if (!_backGroundImage)
+            if (!backGroundImage_)
             {
                 return;
             }
-            removeProtectedChild(_backGroundImage);
-            _backGroundImage = nullptr;
-            _backGroundImageFileName = "";
-            _backGroundImageTextureSize = MATH::SizefZERO;
+            removeProtectedChild(backGroundImage_);
+            backGroundImage_ = nullptr;
+            backGroundImageFileName_ = "";
+            backGroundImageTextureSize_ = MATH::SizefZERO;
         }
 
         void Layout::setBackGroundColorType(BackGroundColorType type)
         {
-            if (_colorType == type)
+            if (colorType_ == type)
             {
                 return;
             }
-            switch (_colorType)
+            switch (colorType_)
             {
                 case BackGroundColorType::NONE:
-                    if (_colorRender)
+                    if (colorRender_)
                     {
-                        removeProtectedChild(_colorRender);
-                        _colorRender = nullptr;
+                        removeProtectedChild(colorRender_);
+                        colorRender_ = nullptr;
                     }
-                    if (_gradientRender)
+                    if (gradientRender_)
                     {
-                        removeProtectedChild(_gradientRender);
-                        _gradientRender = nullptr;
+                        removeProtectedChild(gradientRender_);
+                        gradientRender_ = nullptr;
                     }
                     break;
                 case BackGroundColorType::SOLID:
-                    if (_colorRender)
+                    if (colorRender_)
                     {
-                        removeProtectedChild(_colorRender);
-                        _colorRender = nullptr;
+                        removeProtectedChild(colorRender_);
+                        colorRender_ = nullptr;
                     }
                     break;
                 case BackGroundColorType::GRADIENT:
-                    if (_gradientRender)
+                    if (gradientRender_)
                     {
-                        removeProtectedChild(_gradientRender);
-                        _gradientRender = nullptr;
+                        removeProtectedChild(gradientRender_);
+                        gradientRender_ = nullptr;
                     }
                     break;
                 default:
                     break;
             }
-            _colorType = type;
-            switch (_colorType)
+            colorType_ = type;
+            switch (colorType_)
             {
                 case BackGroundColorType::NONE:
                     break;
                 case BackGroundColorType::SOLID:
-                    _colorRender = LayerColor::create();
-                    _colorRender->setContentSize(contentSize_);
-                    _colorRender->setOpacity(_cOpacity);
-                    _colorRender->setColor(_cColor);
-                    addProtectedChild(_colorRender, BCAKGROUNDCOLORRENDERER_Z, -1);
+                    colorRender_ = LayerColor::create();
+                    colorRender_->setContentSize(contentSize_);
+                    colorRender_->setOpacity(cOpacity_);
+                    colorRender_->setColor(cColor_);
+                    addProtectedChild(colorRender_, BCAKGROUNDCOLORRENDERER_Z, -1);
                     break;
                 case BackGroundColorType::GRADIENT:
-                    _gradientRender = LayerGradient::create();
-                    _gradientRender->setContentSize(contentSize_);
-                    _gradientRender->setOpacity(_cOpacity);
-                    _gradientRender->setStartColor(_gStartColor);
-                    _gradientRender->setEndColor(_gEndColor);
-                    _gradientRender->setVector(_alongVector);
-                    addProtectedChild(_gradientRender, BCAKGROUNDCOLORRENDERER_Z, -1);
+                    gradientRender_ = LayerGradient::create();
+                    gradientRender_->setContentSize(contentSize_);
+                    gradientRender_->setOpacity(cOpacity_);
+                    gradientRender_->setStartColor(gStartColor_);
+                    gradientRender_->setEndColor(gEndColor_);
+                    gradientRender_->setVector(alongVector_);
+                    addProtectedChild(gradientRender_, BCAKGROUNDCOLORRENDERER_Z, -1);
                     break;
                 default:
                     break;
@@ -678,59 +678,59 @@ namespace GRAPH
 
         Layout::BackGroundColorType Layout::getBackGroundColorType()const
         {
-            return _colorType;
+            return colorType_;
         }
 
         void Layout::setBackGroundColor(const Color3B &color)
         {
-            _cColor = color;
-            if (_colorRender)
+            cColor_ = color;
+            if (colorRender_)
             {
-                _colorRender->setColor(color);
+                colorRender_->setColor(color);
             }
         }
 
         const Color3B& Layout::getBackGroundColor()const
         {
-            return _cColor;
+            return cColor_;
         }
 
         void Layout::setBackGroundColor(const Color3B &startColor, const Color3B &endColor)
         {
-            _gStartColor = startColor;
-            if (_gradientRender)
+            gStartColor_ = startColor;
+            if (gradientRender_)
             {
-                _gradientRender->setStartColor(startColor);
+                gradientRender_->setStartColor(startColor);
             }
-            _gEndColor = endColor;
-            if (_gradientRender)
+            gEndColor_ = endColor;
+            if (gradientRender_)
             {
-                _gradientRender->setEndColor(endColor);
+                gradientRender_->setEndColor(endColor);
             }
         }
 
         const Color3B& Layout::getBackGroundStartColor()const
         {
-            return _gStartColor;
+            return gStartColor_;
         }
 
         const Color3B& Layout::getBackGroundEndColor()const
         {
-            return _gEndColor;
+            return gEndColor_;
         }
 
         void Layout::setBackGroundColorOpacity(uint8 opacity)
         {
-            _cOpacity = opacity;
-            switch (_colorType)
+            cOpacity_ = opacity;
+            switch (colorType_)
             {
                 case BackGroundColorType::NONE:
                     break;
                 case BackGroundColorType::SOLID:
-                    _colorRender->setOpacity(opacity);
+                    colorRender_->setOpacity(opacity);
                     break;
                 case BackGroundColorType::GRADIENT:
-                    _gradientRender->setOpacity(opacity);
+                    gradientRender_->setOpacity(opacity);
                     break;
                 default:
                     break;
@@ -739,78 +739,78 @@ namespace GRAPH
 
         uint8 Layout::getBackGroundColorOpacity()const
         {
-            return _cOpacity;
+            return cOpacity_;
         }
 
         void Layout::setBackGroundColorVector(const MATH::Vector2f &vector)
         {
-            _alongVector = vector;
-            if (_gradientRender)
+            alongVector_ = vector;
+            if (gradientRender_)
             {
-                _gradientRender->setVector(vector);
+                gradientRender_->setVector(vector);
             }
         }
 
         const MATH::Vector2f& Layout::getBackGroundColorVector()const
         {
-            return _alongVector;
+            return alongVector_;
         }
 
         void Layout::setBackGroundImageColor(const Color3B &color)
         {
-            _backGroundImageColor = color;
+            backGroundImageColor_ = color;
             updateBackGroundImageColor();
         }
 
         void Layout::setBackGroundImageOpacity(uint8 opacity)
         {
-            _backGroundImageOpacity = opacity;
+            backGroundImageOpacity_ = opacity;
             updateBackGroundImageOpacity();
         }
 
         const Color3B& Layout::getBackGroundImageColor()const
         {
-            return _backGroundImageColor;
+            return backGroundImageColor_;
         }
 
         uint8 Layout::getBackGroundImageOpacity()const
         {
-            return _backGroundImageOpacity;
+            return backGroundImageOpacity_;
         }
 
         void Layout::updateBackGroundImageColor()
         {
-            if (_backGroundImage)
+            if (backGroundImage_)
             {
-                _backGroundImage->setColor(_backGroundImageColor);
+                backGroundImage_->setColor(backGroundImageColor_);
             }
         }
 
         void Layout::updateBackGroundImageOpacity()
         {
-            if (_backGroundImage)
+            if (backGroundImage_)
             {
-                _backGroundImage->setOpacity(_backGroundImageOpacity);
+                backGroundImage_->setOpacity(backGroundImageOpacity_);
             }
         }
 
         void Layout::updateBackGroundImageRGBA()
         {
-            if (_backGroundImage)
+            if (backGroundImage_)
             {
-                _backGroundImage->setColor(_backGroundImageColor);
-                _backGroundImage->setOpacity(_backGroundImageOpacity);
+                backGroundImage_->setColor(backGroundImageColor_);
+                backGroundImage_->setOpacity(backGroundImageOpacity_);
             }
         }
 
         const MATH::Sizef& Layout::getBackGroundImageTextureSize() const
         {
-            return _backGroundImageTextureSize;
+            return backGroundImageTextureSize_;
         }
 
         void Layout::setLayoutType(Type type)
         {
-            _layoutType = type;
+            layoutType_ = type;
 
             for (auto& child : children_)
             {
@@ -820,14 +820,14 @@ namespace GRAPH
                     supplyTheLayoutParameterLackToChild(static_cast<Widget*>(child));
                 }
             }
-            _doLayoutDirty = true;
+            doLayoutDirty_ = true;
         }
 
 
 
         Layout::Type Layout::getLayoutType() const
         {
-            return _layoutType;
+            return layoutType_;
         }
 
         void Layout::forceDoLayout()
@@ -838,7 +838,7 @@ namespace GRAPH
 
         void Layout::requestDoLayout()
         {
-            _doLayoutDirty = true;
+            doLayoutDirty_ = true;
         }
 
         MATH::Sizef Layout::getLayoutContentSize()const
@@ -854,7 +854,7 @@ namespace GRAPH
         LayoutManager* Layout::createLayoutManager()
         {
             LayoutManager* exe = nullptr;
-            switch (_layoutType)
+            switch (layoutType_)
             {
                 case Type::TVERTICAL:
                     exe = LinearVerticalLayoutManager::create();
@@ -875,7 +875,7 @@ namespace GRAPH
         void Layout::doLayout()
         {
 
-            if (!_doLayoutDirty)
+            if (!doLayoutDirty_)
             {
                 return;
             }
@@ -889,7 +889,7 @@ namespace GRAPH
                 executant->doLayout(this);
             }
 
-            _doLayoutDirty = false;
+            doLayoutDirty_ = false;
         }
 
         Widget* Layout::createCloneInstance()
@@ -907,42 +907,42 @@ namespace GRAPH
             Layout* layout = dynamic_cast<Layout*>(widget);
             if (layout)
             {
-                setBackGroundImageScale9Enabled(layout->_backGroundScale9Enabled);
-                setBackGroundImage(layout->_backGroundImageFileName,layout->_bgImageTexType);
-                setBackGroundImageCapInsets(layout->_backGroundImageCapInsets);
-                setBackGroundColorType(layout->_colorType);
-                setBackGroundColor(layout->_cColor);
-                setBackGroundColor(layout->_gStartColor, layout->_gEndColor);
-                setBackGroundColorOpacity(layout->_cOpacity);
-                setBackGroundColorVector(layout->_alongVector);
-                setLayoutType(layout->_layoutType);
-                setClippingEnabled(layout->_clippingEnabled);
-                setClippingType(layout->_clippingType);
-                _loopFocus = layout->_loopFocus;
-                _passFocusToChild = layout->_passFocusToChild;
-                _isInterceptTouch = layout->_isInterceptTouch;
+                setBackGroundImageScale9Enabled(layout->backGroundScale9Enabled_);
+                setBackGroundImage(layout->backGroundImageFileName_,layout->bgImageTexType_);
+                setBackGroundImageCapInsets(layout->backGroundImageCapInsets_);
+                setBackGroundColorType(layout->colorType_);
+                setBackGroundColor(layout->cColor_);
+                setBackGroundColor(layout->gStartColor_, layout->gEndColor_);
+                setBackGroundColorOpacity(layout->cOpacity_);
+                setBackGroundColorVector(layout->alongVector_);
+                setLayoutType(layout->layoutType_);
+                setClippingEnabled(layout->clippingEnabled_);
+                setClippingType(layout->clippingType_);
+                loopFocus_ = layout->loopFocus_;
+                passFocusToChild_ = layout->passFocusToChild_;
+                isInterceptTouch_ = layout->isInterceptTouch_;
             }
         }
 
         void Layout::setLoopFocus(bool loop)
         {
-            _loopFocus = loop;
+            loopFocus_ = loop;
         }
 
         bool Layout::isLoopFocus()const
         {
-            return _loopFocus;
+            return loopFocus_;
         }
 
 
         void Layout::setPassFocusToChild(bool pass)
         {
-            _passFocusToChild = pass;
+            passFocusToChild_ = pass;
         }
 
         bool Layout::isPassFocusToChild()const
         {
-            return _passFocusToChild;
+            return passFocusToChild_;
         }
 
         MATH::Sizef Layout::getLayoutAccumulatedSize()const
@@ -1292,7 +1292,7 @@ namespace GRAPH
                 Layout *layout = dynamic_cast<Layout*>(widget);
                 if (layout)
                 {
-                    layout->_isFocusPassing = true;
+                    layout->isFocusPassing_ = true;
                     return layout->findNextFocusedWidget(dir, layout);
                 }
                 else
@@ -1374,7 +1374,7 @@ namespace GRAPH
                     Layout* layout = dynamic_cast<Layout*>(nextWidget);
                     if (layout)
                     {
-                        layout->_isFocusPassing = true;
+                        layout->isFocusPassing_ = true;
                         return layout->findNextFocusedWidget(direction, layout);
                     }
                     this->dispatchFocusEvent(current, nextWidget);
@@ -1388,7 +1388,7 @@ namespace GRAPH
             }
             else
             {
-                if (_loopFocus)
+                if (loopFocus_)
                 {
                     if (checkFocusEnabledChild())
                     {
@@ -1399,7 +1399,7 @@ namespace GRAPH
                             Layout* layout = dynamic_cast<Layout*>(nextWidget);
                             if (layout)
                             {
-                                layout->_isFocusPassing = true;
+                                layout->isFocusPassing_ = true;
                                 return layout->findNextFocusedWidget(direction, layout);
                             }
                             else
@@ -1466,7 +1466,7 @@ namespace GRAPH
                         Layout* layout = dynamic_cast<Layout*>(nextWidget);
                         if (layout)
                         {
-                            layout->_isFocusPassing = true;
+                            layout->isFocusPassing_ = true;
                             return layout->findNextFocusedWidget(direction, layout);
                         }
                         else
@@ -1487,7 +1487,7 @@ namespace GRAPH
             }
             else
             {
-                if (_loopFocus)
+                if (loopFocus_)
                 {
                     if (checkFocusEnabledChild())
                     {
@@ -1498,7 +1498,7 @@ namespace GRAPH
                             Layout* layout = dynamic_cast<Layout*>(nextWidget);
                             if (layout)
                             {
-                                layout->_isFocusPassing = true;
+                                layout->isFocusPassing_ = true;
                                 return layout->findNextFocusedWidget(direction, layout);
                             }
                             else
@@ -1668,19 +1668,19 @@ namespace GRAPH
 
         Widget* Layout::findNextFocusedWidget(FocusDirection direction, Widget* current)
         {
-            if (_isFocusPassing || this->isFocused())
+            if (isFocusPassing_ || this->isFocused())
             {
                 Layout* parent = dynamic_cast<Layout*>(this->getParent());
-                _isFocusPassing = false;
+                isFocusPassing_ = false;
 
-                if (_passFocusToChild)
+                if (passFocusToChild_)
                 {
                     Widget * w = this->passFocusToChild(direction, current);
                     if (dynamic_cast<Layout*>(w))
                     {
                         if (parent)
                         {
-                            parent->_isFocusPassing = true;
+                            parent->isFocusPassing_ = true;
                             return parent->findNextFocusedWidget(direction, this);
                         }
                     }
@@ -1691,13 +1691,13 @@ namespace GRAPH
                 {
                     return this;
                 }
-                parent->_isFocusPassing = true;
+                parent->isFocusPassing_ = true;
                 return parent->findNextFocusedWidget(direction, this);
 
             }
             else if(current->isFocused() || dynamic_cast<Layout*>(current))
             {
-                if (_layoutType == Type::THORIZONTAL)
+                if (layoutType_ == Type::THORIZONTAL)
                 {
                     switch (direction)
                     {
@@ -1732,7 +1732,7 @@ namespace GRAPH
                             break;
                     }
                 }
-                else if (_layoutType == Type::TVERTICAL)
+                else if (layoutType_ == Type::TVERTICAL)
                 {
                     switch (direction)
                     {
@@ -1783,8 +1783,8 @@ namespace GRAPH
         void Layout::setCameraMask(unsigned short mask, bool applyChildren)
         {
             Widget::setCameraMask(mask, applyChildren);
-            if (_clippingStencil){
-                _clippingStencil->setCameraMask(mask, applyChildren);
+            if (clippingStencil_){
+                clippingStencil_->setCameraMask(mask, applyChildren);
             }
         }
 
@@ -2085,7 +2085,7 @@ namespace GRAPH
                 {
                     RelativeLayoutParameter* layoutParameter = dynamic_cast<RelativeLayoutParameter*>(child->getLayoutParameter());
                     layoutParameter->_put = false;
-                    _unlayoutChildCount++;
+                    unlayoutChildCount_++;
                     widgetChildren.pushBack(child);
                 }
             }
@@ -2101,7 +2101,7 @@ namespace GRAPH
 
             if (!relativeName.empty())
             {
-                for (auto& sWidget : _widgetChildren)
+                for (auto& sWidget : widgetChildren_)
                 {
                     if (sWidget)
                     {
@@ -2109,7 +2109,7 @@ namespace GRAPH
                         if (rlayoutParameter &&  rlayoutParameter->getRelativeName() == relativeName)
                         {
                             relativeWidget = sWidget;
-                            _relativeWidgetLP = rlayoutParameter;
+                            relativeWidgetLP_ = rlayoutParameter;
                             break;
                         }
                     }
@@ -2120,15 +2120,15 @@ namespace GRAPH
 
         bool RelativeLayoutManager::caculateFinalPositionWithRelativeWidget(LayoutProtocol *layout)
         {
-            MATH::Vector2f ap = _widget->getAnchorPoint();
-            MATH::Sizef cs = _widget->getContentSize();
+            MATH::Vector2f ap = widget_->getAnchorPoint();
+            MATH::Sizef cs = widget_->getContentSize();
 
-            _finalPositionX = 0.0f;
-            _finalPositionY = 0.0f;
+            finalPositionX_ = 0.0f;
+            finalPositionY_ = 0.0f;
 
-            Widget* relativeWidget = this->getRelativeWidget(_widget);
+            Widget* relativeWidget = this->getRelativeWidget(widget_);
 
-            RelativeLayoutParameter* layoutParameter = dynamic_cast<RelativeLayoutParameter*>(_widget->getLayoutParameter());
+            RelativeLayoutParameter* layoutParameter = dynamic_cast<RelativeLayoutParameter*>(widget_->getLayoutParameter());
 
             RelativeLayoutParameter::RelativeAlign align = layoutParameter->getAlign();
 
@@ -2139,200 +2139,200 @@ namespace GRAPH
             {
                 case RelativeLayoutParameter::RelativeAlign::NONE:
                 case RelativeLayoutParameter::RelativeAlign::PARENT_TOP_LEFT:
-                    _finalPositionX = ap.x * cs.width;
-                    _finalPositionY = layoutSize.height - ((1.0f - ap.y) * cs.height);
+                    finalPositionX_ = ap.x * cs.width;
+                    finalPositionY_ = layoutSize.height - ((1.0f - ap.y) * cs.height);
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_TOP_CENTER_HORIZONTAL:
-                    _finalPositionX = layoutSize.width * 0.5f - cs.width * (0.5f - ap.x);
-                    _finalPositionY = layoutSize.height - ((1.0f - ap.y) * cs.height);
+                    finalPositionX_ = layoutSize.width * 0.5f - cs.width * (0.5f - ap.x);
+                    finalPositionY_ = layoutSize.height - ((1.0f - ap.y) * cs.height);
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_TOP_RIGHT:
-                    _finalPositionX = layoutSize.width - ((1.0f - ap.x) * cs.width);
-                    _finalPositionY = layoutSize.height - ((1.0f - ap.y) * cs.height);
+                    finalPositionX_ = layoutSize.width - ((1.0f - ap.x) * cs.width);
+                    finalPositionY_ = layoutSize.height - ((1.0f - ap.y) * cs.height);
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_LEFT_CENTER_VERTICAL:
-                    _finalPositionX = ap.x * cs.width;
-                    _finalPositionY = layoutSize.height * 0.5f - cs.height * (0.5f - ap.y);
+                    finalPositionX_ = ap.x * cs.width;
+                    finalPositionY_ = layoutSize.height * 0.5f - cs.height * (0.5f - ap.y);
                     break;
                 case RelativeLayoutParameter::RelativeAlign::CENTER_IN_PARENT:
-                    _finalPositionX = layoutSize.width * 0.5f - cs.width * (0.5f - ap.x);
-                    _finalPositionY = layoutSize.height * 0.5f - cs.height * (0.5f - ap.y);
+                    finalPositionX_ = layoutSize.width * 0.5f - cs.width * (0.5f - ap.x);
+                    finalPositionY_ = layoutSize.height * 0.5f - cs.height * (0.5f - ap.y);
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_RIGHT_CENTER_VERTICAL:
-                    _finalPositionX = layoutSize.width - ((1.0f - ap.x) * cs.width);
-                    _finalPositionY = layoutSize.height * 0.5f - cs.height * (0.5f - ap.y);
+                    finalPositionX_ = layoutSize.width - ((1.0f - ap.x) * cs.width);
+                    finalPositionY_ = layoutSize.height * 0.5f - cs.height * (0.5f - ap.y);
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_LEFT_BOTTOM:
-                    _finalPositionX = ap.x * cs.width;
-                    _finalPositionY = ap.y * cs.height;
+                    finalPositionX_ = ap.x * cs.width;
+                    finalPositionY_ = ap.y * cs.height;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_BOTTOM_CENTER_HORIZONTAL:
-                    _finalPositionX = layoutSize.width * 0.5f - cs.width * (0.5f - ap.x);
-                    _finalPositionY = ap.y * cs.height;
+                    finalPositionX_ = layoutSize.width * 0.5f - cs.width * (0.5f - ap.x);
+                    finalPositionY_ = ap.y * cs.height;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_RIGHT_BOTTOM:
-                    _finalPositionX = layoutSize.width - ((1.0f - ap.x) * cs.width);
-                    _finalPositionY = ap.y * cs.height;
+                    finalPositionX_ = layoutSize.width - ((1.0f - ap.x) * cs.width);
+                    finalPositionY_ = ap.y * cs.height;
                     break;
 
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_ABOVE_LEFTALIGN:
                     if (relativeWidget)
                     {
-                        if (_relativeWidgetLP && !_relativeWidgetLP->_put)
+                        if (relativeWidgetLP_ && !relativeWidgetLP_->_put)
                         {
                             return false;
                         }
                         float locationTop = relativeWidget->getTopBoundary();
                         float locationLeft = relativeWidget->getLeftBoundary();
-                        _finalPositionY = locationTop + ap.y * cs.height;
-                        _finalPositionX = locationLeft + ap.x * cs.width;
+                        finalPositionY_ = locationTop + ap.y * cs.height;
+                        finalPositionX_ = locationLeft + ap.x * cs.width;
                     }
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_ABOVE_CENTER:
                     if (relativeWidget)
                     {
-                        if (_relativeWidgetLP && !_relativeWidgetLP->_put)
+                        if (relativeWidgetLP_ && !relativeWidgetLP_->_put)
                         {
                             return false;
                         }
                         MATH::Sizef rbs = relativeWidget->getContentSize();
                         float locationTop = relativeWidget->getTopBoundary();
 
-                        _finalPositionY = locationTop + ap.y * cs.height;
-                        _finalPositionX = relativeWidget->getLeftBoundary() + rbs.width * 0.5f + ap.x * cs.width - cs.width * 0.5f;
+                        finalPositionY_ = locationTop + ap.y * cs.height;
+                        finalPositionX_ = relativeWidget->getLeftBoundary() + rbs.width * 0.5f + ap.x * cs.width - cs.width * 0.5f;
                     }
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_ABOVE_RIGHTALIGN:
                     if (relativeWidget)
                     {
-                        if (_relativeWidgetLP && !_relativeWidgetLP->_put)
+                        if (relativeWidgetLP_ && !relativeWidgetLP_->_put)
                         {
                             return false;
                         }
                         float locationTop = relativeWidget->getTopBoundary();
                         float locationRight = relativeWidget->getRightBoundary();
-                        _finalPositionY = locationTop + ap.y * cs.height;
-                        _finalPositionX = locationRight - (1.0f - ap.x) * cs.width;
+                        finalPositionY_ = locationTop + ap.y * cs.height;
+                        finalPositionX_ = locationRight - (1.0f - ap.x) * cs.width;
                     }
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_LEFT_OF_TOPALIGN:
                     if (relativeWidget)
                     {
-                        if (_relativeWidgetLP && !_relativeWidgetLP->_put)
+                        if (relativeWidgetLP_ && !relativeWidgetLP_->_put)
                         {
                             return false;
                         }
                         float locationTop = relativeWidget->getTopBoundary();
                         float locationLeft = relativeWidget->getLeftBoundary();
-                        _finalPositionY = locationTop - (1.0f - ap.y) * cs.height;
-                        _finalPositionX = locationLeft - (1.0f - ap.x) * cs.width;
+                        finalPositionY_ = locationTop - (1.0f - ap.y) * cs.height;
+                        finalPositionX_ = locationLeft - (1.0f - ap.x) * cs.width;
                     }
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_LEFT_OF_CENTER:
                     if (relativeWidget)
                     {
-                        if (_relativeWidgetLP && !_relativeWidgetLP->_put)
+                        if (relativeWidgetLP_ && !relativeWidgetLP_->_put)
                         {
                             return false;
                         }
                         MATH::Sizef rbs = relativeWidget->getContentSize();
                         float locationLeft = relativeWidget->getLeftBoundary();
-                        _finalPositionX = locationLeft - (1.0f - ap.x) * cs.width;
+                        finalPositionX_ = locationLeft - (1.0f - ap.x) * cs.width;
 
-                        _finalPositionY = relativeWidget->getBottomBoundary() + rbs.height * 0.5f + ap.y * cs.height - cs.height * 0.5f;
+                        finalPositionY_ = relativeWidget->getBottomBoundary() + rbs.height * 0.5f + ap.y * cs.height - cs.height * 0.5f;
                     }
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_LEFT_OF_BOTTOMALIGN:
                     if (relativeWidget)
                     {
-                        if (_relativeWidgetLP && !_relativeWidgetLP->_put)
+                        if (relativeWidgetLP_ && !relativeWidgetLP_->_put)
                         {
                             return false;
                         }
                         float locationBottom = relativeWidget->getBottomBoundary();
                         float locationLeft = relativeWidget->getLeftBoundary();
-                        _finalPositionY = locationBottom + ap.y * cs.height;
-                        _finalPositionX = locationLeft - (1.0f - ap.x) * cs.width;
+                        finalPositionY_ = locationBottom + ap.y * cs.height;
+                        finalPositionX_ = locationLeft - (1.0f - ap.x) * cs.width;
                     }
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_RIGHT_OF_TOPALIGN:
                     if (relativeWidget)
                     {
-                        if (_relativeWidgetLP && !_relativeWidgetLP->_put)
+                        if (relativeWidgetLP_ && !relativeWidgetLP_->_put)
                         {
                             return false;
                         }
                         float locationTop = relativeWidget->getTopBoundary();
                         float locationRight = relativeWidget->getRightBoundary();
-                        _finalPositionY = locationTop - (1.0f - ap.y) * cs.height;
-                        _finalPositionX = locationRight + ap.x * cs.width;
+                        finalPositionY_ = locationTop - (1.0f - ap.y) * cs.height;
+                        finalPositionX_ = locationRight + ap.x * cs.width;
                     }
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_RIGHT_OF_CENTER:
                     if (relativeWidget)
                     {
-                        if (_relativeWidgetLP && !_relativeWidgetLP->_put)
+                        if (relativeWidgetLP_ && !relativeWidgetLP_->_put)
                         {
                             return false;
                         }
                         MATH::Sizef rbs = relativeWidget->getContentSize();
                         float locationRight = relativeWidget->getRightBoundary();
-                        _finalPositionX = locationRight + ap.x * cs.width;
+                        finalPositionX_ = locationRight + ap.x * cs.width;
 
-                        _finalPositionY = relativeWidget->getBottomBoundary() + rbs.height * 0.5f + ap.y * cs.height - cs.height * 0.5f;
+                        finalPositionY_ = relativeWidget->getBottomBoundary() + rbs.height * 0.5f + ap.y * cs.height - cs.height * 0.5f;
                     }
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_RIGHT_OF_BOTTOMALIGN:
                     if (relativeWidget)
                     {
-                        if (_relativeWidgetLP && !_relativeWidgetLP->_put)
+                        if (relativeWidgetLP_ && !relativeWidgetLP_->_put)
                         {
                             return false;
                         }
                         float locationBottom = relativeWidget->getBottomBoundary();
                         float locationRight = relativeWidget->getRightBoundary();
-                        _finalPositionY = locationBottom + ap.y * cs.height;
-                        _finalPositionX = locationRight + ap.x * cs.width;
+                        finalPositionY_ = locationBottom + ap.y * cs.height;
+                        finalPositionX_ = locationRight + ap.x * cs.width;
                     }
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_BELOW_LEFTALIGN:
                     if (relativeWidget)
                     {
-                        if (_relativeWidgetLP && !_relativeWidgetLP->_put)
+                        if (relativeWidgetLP_ && !relativeWidgetLP_->_put)
                         {
                             return false;
                         }
                         float locationBottom = relativeWidget->getBottomBoundary();
                         float locationLeft = relativeWidget->getLeftBoundary();
-                        _finalPositionY = locationBottom - (1.0f - ap.y) * cs.height;
-                        _finalPositionX = locationLeft + ap.x * cs.width;
+                        finalPositionY_ = locationBottom - (1.0f - ap.y) * cs.height;
+                        finalPositionX_ = locationLeft + ap.x * cs.width;
                     }
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_BELOW_CENTER:
                     if (relativeWidget)
                     {
-                        if (_relativeWidgetLP && !_relativeWidgetLP->_put)
+                        if (relativeWidgetLP_ && !relativeWidgetLP_->_put)
                         {
                             return false;
                         }
                         MATH::Sizef rbs = relativeWidget->getContentSize();
                         float locationBottom = relativeWidget->getBottomBoundary();
 
-                        _finalPositionY = locationBottom - (1.0f - ap.y) * cs.height;
-                        _finalPositionX = relativeWidget->getLeftBoundary() + rbs.width * 0.5f + ap.x * cs.width - cs.width * 0.5f;
+                        finalPositionY_ = locationBottom - (1.0f - ap.y) * cs.height;
+                        finalPositionX_ = relativeWidget->getLeftBoundary() + rbs.width * 0.5f + ap.x * cs.width - cs.width * 0.5f;
                     }
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_BELOW_RIGHTALIGN:
                     if (relativeWidget)
                     {
-                        if (_relativeWidgetLP && !_relativeWidgetLP->_put)
+                        if (relativeWidgetLP_ && !relativeWidgetLP_->_put)
                         {
                             return false;
                         }
                         float locationBottom = relativeWidget->getBottomBoundary();
                         float locationRight = relativeWidget->getRightBoundary();
-                        _finalPositionY = locationBottom - (1.0f - ap.y) * cs.height;
-                        _finalPositionX = locationRight - (1.0f - ap.x) * cs.width;
+                        finalPositionY_ = locationBottom - (1.0f - ap.y) * cs.height;
+                        finalPositionX_ = locationRight - (1.0f - ap.x) * cs.width;
                     }
                     break;
                 default:
@@ -2343,7 +2343,7 @@ namespace GRAPH
 
         void RelativeLayoutManager::caculateFinalPositionWithRelativeAlign()
         {
-            RelativeLayoutParameter* layoutParameter = dynamic_cast<RelativeLayoutParameter*>(_widget->getLayoutParameter());
+            RelativeLayoutParameter* layoutParameter = dynamic_cast<RelativeLayoutParameter*>(widget_->getLayoutParameter());
 
             Margin mg = layoutParameter->getMargin();
 
@@ -2355,82 +2355,82 @@ namespace GRAPH
             {
                 case RelativeLayoutParameter::RelativeAlign::NONE:
                 case RelativeLayoutParameter::RelativeAlign::PARENT_TOP_LEFT:
-                    _finalPositionX += mg.left;
-                    _finalPositionY -= mg.top;
+                    finalPositionX_ += mg.left;
+                    finalPositionY_ -= mg.top;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_TOP_CENTER_HORIZONTAL:
-                    _finalPositionY -= mg.top;
+                    finalPositionY_ -= mg.top;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_TOP_RIGHT:
-                    _finalPositionX -= mg.right;
-                    _finalPositionY -= mg.top;
+                    finalPositionX_ -= mg.right;
+                    finalPositionY_ -= mg.top;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_LEFT_CENTER_VERTICAL:
-                    _finalPositionX += mg.left;
+                    finalPositionX_ += mg.left;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::CENTER_IN_PARENT:
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_RIGHT_CENTER_VERTICAL:
-                    _finalPositionX -= mg.right;
+                    finalPositionX_ -= mg.right;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_LEFT_BOTTOM:
-                    _finalPositionX += mg.left;
-                    _finalPositionY += mg.bottom;
+                    finalPositionX_ += mg.left;
+                    finalPositionY_ += mg.bottom;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_BOTTOM_CENTER_HORIZONTAL:
-                    _finalPositionY += mg.bottom;
+                    finalPositionY_ += mg.bottom;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::PARENT_RIGHT_BOTTOM:
-                    _finalPositionX -= mg.right;
-                    _finalPositionY += mg.bottom;
+                    finalPositionX_ -= mg.right;
+                    finalPositionY_ += mg.bottom;
                     break;
 
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_ABOVE_LEFTALIGN:
-                    _finalPositionY += mg.bottom;
-                    _finalPositionX += mg.left;
+                    finalPositionY_ += mg.bottom;
+                    finalPositionX_ += mg.left;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_ABOVE_RIGHTALIGN:
-                    _finalPositionY += mg.bottom;
-                    _finalPositionX -= mg.right;
+                    finalPositionY_ += mg.bottom;
+                    finalPositionX_ -= mg.right;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_ABOVE_CENTER:
-                    _finalPositionY += mg.bottom;
+                    finalPositionY_ += mg.bottom;
                     break;
 
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_LEFT_OF_TOPALIGN:
-                    _finalPositionX -= mg.right;
-                    _finalPositionY -= mg.top;
+                    finalPositionX_ -= mg.right;
+                    finalPositionY_ -= mg.top;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_LEFT_OF_BOTTOMALIGN:
-                    _finalPositionX -= mg.right;
-                    _finalPositionY += mg.bottom;
+                    finalPositionX_ -= mg.right;
+                    finalPositionY_ += mg.bottom;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_LEFT_OF_CENTER:
-                    _finalPositionX -= mg.right;
+                    finalPositionX_ -= mg.right;
                     break;
 
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_RIGHT_OF_TOPALIGN:
-                    _finalPositionX += mg.left;
-                    _finalPositionY -= mg.top;
+                    finalPositionX_ += mg.left;
+                    finalPositionY_ -= mg.top;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_RIGHT_OF_BOTTOMALIGN:
-                    _finalPositionX += mg.left;
-                    _finalPositionY += mg.bottom;
+                    finalPositionX_ += mg.left;
+                    finalPositionY_ += mg.bottom;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_RIGHT_OF_CENTER:
-                    _finalPositionX += mg.left;
+                    finalPositionX_ += mg.left;
                     break;
 
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_BELOW_LEFTALIGN:
-                    _finalPositionY -= mg.top;
-                    _finalPositionX += mg.left;
+                    finalPositionY_ -= mg.top;
+                    finalPositionX_ += mg.left;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_BELOW_RIGHTALIGN:
-                    _finalPositionY -= mg.top;
-                    _finalPositionX -= mg.right;
+                    finalPositionY_ -= mg.top;
+                    finalPositionX_ -= mg.right;
                     break;
                 case RelativeLayoutParameter::RelativeAlign::LOCATION_BELOW_CENTER:
-                    _finalPositionY -= mg.top;
+                    finalPositionY_ -= mg.top;
                     break;
                 default:
                     break;
@@ -2439,15 +2439,15 @@ namespace GRAPH
 
         void RelativeLayoutManager::doLayout(LayoutProtocol *layout)
         {
-            _widgetChildren = this->getAllWidgets(layout);
+            widgetChildren_ = this->getAllWidgets(layout);
 
-            while (_unlayoutChildCount > 0)
+            while (unlayoutChildCount_ > 0)
             {
-                for (auto& subWidget : _widgetChildren)
+                for (auto& subWidget : widgetChildren_)
                 {
-                    _widget = static_cast<Widget*>(subWidget);
+                    widget_ = static_cast<Widget*>(subWidget);
 
-                    RelativeLayoutParameter* layoutParameter = dynamic_cast<RelativeLayoutParameter*>(_widget->getLayoutParameter());
+                    RelativeLayoutParameter* layoutParameter = dynamic_cast<RelativeLayoutParameter*>(widget_->getLayoutParameter());
 
                     if (layoutParameter)
                     {
@@ -2465,36 +2465,36 @@ namespace GRAPH
                         this->caculateFinalPositionWithRelativeAlign();
 
 
-                        _widget->setPosition(MATH::Vector2f(_finalPositionX, _finalPositionY));
+                        widget_->setPosition(MATH::Vector2f(finalPositionX_, finalPositionY_));
 
                         layoutParameter->_put = true;
                     }
                 }
-                _unlayoutChildCount--;
+                unlayoutChildCount_--;
 
             }
-            _widgetChildren.clear();
+            widgetChildren_.clear();
         }
 
         LayoutComponent::LayoutComponent()
-            :_horizontalEdge(HorizontalEdge::None)
-            , _verticalEdge(VerticalEdge::None)
-            , _leftMargin(0)
-            , _rightMargin(0)
-            , _bottomMargin(0)
-            , _topMargin(0)
-            , _usingPositionPercentX(false)
-            , _positionPercentX(0)
-            , _usingPositionPercentY(false)
-            , _positionPercentY(0)
-            , _usingStretchWidth(false)
-            , _usingStretchHeight(false)
-            , _percentWidth(0)
-            , _usingPercentWidth(false)
-            , _percentHeight(0)
-            , _usingPercentHeight(false)
-            , _actived(true)
-            , _isPercentOnly(false)
+            :horizontalEdge_(HorizontalEdge::None)
+            , verticalEdge_(VerticalEdge::None)
+            , leftMargin_(0)
+            , rightMargin_(0)
+            , bottomMargin_(0)
+            , topMargin_(0)
+            , usingPositionPercentX_(false)
+            , positionPercentX_(0)
+            , usingPositionPercentY_(false)
+            , positionPercentY_(0)
+            , usingStretchWidth_(false)
+            , usingStretchHeight_(false)
+            , percentWidth_(0)
+            , usingPercentWidth_(false)
+            , percentHeight_(0)
+            , usingPercentHeight_(false)
+            , actived_(true)
+            , isPercentOnly_(false)
         {
             name_ = __LAYOUT_COMPONENT_NAME;
         }
@@ -2554,8 +2554,8 @@ namespace GRAPH
             const MATH::Sizef& ownerSize = owner_->getContentSize();
             const MATH::Sizef& parentSize = parent->getContentSize();
 
-            _leftMargin = ownerPoint.x - ownerAnchor.x * ownerSize.width;
-            _rightMargin = parentSize.width - (ownerPoint.x + (1 - ownerAnchor.x) * ownerSize.width);
+            leftMargin_ = ownerPoint.x - ownerAnchor.x * ownerSize.width;
+            rightMargin_ = parentSize.width - (ownerPoint.x + (1 - ownerAnchor.x) * ownerSize.width);
         }
         void LayoutComponent::refreshVerticalMargin()
         {
@@ -2568,19 +2568,19 @@ namespace GRAPH
             const MATH::Sizef& ownerSize = owner_->getContentSize();
             const MATH::Sizef& parentSize = parent->getContentSize();
 
-            _bottomMargin = ownerPoint.y - ownerAnchor.y * ownerSize.height;
-            _topMargin = parentSize.height - (ownerPoint.y + (1 - ownerAnchor.y) * ownerSize.height);
+            bottomMargin_ = ownerPoint.y - ownerAnchor.y * ownerSize.height;
+            topMargin_ = parentSize.height - (ownerPoint.y + (1 - ownerAnchor.y) * ownerSize.height);
         }
 
         //OldVersion
         void LayoutComponent::setUsingPercentContentSize(bool isUsed)
         {
-            _usingPercentWidth = _usingPercentHeight = isUsed;
+            usingPercentWidth_ = usingPercentHeight_ = isUsed;
         }
 
         bool LayoutComponent::getUsingPercentContentSize()const
         {
-            return _usingPercentWidth && _usingPercentHeight;
+            return usingPercentWidth_ && usingPercentHeight_;
         }
 
         void LayoutComponent::setPercentContentSize(const MATH::Vector2f &percent)
@@ -2591,7 +2591,7 @@ namespace GRAPH
 
         MATH::Vector2f LayoutComponent::getPercentContentSize()const
         {
-            MATH::Vector2f vec2 = MATH::Vector2f(_percentWidth,_percentHeight);
+            MATH::Vector2f vec2 = MATH::Vector2f(percentWidth_,percentHeight_);
             return vec2;
         }
 
@@ -2630,20 +2630,20 @@ namespace GRAPH
                 const MATH::Sizef& parentSize = parent->getContentSize();
 
                 if (parentSize.width != 0)
-                    _positionPercentX = ownerPoint.x / parentSize.width;
+                    positionPercentX_ = ownerPoint.x / parentSize.width;
                 else
                 {
-                    _positionPercentX = 0;
-                    if (_usingPositionPercentX)
+                    positionPercentX_ = 0;
+                    if (usingPositionPercentX_)
                         ownerPoint.x = 0;
                 }
 
                 if (parentSize.height != 0)
-                    _positionPercentY = ownerPoint.y / parentSize.height;
+                    positionPercentY_ = ownerPoint.y / parentSize.height;
                 else
                 {
-                    _positionPercentY = 0;
-                    if (_usingPositionPercentY)
+                    positionPercentY_ = 0;
+                    if (usingPositionPercentY_)
                         ownerPoint.y = 0;
                 }
 
@@ -2658,73 +2658,73 @@ namespace GRAPH
 
         bool LayoutComponent::isPositionPercentXEnabled()const
         {
-            return _usingPositionPercentX;
+            return usingPositionPercentX_;
         }
         void LayoutComponent::setPositionPercentXEnabled(bool isUsed)
         {
-            _usingPositionPercentX = isUsed;
-            if (_usingPositionPercentX)
+            usingPositionPercentX_ = isUsed;
+            if (usingPositionPercentX_)
             {
-                _horizontalEdge = HorizontalEdge::None;
+                horizontalEdge_ = HorizontalEdge::None;
             }
         }
 
         float LayoutComponent::getPositionPercentX()const
         {
-            return _positionPercentX;
+            return positionPercentX_;
         }
 
         void LayoutComponent::setPositionPercentX(float percentMargin)
         {
-            _positionPercentX = percentMargin;
+            positionPercentX_ = percentMargin;
 
             Node* parent = this->getOwnerParent();
             if (parent != nullptr)
             {
-                owner_->setPositionX(parent->getContentSize().width * _positionPercentX);
+                owner_->setPositionX(parent->getContentSize().width * positionPercentX_);
                 this->refreshHorizontalMargin();
             }
         }
 
         bool LayoutComponent::isPositionPercentYEnabled()const
         {
-            return _usingPositionPercentY;
+            return usingPositionPercentY_;
         }
         void LayoutComponent::setPositionPercentYEnabled(bool isUsed)
         {
-            _usingPositionPercentY = isUsed;
-            if (_usingPositionPercentY)
+            usingPositionPercentY_ = isUsed;
+            if (usingPositionPercentY_)
             {
-                _verticalEdge = VerticalEdge::None;
+                verticalEdge_ = VerticalEdge::None;
             }
         }
 
         float LayoutComponent::getPositionPercentY()const
         {
-            return _positionPercentY;
+            return positionPercentY_;
         }
         void LayoutComponent::setPositionPercentY(float percentMargin)
         {
-            _positionPercentY = percentMargin;
+            positionPercentY_ = percentMargin;
 
             Node* parent = this->getOwnerParent();
             if (parent != nullptr)
             {
-                owner_->setPositionY(parent->getContentSize().height * _positionPercentY);
+                owner_->setPositionY(parent->getContentSize().height * positionPercentY_);
                 this->refreshVerticalMargin();
             }
         }
 
         LayoutComponent::HorizontalEdge LayoutComponent::getHorizontalEdge()const
         {
-            return _horizontalEdge;
+            return horizontalEdge_;
         }
         void LayoutComponent::setHorizontalEdge(HorizontalEdge hEage)
         {
-            _horizontalEdge = hEage;
-            if (_horizontalEdge != HorizontalEdge::None)
+            horizontalEdge_ = hEage;
+            if (horizontalEdge_ != HorizontalEdge::None)
             {
-                _usingPositionPercentX = false;
+                usingPositionPercentX_ = false;
             }
 
             Node* parent = this->getOwnerParent();
@@ -2733,12 +2733,12 @@ namespace GRAPH
                 MATH::Vector2f ownerPoint = owner_->getPosition();
                 const MATH::Sizef& parentSize = parent->getContentSize();
                 if (parentSize.width != 0)
-                    _positionPercentX = ownerPoint.x / parentSize.width;
+                    positionPercentX_ = ownerPoint.x / parentSize.width;
                 else
                 {
-                    _positionPercentX = 0;
+                    positionPercentX_ = 0;
                     ownerPoint.x = 0;
-                    if (_usingPositionPercentX)
+                    if (usingPositionPercentX_)
                         owner_->setPosition(ownerPoint);
                 }
 
@@ -2748,14 +2748,14 @@ namespace GRAPH
 
         LayoutComponent::VerticalEdge LayoutComponent::getVerticalEdge()const
         {
-            return _verticalEdge;
+            return verticalEdge_;
         }
         void LayoutComponent::setVerticalEdge(VerticalEdge vEage)
         {
-            _verticalEdge = vEage;
-            if (_verticalEdge != VerticalEdge::None)
+            verticalEdge_ = vEage;
+            if (verticalEdge_ != VerticalEdge::None)
             {
-                _usingPositionPercentY = false;
+                usingPositionPercentY_ = false;
             }
 
             Node* parent = this->getOwnerParent();
@@ -2764,12 +2764,12 @@ namespace GRAPH
                 MATH::Vector2f ownerPoint = owner_->getPosition();
                 const MATH::Sizef& parentSize = parent->getContentSize();
                 if (parentSize.height != 0)
-                    _positionPercentY = ownerPoint.y / parentSize.height;
+                    positionPercentY_ = ownerPoint.y / parentSize.height;
                 else
                 {
-                    _positionPercentY = 0;
+                    positionPercentY_ = 0;
                     ownerPoint.y = 0;
-                    if (_usingPositionPercentY)
+                    if (usingPositionPercentY_)
                         owner_->setPosition(ownerPoint);
                 }
 
@@ -2779,38 +2779,38 @@ namespace GRAPH
 
         float LayoutComponent::getLeftMargin()const
         {
-            return _leftMargin;
+            return leftMargin_;
         }
         void LayoutComponent::setLeftMargin(float margin)
         {
-            _leftMargin = margin;
+            leftMargin_ = margin;
         }
 
         float LayoutComponent::getRightMargin()const
         {
-            return _rightMargin;
+            return rightMargin_;
         }
         void LayoutComponent::setRightMargin(float margin)
         {
-            _rightMargin = margin;
+            rightMargin_ = margin;
         }
 
         float LayoutComponent::getTopMargin()const
         {
-            return _topMargin;
+            return topMargin_;
         }
         void LayoutComponent::setTopMargin(float margin)
         {
-            _topMargin = margin;
+            topMargin_ = margin;
         }
 
         float LayoutComponent::getBottomMargin()const
         {
-            return _bottomMargin;
+            return bottomMargin_;
         }
         void LayoutComponent::setBottomMargin(float margin)
         {
-            _bottomMargin = margin;
+            bottomMargin_ = margin;
         }
 
         //Size & Percent
@@ -2827,20 +2827,20 @@ namespace GRAPH
                 const MATH::Sizef& parentSize = parent->getContentSize();
 
                 if (parentSize.width != 0)
-                    _percentWidth = ownerSize.width / parentSize.width;
+                    percentWidth_ = ownerSize.width / parentSize.width;
                 else
                 {
-                    _percentWidth = 0;
-                    if (_usingPercentWidth)
+                    percentWidth_ = 0;
+                    if (usingPercentWidth_)
                         ownerSize.width = 0;
                 }
 
                 if (parentSize.height != 0)
-                    _percentHeight = ownerSize.height / parentSize.height;
+                    percentHeight_ = ownerSize.height / parentSize.height;
                 else
                 {
-                    _percentHeight = 0;
-                    if (_usingPercentHeight)
+                    percentHeight_ = 0;
+                    if (usingPercentHeight_)
                         ownerSize.height = 0;
                 }
 
@@ -2855,14 +2855,14 @@ namespace GRAPH
 
         bool LayoutComponent::isPercentWidthEnabled()const
         {
-            return _usingPercentWidth;
+            return usingPercentWidth_;
         }
         void LayoutComponent::setPercentWidthEnabled(bool isUsed)
         {
-            _usingPercentWidth = isUsed;
-            if (_usingPercentWidth)
+            usingPercentWidth_ = isUsed;
+            if (usingPercentWidth_)
             {
-                _usingStretchWidth = false;
+                usingStretchWidth_ = false;
             }
         }
 
@@ -2880,11 +2880,11 @@ namespace GRAPH
             {
                 const MATH::Sizef& parentSize = parent->getContentSize();
                 if (parentSize.width != 0)
-                    _percentWidth = ownerSize.width / parentSize.width;
+                    percentWidth_ = ownerSize.width / parentSize.width;
                 else
                 {
-                    _percentWidth = 0;
-                    if (_usingPercentWidth)
+                    percentWidth_ = 0;
+                    if (usingPercentWidth_)
                         ownerSize.width = 0;
                 }
                 owner_->setContentSize(ownerSize);
@@ -2896,17 +2896,17 @@ namespace GRAPH
 
         float LayoutComponent::getPercentWidth()const
         {
-            return _percentWidth;
+            return percentWidth_;
         }
         void LayoutComponent::setPercentWidth(float percentWidth)
         {
-            _percentWidth = percentWidth;
+            percentWidth_ = percentWidth;
 
             Node* parent = this->getOwnerParent();
             if (parent != nullptr)
             {
                 MATH::Sizef ownerSize = owner_->getContentSize();
-                ownerSize.width = parent->getContentSize().width * _percentWidth;
+                ownerSize.width = parent->getContentSize().width * percentWidth_;
                 owner_->setContentSize(ownerSize);
 
                 this->refreshHorizontalMargin();
@@ -2915,14 +2915,14 @@ namespace GRAPH
 
         bool LayoutComponent::isPercentHeightEnabled()const
         {
-            return _usingPercentHeight;
+            return usingPercentHeight_;
         }
         void LayoutComponent::setPercentHeightEnabled(bool isUsed)
         {
-            _usingPercentHeight = isUsed;
-            if (_usingPercentHeight)
+            usingPercentHeight_ = isUsed;
+            if (usingPercentHeight_)
             {
-                _usingStretchHeight = false;
+                usingStretchHeight_ = false;
             }
         }
 
@@ -2940,11 +2940,11 @@ namespace GRAPH
             {
                 const MATH::Sizef& parentSize = parent->getContentSize();
                 if (parentSize.height != 0)
-                    _percentHeight = ownerSize.height / parentSize.height;
+                    percentHeight_ = ownerSize.height / parentSize.height;
                 else
                 {
-                    _percentHeight = 0;
-                    if (_usingPercentHeight)
+                    percentHeight_ = 0;
+                    if (usingPercentHeight_)
                         ownerSize.height = 0;
                 }
                 owner_->setContentSize(ownerSize);
@@ -2956,17 +2956,17 @@ namespace GRAPH
 
         float LayoutComponent::getPercentHeight()const
         {
-            return _percentHeight;
+            return percentHeight_;
         }
         void LayoutComponent::setPercentHeight(float percentHeight)
         {
-            _percentHeight = percentHeight;
+            percentHeight_ = percentHeight;
 
             Node* parent = this->getOwnerParent();
             if (parent != nullptr)
             {
                 MATH::Sizef ownerSize = owner_->getContentSize();
-                ownerSize.height = parent->getContentSize().height * _percentHeight;
+                ownerSize.height = parent->getContentSize().height * percentHeight_;
                 owner_->setContentSize(ownerSize);
 
                 this->refreshVerticalMargin();
@@ -2975,33 +2975,33 @@ namespace GRAPH
 
         bool LayoutComponent::isStretchWidthEnabled()const
         {
-            return _usingStretchWidth;
+            return usingStretchWidth_;
         }
         void LayoutComponent::setStretchWidthEnabled(bool isUsed)
         {
-            _usingStretchWidth = isUsed;
-            if (_usingStretchWidth)
+            usingStretchWidth_ = isUsed;
+            if (usingStretchWidth_)
             {
-                _usingPercentWidth = false;
+                usingPercentWidth_ = false;
             }
         }
 
         bool LayoutComponent::isStretchHeightEnabled()const
         {
-            return _usingStretchHeight;
+            return usingStretchHeight_;
         }
         void LayoutComponent::setStretchHeightEnabled(bool isUsed)
         {
-            _usingStretchHeight = isUsed;
-            if (_usingStretchHeight)
+            usingStretchHeight_ = isUsed;
+            if (usingStretchHeight_)
             {
-                _usingPercentHeight = false;
+                usingPercentHeight_ = false;
             }
         }
 
         void LayoutComponent::refreshLayout()
         {
-            if (!_actived)
+            if (!actived_)
                 return;
 
             Node* parent = this->getOwnerParent();
@@ -3013,102 +3013,102 @@ namespace GRAPH
             MATH::Sizef ownerSize = owner_->getContentSize();
             MATH::Vector2f ownerPosition = owner_->getPosition();
 
-            switch (this->_horizontalEdge)
+            switch (this->horizontalEdge_)
             {
             case HorizontalEdge::None:
-                if (_usingStretchWidth && !_isPercentOnly)
+                if (usingStretchWidth_ && !isPercentOnly_)
                 {
-                    ownerSize.width = parentSize.width * _percentWidth;
-                    ownerPosition.x = _leftMargin + ownerAnchor.x * ownerSize.width;
+                    ownerSize.width = parentSize.width * percentWidth_;
+                    ownerPosition.x = leftMargin_ + ownerAnchor.x * ownerSize.width;
                 }
                 else
                 {
-                    if (_usingPositionPercentX)
-                        ownerPosition.x = parentSize.width * _positionPercentX;
-                    if (_usingPercentWidth)
-                        ownerSize.width = parentSize.width * _percentWidth;
+                    if (usingPositionPercentX_)
+                        ownerPosition.x = parentSize.width * positionPercentX_;
+                    if (usingPercentWidth_)
+                        ownerSize.width = parentSize.width * percentWidth_;
                 }
                 break;
             case HorizontalEdge::Left:
-                if (_isPercentOnly)
+                if (isPercentOnly_)
                     break;
-                if (_usingPercentWidth || _usingStretchWidth)
-                    ownerSize.width = parentSize.width * _percentWidth;
-                ownerPosition.x = _leftMargin + ownerAnchor.x * ownerSize.width;
+                if (usingPercentWidth_ || usingStretchWidth_)
+                    ownerSize.width = parentSize.width * percentWidth_;
+                ownerPosition.x = leftMargin_ + ownerAnchor.x * ownerSize.width;
                 break;
             case HorizontalEdge::Right:
-                if (_isPercentOnly)
+                if (isPercentOnly_)
                     break;
-                if (_usingPercentWidth || _usingStretchWidth)
-                    ownerSize.width = parentSize.width * _percentWidth;
-                ownerPosition.x = parentSize.width - (_rightMargin + (1 - ownerAnchor.x) * ownerSize.width);
+                if (usingPercentWidth_ || usingStretchWidth_)
+                    ownerSize.width = parentSize.width * percentWidth_;
+                ownerPosition.x = parentSize.width - (rightMargin_ + (1 - ownerAnchor.x) * ownerSize.width);
                 break;
             case HorizontalEdge::Center:
-                if (_isPercentOnly)
+                if (isPercentOnly_)
                     break;
-                if (_usingStretchWidth)
+                if (usingStretchWidth_)
                 {
-                    ownerSize.width = parentSize.width - _leftMargin - _rightMargin;
+                    ownerSize.width = parentSize.width - leftMargin_ - rightMargin_;
                     if (ownerSize.width < 0)
                         ownerSize.width = 0;
-                    ownerPosition.x = _leftMargin + ownerAnchor.x * ownerSize.width;
+                    ownerPosition.x = leftMargin_ + ownerAnchor.x * ownerSize.width;
                 }
                 else
                 {
-                    if (_usingPercentWidth)
-                        ownerSize.width = parentSize.width * _percentWidth;
-                    ownerPosition.x = parentSize.width * _positionPercentX;
+                    if (usingPercentWidth_)
+                        ownerSize.width = parentSize.width * percentWidth_;
+                    ownerPosition.x = parentSize.width * positionPercentX_;
                 }
                 break;
             default:
                 break;
             }
 
-            switch (this->_verticalEdge)
+            switch (this->verticalEdge_)
             {
             case VerticalEdge::None:
-                if (_usingStretchHeight && !_isPercentOnly)
+                if (usingStretchHeight_ && !isPercentOnly_)
                 {
-                    ownerSize.height = parentSize.height * _percentHeight;
-                    ownerPosition.y = _bottomMargin + ownerAnchor.y * ownerSize.height;
+                    ownerSize.height = parentSize.height * percentHeight_;
+                    ownerPosition.y = bottomMargin_ + ownerAnchor.y * ownerSize.height;
                 }
                 else
                 {
-                    if (_usingPositionPercentY)
-                        ownerPosition.y = parentSize.height * _positionPercentY;
-                    if (_usingPercentHeight)
-                        ownerSize.height = parentSize.height * _percentHeight;
+                    if (usingPositionPercentY_)
+                        ownerPosition.y = parentSize.height * positionPercentY_;
+                    if (usingPercentHeight_)
+                        ownerSize.height = parentSize.height * percentHeight_;
                 }
                 break;
             case VerticalEdge::Bottom:
-                if (_isPercentOnly)
+                if (isPercentOnly_)
                     break;
-                if (_usingPercentHeight || _usingStretchHeight)
-                    ownerSize.height = parentSize.height * _percentHeight;
-                ownerPosition.y = _bottomMargin + ownerAnchor.y * ownerSize.height;
+                if (usingPercentHeight_ || usingStretchHeight_)
+                    ownerSize.height = parentSize.height * percentHeight_;
+                ownerPosition.y = bottomMargin_ + ownerAnchor.y * ownerSize.height;
                 break;
             case VerticalEdge::Top:
-                if (_isPercentOnly)
+                if (isPercentOnly_)
                     break;
-                if (_usingPercentHeight || _usingStretchHeight)
-                    ownerSize.height = parentSize.height * _percentHeight;
-                ownerPosition.y = parentSize.height - (_topMargin + (1 - ownerAnchor.y) * ownerSize.height);
+                if (usingPercentHeight_ || usingStretchHeight_)
+                    ownerSize.height = parentSize.height * percentHeight_;
+                ownerPosition.y = parentSize.height - (topMargin_ + (1 - ownerAnchor.y) * ownerSize.height);
                 break;
             case VerticalEdge::Center:
-                if (_isPercentOnly)
+                if (isPercentOnly_)
                     break;
-                if (_usingStretchHeight)
+                if (usingStretchHeight_)
                 {
-                    ownerSize.height = parentSize.height - _topMargin - _bottomMargin;
+                    ownerSize.height = parentSize.height - topMargin_ - bottomMargin_;
                     if (ownerSize.height < 0)
                         ownerSize.height = 0;
-                    ownerPosition.y = _bottomMargin + ownerAnchor.y * ownerSize.height;
+                    ownerPosition.y = bottomMargin_ + ownerAnchor.y * ownerSize.height;
                 }
                 else
                 {
-                    if (_usingPercentHeight)
-                        ownerSize.height = parentSize.height * _percentHeight;
-                    ownerPosition.y = parentSize.height* _positionPercentY;
+                    if (usingPercentHeight_)
+                        ownerSize.height = parentSize.height * percentHeight_;
+                    ownerPosition.y = parentSize.height* positionPercentY_;
                 }
                 break;
             default:
@@ -3123,12 +3123,12 @@ namespace GRAPH
 
         void LayoutComponent::setActiveEnabled(bool enable)
         {
-            _actived = enable;
+            actived_ = enable;
         }
 
         void LayoutComponent::setPercentOnlyEnabled(bool enable)
         {
-            _isPercentOnly = enable;
+            isPercentOnly_ = enable;
         }
     }
 }

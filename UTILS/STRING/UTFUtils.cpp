@@ -650,9 +650,9 @@ namespace UTILS
             }
 
             int nLen = (int) wstring.length();
-            int nResult = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR) wstring.c_str(), nLen, 0, 0, NULL, NULL);
+            int nResult = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR) wstring.c_str(), nLen, 0, 0, nullptr, nullptr);
             outString.resize(nResult);
-            WideCharToMultiByte(CP_ACP, 0, (LPCWSTR) wstring.c_str(), nLen, (LPSTR) &outString[0], nResult, NULL, NULL);
+            WideCharToMultiByte(CP_ACP, 0, (LPCWSTR) wstring.c_str(), nLen, (LPSTR) &outString[0], nResult, nullptr, nullptr);
         }
 
         void StringToWstring(const std::string &string, std::wstring &outWstring) {

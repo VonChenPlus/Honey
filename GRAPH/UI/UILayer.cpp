@@ -11,14 +11,14 @@ namespace GRAPH
     {
         // Layer
         Layer::Layer()
-        : _touchEnabled(false)
-        , _accelerometerEnabled(false)
-        , _keyboardEnabled(false)
-        , _touchListener(nullptr)
-        , _keyboardListener(nullptr)
-        , _accelerationListener(nullptr)
-        , _touchMode(Touch::DispatchMode::ALL_AT_ONCE)
-        , _swallowsTouches(true)
+        : touchEnabled_(false)
+        , accelerometerEnabled_(false)
+        , keyboardEnabled_(false)
+        , touchListener_(nullptr)
+        , keyboardListener_(nullptr)
+        , accelerationListener_(nullptr)
+        , touchMode_(Touch::DispatchMode::ALL_AT_ONCE)
+        , swallowsTouches_(true)
         {
             ignoreAnchorPointForPosition_ = true;
             setAnchorPoint(MATH::Vector2f(0.5f, 0.5f));
@@ -102,7 +102,7 @@ namespace GRAPH
         LayerColor::LayerColor()
         {
             // default blend function
-            _blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
+            blendFunc_ = BlendFunc::ALPHA_PREMULTIPLIED;
             u3dContext_ = Unity3DCreator::CreateContext();
         }
 
@@ -115,12 +115,12 @@ namespace GRAPH
         /// blendFunc getter
         const BlendFunc &LayerColor::getBlendFunc() const
         {
-            return _blendFunc;
+            return blendFunc_;
         }
         /// blendFunc setter
         void LayerColor::setBlendFunc(const BlendFunc &var)
         {
-            _blendFunc = var;
+            blendFunc_ = var;
         }
 
         LayerColor* LayerColor::create()
@@ -170,24 +170,24 @@ namespace GRAPH
         bool LayerColor::initWithColor(const Color4B& color, GLfloat w, GLfloat h) {
             if (Layer::init()) {
                 // default blend function
-                _blendFunc = BlendFunc::ALPHA_NON_PREMULTIPLIED;
+                blendFunc_ = BlendFunc::ALPHA_NON_PREMULTIPLIED;
 
                 displayedColor_.red = realColor_.red = color.red;
                 displayedColor_.green = realColor_.green = color.green;
                 displayedColor_.blue = realColor_.blue = color.blue;
                 displayedOpacity_ = realOpacity_ = color.alpha;
 
-                for (uint64 i = 0; i<sizeof(_squareVertices) / sizeof( _squareVertices[0]); i++ ) {
-                    _squareVertices[i].x = 0.0f;
-                    _squareVertices[i].y = 0.0f;
+                for (uint64 i = 0; i<sizeof(squareVertices_) / sizeof( squareVertices_[0]); i++ ) {
+                    squareVertices_[i].x = 0.0f;
+                    squareVertices_[i].y = 0.0f;
                 }
 
                 updateColor();
                 setContentSize(MATH::Sizef(w, h));
 
                 std::vector<U3DVertexComponent> vertexFormat = {
-                    U3DVertexComponent(SEM_POSITION, FLOATx3, 0, intptr(_noMVPVertices)),
-                    U3DVertexComponent(SEM_COLOR0, FLOATx4, 0, intptr(_squareColors)) };
+                    U3DVertexComponent(SEM_POSITION, FLOATx3, 0, intptr(noMVPVertices_)),
+                    U3DVertexComponent(SEM_COLOR0, FLOATx4, 0, intptr(squareColors_)) };
                 u3dVertexFormat_ = Unity3DCreator::CreateVertexFormat(vertexFormat);
 
                 setU3DShaderState(ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_POSITION_COLOR_NO_MVP));
@@ -206,10 +206,10 @@ namespace GRAPH
         /// override contentSize
         void LayerColor::setContentSize(const MATH::Sizef & size)
         {
-            _squareVertices[1].x = size.width;
-            _squareVertices[2].y = size.height;
-            _squareVertices[3].x = size.width;
-            _squareVertices[3].y = size.height;
+            squareVertices_[1].x = size.width;
+            squareVertices_[2].y = size.height;
+            squareVertices_[3].x = size.width;
+            squareVertices_[3].y = size.height;
 
             Layer::setContentSize(size);
         }
@@ -233,26 +233,26 @@ namespace GRAPH
         {
             for( unsigned int i=0; i < 4; i++ )
             {
-                _squareColors[i].red = displayedColor_.red / 255.0f;
-                _squareColors[i].green = displayedColor_.green / 255.0f;
-                _squareColors[i].blue = displayedColor_.blue / 255.0f;
-                _squareColors[i].alpha = displayedOpacity_ / 255.0f;
+                squareColors_[i].red = displayedColor_.red / 255.0f;
+                squareColors_[i].green = displayedColor_.green / 255.0f;
+                squareColors_[i].blue = displayedColor_.blue / 255.0f;
+                squareColors_[i].alpha = displayedOpacity_ / 255.0f;
             }
         }
 
         void LayerColor::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags)
         {
-            _customCommand.init(globalZOrder_, transform, flags);
-            _customCommand.func = std::bind(&LayerColor::onDraw, this, transform, flags);
-            renderer->addCommand(&_customCommand);
+            customCommand_.init(globalZOrder_, transform, flags);
+            customCommand_.func = std::bind(&LayerColor::onDraw, this, transform, flags);
+            renderer->addCommand(&customCommand_);
 
             for(int i = 0; i < 4; ++i)
             {
                 MATH::Vector4f pos;
-                pos.x = _squareVertices[i].x; pos.y = _squareVertices[i].y; pos.z = positionZ_;
+                pos.x = squareVertices_[i].x; pos.y = squareVertices_[i].y; pos.z = positionZ_;
                 pos.w = 1;
                 modelViewTransform_.transformVector(&pos);
-                _noMVPVertices[i] = MATH::Vector3f(pos.x,pos.y,pos.z)/pos.w;
+                noMVPVertices_[i] = MATH::Vector3f(pos.x,pos.y,pos.z)/pos.w;
             }
         }
 
@@ -260,7 +260,7 @@ namespace GRAPH
             getU3DShader()->apply();
             getU3DShader()->setUniformsForBuiltins(transform);
 
-            Unity3DGLState::OpenGLState().blendFunc.set(_blendFunc.src, _blendFunc.dst);
+            Unity3DGLState::OpenGLState().blendFunc.set(blendFunc_.src, blendFunc_.dst);
             u3dContext_->drawUp(PRIM_TRIANGLESGL_STRIP, u3dVertexFormat_, 0, 4);
         }
 
@@ -268,12 +268,12 @@ namespace GRAPH
         // LayerGradient
         //
         LayerGradient::LayerGradient()
-        : _startColor(Color4B::BLACK)
-        , _endColor(Color4B::BLACK)
-        , _startOpacity(255)
-        , _endOpacity(255)
-        , _alongVector(MATH::Vector2f(0, -1))
-        , _compressedInterpolation(true)
+        : startColor_(Color4B::BLACK)
+        , endColor_(Color4B::BLACK)
+        , startOpacity_(255)
+        , endOpacity_(255)
+        , alongVector_(MATH::Vector2f(0, -1))
+        , compressedInterpolation_(true)
         {
 
         }
@@ -332,15 +332,15 @@ namespace GRAPH
 
         bool LayerGradient::initWithColor(const Color4B& start, const Color4B& end, const MATH::Vector2f& v)
         {
-            _endColor.red  = end.red;
-            _endColor.green  = end.green;
-            _endColor.blue  = end.blue;
+            endColor_.red  = end.red;
+            endColor_.green  = end.green;
+            endColor_.blue  = end.blue;
 
-            _endOpacity     = end.alpha;
-            _startOpacity   = start.alpha;
-            _alongVector    = v;
+            endOpacity_     = end.alpha;
+            startOpacity_   = start.alpha;
+            alongVector_    = v;
 
-            _compressedInterpolation = true;
+            compressedInterpolation_ = true;
 
             return LayerColor::initWithColor(Color4B(start.red, start.green, start.blue, 255));
         }
@@ -349,15 +349,15 @@ namespace GRAPH
         {
             LayerColor::updateColor();
 
-            float h = _alongVector.length();
+            float h = alongVector_.length();
             if (h == 0)
                 return;
 
             float c = sqrtf(2.0f);
-            MATH::Vector2f u(_alongVector.x / h, _alongVector.y / h);
+            MATH::Vector2f u(alongVector_.x / h, alongVector_.y / h);
 
             // Compressed Interpolation mode
-            if (_compressedInterpolation)
+            if (compressedInterpolation_)
             {
                 float h2 = 1 / ( fabsf(u.x) + fabsf(u.y) );
                 u = u * (h2 * (float)c);
@@ -369,36 +369,36 @@ namespace GRAPH
                 displayedColor_.red / 255.0f,
                 displayedColor_.green / 255.0f,
                 displayedColor_.blue / 255.0f,
-                _startOpacity * opacityf / 255.0f
+                startOpacity_ * opacityf / 255.0f
             );
 
             Color4F E(
-                _endColor.red / 255.0f,
-                _endColor.green / 255.0f,
-                _endColor.blue / 255.0f,
-                _endOpacity * opacityf / 255.0f
+                endColor_.red / 255.0f,
+                endColor_.green / 255.0f,
+                endColor_.blue / 255.0f,
+                endOpacity_ * opacityf / 255.0f
             );
 
             // (-1, -1)
-            _squareColors[0].red = E.red + (S.red - E.red) * ((c + u.x + u.y) / (2.0f * c));
-            _squareColors[0].green = E.green + (S.green - E.green) * ((c + u.x + u.y) / (2.0f * c));
-            _squareColors[0].blue = E.blue + (S.blue - E.blue) * ((c + u.x + u.y) / (2.0f * c));
-            _squareColors[0].alpha = E.alpha + (S.alpha - E.alpha) * ((c + u.x + u.y) / (2.0f * c));
+            squareColors_[0].red = E.red + (S.red - E.red) * ((c + u.x + u.y) / (2.0f * c));
+            squareColors_[0].green = E.green + (S.green - E.green) * ((c + u.x + u.y) / (2.0f * c));
+            squareColors_[0].blue = E.blue + (S.blue - E.blue) * ((c + u.x + u.y) / (2.0f * c));
+            squareColors_[0].alpha = E.alpha + (S.alpha - E.alpha) * ((c + u.x + u.y) / (2.0f * c));
             // (1, -1)
-            _squareColors[1].red = E.red + (S.red - E.red) * ((c - u.x + u.y) / (2.0f * c));
-            _squareColors[1].green = E.green + (S.green - E.green) * ((c - u.x + u.y) / (2.0f * c));
-            _squareColors[1].blue = E.blue + (S.blue - E.blue) * ((c - u.x + u.y) / (2.0f * c));
-            _squareColors[1].alpha = E.alpha + (S.alpha - E.alpha) * ((c - u.x + u.y) / (2.0f * c));
+            squareColors_[1].red = E.red + (S.red - E.red) * ((c - u.x + u.y) / (2.0f * c));
+            squareColors_[1].green = E.green + (S.green - E.green) * ((c - u.x + u.y) / (2.0f * c));
+            squareColors_[1].blue = E.blue + (S.blue - E.blue) * ((c - u.x + u.y) / (2.0f * c));
+            squareColors_[1].alpha = E.alpha + (S.alpha - E.alpha) * ((c - u.x + u.y) / (2.0f * c));
             // (-1, 1)
-            _squareColors[2].red = E.red + (S.red - E.red) * ((c + u.x - u.y) / (2.0f * c));
-            _squareColors[2].green = E.green + (S.green - E.green) * ((c + u.x - u.y) / (2.0f * c));
-            _squareColors[2].blue = E.blue + (S.blue - E.blue) * ((c + u.x - u.y) / (2.0f * c));
-            _squareColors[2].alpha = E.alpha + (S.alpha - E.alpha) * ((c + u.x - u.y) / (2.0f * c));
+            squareColors_[2].red = E.red + (S.red - E.red) * ((c + u.x - u.y) / (2.0f * c));
+            squareColors_[2].green = E.green + (S.green - E.green) * ((c + u.x - u.y) / (2.0f * c));
+            squareColors_[2].blue = E.blue + (S.blue - E.blue) * ((c + u.x - u.y) / (2.0f * c));
+            squareColors_[2].alpha = E.alpha + (S.alpha - E.alpha) * ((c + u.x - u.y) / (2.0f * c));
             // (1, 1)
-            _squareColors[3].red = E.red + (S.red - E.red) * ((c - u.x - u.y) / (2.0f * c));
-            _squareColors[3].green = E.green + (S.green - E.green) * ((c - u.x - u.y) / (2.0f * c));
-            _squareColors[3].blue = E.blue + (S.blue - E.blue) * ((c - u.x - u.y) / (2.0f * c));
-            _squareColors[3].alpha = E.alpha + (S.alpha - E.alpha) * ((c - u.x - u.y) / (2.0f * c));
+            squareColors_[3].red = E.red + (S.red - E.red) * ((c - u.x - u.y) / (2.0f * c));
+            squareColors_[3].green = E.green + (S.green - E.green) * ((c - u.x - u.y) / (2.0f * c));
+            squareColors_[3].blue = E.blue + (S.blue - E.blue) * ((c - u.x - u.y) / (2.0f * c));
+            squareColors_[3].alpha = E.alpha + (S.alpha - E.alpha) * ((c - u.x - u.y) / (2.0f * c));
         }
 
         const Color3B& LayerGradient::getStartColor() const
@@ -413,69 +413,69 @@ namespace GRAPH
 
         void LayerGradient::setEndColor(const Color3B& color)
         {
-            _endColor = color;
+            endColor_ = color;
             updateColor();
         }
 
         const Color3B& LayerGradient::getEndColor() const
         {
-            return _endColor;
+            return endColor_;
         }
 
         void LayerGradient::setStartOpacity(uint8 o)
         {
-            _startOpacity = o;
+            startOpacity_ = o;
             updateColor();
         }
 
         uint8 LayerGradient::getStartOpacity() const
         {
-            return _startOpacity;
+            return startOpacity_;
         }
 
         void LayerGradient::setEndOpacity(uint8 o)
         {
-            _endOpacity = o;
+            endOpacity_ = o;
             updateColor();
         }
 
         uint8 LayerGradient::getEndOpacity() const
         {
-            return _endOpacity;
+            return endOpacity_;
         }
 
         void LayerGradient::setVector(const MATH::Vector2f& var)
         {
-            _alongVector = var;
+            alongVector_ = var;
             updateColor();
         }
 
         const MATH::Vector2f& LayerGradient::getVector() const
         {
-            return _alongVector;
+            return alongVector_;
         }
 
         bool LayerGradient::isCompressedInterpolation() const
         {
-            return _compressedInterpolation;
+            return compressedInterpolation_;
         }
 
         void LayerGradient::setCompressedInterpolation(bool compress)
         {
-            _compressedInterpolation = compress;
+            compressedInterpolation_ = compress;
             updateColor();
         }
 
         /// MultiplexLayer
 
         LayerMultiplex::LayerMultiplex()
-        : _enabledLayer(0)
+        : enabledLayer_(0)
         {
         }
 
         LayerMultiplex::~LayerMultiplex()
         {
-            for(const auto &layer : _layers) {
+            for(const auto &layer : layers_) {
                 layer->cleanup();
             }
         }
@@ -532,14 +532,14 @@ namespace GRAPH
 
         void LayerMultiplex::addLayer(Layer* layer)
         {
-            _layers.pushBack(layer);
+            layers_.pushBack(layer);
         }
 
         bool LayerMultiplex::init()
         {
             if (Layer::init())
             {
-                _enabledLayer = 0;
+                enabledLayer_ = 0;
                 return true;
             }
             return false;
@@ -549,17 +549,17 @@ namespace GRAPH
         {
             if (Layer::init())
             {
-                _layers.reserve(5);
-                _layers.pushBack(layer);
+                layers_.reserve(5);
+                layers_.pushBack(layer);
 
                 Layer *l = va_arg(params,Layer*);
                 while( l ) {
-                    _layers.pushBack(l);
+                    layers_.pushBack(l);
                     l = va_arg(params,Layer*);
                 }
 
-                _enabledLayer = 0;
-                this->addChild(_layers.at(_enabledLayer));
+                enabledLayer_ = 0;
+                this->addChild(layers_.at(enabledLayer_));
                 return true;
             }
 
@@ -570,11 +570,11 @@ namespace GRAPH
         {
             if (Layer::init())
             {
-                _layers.reserve(arrayOfLayers.size());
-                _layers.pushBack(arrayOfLayers);
+                layers_.reserve(arrayOfLayers.size());
+                layers_.pushBack(arrayOfLayers);
 
-                _enabledLayer = 0;
-                this->addChild(_layers.at(_enabledLayer));
+                enabledLayer_ = 0;
+                this->addChild(layers_.at(enabledLayer_));
                 return true;
             }
             return false;
@@ -582,22 +582,22 @@ namespace GRAPH
 
         void LayerMultiplex::switchTo(int n)
         {
-            this->removeChild(_layers.at(_enabledLayer), true);
+            this->removeChild(layers_.at(enabledLayer_), true);
 
-            _enabledLayer = n;
+            enabledLayer_ = n;
 
-            this->addChild(_layers.at(n));
+            this->addChild(layers_.at(n));
         }
 
         void LayerMultiplex::switchToAndReleaseMe(int n)
         {
-            this->removeChild(_layers.at(_enabledLayer), true);
+            this->removeChild(layers_.at(enabledLayer_), true);
 
-            _layers.replace(_enabledLayer, nullptr);
+            layers_.replace(enabledLayer_, nullptr);
 
-            _enabledLayer = n;
+            enabledLayer_ = n;
 
-            this->addChild(_layers.at(n));
+            this->addChild(layers_.at(n));
         }
     }
 }

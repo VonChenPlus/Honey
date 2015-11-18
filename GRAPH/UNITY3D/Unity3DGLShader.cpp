@@ -547,7 +547,7 @@ namespace GRAPH
         }
         else {
             GLchar ErrorLog[1024];
-            glGetProgramInfoLog(program_, sizeof(ErrorLog), NULL, ErrorLog);
+            glGetProgramInfoLog(program_, sizeof(ErrorLog), nullptr, ErrorLog);
             throw _HException_(UTILS::STRING::StringFromFormat(ErrorLog), HException::GRAPH);
         }
     }
@@ -586,7 +586,7 @@ namespace GRAPH
         }
         else {
             GLchar ErrorLog[1024];
-            glGetProgramInfoLog(program_, sizeof(ErrorLog), NULL, ErrorLog);
+            glGetProgramInfoLog(program_, sizeof(ErrorLog), nullptr, ErrorLog);
             throw _HException_(UTILS::STRING::StringFromFormat(ErrorLog), HException::GRAPH);
         }
     }
