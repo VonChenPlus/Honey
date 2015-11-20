@@ -75,31 +75,31 @@ namespace GRAPH
             virtual void copySpecialProperties(Widget* model) override;
             virtual void adaptRenderers() override;
         protected:
-            Sprite* _backGroundBoxRenderer;
-            Sprite* _backGroundSelectedBoxRenderer;
-            Sprite* _frontCrossRenderer;
-            Sprite* _backGroundBoxDisabledRenderer;
-            Sprite* _frontCrossDisabledRenderer;
-            bool _isSelected;
+            Sprite* backGroundBoxRenderer_;
+            Sprite* backGroundSelectedBoxRenderer_;
+            Sprite* frontCrossRenderer_;
+            Sprite* backGroundBoxDisabledRenderer_;
+            Sprite* frontCrossDisabledRenderer_;
+            bool isSelected_;
 
-            bool _isBackgroundSelectedTextureLoaded;
-            bool _isBackgroundDisabledTextureLoaded;
-            bool _isFrontCrossDisabledTextureLoaded;
-            TextureResType _backGroundTexType;
-            TextureResType _backGroundSelectedTexType;
-            TextureResType _frontCrossTexType;
-            TextureResType _backGroundDisabledTexType;
-            TextureResType _frontCrossDisabledTexType;
+            bool isBackgroundSelectedTextureLoaded_;
+            bool isBackgroundDisabledTextureLoaded_;
+            bool isFrontCrossDisabledTextureLoaded_;
+            TextureResType backGroundTexType_;
+            TextureResType backGroundSelectedTexType_;
+            TextureResType frontCrossTexType_;
+            TextureResType backGroundDisabledTexType_;
+            TextureResType frontCrossDisabledTexType_;
 
-            float _zoomScale;
-            float _backgroundTextureScaleX;
-            float _backgroundTextureScaleY;
+            float zoomScale_;
+            float backgroundTextureScaleX_;
+            float backgroundTextureScaleY_;
 
-            bool _backGroundBoxRendererAdaptDirty;
-            bool _backGroundSelectedBoxRendererAdaptDirty;
-            bool _frontCrossRendererAdaptDirty;
-            bool _backGroundBoxDisabledRendererAdaptDirty;
-            bool _frontCrossDisabledRendererAdaptDirty;
+            bool backGroundBoxRendererAdaptDirty_;
+            bool backGroundSelectedBoxRendererAdaptDirty_;
+            bool frontCrossRendererAdaptDirty_;
+            bool backGroundBoxDisabledRendererAdaptDirty_;
+            bool frontCrossDisabledRendererAdaptDirty_;
         };
 
         typedef enum
@@ -150,9 +150,9 @@ namespace GRAPH
             virtual void copySpecialProperties(Widget* model) override;
 
         protected:
-            HObject*       _checkBoxEventListener;
-            SEL_SelectedStateEvent    _checkBoxEventSelector;
-            CheckBoxCallback _checkBoxEventCallback;
+            HObject*       checkBoxEventListener_;
+            SEL_SelectedStateEvent    checkBoxEventSelector_;
+            CheckBoxCallback checkBoxEventCallback_;
         };
     }
 }

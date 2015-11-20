@@ -10,15 +10,15 @@ namespace GRAPH
         IMPLEMENT_CLASS_GUI_INFO(Text)
 
         Text::Text():
-        _touchScaleChangeEnabled(false),
-        _normalScaleValueX(1.0f),
-        _normalScaleValueY(1.0f),
-        _fontName("Thonburi"),
-        _fontSize(10),
-        _onSelectedScaleOffset(0.5),
-        _labelRenderer(nullptr),
-        _labelRendererAdaptDirty(true),
-        _type(Type::SYSTEM)
+        touchScaleChangeEnabled_(false),
+        normalScaleValueX_(1.0f),
+        normalScaleValueY_(1.0f),
+        fontName_("Thonburi"),
+        fontSize_(10),
+        onSelectedScaleOffset_(0.5),
+        labelRenderer_(nullptr),
+        labelRendererAdaptDirty_(true),
+        type_(Type::SYSTEM)
         {
         }
 
@@ -79,116 +79,116 @@ namespace GRAPH
 
         void Text::initRenderer()
         {
-            _labelRenderer = Label::create();
-            addProtectedChild(_labelRenderer, LABEL_RENDERER_Z, -1);
+            labelRenderer_ = Label::create();
+            addProtectedChild(labelRenderer_, LABEL_RENDERER_Z, -1);
         }
 
 
         void Text::setString(const std::string &text)
         {
-            if (text == _labelRenderer->getString())
+            if (text == labelRenderer_->getString())
             {
                 return;
             }
-            _labelRenderer->setString(text);
-            updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
-            _labelRendererAdaptDirty = true;
+            labelRenderer_->setString(text);
+            updateContentSizeWithTextureSize(labelRenderer_->getContentSize());
+            labelRendererAdaptDirty_ = true;
         }
 
         const std::string& Text::getString() const
         {
-            return _labelRenderer->getString();
+            return labelRenderer_->getString();
         }
 
         uint64 Text::getStringLength()const
         {
-            return _labelRenderer->getStringLength();
+            return labelRenderer_->getStringLength();
         }
 
         void Text::setFontSize(int size)
         {
-            _fontSize = size;
-            updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
-            _labelRendererAdaptDirty = true;
+            fontSize_ = size;
+            updateContentSizeWithTextureSize(labelRenderer_->getContentSize());
+            labelRendererAdaptDirty_ = true;
         }
 
         int Text::getFontSize()const
         {
-            return _fontSize;
+            return fontSize_;
         }
 
         void Text::setFontName(const std::string& name)
         {
-            _type = Type::SYSTEM;
-            _fontName = name;
-            updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
-            _labelRendererAdaptDirty = true;
+            type_ = Type::SYSTEM;
+            fontName_ = name;
+            updateContentSizeWithTextureSize(labelRenderer_->getContentSize());
+            labelRendererAdaptDirty_ = true;
         }
 
         const std::string& Text::getFontName()const
         {
-            return _fontName;
+            return fontName_;
         }
 
         Text::Type Text::getType() const
         {
-            return _type;
+            return type_;
         }
 
         void Text::setTextAreaSize(const MATH::Sizef &size)
         {
-            _labelRenderer->setDimensions(size.width,size.height);
+            labelRenderer_->setDimensions(size.width,size.height);
             if (!ignoreSize_)
             {
                 customSize_=size;
             }
-            updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
-            _labelRendererAdaptDirty = true;
+            updateContentSizeWithTextureSize(labelRenderer_->getContentSize());
+            labelRendererAdaptDirty_ = true;
         }
 
         const MATH::Sizef& Text::getTextAreaSize()const
         {
-            return _labelRenderer->getDimensions();
+            return labelRenderer_->getDimensions();
         }
 
         void Text::setTextColor(const Color4B color)
         {
-            _labelRenderer->setTextColor(color);
+            labelRenderer_->setTextColor(color);
         }
 
         const Color4B& Text::getTextColor() const
         {
-            return _labelRenderer->getTextColor();
+            return labelRenderer_->getTextColor();
         }
 
         void Text::setTouchScaleChangeEnabled(bool enable)
         {
-            _touchScaleChangeEnabled = enable;
+            touchScaleChangeEnabled_ = enable;
         }
 
         bool Text::isTouchScaleChangeEnabled()const
         {
-            return _touchScaleChangeEnabled;
+            return touchScaleChangeEnabled_;
         }
 
         void Text::onPressStateChangedToNormal()
         {
-            if (!_touchScaleChangeEnabled)
+            if (!touchScaleChangeEnabled_)
             {
                 return;
             }
-            _labelRenderer->setScaleX(_normalScaleValueX);
-            _labelRenderer->setScaleY(_normalScaleValueY);
+            labelRenderer_->setScaleX(normalScaleValueX_);
+            labelRenderer_->setScaleY(normalScaleValueY_);
         }
 
         void Text::onPressStateChangedToPressed()
         {
-            if (!_touchScaleChangeEnabled)
+            if (!touchScaleChangeEnabled_)
             {
                 return;
             }
-            _labelRenderer->setScaleX(_normalScaleValueX + _onSelectedScaleOffset);
-            _labelRenderer->setScaleY(_normalScaleValueY + _onSelectedScaleOffset);
+            labelRenderer_->setScaleX(normalScaleValueX_ + onSelectedScaleOffset_);
+            labelRenderer_->setScaleY(normalScaleValueY_ + onSelectedScaleOffset_);
         }
 
         void Text::onPressStateChangedToDisabled()
@@ -199,31 +199,31 @@ namespace GRAPH
         void Text::onSizeChanged()
         {
             Widget::onSizeChanged();
-            _labelRendererAdaptDirty = true;
+            labelRendererAdaptDirty_ = true;
         }
 
         void Text::adaptRenderers()
         {
-            if (_labelRendererAdaptDirty)
+            if (labelRendererAdaptDirty_)
             {
                 labelScaleChangedWithSize();
-                _labelRendererAdaptDirty = false;
+                labelRendererAdaptDirty_ = false;
             }
         }
 
         MATH::Sizef Text::getVirtualRendererSize() const
         {
-            return _labelRenderer->getContentSize();
+            return labelRenderer_->getContentSize();
         }
 
         MATH::Sizef Text::getAutoRenderSize()
         {
-            MATH::Sizef virtualSize = _labelRenderer->getContentSize();
+            MATH::Sizef virtualSize = labelRenderer_->getContentSize();
             if (!ignoreSize_)
             {
-                _labelRenderer->setDimensions(0, 0);
-                virtualSize = _labelRenderer->getContentSize();
-                _labelRenderer->setDimensions(contentSize_.width, contentSize_.height);
+                labelRenderer_->setDimensions(0, 0);
+                virtualSize = labelRenderer_->getContentSize();
+                labelRenderer_->setDimensions(contentSize_.width, contentSize_.height);
             }
 
             return virtualSize;
@@ -231,63 +231,63 @@ namespace GRAPH
 
         Node* Text::getVirtualRenderer()
         {
-            return _labelRenderer;
+            return labelRenderer_;
         }
 
         void Text::labelScaleChangedWithSize()
         {
             if (ignoreSize_)
             {
-                _labelRenderer->setDimensions(0,0);
-                _labelRenderer->setScale(1.0f);
-                _normalScaleValueX = _normalScaleValueY = 1.0f;
+                labelRenderer_->setDimensions(0,0);
+                labelRenderer_->setScale(1.0f);
+                normalScaleValueX_ = normalScaleValueY_ = 1.0f;
             }
             else
             {
-                _labelRenderer->setDimensions(contentSize_.width,contentSize_.height);
-                MATH::Sizef textureSize = _labelRenderer->getContentSize();
+                labelRenderer_->setDimensions(contentSize_.width,contentSize_.height);
+                MATH::Sizef textureSize = labelRenderer_->getContentSize();
                 if (textureSize.width <= 0.0f || textureSize.height <= 0.0f)
                 {
-                    _labelRenderer->setScale(1.0f);
+                    labelRenderer_->setScale(1.0f);
                     return;
                 }
                 float scaleX = contentSize_.width / textureSize.width;
                 float scaleY = contentSize_.height / textureSize.height;
-                _labelRenderer->setScaleX(scaleX);
-                _labelRenderer->setScaleY(scaleY);
-                _normalScaleValueX = scaleX;
-                _normalScaleValueY = scaleY;
+                labelRenderer_->setScaleX(scaleX);
+                labelRenderer_->setScaleY(scaleY);
+                normalScaleValueX_ = scaleX;
+                normalScaleValueY_ = scaleY;
             }
-            _labelRenderer->setPosition(contentSize_.width / 2.0f, contentSize_.height / 2.0f);
+            labelRenderer_->setPosition(contentSize_.width / 2.0f, contentSize_.height / 2.0f);
         }
 
         void Text::enableShadow(const Color4B& shadowColor,const MATH::Sizef &offset, int)
         {
-            _labelRenderer->enableShadow(shadowColor, offset);
+            labelRenderer_->enableShadow(shadowColor, offset);
         }
 
         void Text::enableOutline(const Color4B& outlineColor,int outlineSize)
         {
-            _labelRenderer->enableOutline(outlineColor, outlineSize);
-            updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
-            _labelRendererAdaptDirty = true;
+            labelRenderer_->enableOutline(outlineColor, outlineSize);
+            updateContentSizeWithTextureSize(labelRenderer_->getContentSize());
+            labelRendererAdaptDirty_ = true;
         }
 
         void Text::disableEffect()
         {
-            _labelRenderer->disableEffect();
-            updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
-            _labelRendererAdaptDirty = true;
+            labelRenderer_->disableEffect();
+            updateContentSizeWithTextureSize(labelRenderer_->getContentSize());
+            labelRendererAdaptDirty_ = true;
         }
 
         void Text::disableEffect(LabelEffect effect)
         {
-            _labelRenderer->disableEffect(effect);
+            labelRenderer_->disableEffect(effect);
             //only outline effect will affect the content size of label
             if(LabelEffect::OUTLINE == effect)
             {
-                updateContentSizeWithTextureSize(_labelRenderer->getContentSize());
-                _labelRendererAdaptDirty = true;
+                updateContentSizeWithTextureSize(labelRenderer_->getContentSize());
+                labelRendererAdaptDirty_ = true;
             }
         }
 
@@ -301,12 +301,12 @@ namespace GRAPH
             Text* label = dynamic_cast<Text*>(widget);
             if (label)
             {
-                setFontName(label->_fontName);
+                setFontName(label->fontName_);
                 setFontSize(label->getFontSize());
                 setTextColor(label->getTextColor());
                 setString(label->getString());
-                setTouchScaleChangeEnabled(label->_touchScaleChangeEnabled);
-                setTextAreaSize(label->_labelRenderer->getDimensions());
+                setTouchScaleChangeEnabled(label->touchScaleChangeEnabled_);
+                setTextAreaSize(label->labelRenderer_->getDimensions());
                 setContentSize(label->getContentSize());
             }
         }

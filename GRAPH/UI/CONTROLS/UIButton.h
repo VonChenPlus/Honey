@@ -102,35 +102,35 @@ namespace GRAPH
 
             virtual MATH::Sizef getNormalSize() const;
         protected:
-            Scale9Sprite* _buttonNormalRenderer;
-            Scale9Sprite* _buttonClickedRenderer;
-            Scale9Sprite* _buttonDisableRenderer;
-            Label* _titleRenderer;
+            Scale9Sprite* buttonNormalRenderer_;
+            Scale9Sprite* buttonClickedRenderer_;
+            Scale9Sprite* buttonDisableRenderer_;
+            Label* titleRenderer_;
 
-            float _zoomScale;
-            bool _prevIgnoreSize;
-            bool _scale9Enabled;
-            bool _pressedActionEnabled;
+            float zoomScale_;
+            bool prevIgnoreSize_;
+            bool scale9Enabled_;
+            bool pressedActionEnabled_;
 
-            MATH::Rectf _capInsetsNormal;
-            MATH::Rectf _capInsetsPressed;
-            MATH::Rectf _capInsetsDisabled;
+            MATH::Rectf capInsetsNormal_;
+            MATH::Rectf capInsetsPressed_;
+            MATH::Rectf capInsetsDisabled_;
 
-            MATH::Sizef _normalTextureSize;
-            MATH::Sizef _pressedTextureSize;
-            MATH::Sizef _disabledTextureSize;
+            MATH::Sizef normalTextureSize_;
+            MATH::Sizef pressedTextureSize_;
+            MATH::Sizef disabledTextureSize_;
 
-            float _normalTextureScaleXInSize;
-            float _normalTextureScaleYInSize;
-            float _pressedTextureScaleXInSize;
-            float _pressedTextureScaleYInSize;
+            float normalTextureScaleXInSize_;
+            float normalTextureScaleYInSize_;
+            float pressedTextureScaleXInSize_;
+            float pressedTextureScaleYInSize_;
 
-            bool _normalTextureLoaded;
-            bool _pressedTextureLoaded;
-            bool _disabledTextureLoaded;
-            bool _normalTextureAdaptDirty;
-            bool _pressedTextureAdaptDirty;
-            bool _disabledTextureAdaptDirty;
+            bool normalTextureLoaded_;
+            bool pressedTextureLoaded_;
+            bool disabledTextureLoaded_;
+            bool normalTextureAdaptDirty_;
+            bool pressedTextureAdaptDirty_;
+            bool disabledTextureAdaptDirty_;
 
         private:
             enum class FontType
@@ -140,10 +140,10 @@ namespace GRAPH
                 BMFONT
             };
 
-            int _fontSize;
-            FontType _type;
+            int fontSize_;
+            FontType type_;
         };
     }
 }
 
-#endif /* defined(__CocoGUI__Button__) */
+#endif // UIBUTTON_H

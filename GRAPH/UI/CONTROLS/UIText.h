@@ -79,15 +79,15 @@ namespace GRAPH
             virtual void copySpecialProperties(Widget* model) override;
             virtual void adaptRenderers() override;
         protected:
-            bool _touchScaleChangeEnabled;
-            float _normalScaleValueX;
-            float _normalScaleValueY;
-            std::string _fontName;
-            int _fontSize;
-            float _onSelectedScaleOffset;
-            Label* _labelRenderer;
-            bool _labelRendererAdaptDirty;
-            Type _type;
+            bool touchScaleChangeEnabled_;
+            float normalScaleValueX_;
+            float normalScaleValueY_;
+            std::string fontName_;
+            int fontSize_;
+            float onSelectedScaleOffset_;
+            Label* labelRenderer_;
+            bool labelRendererAdaptDirty_;
+            Type type_;
         };
     }
 }

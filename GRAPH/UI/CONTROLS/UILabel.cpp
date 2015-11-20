@@ -150,11 +150,11 @@ namespace GRAPH
         }
 
         Label::Label()
-            : _textSprite(nullptr)
-            , _shadowNode(nullptr)
-            , _fontAtlas(nullptr)
-            , _reusedLetter(nullptr)
-            , _horizontalKernings(nullptr)
+            : textSprite_(nullptr)
+            , shadowNode_(nullptr)
+            , fontAtlas_(nullptr)
+            , reusedLetter_(nullptr)
+            , horizontalKernings_(nullptr)
         {
             setAnchorPoint(MATH::Vec2fMIDDLE);
             reset();
@@ -162,90 +162,90 @@ namespace GRAPH
 
         Label::~Label()
         {
-            delete [] _horizontalKernings;
+            delete [] horizontalKernings_;
 
-            if (_fontAtlas)
+            if (fontAtlas_)
             {
                 Node::removeAllChildrenWithCleanup(true);
-                SAFE_RELEASE_NULL(_reusedLetter);
-                _batchNodes.clear();
-                FontAtlasCache::releaseFontAtlas(_fontAtlas);
+                SAFE_RELEASE_NULL(reusedLetter_);
+                batchNodes_.clear();
+                FontAtlasCache::releaseFontAtlas(fontAtlas_);
             }
 
-            SAFE_RELEASE_NULL(_textSprite);
-            SAFE_RELEASE_NULL(_shadowNode);
+            SAFE_RELEASE_NULL(textSprite_);
+            SAFE_RELEASE_NULL(shadowNode_);
         }
 
         void Label::reset()
         {
-            SAFE_RELEASE_NULL(_textSprite);
-            SAFE_RELEASE_NULL(_shadowNode);
+            SAFE_RELEASE_NULL(textSprite_);
+            SAFE_RELEASE_NULL(shadowNode_);
             Node::removeAllChildrenWithCleanup(true);
-            SAFE_RELEASE_NULL(_reusedLetter);
-            _letters.clear();
-            _batchNodes.clear();
-            _lettersInfo.clear();
-            if (_fontAtlas)
+            SAFE_RELEASE_NULL(reusedLetter_);
+            letters_.clear();
+            batchNodes_.clear();
+            lettersInfo_.clear();
+            if (fontAtlas_)
             {
-                FontAtlasCache::releaseFontAtlas(_fontAtlas);
-                _fontAtlas = nullptr;
+                FontAtlasCache::releaseFontAtlas(fontAtlas_);
+                fontAtlas_ = nullptr;
             }
 
-            _currLabelEffect = LabelEffect::NORMAL;
-            _contentDirty = false;
-            _numberOfLines = 0;
-            _lengthOfString = 0;
-            _utf16Text.clear();
-            _utf8Text.clear();
+            currLabelEffect_ = LabelEffect::NORMAL;
+            contentDirty_ = false;
+            numberOfLines_ = 0;
+            lengthOfString_ = 0;
+            utf16Text_.clear();
+            utf8Text_.clear();
 
-            _outlineSize = 0.f;
-            _bmFontPath = "";
-            _systemFontDirty = false;
-            _systemFont = "Helvetica";
-            _systemFontSize = 12;
+            outlineSize_ = 0.f;
+            bmFontPath_ = "";
+            systemFontDirty_ = false;
+            systemFont_ = "Helvetica";
+            systemFontSize_ = 12;
 
-            if (_horizontalKernings)
+            if (horizontalKernings_)
             {
-                delete[] _horizontalKernings;
-                _horizontalKernings = nullptr;
+                delete[] horizontalKernings_;
+                horizontalKernings_ = nullptr;
             }
-            _additionalKerning = 0.f;
-            _lineHeight = 0.f;
-            _maxLineWidth = 0.f;
-            _labelDimensions.width = 0.f;
-            _labelDimensions.height = 0.f;
-            _labelWidth = 0.f;
-            _labelHeight = 0.f;
-            _lineBreakWithoutSpaces = false;
+            additionalKerning_ = 0.f;
+            lineHeight_ = 0.f;
+            maxLineWidth_ = 0.f;
+            labelDimensions_.width = 0.f;
+            labelDimensions_.height = 0.f;
+            labelWidth_ = 0.f;
+            labelHeight_ = 0.f;
+            lineBreakWithoutSpaces_ = false;
 
-            _effectColorF = Color4F::BLACK;
-            _textColor = Color4B::WHITE;
-            _textColorF = Color4F::WHITE;
+            effectColorF_ = Color4F::BLACK;
+            textColor_ = Color4B::WHITE;
+            textColorF_ = Color4F::WHITE;
             setColor(Color3B::WHITE);
 
-            _shadowDirty = false;
-            _shadowEnabled = false;
-            _shadowBlurRadius = 0.f;
+            shadowDirty_ = false;
+            shadowEnabled_ = false;
+            shadowBlurRadius_ = 0.f;
 
-            _useDistanceField = false;
-            _useA8Shader = false;
-            _clipEnabled = false;
-            _blendFuncDirty = false;
-            _blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
-            _isOpacityModifyRGB = false;
-            _insideBounds = true;
+            useDistanceField_ = false;
+            useA8Shader_ = false;
+            clipEnabled_ = false;
+            blendFuncDirty_ = false;
+            blendFunc_ = BlendFunc::ALPHA_PREMULTIPLIED;
+            isOpacityModifyRGB_ = false;
+            insideBounds_ = true;
         }
 
         void Label::updateShaderProgram()
         {
-            switch (_currLabelEffect)
+            switch (currLabelEffect_)
             {
             case LabelEffect::NORMAL:
-                if (_useDistanceField)
+                if (useDistanceField_)
                     setU3DShaderState(ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_NORMAL));
-                else if (_useA8Shader)
+                else if (useA8Shader_)
                     setU3DShaderState(ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_LABEL_NORMAL));
-                else if (_shadowEnabled)
+                else if (shadowEnabled_)
                     setU3DShaderState(ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR));
                 else
                     setU3DShaderState(ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
@@ -253,100 +253,100 @@ namespace GRAPH
                 break;
             case LabelEffect::OUTLINE:
                 setU3DShaderState(ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_LABEL_OUTLINE));
-                _uniformEffectColor = getU3DShader()->getUniformLocation("u_effectColor");
+                uniformEffectColor_ = getU3DShader()->getUniformLocation("u_effectColor");
                 break;
             case LabelEffect::GLOW:
-                if (_useDistanceField)
+                if (useDistanceField_)
                 {
                     setU3DShaderState(ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_LABEL_DISTANCEFIELD_GLOW));
-                    _uniformEffectColor = getU3DShader()->getUniformLocation("u_effectColor");
+                    uniformEffectColor_ = getU3DShader()->getUniformLocation("u_effectColor");
                 }
                 break;
             default:
                 return;
             }
 
-            _uniformTextColor = getU3DShader()->getUniformLocation("u_textColor");
+            uniformTextColor_ = getU3DShader()->getUniformLocation("u_textColor");
         }
 
         void Label::setFontAtlas(FontAtlas* atlas,bool distanceFieldEnabled /* = false */, bool useA8Shader /* = false */)
         {
-            if (atlas == _fontAtlas)
+            if (atlas == fontAtlas_)
             {
                 FontAtlasCache::releaseFontAtlas(atlas);
                 return;
             }
 
-            if (_fontAtlas)
+            if (fontAtlas_)
             {
-                _batchNodes.clear();
-                FontAtlasCache::releaseFontAtlas(_fontAtlas);
-                _fontAtlas = nullptr;
+                batchNodes_.clear();
+                FontAtlasCache::releaseFontAtlas(fontAtlas_);
+                fontAtlas_ = nullptr;
             }
 
-            _fontAtlas = atlas;
-            if (_reusedLetter == nullptr)
+            fontAtlas_ = atlas;
+            if (reusedLetter_ == nullptr)
             {
-                _reusedLetter = Sprite::create();
-                _reusedLetter->setOpacityModifyRGB(_isOpacityModifyRGB);
-                _reusedLetter->retain();
-                _reusedLetter->setAnchorPoint(MATH::Vec2fTOPLEFT);
+                reusedLetter_ = Sprite::create();
+                reusedLetter_->setOpacityModifyRGB(isOpacityModifyRGB_);
+                reusedLetter_->retain();
+                reusedLetter_->setAnchorPoint(MATH::Vec2fTOPLEFT);
             }
 
-            if (_fontAtlas)
+            if (fontAtlas_)
             {
-                _lineHeight = _fontAtlas->getCommonLineHeight();
-                _contentDirty = true;
+                lineHeight_ = fontAtlas_->getCommonLineHeight();
+                contentDirty_ = true;
             }
-            _useDistanceField = distanceFieldEnabled;
-            _useA8Shader = useA8Shader;
+            useDistanceField_ = distanceFieldEnabled;
+            useA8Shader_ = useA8Shader;
 
-            _currLabelEffect = LabelEffect::NORMAL;
+            currLabelEffect_ = LabelEffect::NORMAL;
             updateShaderProgram();
         }
 
         void Label::setString(const std::string& text)
         {
-            if (text.compare(_utf8Text))
+            if (text.compare(utf8Text_))
             {
-                _utf8Text = text;
-                _contentDirty = true;
+                utf8Text_ = text;
+                contentDirty_ = true;
 
                 std::u16string utf16String;
-                UTILS::STRING::UTF8ToUTF16(_utf8Text, utf16String);
-                _utf16Text  = utf16String;
+                UTILS::STRING::UTF8ToUTF16(utf8Text_, utf16String);
+                utf16Text_  = utf16String;
             }
         }
 
         void Label::setMaxLineWidth(float maxLineWidth)
         {
-            if (_labelWidth == 0 && _maxLineWidth != maxLineWidth)
+            if (labelWidth_ == 0 && maxLineWidth_ != maxLineWidth)
             {
-                _maxLineWidth = maxLineWidth;
-                _contentDirty = true;
+                maxLineWidth_ = maxLineWidth;
+                contentDirty_ = true;
             }
         }
 
         void Label::setDimensions(float width, float height)
         {
-            if (height != _labelHeight || width != _labelWidth)
+            if (height != labelHeight_ || width != labelWidth_)
             {
-                _labelWidth = width;
-                _labelHeight = height;
-                _labelDimensions.width = width;
-                _labelDimensions.height = height;
+                labelWidth_ = width;
+                labelHeight_ = height;
+                labelDimensions_.width = width;
+                labelDimensions_.height = height;
 
-                _maxLineWidth = width;
-                _contentDirty = true;
+                maxLineWidth_ = width;
+                contentDirty_ = true;
             }
         }
 
         void Label::setLineBreakWithoutSpace(bool breakWithoutSpace)
         {
-            if (breakWithoutSpace != _lineBreakWithoutSpaces)
+            if (breakWithoutSpace != lineBreakWithoutSpaces_)
             {
-                _lineBreakWithoutSpaces = breakWithoutSpace;
-                _contentDirty = true;
+                lineBreakWithoutSpaces_ = breakWithoutSpace;
+                contentDirty_ = true;
             }
         }
 
@@ -364,35 +364,35 @@ namespace GRAPH
             MATH::Vector2f letterPosition;
 
             for (int index = 0; index < textLen; index++) {
-                auto character = _utf16Text[index];
+                auto character = utf16Text_[index];
                 if (character == '\r') {
                     recordPlaceholderInfo(index, character);
                     continue;
                 }
                 if (character == '\n') {
-                    _linesWidth.push_back(letterRight);
+                    linesWidth_.push_back(letterRight);
                     letterRight = 0.f;
                     lineIndex++;
                     nextLetterX = 0.f;
-                    nextLetterY -= _lineHeight;
+                    nextLetterY -= lineHeight_;
                     recordPlaceholderInfo(index, character);
                     continue;
                 }
 
-                if (_fontAtlas->getLetterDefinitionForChar(character, letterDef) == false)
+                if (fontAtlas_->getLetterDefinitionForChar(character, letterDef) == false)
                 {
                     recordPlaceholderInfo(index, character);
                     continue;
                 }
 
                 auto letterX = nextLetterX;
-                if (_maxLineWidth > 0.f && nextLetterX > 0.f && letterX + letterDef.width > _maxLineWidth)
+                if (maxLineWidth_ > 0.f && nextLetterX > 0.f && letterX + letterDef.width > maxLineWidth_)
                 {
-                    _linesWidth.push_back(letterRight);
+                    linesWidth_.push_back(letterRight);
                     letterRight = 0.f;
                     lineIndex++;
                     nextLetterX = 0.f;
-                    nextLetterY -= _lineHeight;
+                    nextLetterY -= lineHeight_;
                 }
                 else
                 {
@@ -401,9 +401,9 @@ namespace GRAPH
                 letterPosition.y = nextLetterY;
                 recordLetterInfo(letterPosition, character, index, lineIndex);
 
-                if (_horizontalKernings && index < textLen - 1)
-                    nextLetterX += _horizontalKernings[index + 1];
-                nextLetterX += _additionalKerning;
+                if (horizontalKernings_ && index < textLen - 1)
+                    nextLetterX += horizontalKernings_[index + 1];
+                nextLetterX += additionalKerning_;
 
                 letterRight = letterPosition.x + letterDef.width;
 
@@ -415,23 +415,23 @@ namespace GRAPH
                     longestLine = letterRight;
             }
 
-            _linesWidth.push_back(letterRight);
+            linesWidth_.push_back(letterRight);
 
-            _numberOfLines = lineIndex + 1;
-            _textDesiredHeight = (_numberOfLines * _lineHeight);
-            MATH::Sizef contentSize(_labelWidth, _labelHeight);
-            if (_labelWidth <= 0.f)
+            numberOfLines_ = lineIndex + 1;
+            textDesiredHeight_ = (numberOfLines_ * lineHeight_);
+            MATH::Sizef contentSize(labelWidth_, labelHeight_);
+            if (labelWidth_ <= 0.f)
                 contentSize.width = longestLine;
-            if (_labelHeight <= 0.f)
-                contentSize.height = _textDesiredHeight;
+            if (labelHeight_ <= 0.f)
+                contentSize.height = textDesiredHeight_;
             setContentSize(contentSize);
 
-            _tailoredTopY = contentSize.height;
-            _tailoredBottomY = 0.f;
+            tailoredTopY_ = contentSize.height;
+            tailoredBottomY_ = 0.f;
             if (highestY > 0.f)
-                _tailoredTopY = contentSize.height + highestY;
-            if (lowestY < -_textDesiredHeight)
-                _tailoredBottomY = _textDesiredHeight + lowestY;
+                tailoredTopY_ = contentSize.height + highestY;
+            if (lowestY < -textDesiredHeight_)
+                tailoredBottomY_ = textDesiredHeight_ + lowestY;
 
             return true;
         }
@@ -452,20 +452,20 @@ namespace GRAPH
 
             for (int index = 0; index < textLen;)
             {
-                auto character = _utf16Text[index];
+                auto character = utf16Text_[index];
                 if (character == '\n')
                 {
-                    _linesWidth.push_back(letterRight);
+                    linesWidth_.push_back(letterRight);
                     letterRight = 0.f;
                     lineIndex++;
                     nextWordX = 0.f;
-                    nextWordY -= _lineHeight;
+                    nextWordY -= lineHeight_;
                     recordPlaceholderInfo(index, character);
                     index++;
                     continue;
                 }
 
-                auto wordLen = UTILS::STRING::GetWordLen(_utf16Text, index, textLen);
+                auto wordLen = UTILS::STRING::GetWordLen(utf16Text_, index, textLen);
                 float wordHighestY = highestY;;
                 float wordLowestY = lowestY;
                 float wordRight = letterRight;
@@ -474,26 +474,26 @@ namespace GRAPH
                 for (int tmp = 0; tmp < wordLen; ++tmp)
                 {
                     int letterIndex = index + tmp;
-                    character = _utf16Text[letterIndex];
+                    character = utf16Text_[letterIndex];
                     if (character == '\r')
                     {
                         recordPlaceholderInfo(letterIndex, character);
                         continue;
                     }
-                    if (_fontAtlas->getLetterDefinitionForChar(character, letterDef) == false)
+                    if (fontAtlas_->getLetterDefinitionForChar(character, letterDef) == false)
                     {
                         recordPlaceholderInfo(letterIndex, character);
                         continue;
                     }
 
                     auto letterX = nextLetterX;
-                    if (_maxLineWidth > 0.f && nextWordX > 0.f && letterX + letterDef.width > _maxLineWidth)
+                    if (maxLineWidth_ > 0.f && nextWordX > 0.f && letterX + letterDef.width > maxLineWidth_)
                     {
-                        _linesWidth.push_back(letterRight);
+                        linesWidth_.push_back(letterRight);
                         letterRight = 0.f;
                         lineIndex++;
                         nextWordX = 0.f;
-                        nextWordY -= _lineHeight;
+                        nextWordY -= lineHeight_;
                         newLine = true;
                         break;
                     }
@@ -504,9 +504,9 @@ namespace GRAPH
                     letterPosition.y = nextWordY;
                     recordLetterInfo(letterPosition, character, letterIndex, lineIndex);
 
-                    if (_horizontalKernings && letterIndex < textLen - 1)
-                        nextLetterX += _horizontalKernings[letterIndex + 1];
-                    nextLetterX += _additionalKerning;
+                    if (horizontalKernings_ && letterIndex < textLen - 1)
+                        nextLetterX += horizontalKernings_[letterIndex + 1];
+                    nextLetterX += additionalKerning_;
 
                     wordRight = letterPosition.x + letterDef.width;
 
@@ -533,55 +533,55 @@ namespace GRAPH
                 index += wordLen;
             }
 
-            _linesWidth.push_back(letterRight);
+            linesWidth_.push_back(letterRight);
 
-            _numberOfLines = lineIndex + 1;
-            _textDesiredHeight = _numberOfLines * _lineHeight;
-            MATH::Sizef contentSize(_labelWidth, _labelHeight);
-            if (_labelWidth <= 0.f)
+            numberOfLines_ = lineIndex + 1;
+            textDesiredHeight_ = numberOfLines_ * lineHeight_;
+            MATH::Sizef contentSize(labelWidth_, labelHeight_);
+            if (labelWidth_ <= 0.f)
                 contentSize.width = longestLine;
-            if (_labelHeight <= 0.f)
-                contentSize.height = _textDesiredHeight;
+            if (labelHeight_ <= 0.f)
+                contentSize.height = textDesiredHeight_;
             setContentSize(contentSize);
 
-            _tailoredTopY = contentSize.height;
-            _tailoredBottomY = 0.f;
+            tailoredTopY_ = contentSize.height;
+            tailoredBottomY_ = 0.f;
             if (highestY > 0.f)
-                _tailoredTopY = contentSize.height + highestY;
-            if (lowestY < -_textDesiredHeight)
-                _tailoredBottomY = _textDesiredHeight + lowestY;
+                tailoredTopY_ = contentSize.height + highestY;
+            if (lowestY < -textDesiredHeight_)
+                tailoredBottomY_ = textDesiredHeight_ + lowestY;
 
             return true;
         }
 
         void Label::updateLabelLetters()
         {
-            if (!_letters.empty())
+            if (!letters_.empty())
             {
                 MATH::Rectf uvRect;
                 LabelLetter* letterSprite;
                 int letterIndex;
 
-                for (auto it = _letters.begin(); it != _letters.end();)
+                for (auto it = letters_.begin(); it != letters_.end();)
                 {
                     letterIndex = it->first;
                     letterSprite = (LabelLetter*)it->second;
 
-                    if (letterIndex >= _lengthOfString)
+                    if (letterIndex >= lengthOfString_)
                     {
                         Node::removeChild(letterSprite, true);
-                        it = _letters.erase(it);
+                        it = letters_.erase(it);
                     }
                     else
                     {
-                        auto& letterInfo = _lettersInfo[letterIndex];
-                        auto& letterDef = _fontAtlas->letterDefinitions_[letterInfo.utf16Char];
+                        auto& letterInfo = lettersInfo_[letterIndex];
+                        auto& letterDef = fontAtlas_->letterDefinitions_[letterInfo.utf16Char];
                         uvRect.size.height = letterDef.height;
                         uvRect.size.width = letterDef.width;
                         uvRect.origin.x = letterDef.U;
                         uvRect.origin.y = letterDef.V;
 
-                        letterSprite->setTexture(_fontAtlas->getTexture(letterDef.textureID));
+                        letterSprite->setTexture(fontAtlas_->getTexture(letterDef.textureID));
                         if (letterDef.width <= 0.f || letterDef.height <= 0.f)
                         {
                             letterSprite->setTextureAtlas(nullptr);
@@ -589,12 +589,12 @@ namespace GRAPH
                         else
                         {
                             letterSprite->setTextureRect(uvRect, false, uvRect.size);
-                            letterSprite->setTextureAtlas(_batchNodes.at(letterDef.textureID)->getTextureAtlas());
-                            letterSprite->setAtlasIndex(_lettersInfo[letterIndex].atlasIndex);
+                            letterSprite->setTextureAtlas(batchNodes_.at(letterDef.textureID)->getTextureAtlas());
+                            letterSprite->setAtlasIndex(lettersInfo_[letterIndex].atlasIndex);
                         }
 
-                        auto px = letterInfo.positionX + letterDef.width / 2 + _linesOffsetX[letterInfo.lineIndex];
-                        auto py = letterInfo.positionY - letterDef.height / 2 + _letterOffsetY;
+                        auto px = letterInfo.positionX + letterDef.width / 2 + linesOffsetX_[letterInfo.lineIndex];
+                        auto py = letterInfo.positionY - letterDef.height / 2 + letterOffsetY_;
                         letterSprite->setPosition(px, py);
 
                         ++it;
@@ -605,39 +605,39 @@ namespace GRAPH
 
         void Label::alignText()
         {
-            if (_fontAtlas == nullptr || _utf16Text.empty())
+            if (fontAtlas_ == nullptr || utf16Text_.empty())
             {
                 setContentSize(MATH::SizefZERO);
                 return;
             }
 
-            _fontAtlas->prepareLetterDefinitions(_utf16Text);
-            auto& textures = _fontAtlas->getTextures();
-            if (textures.size() > _batchNodes.size())
+            fontAtlas_->prepareLetterDefinitions(utf16Text_);
+            auto& textures = fontAtlas_->getTextures();
+            if (textures.size() > batchNodes_.size())
             {
-                for (auto index = _batchNodes.size(); index < textures.size(); ++index)
+                for (auto index = batchNodes_.size(); index < textures.size(); ++index)
                 {
                     auto batchNode = SpriteBatchNode::createWithTexture(textures.at(index));
                     if (batchNode)
                     {
-                        _isOpacityModifyRGB = batchNode->getTexture()->hasPremultipliedAlpha();
-                        _blendFunc = batchNode->getBlendFunc();
+                        isOpacityModifyRGB_ = batchNode->getTexture()->hasPremultipliedAlpha();
+                        blendFunc_ = batchNode->getBlendFunc();
                         batchNode->setAnchorPoint(MATH::Vec2fTOPLEFT);
                         batchNode->setPosition(MATH::Vec2fZERO);
-                        _batchNodes.pushBack(batchNode);
+                        batchNodes_.pushBack(batchNode);
                     }
                 }
             }
-            if (_batchNodes.empty())
+            if (batchNodes_.empty())
             {
                 return;
             }
-            _reusedLetter->setBatchNode(_batchNodes.at(0));
+            reusedLetter_->setBatchNode(batchNodes_.at(0));
 
-            _lengthOfString = 0;
-            _textDesiredHeight = 0.f;
-            _linesWidth.clear();
-            if (_maxLineWidth > 0.f && !_lineBreakWithoutSpaces)
+            lengthOfString_ = 0;
+            textDesiredHeight_ = 0.f;
+            linesWidth_.clear();
+            if (maxLineWidth_ > 0.f && !lineBreakWithoutSpaces_)
             {
                 multilineTextWrapByWord();
             }
@@ -655,69 +655,69 @@ namespace GRAPH
 
         void Label::recordLetterInfo(const MATH::Vector2f& point, char16_t utf16Char, int letterIndex, int lineIndex)
         {
-            if (static_cast<uint64>(letterIndex) >= _lettersInfo.size())
+            if (static_cast<uint64>(letterIndex) >= lettersInfo_.size())
             {
                 LetterInfo tmpInfo;
-                _lettersInfo.push_back(tmpInfo);
+                lettersInfo_.push_back(tmpInfo);
             }
-            _lettersInfo[letterIndex].lineIndex = lineIndex;
-            _lettersInfo[letterIndex].utf16Char = utf16Char;
-            _lettersInfo[letterIndex].valid = true;
-            _lettersInfo[letterIndex].positionX = point.x;
-            _lettersInfo[letterIndex].positionY = point.y;
+            lettersInfo_[letterIndex].lineIndex = lineIndex;
+            lettersInfo_[letterIndex].utf16Char = utf16Char;
+            lettersInfo_[letterIndex].valid = true;
+            lettersInfo_[letterIndex].positionX = point.x;
+            lettersInfo_[letterIndex].positionY = point.y;
         }
 
         void Label::recordPlaceholderInfo(int letterIndex, char16_t utf16Char)
         {
-            if (static_cast<uint64>(letterIndex) >= _lettersInfo.size())
+            if (static_cast<uint64>(letterIndex) >= lettersInfo_.size())
             {
                 LetterInfo tmpInfo;
-                _lettersInfo.push_back(tmpInfo);
+                lettersInfo_.push_back(tmpInfo);
             }
-            _lettersInfo[letterIndex].utf16Char = utf16Char;
-            _lettersInfo[letterIndex].valid = false;
+            lettersInfo_[letterIndex].utf16Char = utf16Char;
+            lettersInfo_[letterIndex].valid = false;
         }
 
         void Label::updateQuads()
         {
-            for (auto&& batchNode : _batchNodes)
+            for (auto&& batchNode : batchNodes_)
             {
                 batchNode->getTextureAtlas()->removeAllQuads();
             }
 
-            for (int ctr = 0; ctr < _lengthOfString; ++ctr)
+            for (int ctr = 0; ctr < lengthOfString_; ++ctr)
             {
-                if (_lettersInfo[ctr].valid)
+                if (lettersInfo_[ctr].valid)
                 {
-                    auto& letterDef = _fontAtlas->letterDefinitions_[_lettersInfo[ctr].utf16Char];
+                    auto& letterDef = fontAtlas_->letterDefinitions_[lettersInfo_[ctr].utf16Char];
 
-                    _reusedRect.size.height = letterDef.height;
-                    _reusedRect.size.width  = letterDef.width;
-                    _reusedRect.origin.x    = letterDef.U;
-                    _reusedRect.origin.y    = letterDef.V;
+                    reusedRect_.size.height = letterDef.height;
+                    reusedRect_.size.width  = letterDef.width;
+                    reusedRect_.origin.x    = letterDef.U;
+                    reusedRect_.origin.y    = letterDef.V;
 
-                    auto py = _lettersInfo[ctr].positionY + _letterOffsetY;
-                    if (_labelHeight > 0.f) {
-                        if (py > _tailoredTopY)
+                    auto py = lettersInfo_[ctr].positionY + letterOffsetY_;
+                    if (labelHeight_ > 0.f) {
+                        if (py > tailoredTopY_)
                         {
-                            auto clipTop = py - _tailoredTopY;
-                            _reusedRect.origin.y += clipTop;
-                            _reusedRect.size.height -= clipTop;
+                            auto clipTop = py - tailoredTopY_;
+                            reusedRect_.origin.y += clipTop;
+                            reusedRect_.size.height -= clipTop;
                             py -= clipTop;
                         }
-                        if (py - letterDef.height < _tailoredBottomY)
+                        if (py - letterDef.height < tailoredBottomY_)
                         {
-                            _reusedRect.size.height = (py < _tailoredBottomY) ? 0.f : (py - _tailoredBottomY);
+                            reusedRect_.size.height = (py < tailoredBottomY_) ? 0.f : (py - tailoredBottomY_);
                         }
                     }
 
-                    if (_reusedRect.size.height > 0.f && _reusedRect.size.width > 0.f)
+                    if (reusedRect_.size.height > 0.f && reusedRect_.size.width > 0.f)
                     {
-                        _reusedLetter->setTextureRect(_reusedRect, false, _reusedRect.size);
-                        _reusedLetter->setPosition(_lettersInfo[ctr].positionX + _linesOffsetX[_lettersInfo[ctr].lineIndex], py);
-                        auto index = static_cast<int>(_batchNodes.at(letterDef.textureID)->getTextureAtlas()->getTotalQuads());
-                        _lettersInfo[ctr].atlasIndex = index;
-                        _batchNodes.at(letterDef.textureID)->insertQuadFromSprite(_reusedLetter, index);
+                        reusedLetter_->setTextureRect(reusedRect_, false, reusedRect_.size);
+                        reusedLetter_->setPosition(lettersInfo_[ctr].positionX + linesOffsetX_[lettersInfo_[ctr].lineIndex], py);
+                        auto index = static_cast<int>(batchNodes_.at(letterDef.textureID)->getTextureAtlas()->getTotalQuads());
+                        lettersInfo_[ctr].atlasIndex = index;
+                        batchNodes_.at(letterDef.textureID)->insertQuadFromSprite(reusedLetter_, index);
                     }
                 }
             }
@@ -725,44 +725,44 @@ namespace GRAPH
 
         void Label::enableOutline(const Color4B& outlineColor,int outlineSize /* = -1 */)
         {
-            if (outlineSize > 0 || _currLabelEffect == LabelEffect::OUTLINE)
+            if (outlineSize > 0 || currLabelEffect_ == LabelEffect::OUTLINE)
             {
-               if (_effectColorF != outlineColor || _outlineSize != outlineSize)
+               if (effectColorF_ != outlineColor || outlineSize_ != outlineSize)
                 {
-                    _effectColorF.red = outlineColor.red / 255.f;
-                    _effectColorF.green = outlineColor.green / 255.f;
-                    _effectColorF.blue = outlineColor.blue / 255.f;
-                    _effectColorF.alpha = outlineColor.alpha / 255.f;
-                    _outlineSize = outlineSize;
-                    _currLabelEffect = LabelEffect::OUTLINE;
-                    _contentDirty = true;
+                    effectColorF_.red = outlineColor.red / 255.f;
+                    effectColorF_.green = outlineColor.green / 255.f;
+                    effectColorF_.blue = outlineColor.blue / 255.f;
+                    effectColorF_.alpha = outlineColor.alpha / 255.f;
+                    outlineSize_ = outlineSize;
+                    currLabelEffect_ = LabelEffect::OUTLINE;
+                    contentDirty_ = true;
                 }
             }
         }
 
         void Label::enableShadow(const Color4B& shadowColor /* = Color4B::BLACK */,const MATH::Sizef &offset /* = Size(2 ,-2)*/)
         {
-            _shadowEnabled = true;
-            _shadowDirty = true;
+            shadowEnabled_ = true;
+            shadowDirty_ = true;
 
-            _shadowOffset.width = offset.width;
-            _shadowOffset.height = offset.height;
+            shadowOffset_.width = offset.width;
+            shadowOffset_.height = offset.height;
             //TODO: support blur for shadow
 
-            _shadowColor3B.red = shadowColor.red;
-            _shadowColor3B.green = shadowColor.green;
-            _shadowColor3B.blue = shadowColor.blue;
-            _shadowOpacity = shadowColor.alpha;
+            shadowColor3B_.red = shadowColor.red;
+            shadowColor3B_.green = shadowColor.green;
+            shadowColor3B_.blue = shadowColor.blue;
+            shadowOpacity_ = shadowColor.alpha;
 
-            if (!_systemFontDirty && !_contentDirty && _textSprite)
+            if (!systemFontDirty_ && !contentDirty_ && textSprite_)
             {
                 // TODO
             }
 
-            _shadowColor4F.red = shadowColor.red / 255.0f;
-            _shadowColor4F.green = shadowColor.green / 255.0f;
-            _shadowColor4F.blue = shadowColor.blue / 255.0f;
-            _shadowColor4F.alpha = shadowColor.alpha / 255.0f;
+            shadowColor4F_.red = shadowColor.red / 255.0f;
+            shadowColor4F_.green = shadowColor.green / 255.0f;
+            shadowColor4F_.blue = shadowColor.blue / 255.0f;
+            shadowColor4F_.alpha = shadowColor.alpha / 255.0f;
         }
 
         void Label::disableEffect()
@@ -779,23 +779,23 @@ namespace GRAPH
             case LabelEffect::NORMAL:
                 break;
             case LabelEffect::OUTLINE:
-                if (_currLabelEffect == LabelEffect::OUTLINE)
+                if (currLabelEffect_ == LabelEffect::OUTLINE)
                 {
-                    _currLabelEffect = LabelEffect::NORMAL;
-                    _contentDirty = true;
+                    currLabelEffect_ = LabelEffect::NORMAL;
+                    contentDirty_ = true;
                 }
                 break;
             case LabelEffect::SHADOW:
-                if (_shadowEnabled)
+                if (shadowEnabled_)
                 {
-                    _shadowEnabled = false;
-                    SAFE_RELEASE_NULL(_shadowNode);
+                    shadowEnabled_ = false;
+                    SAFE_RELEASE_NULL(shadowNode_);
                 }
                 break;
             case LabelEffect::GLOW:
-                if (_currLabelEffect == LabelEffect::GLOW)
+                if (currLabelEffect_ == LabelEffect::GLOW)
                 {
-                    _currLabelEffect = LabelEffect::NORMAL;
+                    currLabelEffect_ = LabelEffect::NORMAL;
                     updateShaderProgram();
                 }
                 break;
@@ -815,70 +815,70 @@ namespace GRAPH
         {
             Node::setCameraMask(mask, applyChildren);
 
-            if (_textSprite)
+            if (textSprite_)
             {
-                _textSprite->setCameraMask(mask, applyChildren);
+                textSprite_->setCameraMask(mask, applyChildren);
             }
-            if (_shadowNode)
+            if (shadowNode_)
             {
-                _shadowNode->setCameraMask(mask, applyChildren);
+                shadowNode_->setCameraMask(mask, applyChildren);
             }
         }
 
         void Label::updateContent() {
-            if (_systemFontDirty) {
-                if (_fontAtlas) {
-                    _batchNodes.clear();
-                    FontAtlasCache::releaseFontAtlas(_fontAtlas);
-                    _fontAtlas = nullptr;
+            if (systemFontDirty_) {
+                if (fontAtlas_) {
+                    batchNodes_.clear();
+                    FontAtlasCache::releaseFontAtlas(fontAtlas_);
+                    fontAtlas_ = nullptr;
                 }
 
-                _systemFontDirty = false;
+                systemFontDirty_ = false;
             }
 
-            SAFE_RELEASE_NULL(_textSprite);
-            SAFE_RELEASE_NULL(_shadowNode);
+            SAFE_RELEASE_NULL(textSprite_);
+            SAFE_RELEASE_NULL(shadowNode_);
 
-            if (_fontAtlas) {
+            if (fontAtlas_) {
                 std::u16string utf16String;
-                UTILS::STRING::UTF8ToUTF16(_utf8Text, utf16String);
-                _utf16Text = utf16String;
+                UTILS::STRING::UTF8ToUTF16(utf8Text_, utf16String);
+                utf16Text_ = utf16String;
                 alignText();
             }
             else {
                 auto texture = Unity3DCreator::CreateTexture();
-                texture->initWithString(_utf8Text.c_str(), stringToTextureLoader_, stringtoTextureOwner_);
-                _textSprite = Sprite::createWithTexture(texture);
+                texture->initWithString(utf8Text_.c_str(), stringToTextureLoader_, stringtoTextureOwner_);
+                textSprite_ = Sprite::createWithTexture(texture);
                 //set camera mask using label's camera mask, because _textSprite may be null when setting camera mask to label
-                _textSprite->setCameraMask(getCameraMask());
-                _textSprite->setGlobalZOrder(getGlobalZOrder());
-                _textSprite->setAnchorPoint(MATH::Vec2fBOTTOMLEFT);
-                this->setContentSize(_textSprite->getContentSize());
+                textSprite_->setCameraMask(getCameraMask());
+                textSprite_->setGlobalZOrder(getGlobalZOrder());
+                textSprite_->setAnchorPoint(MATH::Vec2fBOTTOMLEFT);
+                this->setContentSize(textSprite_->getContentSize());
                 texture->release();
-                if (_blendFuncDirty) {
-                    _textSprite->setBlendFunc(_blendFunc);
+                if (blendFuncDirty_) {
+                    textSprite_->setBlendFunc(blendFunc_);
                 }
 
-                _textSprite->retain();
-                _textSprite->updateDisplayedColor(displayedColor_);
-                _textSprite->updateDisplayedOpacity(displayedOpacity_);
+                textSprite_->retain();
+                textSprite_->updateDisplayedColor(displayedColor_);
+                textSprite_->updateDisplayedOpacity(displayedOpacity_);
             }
-            _contentDirty = false;
+            contentDirty_ = false;
         }
 
         void Label::onDrawShadow(Unity3DShaderSet* u3dShader)
         {
             Color3B oldColor = realColor_;
             GLubyte oldOPacity = displayedOpacity_;
-            displayedOpacity_ = _shadowOpacity;
-            setColor(_shadowColor3B);
+            displayedOpacity_ = shadowOpacity_;
+            setColor(shadowColor3B_);
 
-            u3dShader->setUniformsForBuiltins(_shadowTransform);
-            for (auto&& it : _letters)
+            u3dShader->setUniformsForBuiltins(shadowTransform_);
+            for (auto&& it : letters_)
             {
                 it.second->updateTransform();
             }
-            for (auto&& batchNode : _batchNodes)
+            for (auto&& batchNode : batchNodes_)
             {
                 batchNode->getTextureAtlas()->drawQuads();
             }
@@ -891,20 +891,20 @@ namespace GRAPH
         {
             auto u3dShader = getU3DShader();
             u3dShader->apply();
-            Unity3DGLState::OpenGLState().blendFunc.set(_blendFunc.src, _blendFunc.dst);
+            Unity3DGLState::OpenGLState().blendFunc.set(blendFunc_.src, blendFunc_.dst);
 
-            if (_shadowEnabled)
+            if (shadowEnabled_)
             {
                 onDrawShadow(u3dShader);
             }
 
             u3dShader->setUniformsForBuiltins(transform);
-            for (auto&& it : _letters)
+            for (auto&& it : letters_)
             {
                 it.second->updateTransform();
             }
 
-            for (auto&& batchNode : _batchNodes)
+            for (auto&& batchNode : batchNodes_)
             {
                 batchNode->getTextureAtlas()->drawQuads();
             }
@@ -912,53 +912,53 @@ namespace GRAPH
 
         void Label::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags)
         {
-            if (_batchNodes.empty() || _lengthOfString <= 0)
+            if (batchNodes_.empty() || lengthOfString_ <= 0)
             {
                 return;
             }
             // Don't do calculate the culling if the transform was not updated
             bool transformUpdated = flags & FLAGS_TRANSFORM_DIRTY;
-                _insideBounds = transformUpdated ? Director::getInstance().checkVisibility(transform, contentSize_) : _insideBounds;
+                insideBounds_ = transformUpdated ? Director::getInstance().checkVisibility(transform, contentSize_) : insideBounds_;
 
-            if (_insideBounds)
+            if (insideBounds_)
             {
-                _customCommand.init(globalZOrder_, transform, flags);
-                _customCommand.func = std::bind(&Label::onDraw, this, transform, transformUpdated);
+                customCommand_.init(globalZOrder_, transform, flags);
+                customCommand_.func = std::bind(&Label::onDraw, this, transform, transformUpdated);
 
-                renderer->addCommand(&_customCommand);
+                renderer->addCommand(&customCommand_);
             }
         }
 
         void Label::visit(Renderer *renderer, const MATH::Matrix4 &parentTransform, uint32_t parentFlags)
         {
-            if (! visible_ || (_utf8Text.empty() && children_.empty()) )
+            if (! visible_ || (utf8Text_.empty() && children_.empty()) )
             {
                 return;
             }
 
-            if (_systemFontDirty || _contentDirty)
+            if (systemFontDirty_ || contentDirty_)
             {
                 updateContent();
             }
 
             uint32_t flags = processParentFlags(parentTransform, parentFlags);
 
-            if (!_utf8Text.empty() && _shadowEnabled && (_shadowDirty || (flags & FLAGS_DIRTY_MASK)))
+            if (!utf8Text_.empty() && shadowEnabled_ && (shadowDirty_ || (flags & FLAGS_DIRTY_MASK)))
             {
-                position_.x += _shadowOffset.width;
-                position_.y += _shadowOffset.height;
+                position_.x += shadowOffset_.width;
+                position_.y += shadowOffset_.height;
                 transformDirty_ = inverseDirty_ = true;
 
-                _shadowTransform = transform(parentTransform);
+                shadowTransform_ = transform(parentTransform);
 
-                position_.x -= _shadowOffset.width;
-                position_.y -= _shadowOffset.height;
+                position_.x -= shadowOffset_.width;
+                position_.y -= shadowOffset_.height;
                 transformDirty_ = inverseDirty_ = true;
 
-                _shadowDirty = false;
+                shadowDirty_ = false;
             }
 
-            if (children_.empty() && !_textSprite)
+            if (children_.empty() && !textSprite_)
             {
                 return;
             }
@@ -1003,15 +1003,15 @@ namespace GRAPH
 
         void Label::drawSelf(Renderer* renderer, uint32_t flags)
         {
-            if (_textSprite)
+            if (textSprite_)
             {
-                if (_shadowNode)
+                if (shadowNode_)
                 {
-                    _shadowNode->visit(renderer, modelViewTransform_, flags);
+                    shadowNode_->visit(renderer, modelViewTransform_, flags);
                 }
-                _textSprite->visit(renderer, modelViewTransform_, flags);
+                textSprite_->visit(renderer, modelViewTransform_, flags);
             }
-            else if (!_utf8Text.empty())
+            else if (!utf8Text_.empty())
             {
                 draw(renderer, modelViewTransform_, flags);
             }
@@ -1022,33 +1022,33 @@ namespace GRAPH
             Sprite* letter = nullptr;
             do
             {
-                if (_systemFontDirty)
+                if (systemFontDirty_)
                 {
                     break;
                 }
 
-                auto contentDirty = _contentDirty;
+                auto contentDirty = contentDirty_;
                 if (contentDirty)
                 {
                     updateContent();
                 }
 
-                if (_textSprite == nullptr && letterIndex < _lengthOfString)
+                if (textSprite_ == nullptr && letterIndex < lengthOfString_)
                 {
-                    const auto &letterInfo = _lettersInfo[letterIndex];
+                    const auto &letterInfo = lettersInfo_[letterIndex];
                     if (!letterInfo.valid)
                     {
                         break;
                     }
 
-                    if (_letters.find(letterIndex) != _letters.end())
+                    if (letters_.find(letterIndex) != letters_.end())
                     {
-                        letter = _letters[letterIndex];
+                        letter = letters_[letterIndex];
                     }
 
                     if (letter == nullptr)
                     {
-                        auto& letterDef = _fontAtlas->letterDefinitions_[letterInfo.utf16Char];
+                        auto& letterDef = fontAtlas_->letterDefinitions_[letterInfo.utf16Char];
                         auto textureID = letterDef.textureID;
                         MATH::Rectf uvRect;
                         uvRect.size.height = letterDef.height;
@@ -1062,17 +1062,17 @@ namespace GRAPH
                         }
                         else
                         {
-                            letter = LabelLetter::createWithTexture(_fontAtlas->getTexture(textureID), uvRect);
-                            letter->setTextureAtlas(_batchNodes.at(textureID)->getTextureAtlas());
+                            letter = LabelLetter::createWithTexture(fontAtlas_->getTexture(textureID), uvRect);
+                            letter->setTextureAtlas(batchNodes_.at(textureID)->getTextureAtlas());
                             letter->setAtlasIndex(letterInfo.atlasIndex);
-                            auto px = letterInfo.positionX + uvRect.size.width / 2 + _linesOffsetX[letterInfo.lineIndex];
-                            auto py = letterInfo.positionY - uvRect.size.height / 2 + _letterOffsetY;
+                            auto px = letterInfo.positionX + uvRect.size.width / 2 + linesOffsetX_[letterInfo.lineIndex];
+                            auto py = letterInfo.positionY - uvRect.size.height / 2 + letterOffsetY_;
                             letter->setPosition(px,py);
                             letter->setOpacity(realOpacity_);
                         }
 
                         addChild(letter);
-                        _letters[letterIndex] = letter;
+                        letters_[letterIndex] = letter;
                     }
                 }
             } while (false);
@@ -1082,76 +1082,76 @@ namespace GRAPH
 
         void Label::setLineHeight(float height)
         {
-            if (_lineHeight != height)
+            if (lineHeight_ != height)
             {
-                _lineHeight = height;
-                _contentDirty = true;
+                lineHeight_ = height;
+                contentDirty_ = true;
             }
         }
 
         float Label::getLineHeight() const
         {
-            return _textSprite ? 0.0f : _lineHeight;
+            return textSprite_ ? 0.0f : lineHeight_;
         }
 
         void Label::setAdditionalKerning(float space)
         {
-            if (_additionalKerning != space)
+            if (additionalKerning_ != space)
             {
-                _additionalKerning = space;
-                _contentDirty = true;
+                additionalKerning_ = space;
+                contentDirty_ = true;
             }
         }
 
         float Label::getAdditionalKerning() const
         {
-            return _additionalKerning;
+            return additionalKerning_;
         }
 
         void Label::computeStringNumLines()
         {
             int quantityOfLines = 1;
 
-            if (_utf16Text.empty())
+            if (utf16Text_.empty())
             {
-                _numberOfLines = 0;
+                numberOfLines_ = 0;
                 return;
             }
 
             // count number of lines
-            uint64 stringLen = _utf16Text.length();
+            uint64 stringLen = utf16Text_.length();
             for (uint64 i = 0; i < stringLen - 1; ++i)
             {
-                if (_utf16Text[i] == '\n')
+                if (utf16Text_[i] == '\n')
                 {
                     quantityOfLines++;
                 }
             }
 
-            _numberOfLines = quantityOfLines;
+            numberOfLines_ = quantityOfLines;
         }
 
         int Label::getStringNumLines()
         {
-            if (_contentDirty)
+            if (contentDirty_)
             {
                 updateContent();
             }
 
-            return _numberOfLines;
+            return numberOfLines_;
         }
 
         int Label::getStringLength()
         {
-            _lengthOfString = static_cast<int>(_utf16Text.length());
-            return _lengthOfString;
+            lengthOfString_ = static_cast<int>(utf16Text_.length());
+            return lengthOfString_;
         }
 
         void Label::setOpacityModifyRGB(bool isOpacityModifyRGB)
         {
-            if (isOpacityModifyRGB != _isOpacityModifyRGB)
+            if (isOpacityModifyRGB != isOpacityModifyRGB_)
             {
-                _isOpacityModifyRGB = isOpacityModifyRGB;
+                isOpacityModifyRGB_ = isOpacityModifyRGB;
                 updateColor();
             }
         }
@@ -1160,16 +1160,16 @@ namespace GRAPH
         {
             Node::updateDisplayedColor(parentColor);
 
-            if (_textSprite)
+            if (textSprite_)
             {
-                _textSprite->updateDisplayedColor(displayedColor_);
-                if (_shadowNode)
+                textSprite_->updateDisplayedColor(displayedColor_);
+                if (shadowNode_)
                 {
-                    _shadowNode->updateDisplayedColor(displayedColor_);
+                    shadowNode_->updateDisplayedColor(displayedColor_);
                 }
             }
 
-            for (auto&& it : _letters)
+            for (auto&& it : letters_)
             {
                 it.second->updateDisplayedColor(displayedColor_);;
             }
@@ -1179,16 +1179,16 @@ namespace GRAPH
         {
             Node::updateDisplayedOpacity(parentOpacity);
 
-            if (_textSprite)
+            if (textSprite_)
             {
-                _textSprite->updateDisplayedOpacity(displayedOpacity_);
-                if (_shadowNode)
+                textSprite_->updateDisplayedOpacity(displayedOpacity_);
+                if (shadowNode_)
                 {
-                    _shadowNode->updateDisplayedOpacity(displayedOpacity_);
+                    shadowNode_->updateDisplayedOpacity(displayedOpacity_);
                 }
             }
 
-            for (auto&& it : _letters)
+            for (auto&& it : letters_)
             {
                 it.second->updateDisplayedOpacity(displayedOpacity_);;
             }
@@ -1196,16 +1196,16 @@ namespace GRAPH
 
         void Label::setTextColor(const Color4B &color)
         {
-            _textColor = color;
-            _textColorF.red = _textColor.red / 255.0f;
-            _textColorF.green = _textColor.green / 255.0f;
-            _textColorF.blue = _textColor.blue / 255.0f;
-            _textColorF.alpha = _textColor.alpha / 255.0f;
+            textColor_ = color;
+            textColorF_.red = textColor_.red / 255.0f;
+            textColorF_.green = textColor_.green / 255.0f;
+            textColorF_.blue = textColor_.blue / 255.0f;
+            textColorF_.alpha = textColor_.alpha / 255.0f;
         }
 
         void Label::updateColor()
         {
-            if (_batchNodes.empty())
+            if (batchNodes_.empty())
             {
                 return;
             }
@@ -1213,7 +1213,7 @@ namespace GRAPH
             Color4B color4( displayedColor_.red, displayedColor_.green, displayedColor_.blue, displayedOpacity_ );
 
             // special opacity for premultiplied textures
-            if (_isOpacityModifyRGB)
+            if (isOpacityModifyRGB_)
             {
                 color4.red *= displayedOpacity_/255.0f;
                 color4.green *= displayedOpacity_/255.0f;
@@ -1222,7 +1222,7 @@ namespace GRAPH
 
             TextureAtlas* textureAtlas;
             V3F_C4B_T2F_Quad *quads;
-            for (auto&& batchNode:_batchNodes)
+            for (auto&& batchNode:batchNodes_)
             {
                 textureAtlas = batchNode->getTextureAtlas();
                 quads = textureAtlas->getQuads();
@@ -1241,7 +1241,7 @@ namespace GRAPH
 
         const MATH::Sizef& Label::getContentSize() const
         {
-            if (_systemFontDirty || _contentDirty)
+            if (systemFontDirty_ || contentDirty_)
             {
                 const_cast<Label*>(this)->updateContent();
             }
@@ -1257,14 +1257,14 @@ namespace GRAPH
 
         void Label::setBlendFunc(const BlendFunc &blendFunc)
         {
-            _blendFunc = blendFunc;
-            _blendFuncDirty = true;
-            if (_textSprite)
+            blendFunc_ = blendFunc;
+            blendFuncDirty_ = true;
+            if (textSprite_)
             {
-                _textSprite->setBlendFunc(blendFunc);
-                if (_shadowNode)
+                textSprite_->setBlendFunc(blendFunc);
+                if (shadowNode_)
                 {
-                    _shadowNode->setBlendFunc(blendFunc);
+                    shadowNode_->setBlendFunc(blendFunc);
                 }
             }
         }
@@ -1272,17 +1272,17 @@ namespace GRAPH
         void Label::removeAllChildrenWithCleanup(bool cleanup)
         {
             Node::removeAllChildrenWithCleanup(cleanup);
-            _letters.clear();
+            letters_.clear();
         }
 
         void Label::removeChild(Node* child, bool cleanup /* = true */)
         {
             Node::removeChild(child, cleanup);
-            for (auto&& it : _letters)
+            for (auto&& it : letters_)
             {
                 if (it.second == child)
                 {
-                    _letters.erase(it.first);
+                    letters_.erase(it.first);
                     break;
                 }
             }
@@ -1291,12 +1291,12 @@ namespace GRAPH
         void Label::setGlobalZOrder(float globalZOrder)
         {
             Node::setGlobalZOrder(globalZOrder);
-            if (_textSprite)
+            if (textSprite_)
             {
-                _textSprite->setGlobalZOrder(globalZOrder);
-                if (_shadowNode)
+                textSprite_->setGlobalZOrder(globalZOrder);
+                if (shadowNode_)
                 {
-                    _shadowNode->setGlobalZOrder(globalZOrder);
+                    shadowNode_->setGlobalZOrder(globalZOrder);
                 }
             }
         }

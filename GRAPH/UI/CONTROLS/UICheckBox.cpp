@@ -11,28 +11,28 @@ namespace GRAPH
         static const int FRONTCROSSDISABLED_RENDERER_Z = (-1);
 
         AbstractCheckButton::AbstractCheckButton():
-        _backGroundBoxRenderer(nullptr),
-        _backGroundSelectedBoxRenderer(nullptr),
-        _frontCrossRenderer(nullptr),
-        _backGroundBoxDisabledRenderer(nullptr),
-        _frontCrossDisabledRenderer(nullptr),
-        _isSelected(true),
-        _isBackgroundSelectedTextureLoaded(false),
-        _isBackgroundDisabledTextureLoaded(false),
-        _isFrontCrossDisabledTextureLoaded(false),
-        _backGroundTexType(TextureResType::LOCAL),
-        _backGroundSelectedTexType(TextureResType::LOCAL),
-        _frontCrossTexType(TextureResType::LOCAL),
-        _backGroundDisabledTexType(TextureResType::LOCAL),
-        _frontCrossDisabledTexType(TextureResType::LOCAL),
-        _zoomScale(0.1f),
-        _backgroundTextureScaleX(1.0),
-        _backgroundTextureScaleY(1.0),
-        _backGroundBoxRendererAdaptDirty(true),
-        _backGroundSelectedBoxRendererAdaptDirty(true),
-        _frontCrossRendererAdaptDirty(true),
-        _backGroundBoxDisabledRendererAdaptDirty(true),
-        _frontCrossDisabledRendererAdaptDirty(true)
+        backGroundBoxRenderer_(nullptr),
+        backGroundSelectedBoxRenderer_(nullptr),
+        frontCrossRenderer_(nullptr),
+        backGroundBoxDisabledRenderer_(nullptr),
+        frontCrossDisabledRenderer_(nullptr),
+        isSelected_(true),
+        isBackgroundSelectedTextureLoaded_(false),
+        isBackgroundDisabledTextureLoaded_(false),
+        isFrontCrossDisabledTextureLoaded_(false),
+        backGroundTexType_(TextureResType::LOCAL),
+        backGroundSelectedTexType_(TextureResType::LOCAL),
+        frontCrossTexType_(TextureResType::LOCAL),
+        backGroundDisabledTexType_(TextureResType::LOCAL),
+        frontCrossDisabledTexType_(TextureResType::LOCAL),
+        zoomScale_(0.1f),
+        backgroundTextureScaleX_(1.0),
+        backgroundTextureScaleY_(1.0),
+        backGroundBoxRendererAdaptDirty_(true),
+        backGroundSelectedBoxRendererAdaptDirty_(true),
+        frontCrossRendererAdaptDirty_(true),
+        backGroundBoxDisabledRendererAdaptDirty_(true),
+        frontCrossDisabledRendererAdaptDirty_(true)
         {
             setTouchEnabled(true);
         }
@@ -75,17 +75,17 @@ namespace GRAPH
 
         void AbstractCheckButton::initRenderer()
         {
-            _backGroundBoxRenderer = Sprite::create();
-            _backGroundSelectedBoxRenderer = Sprite::create();
-            _frontCrossRenderer = Sprite::create();
-            _backGroundBoxDisabledRenderer = Sprite::create();
-            _frontCrossDisabledRenderer = Sprite::create();
+            backGroundBoxRenderer_ = Sprite::create();
+            backGroundSelectedBoxRenderer_ = Sprite::create();
+            frontCrossRenderer_ = Sprite::create();
+            backGroundBoxDisabledRenderer_ = Sprite::create();
+            frontCrossDisabledRenderer_ = Sprite::create();
 
-            addProtectedChild(_backGroundBoxRenderer, BACKGROUNDBOX_RENDERER_Z, -1);
-            addProtectedChild(_backGroundSelectedBoxRenderer, BACKGROUNDSELECTEDBOX_RENDERER_Z, -1);
-            addProtectedChild(_frontCrossRenderer, FRONTCROSS_RENDERER_Z, -1);
-            addProtectedChild(_backGroundBoxDisabledRenderer, BACKGROUNDBOXDISABLED_RENDERER_Z, -1);
-            addProtectedChild(_frontCrossDisabledRenderer, FRONTCROSSDISABLED_RENDERER_Z, -1);
+            addProtectedChild(backGroundBoxRenderer_, BACKGROUNDBOX_RENDERER_Z, -1);
+            addProtectedChild(backGroundSelectedBoxRenderer_, BACKGROUNDSELECTEDBOX_RENDERER_Z, -1);
+            addProtectedChild(frontCrossRenderer_, FRONTCROSS_RENDERER_Z, -1);
+            addProtectedChild(backGroundBoxDisabledRenderer_, BACKGROUNDBOXDISABLED_RENDERER_Z, -1);
+            addProtectedChild(frontCrossDisabledRenderer_, FRONTCROSSDISABLED_RENDERER_Z, -1);
         }
 
         void AbstractCheckButton::loadTextures(const std::string& backGround,
@@ -108,14 +108,14 @@ namespace GRAPH
             {
                 return;
             }
-            _backGroundTexType = texType;
-            switch (_backGroundTexType)
+            backGroundTexType_ = texType;
+            switch (backGroundTexType_)
             {
                 case TextureResType::LOCAL:
-                    _backGroundBoxRenderer->setTexture(backGround);
+                    backGroundBoxRenderer_->setTexture(backGround);
                     break;
                 case TextureResType::PLIST:
-                    _backGroundBoxRenderer->setSpriteFrame(backGround);
+                    backGroundBoxRenderer_->setSpriteFrame(backGround);
                     break;
                 default:
                     break;
@@ -129,13 +129,13 @@ namespace GRAPH
 
             this->updateChildrenDisplayedRGBA();
 
-            updateContentSizeWithTextureSize(_backGroundBoxRenderer->getContentSize());
-            _backGroundBoxRendererAdaptDirty = true;
+            updateContentSizeWithTextureSize(backGroundBoxRenderer_->getContentSize());
+            backGroundBoxRendererAdaptDirty_ = true;
         }
 
         void AbstractCheckButton::loadTextureBackGround(SpriteFrame* spriteFrame)
         {
-            _backGroundBoxRenderer->setSpriteFrame(spriteFrame);
+            backGroundBoxRenderer_->setSpriteFrame(spriteFrame);
             this->setupBackgroundTexture();
         }
 
@@ -146,15 +146,15 @@ namespace GRAPH
                 return;
             }
 
-            _backGroundSelectedTexType = texType;
-            _isBackgroundSelectedTextureLoaded = true;
-            switch (_backGroundSelectedTexType)
+            backGroundSelectedTexType_ = texType;
+            isBackgroundSelectedTextureLoaded_ = true;
+            switch (backGroundSelectedTexType_)
             {
                 case TextureResType::LOCAL:
-                    _backGroundSelectedBoxRenderer->setTexture(backGroundSelected);
+                    backGroundSelectedBoxRenderer_->setTexture(backGroundSelected);
                     break;
                 case TextureResType::PLIST:
-                    _backGroundSelectedBoxRenderer->setSpriteFrame(backGroundSelected);
+                    backGroundSelectedBoxRenderer_->setSpriteFrame(backGroundSelected);
                     break;
                 default:
                     break;
@@ -164,14 +164,14 @@ namespace GRAPH
 
         void AbstractCheckButton::loadTextureBackGroundSelected(SpriteFrame* spriteframe)
         {
-            this->_backGroundSelectedBoxRenderer->setSpriteFrame(spriteframe);
+            this->backGroundSelectedBoxRenderer_->setSpriteFrame(spriteframe);
             this->setupBackgroundSelectedTexture();
         }
 
         void AbstractCheckButton::setupBackgroundSelectedTexture()
         {
             this->updateChildrenDisplayedRGBA();
-            _backGroundSelectedBoxRendererAdaptDirty = true;
+            backGroundSelectedBoxRendererAdaptDirty_ = true;
         }
 
         void AbstractCheckButton::loadTextureFrontCross(const std::string& cross,TextureResType texType)
@@ -180,14 +180,14 @@ namespace GRAPH
             {
                 return;
             }
-            _frontCrossTexType = texType;
-            switch (_frontCrossTexType)
+            frontCrossTexType_ = texType;
+            switch (frontCrossTexType_)
             {
                 case TextureResType::LOCAL:
-                    _frontCrossRenderer->setTexture(cross);
+                    frontCrossRenderer_->setTexture(cross);
                     break;
                 case TextureResType::PLIST:
-                    _frontCrossRenderer->setSpriteFrame(cross);
+                    frontCrossRenderer_->setSpriteFrame(cross);
                     break;
                 default:
                     break;
@@ -197,14 +197,14 @@ namespace GRAPH
 
         void AbstractCheckButton::loadTextureFrontCross(SpriteFrame* spriteFrame)
         {
-            this->_frontCrossRenderer->setSpriteFrame(spriteFrame);
+            this->frontCrossRenderer_->setSpriteFrame(spriteFrame);
             this->setupFrontCrossTexture();
         }
 
         void AbstractCheckButton::setupFrontCrossTexture()
         {
             this->updateChildrenDisplayedRGBA();
-            _frontCrossRendererAdaptDirty = true;
+            frontCrossRendererAdaptDirty_ = true;
         }
 
         void AbstractCheckButton::loadTextureBackGroundDisabled(const std::string& backGroundDisabled,TextureResType texType)
@@ -213,15 +213,15 @@ namespace GRAPH
             {
                 return;
             }
-            _backGroundDisabledTexType = texType;
-            _isBackgroundDisabledTextureLoaded = true;
-            switch (_backGroundDisabledTexType)
+            backGroundDisabledTexType_ = texType;
+            isBackgroundDisabledTextureLoaded_ = true;
+            switch (backGroundDisabledTexType_)
             {
                 case TextureResType::LOCAL:
-                    _backGroundBoxDisabledRenderer->setTexture(backGroundDisabled);
+                    backGroundBoxDisabledRenderer_->setTexture(backGroundDisabled);
                     break;
                 case TextureResType::PLIST:
-                    _backGroundBoxDisabledRenderer->setSpriteFrame(backGroundDisabled);
+                    backGroundBoxDisabledRenderer_->setSpriteFrame(backGroundDisabled);
                     break;
                 default:
                     break;
@@ -231,7 +231,7 @@ namespace GRAPH
 
         void AbstractCheckButton::loadTextureBackGroundDisabled(SpriteFrame* spriteframe)
         {
-            this->_backGroundBoxDisabledRenderer->setSpriteFrame(spriteframe);
+            this->backGroundBoxDisabledRenderer_->setSpriteFrame(spriteframe);
             this->setupBackgroundDisable();
         }
 
@@ -239,7 +239,7 @@ namespace GRAPH
         {
             this->updateChildrenDisplayedRGBA();
 
-            _backGroundBoxDisabledRendererAdaptDirty = true;
+            backGroundBoxDisabledRendererAdaptDirty_ = true;
         }
 
         void AbstractCheckButton::loadTextureFrontCrossDisabled(const std::string& frontCrossDisabled,TextureResType texType)
@@ -248,15 +248,15 @@ namespace GRAPH
             {
                 return;
             }
-            _frontCrossDisabledTexType = texType;
-            _isFrontCrossDisabledTextureLoaded = true;
-            switch (_frontCrossDisabledTexType)
+            frontCrossDisabledTexType_ = texType;
+            isFrontCrossDisabledTextureLoaded_ = true;
+            switch (frontCrossDisabledTexType_)
             {
                 case TextureResType::LOCAL:
-                    _frontCrossDisabledRenderer->setTexture(frontCrossDisabled);
+                    frontCrossDisabledRenderer_->setTexture(frontCrossDisabled);
                     break;
                 case TextureResType::PLIST:
-                    _frontCrossDisabledRenderer->setSpriteFrame(frontCrossDisabled);
+                    frontCrossDisabledRenderer_->setSpriteFrame(frontCrossDisabled);
                     break;
                 default:
                     break;
@@ -267,271 +267,271 @@ namespace GRAPH
 
         void AbstractCheckButton::loadTextureFrontCrossDisabled(SpriteFrame* spriteframe)
         {
-            this->_frontCrossDisabledRenderer->setSpriteFrame(spriteframe);
+            this->frontCrossDisabledRenderer_->setSpriteFrame(spriteframe);
             this->setupFrontCrossDisableTexture();
         }
 
         void AbstractCheckButton::setupFrontCrossDisableTexture()
         {
             this->updateChildrenDisplayedRGBA();
-            _frontCrossDisabledRendererAdaptDirty = true;
+            frontCrossDisabledRendererAdaptDirty_ = true;
         }
 
         void AbstractCheckButton::onPressStateChangedToNormal()
         {
-            _backGroundBoxRenderer->setVisible(true);
-            _backGroundSelectedBoxRenderer->setVisible(false);
-            _backGroundBoxDisabledRenderer->setVisible(false);
-            _frontCrossDisabledRenderer->setVisible(false);
+            backGroundBoxRenderer_->setVisible(true);
+            backGroundSelectedBoxRenderer_->setVisible(false);
+            backGroundBoxDisabledRenderer_->setVisible(false);
+            frontCrossDisabledRenderer_->setVisible(false);
 
-            _backGroundBoxRenderer->setU3DShaderState(this->getNormalShaderState());
-            _frontCrossRenderer->setU3DShaderState(this->getNormalShaderState());
-
-
-            _backGroundBoxRenderer->setScale(_backgroundTextureScaleX, _backgroundTextureScaleY);
-            _frontCrossRenderer->setScale(_backgroundTextureScaleX, _backgroundTextureScaleY);
+            backGroundBoxRenderer_->setU3DShaderState(this->getNormalShaderState());
+            frontCrossRenderer_->setU3DShaderState(this->getNormalShaderState());
 
 
-            if (_isSelected)
+            backGroundBoxRenderer_->setScale(backgroundTextureScaleX_, backgroundTextureScaleY_);
+            frontCrossRenderer_->setScale(backgroundTextureScaleX_, backgroundTextureScaleY_);
+
+
+            if (isSelected_)
             {
-                _frontCrossRenderer->setVisible(true);
-                _frontCrossRendererAdaptDirty = true;
+                frontCrossRenderer_->setVisible(true);
+                frontCrossRendererAdaptDirty_ = true;
             }
         }
 
         void AbstractCheckButton::onPressStateChangedToPressed()
         {
-            _backGroundBoxRenderer->setU3DShaderState(this->getNormalShaderState());
-            _frontCrossRenderer->setU3DShaderState(this->getNormalShaderState());
+            backGroundBoxRenderer_->setU3DShaderState(this->getNormalShaderState());
+            frontCrossRenderer_->setU3DShaderState(this->getNormalShaderState());
 
-            if (!_isBackgroundSelectedTextureLoaded)
+            if (!isBackgroundSelectedTextureLoaded_)
             {
-                _backGroundBoxRenderer->setScale(_backgroundTextureScaleX + _zoomScale,
-                                                 _backgroundTextureScaleY + _zoomScale);
-                _frontCrossRenderer->setScale(_backgroundTextureScaleX + _zoomScale,
-                                              _backgroundTextureScaleY + _zoomScale);
+                backGroundBoxRenderer_->setScale(backgroundTextureScaleX_ + zoomScale_,
+                                                 backgroundTextureScaleY_ + zoomScale_);
+                frontCrossRenderer_->setScale(backgroundTextureScaleX_ + zoomScale_,
+                                              backgroundTextureScaleY_ + zoomScale_);
             }
             else
             {
-                _backGroundBoxRenderer->setVisible(false);
-                _backGroundSelectedBoxRenderer->setVisible(true);
-                _backGroundBoxDisabledRenderer->setVisible(false);
-                _frontCrossDisabledRenderer->setVisible(false);
+                backGroundBoxRenderer_->setVisible(false);
+                backGroundSelectedBoxRenderer_->setVisible(true);
+                backGroundBoxDisabledRenderer_->setVisible(false);
+                frontCrossDisabledRenderer_->setVisible(false);
             }
         }
 
         void AbstractCheckButton::onPressStateChangedToDisabled()
         {
-            if (!_isBackgroundDisabledTextureLoaded
-                || !_isFrontCrossDisabledTextureLoaded)
+            if (!isBackgroundDisabledTextureLoaded_
+                || !isFrontCrossDisabledTextureLoaded_)
             {
-                _backGroundBoxRenderer->setU3DShaderState(this->getGrayShaderState());
-                _frontCrossRenderer->setU3DShaderState(this->getGrayShaderState());
+                backGroundBoxRenderer_->setU3DShaderState(this->getGrayShaderState());
+                frontCrossRenderer_->setU3DShaderState(this->getGrayShaderState());
             }
             else
             {
-                _backGroundBoxRenderer->setVisible(false);
-                _backGroundBoxDisabledRenderer->setVisible(true);
+                backGroundBoxRenderer_->setVisible(false);
+                backGroundBoxDisabledRenderer_->setVisible(true);
             }
 
-            _backGroundSelectedBoxRenderer->setVisible(false);
-            _frontCrossRenderer->setVisible(false);
-            _backGroundBoxRenderer->setScale(_backgroundTextureScaleX, _backgroundTextureScaleY);
-            _frontCrossRenderer->setScale(_backgroundTextureScaleX, _backgroundTextureScaleY);
+            backGroundSelectedBoxRenderer_->setVisible(false);
+            frontCrossRenderer_->setVisible(false);
+            backGroundBoxRenderer_->setScale(backgroundTextureScaleX_, backgroundTextureScaleY_);
+            frontCrossRenderer_->setScale(backgroundTextureScaleX_, backgroundTextureScaleY_);
 
-            if (_isSelected)
+            if (isSelected_)
             {
-                _frontCrossDisabledRenderer->setVisible(true);
-                _frontCrossDisabledRendererAdaptDirty = true;
+                frontCrossDisabledRenderer_->setVisible(true);
+                frontCrossDisabledRendererAdaptDirty_ = true;
             }
         }
 
         void AbstractCheckButton::setZoomScale(float scale)
         {
-            _zoomScale = scale;
+            zoomScale_ = scale;
         }
 
         float AbstractCheckButton::getZoomScale()const
         {
-            return _zoomScale;
+            return zoomScale_;
         }
 
         void AbstractCheckButton::setSelected(bool selected)
         {
-            if (selected == _isSelected)
+            if (selected == isSelected_)
             {
                 return;
             }
-            _isSelected = selected;
-            _frontCrossRenderer->setVisible(_isSelected);
+            isSelected_ = selected;
+            frontCrossRenderer_->setVisible(isSelected_);
         }
 
         bool AbstractCheckButton::isSelected()const
         {
-            return _isSelected;
+            return isSelected_;
         }
 
         void AbstractCheckButton::onSizeChanged()
         {
             Widget::onSizeChanged();
-            _backGroundBoxRendererAdaptDirty = true;
-            _backGroundSelectedBoxRendererAdaptDirty = true;
-            _frontCrossRendererAdaptDirty = true;
-            _backGroundBoxDisabledRendererAdaptDirty = true;
-            _frontCrossDisabledRendererAdaptDirty = true;
+            backGroundBoxRendererAdaptDirty_ = true;
+            backGroundSelectedBoxRendererAdaptDirty_ = true;
+            frontCrossRendererAdaptDirty_ = true;
+            backGroundBoxDisabledRendererAdaptDirty_ = true;
+            frontCrossDisabledRendererAdaptDirty_ = true;
         }
 
         void AbstractCheckButton::adaptRenderers()
         {
-            if (_backGroundBoxRendererAdaptDirty)
+            if (backGroundBoxRendererAdaptDirty_)
             {
                 backGroundTextureScaleChangedWithSize();
-                _backGroundBoxRendererAdaptDirty = false;
+                backGroundBoxRendererAdaptDirty_ = false;
             }
-            if (_backGroundSelectedBoxRendererAdaptDirty)
+            if (backGroundSelectedBoxRendererAdaptDirty_)
             {
                 backGroundSelectedTextureScaleChangedWithSize();
-                _backGroundSelectedBoxRendererAdaptDirty = false;
+                backGroundSelectedBoxRendererAdaptDirty_ = false;
             }
-            if (_frontCrossRendererAdaptDirty)
+            if (frontCrossRendererAdaptDirty_)
             {
                 frontCrossTextureScaleChangedWithSize();
-                _frontCrossRendererAdaptDirty = false;
+                frontCrossRendererAdaptDirty_ = false;
             }
-            if (_backGroundBoxDisabledRendererAdaptDirty)
+            if (backGroundBoxDisabledRendererAdaptDirty_)
             {
                 backGroundDisabledTextureScaleChangedWithSize();
-                _backGroundBoxDisabledRendererAdaptDirty = false;
+                backGroundBoxDisabledRendererAdaptDirty_ = false;
             }
-            if (_frontCrossDisabledRendererAdaptDirty)
+            if (frontCrossDisabledRendererAdaptDirty_)
             {
                 frontCrossDisabledTextureScaleChangedWithSize();
-                _frontCrossDisabledRendererAdaptDirty = false;
+                frontCrossDisabledRendererAdaptDirty_ = false;
             }
         }
 
         MATH::Sizef AbstractCheckButton::getVirtualRendererSize() const
         {
-            return _backGroundBoxRenderer->getContentSize();
+            return backGroundBoxRenderer_->getContentSize();
         }
 
         Node* AbstractCheckButton::getVirtualRenderer()
         {
-            return _backGroundBoxRenderer;
+            return backGroundBoxRenderer_;
         }
 
         void AbstractCheckButton::backGroundTextureScaleChangedWithSize()
         {
             if (ignoreSize_)
             {
-                _backGroundBoxRenderer->setScale(1.0f);
-                _backgroundTextureScaleX = _backgroundTextureScaleY = 1.0f;
+                backGroundBoxRenderer_->setScale(1.0f);
+                backgroundTextureScaleX_ = backgroundTextureScaleY_ = 1.0f;
             }
             else
             {
-                MATH::Sizef textureSize = _backGroundBoxRenderer->getContentSize();
+                MATH::Sizef textureSize = backGroundBoxRenderer_->getContentSize();
                 if (textureSize.width <= 0.0f || textureSize.height <= 0.0f)
                 {
-                    _backGroundBoxRenderer->setScale(1.0f);
-                    _backgroundTextureScaleX = _backgroundTextureScaleY = 1.0f;
+                    backGroundBoxRenderer_->setScale(1.0f);
+                    backgroundTextureScaleX_ = backgroundTextureScaleY_ = 1.0f;
                     return;
                 }
                 float scaleX = contentSize_.width / textureSize.width;
                 float scaleY = contentSize_.height / textureSize.height;
-                _backgroundTextureScaleX = scaleX;
-                _backgroundTextureScaleY = scaleY;
-                _backGroundBoxRenderer->setScaleX(scaleX);
-                _backGroundBoxRenderer->setScaleY(scaleY);
+                backgroundTextureScaleX_ = scaleX;
+                backgroundTextureScaleY_ = scaleY;
+                backGroundBoxRenderer_->setScaleX(scaleX);
+                backGroundBoxRenderer_->setScaleY(scaleY);
             }
-            _backGroundBoxRenderer->setPosition(contentSize_.width / 2, contentSize_.height / 2);
+            backGroundBoxRenderer_->setPosition(contentSize_.width / 2, contentSize_.height / 2);
         }
 
         void AbstractCheckButton::backGroundSelectedTextureScaleChangedWithSize()
         {
             if (ignoreSize_)
             {
-                _backGroundSelectedBoxRenderer->setScale(1.0f);
+                backGroundSelectedBoxRenderer_->setScale(1.0f);
             }
             else
             {
-                MATH::Sizef textureSize = _backGroundSelectedBoxRenderer->getContentSize();
+                MATH::Sizef textureSize = backGroundSelectedBoxRenderer_->getContentSize();
                 if (textureSize.width <= 0.0f || textureSize.height <= 0.0f)
                 {
-                    _backGroundSelectedBoxRenderer->setScale(1.0f);
+                    backGroundSelectedBoxRenderer_->setScale(1.0f);
                     return;
                 }
                 float scaleX = contentSize_.width / textureSize.width;
                 float scaleY = contentSize_.height / textureSize.height;
-                _backGroundSelectedBoxRenderer->setScaleX(scaleX);
-                _backGroundSelectedBoxRenderer->setScaleY(scaleY);
+                backGroundSelectedBoxRenderer_->setScaleX(scaleX);
+                backGroundSelectedBoxRenderer_->setScaleY(scaleY);
             }
-            _backGroundSelectedBoxRenderer->setPosition(contentSize_.width / 2, contentSize_.height / 2);
+            backGroundSelectedBoxRenderer_->setPosition(contentSize_.width / 2, contentSize_.height / 2);
         }
 
         void AbstractCheckButton::frontCrossTextureScaleChangedWithSize()
         {
             if (ignoreSize_)
             {
-                _frontCrossRenderer->setScale(1.0f);
+                frontCrossRenderer_->setScale(1.0f);
             }
             else
             {
-                MATH::Sizef textureSize = _frontCrossRenderer->getContentSize();
+                MATH::Sizef textureSize = frontCrossRenderer_->getContentSize();
                 if (textureSize.width <= 0.0f || textureSize.height <= 0.0f)
                 {
-                    _frontCrossRenderer->setScale(1.0f);
+                    frontCrossRenderer_->setScale(1.0f);
                     return;
                 }
                 float scaleX = contentSize_.width / textureSize.width;
                 float scaleY = contentSize_.height / textureSize.height;
-                _frontCrossRenderer->setScaleX(scaleX);
-                _frontCrossRenderer->setScaleY(scaleY);
+                frontCrossRenderer_->setScaleX(scaleX);
+                frontCrossRenderer_->setScaleY(scaleY);
             }
-            _frontCrossRenderer->setPosition(contentSize_.width / 2, contentSize_.height / 2);
+            frontCrossRenderer_->setPosition(contentSize_.width / 2, contentSize_.height / 2);
         }
 
         void AbstractCheckButton::backGroundDisabledTextureScaleChangedWithSize()
         {
             if (ignoreSize_)
             {
-                _backGroundBoxDisabledRenderer->setScale(1.0f);
+                backGroundBoxDisabledRenderer_->setScale(1.0f);
             }
             else
             {
-                MATH::Sizef textureSize = _backGroundBoxDisabledRenderer->getContentSize();
+                MATH::Sizef textureSize = backGroundBoxDisabledRenderer_->getContentSize();
                 if (textureSize.width <= 0.0f || textureSize.height <= 0.0f)
                 {
-                    _backGroundBoxDisabledRenderer->setScale(1.0f);
+                    backGroundBoxDisabledRenderer_->setScale(1.0f);
                     return;
                 }
                 float scaleX = contentSize_.width / textureSize.width;
                 float scaleY = contentSize_.height / textureSize.height;
-                _backGroundBoxDisabledRenderer->setScaleX(scaleX);
-                _backGroundBoxDisabledRenderer->setScaleY(scaleY);
+                backGroundBoxDisabledRenderer_->setScaleX(scaleX);
+                backGroundBoxDisabledRenderer_->setScaleY(scaleY);
             }
-            _backGroundBoxDisabledRenderer->setPosition(contentSize_.width / 2, contentSize_.height / 2);
+            backGroundBoxDisabledRenderer_->setPosition(contentSize_.width / 2, contentSize_.height / 2);
         }
 
         void AbstractCheckButton::frontCrossDisabledTextureScaleChangedWithSize()
         {
             if (ignoreSize_)
             {
-                _frontCrossDisabledRenderer->setScale(1.0f);
+                frontCrossDisabledRenderer_->setScale(1.0f);
             }
             else
             {
-                MATH::Sizef textureSize = _frontCrossDisabledRenderer->getContentSize();
+                MATH::Sizef textureSize = frontCrossDisabledRenderer_->getContentSize();
                 if (textureSize.width <= 0.0f || textureSize.height <= 0.0f)
                 {
-                    _frontCrossDisabledRenderer->setScale(1.0f);
+                    frontCrossDisabledRenderer_->setScale(1.0f);
                     return;
                 }
                 float scaleX = contentSize_.width / textureSize.width;
                 float scaleY = contentSize_.height / textureSize.height;
-                _frontCrossDisabledRenderer->setScaleX(scaleX);
-                _frontCrossDisabledRenderer->setScaleY(scaleY);
+                frontCrossDisabledRenderer_->setScaleX(scaleX);
+                frontCrossDisabledRenderer_->setScaleY(scaleY);
             }
-            _frontCrossDisabledRenderer->setPosition(contentSize_.width / 2, contentSize_.height / 2);
+            frontCrossDisabledRenderer_->setPosition(contentSize_.width / 2, contentSize_.height / 2);
         }
 
         void AbstractCheckButton::copySpecialProperties(Widget *widget)
@@ -539,31 +539,31 @@ namespace GRAPH
             AbstractCheckButton* abstractCheckButton = dynamic_cast<AbstractCheckButton*>(widget);
             if (abstractCheckButton)
             {
-                loadTextureBackGround(abstractCheckButton->_backGroundBoxRenderer->getSpriteFrame());
-                loadTextureBackGroundSelected(abstractCheckButton->_backGroundSelectedBoxRenderer->getSpriteFrame());
-                loadTextureFrontCross(abstractCheckButton->_frontCrossRenderer->getSpriteFrame());
-                loadTextureBackGroundDisabled(abstractCheckButton->_backGroundBoxDisabledRenderer->getSpriteFrame());
-                loadTextureFrontCrossDisabled(abstractCheckButton->_frontCrossDisabledRenderer->getSpriteFrame());
-                setSelected(abstractCheckButton->_isSelected);
-                _zoomScale = abstractCheckButton->_zoomScale;
-                _backgroundTextureScaleX = abstractCheckButton->_backgroundTextureScaleX;
-                _backgroundTextureScaleY = abstractCheckButton->_backgroundTextureScaleY;
-                _isBackgroundSelectedTextureLoaded = abstractCheckButton->_isBackgroundSelectedTextureLoaded;
-                _isBackgroundDisabledTextureLoaded = abstractCheckButton->_isBackgroundDisabledTextureLoaded;
-                _isFrontCrossDisabledTextureLoaded = abstractCheckButton->_isFrontCrossDisabledTextureLoaded;
+                loadTextureBackGround(abstractCheckButton->backGroundBoxRenderer_->getSpriteFrame());
+                loadTextureBackGroundSelected(abstractCheckButton->backGroundSelectedBoxRenderer_->getSpriteFrame());
+                loadTextureFrontCross(abstractCheckButton->frontCrossRenderer_->getSpriteFrame());
+                loadTextureBackGroundDisabled(abstractCheckButton->backGroundBoxDisabledRenderer_->getSpriteFrame());
+                loadTextureFrontCrossDisabled(abstractCheckButton->frontCrossDisabledRenderer_->getSpriteFrame());
+                setSelected(abstractCheckButton->isSelected_);
+                zoomScale_ = abstractCheckButton->zoomScale_;
+                backgroundTextureScaleX_ = abstractCheckButton->backgroundTextureScaleX_;
+                backgroundTextureScaleY_ = abstractCheckButton->backgroundTextureScaleY_;
+                isBackgroundSelectedTextureLoaded_ = abstractCheckButton->isBackgroundSelectedTextureLoaded_;
+                isBackgroundDisabledTextureLoaded_ = abstractCheckButton->isBackgroundDisabledTextureLoaded_;
+                isFrontCrossDisabledTextureLoaded_ = abstractCheckButton->isFrontCrossDisabledTextureLoaded_;
             }
         }
         IMPLEMENT_CLASS_GUI_INFO(CheckBox)
 
         CheckBox::CheckBox():
-        _checkBoxEventListener(nullptr),
-        _checkBoxEventSelector(nullptr)
+        checkBoxEventListener_(nullptr),
+        checkBoxEventSelector_(nullptr)
         {
         }
 
         CheckBox::~CheckBox()
         {
-            _checkBoxEventSelector = nullptr;
+            checkBoxEventSelector_ = nullptr;
         }
 
         CheckBox* CheckBox::create()
@@ -623,7 +623,7 @@ namespace GRAPH
         {
             Widget::releaseUpEvent();
 
-            if (_isSelected)
+            if (isSelected_)
             {
                 setSelected(false);
                 dispatchSelectChangedEvent(false);
@@ -641,18 +641,18 @@ namespace GRAPH
             CheckBoxEventType checkBoxEventType = (selected ? CHECKBOX_STATE_EVENT_SELECTED : CHECKBOX_STATE_EVENT_UNSELECTED);
 
             this->retain();
-            if (_checkBoxEventCallback)
+            if (checkBoxEventCallback_)
             {
-                _checkBoxEventCallback(this, eventType);
+                checkBoxEventCallback_(this, eventType);
             }
             if (EventCallback_)
             {
                 EventCallback_(this, static_cast<int>(eventType));
             }
 
-            if (_checkBoxEventListener && _checkBoxEventSelector)
+            if (checkBoxEventListener_ && checkBoxEventSelector_)
             {
-                (_checkBoxEventListener->*_checkBoxEventSelector)(this, checkBoxEventType);
+                (checkBoxEventListener_->*checkBoxEventSelector_)(this, checkBoxEventType);
             }
             this->release();
 
@@ -660,7 +660,7 @@ namespace GRAPH
 
         void CheckBox::addEventListener(const CheckBoxCallback& callback)
         {
-            _checkBoxEventCallback = callback;
+            checkBoxEventCallback_ = callback;
         }
 
         Widget* CheckBox::createCloneInstance()
@@ -674,9 +674,9 @@ namespace GRAPH
             if (checkBox)
             {
                 AbstractCheckButton::copySpecialProperties(widget);
-                _checkBoxEventListener = checkBox->_checkBoxEventListener;
-                _checkBoxEventSelector = checkBox->_checkBoxEventSelector;
-                _checkBoxEventCallback = checkBox->_checkBoxEventCallback;
+                checkBoxEventListener_ = checkBox->checkBoxEventListener_;
+                checkBoxEventSelector_ = checkBox->checkBoxEventSelector_;
+                checkBoxEventCallback_ = checkBox->checkBoxEventCallback_;
                 EventCallback_ = checkBox->EventCallback_;
             }
         }
