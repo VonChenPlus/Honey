@@ -53,7 +53,7 @@ namespace GRAPH
             u3dVertexBuffer_[index]->setData((const uint8 *) vboArray_[index].u1.bufferData, sizeof(V2F_C4B_T2F) * vboArray_[index].u1.bufferCapacity);
 
             std::vector<U3DVertexComponent> vertexFormat = {
-                U3DVertexComponent(SEM_POSITION, FLOATx3, sizeof(V2F_C4B_T2F), offsetof(V2F_C4B_T2F, vertices)),
+                U3DVertexComponent(SEM_POSITION, FLOATx2, sizeof(V2F_C4B_T2F), offsetof(V2F_C4B_T2F, vertices)),
                 U3DVertexComponent(SEM_COLOR0, UNORM8x4, sizeof(V2F_C4B_T2F), offsetof(V2F_C4B_T2F, colors)),
                 U3DVertexComponent(SEM_TEXCOORD0, FLOATx2, sizeof(V2F_C4B_T2F), offsetof(V2F_C4B_T2F, texCoords)) };
             u3dVertexFormat_[index] = Unity3DCreator::CreateVertexFormat(vertexFormat);
