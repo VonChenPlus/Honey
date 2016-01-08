@@ -47,7 +47,7 @@ namespace GRAPH
         setU3DShaderState(ShaderState::getOrCreateWithShaderName(Unity3DShader::SHADER_NAME_POSITION_LENGTH_TEXTURE_COLOR));
 
         for (int index = 0; index < 3; ++index) {
-            ensureCapacity(0, 512);
+            ensureCapacity(index, 512);
 
             u3dVertexBuffer_[index] = Unity3DCreator::CreateBuffer(VERTEXDATA | STREAM);
             u3dVertexBuffer_[index]->setData((const uint8 *) vboArray_[index].u1.bufferData, sizeof(V2F_C4B_T2F) * vboArray_[index].u1.bufferCapacity);
@@ -129,14 +129,14 @@ namespace GRAPH
     }
 
     void DrawNode::drawPoint(const MATH::Vector2f& position, const float pointSize, const Color4F &color) {
-        ensureCapacity(1, 1);
+        ensureCapacity(POINT, 1);
 
         V2F_C4B_T2F *point = (V2F_C4B_T2F*)(vboArray_[1].u1.bufferData + vboArray_[1].u1.bufferCount);
         V2F_C4B_T2F a = {position, Color4B(color), Tex2F(pointSize,0)};
         *point = a;
 
-        vboArray_[1].u1.bufferCount += 1;
-        dirty_[1] = true;
+        vboArray_[POINT].u1.bufferCount += 1;
+        dirty_[POINT] = true;
     }
 
     void DrawNode::drawPoints(const MATH::Vector2f *position, unsigned int numberOfPoints, const Color4F &color) {
@@ -144,7 +144,7 @@ namespace GRAPH
     }
 
     void DrawNode::drawPoints(const MATH::Vector2f *position, unsigned int numberOfPoints, const float pointSize, const Color4F &color) {
-        ensureCapacity(1, numberOfPoints);
+        ensureCapacity(POINT, numberOfPoints);
 
         V2F_C4B_T2F *point = (V2F_C4B_T2F*)(vboArray_[1].u1.bufferData + vboArray_[1].u1.bufferCount);
 
@@ -153,12 +153,12 @@ namespace GRAPH
             *point = a;
         }
 
-        vboArray_[1].u1.bufferCount += numberOfPoints;
-        dirty_[1] = true;
+        vboArray_[POINT].u1.bufferCount += numberOfPoints;
+        dirty_[POINT] = true;
     }
 
     void DrawNode::drawLine(const MATH::Vector2f &origin, const MATH::Vector2f &destination, const Color4F &color) {
-        ensureCapacity(2, 2);
+        ensureCapacity(LINE, 2);
 
         V2F_C4B_T2F *point = (V2F_C4B_T2F*) (vboArray_[2].u1.bufferData + vboArray_[2].u1.bufferCount);
 
@@ -168,8 +168,8 @@ namespace GRAPH
         *point = a;
         *(point+1) = b;
 
-        vboArray_[2].u1.bufferCount += 2;
-        dirty_[2] = true;
+        vboArray_[LINE].u1.bufferCount += 2;
+        dirty_[LINE] = true;
     }
 
     void DrawNode::drawRect(const MATH::Vector2f &origin, const MATH::Vector2f &destination, const Color4F &color) {
@@ -183,11 +183,11 @@ namespace GRAPH
         unsigned int vertext_count;
         if(closePolygon) {
             vertext_count = 2 * numberOfPoints;
-            ensureCapacity(2, vertext_count);
+            ensureCapacity(LINE, vertext_count);
         }
         else {
             vertext_count = 2 * (numberOfPoints - 1);
-            ensureCapacity(2, vertext_count);
+            ensureCapacity(LINE, vertext_count);
         }
 
         V2F_C4B_T2F *point = (V2F_C4B_T2F*) (vboArray_[2].u1.bufferData + vboArray_[2].u1.bufferCount);
@@ -209,7 +209,7 @@ namespace GRAPH
             *(point+1) = b;
         }
 
-        vboArray_[2].u1.bufferCount += vertext_count;
+        vboArray_[LINE].u1.bufferCount += vertext_count;
     }
 
     void DrawNode::drawCircle(const MATH::Vector2f& center, float radius, float angle, unsigned int segments, bool drawLineToCenter, float scaleX, float scaleY, const Color4F &color) {
@@ -283,7 +283,7 @@ namespace GRAPH
 
     void DrawNode::drawDot(const MATH::Vector2f &pos, float radius, const Color4F &color) {
         unsigned int vertex_count = 2*3;
-        ensureCapacity(0, vertex_count);
+        ensureCapacity(DEFAULT, vertex_count);
 
         V2F_C4B_T2F a = {MATH::Vector2f(pos.x - radius, pos.y - radius), Color4B(color), Tex2F(-1.0, -1.0) };
         V2F_C4B_T2F b = {MATH::Vector2f(pos.x - radius, pos.y + radius), Color4B(color), Tex2F(-1.0,  1.0) };
@@ -297,7 +297,7 @@ namespace GRAPH
         triangles[1] = triangle1;
 
         vboArray_[0].u1.bufferCount += vertex_count;
-        dirty_[0] = true;
+        dirty_[DEFAULT] = true;
     }
 
     void DrawNode::drawRect(const MATH::Vector2f &p1, const MATH::Vector2f &p2, const MATH::Vector2f &p3, const MATH::Vector2f& p4, const Color4F &color) {
@@ -410,9 +410,9 @@ namespace GRAPH
         };
         triangles[5] = triangles5;
 
-        vboArray_[0].u1.bufferCount += vertex_count;
+        vboArray_[DEFAULT].u1.bufferCount += vertex_count;
 
-        dirty_[0] = true;
+        dirty_[DEFAULT] = true;
     }
 
     void DrawNode::drawPolygon(const MATH::Vector2f *verts, int count, const Color4F &fillColor, float borderWidth, const Color4F &borderColor)
@@ -421,7 +421,7 @@ namespace GRAPH
 
         auto  triangle_count = outline ? (3*count - 2) : (count - 2);
         auto vertex_count = 3*triangle_count;
-        ensureCapacity(0, vertex_count);
+        ensureCapacity(DEFAULT, vertex_count);
 
         V2F_C4B_T2F_Triangle *triangles = (V2F_C4B_T2F_Triangle *)(vboArray_[0].u1.bufferData + vboArray_[0].u1.bufferCount);
         V2F_C4B_T2F_Triangle *cursor = triangles;
@@ -487,13 +487,13 @@ namespace GRAPH
             free(extrude);
         }
 
-        vboArray_[0].u1.bufferCount += vertex_count;
-        dirty_[0] = true;
+        vboArray_[DEFAULT].u1.bufferCount += vertex_count;
+        dirty_[DEFAULT] = true;
     }
 
     void DrawNode::drawTriangle(const MATH::Vector2f &p1, const MATH::Vector2f &p2, const MATH::Vector2f &p3, const Color4F &color) {
         unsigned int vertex_count = 3;
-        ensureCapacity(0, vertex_count);
+        ensureCapacity(DEFAULT, vertex_count);
 
         Color4B col = Color4B(color);
         V2F_C4B_T2F a = {MATH::Vector2f(p1.x, p1.y), col, Tex2F(0.0, 0.0) };
@@ -504,8 +504,8 @@ namespace GRAPH
         V2F_C4B_T2F_Triangle triangle = {a, b, c};
         triangles[0] = triangle;
 
-        vboArray_[0].u1.bufferCount += vertex_count;
-        dirty_[0] = true;
+        vboArray_[DEFAULT].u1.bufferCount += vertex_count;
+        dirty_[DEFAULT] = true;
     }
 
     void DrawNode::clear() {
