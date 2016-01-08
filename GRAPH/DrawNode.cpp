@@ -65,19 +65,19 @@ namespace GRAPH
     }
 
     void DrawNode::draw(Renderer *renderer, const MATH::Matrix4 &transform, uint32_t flags) {
-        if(vboArray_[0].u1.bufferCount) {
+        if (vboArray_[DEFAULT].u1.bufferCount) {
             customCommand_.init(globalZOrder_, transform, flags);
             customCommand_.func = std::bind(&DrawNode::onDraw, this, transform, flags);
             renderer->addCommand(&customCommand_);
         }
 
-        if(vboArray_[1].u1.bufferCount) {
+        if (vboArray_[POINT].u1.bufferCount) {
             customCommandGLPoint_.init(globalZOrder_, transform, flags);
             customCommandGLPoint_.func = std::bind(&DrawNode::onDrawGLPoint, this, transform, flags);
             renderer->addCommand(&customCommandGLPoint_);
         }
 
-        if(vboArray_[2].u1.bufferCount) {
+        if (vboArray_[LINE].u1.bufferCount) {
             customCommandGLLine_.init(globalZOrder_, transform, flags);
             customCommandGLLine_.func = std::bind(&DrawNode::onDrawGLLine, this, transform, flags);
             renderer->addCommand(&customCommandGLLine_);
@@ -91,10 +91,10 @@ namespace GRAPH
 
         Unity3DGLState::OpenGLState().blendFunc.set(blendFunc_.src, blendFunc_.dst);
 
-        if (dirty_[0]) {
+        if (dirty_[DEFAULT]) {
             u3dVertexBuffer_[DEFAULT]->bind();
             u3dVertexBuffer_[DEFAULT]->setData((const uint8 *) vboArray_[0].u1.bufferData, sizeof(V2F_C4B_T2F)*vboArray_[0].u1.bufferCapacity);
-            dirty_[0] = false;
+            dirty_[DEFAULT] = false;
         }
 
         u3dContext_->draw(PRIM_TRIANGLES, u3dVertexFormat_[DEFAULT], u3dVertexBuffer_[DEFAULT], vboArray_[DEFAULT].u1.bufferCount, 0);
@@ -105,10 +105,10 @@ namespace GRAPH
         u3dShader->apply();
         u3dShader->setUniformsForBuiltins(transform);
 
-        if (dirty_[0]) {
+        if (dirty_[LINE]) {
             u3dVertexBuffer_[LINE]->bind();
             u3dVertexBuffer_[LINE]->setData((const uint8 *) vboArray_[LINE].u1.bufferData, sizeof(V2F_C4B_T2F)*vboArray_[LINE].u1.bufferCapacity);
-            dirty_[0] = false;
+            dirty_[LINE] = false;
         }
 
         u3dContext_->draw(PRIM_LINES, u3dVertexFormat_[LINE], u3dVertexBuffer_[LINE], vboArray_[LINE].u1.bufferCount, 0);
@@ -119,10 +119,10 @@ namespace GRAPH
         u3dShader->apply();
         u3dShader->setUniformsForBuiltins(transform);
 
-        if (dirty_[0]) {
+        if (dirty_[POINT]) {
             u3dVertexBuffer_[POINT]->bind();
             u3dVertexBuffer_[POINT]->setData((const uint8 *) vboArray_[POINT].u1.bufferData, sizeof(V2F_C4B_T2F)*vboArray_[POINT].u1.bufferCapacity);
-            dirty_[0] = false;
+            dirty_[POINT] = false;
         }
 
         u3dContext_->draw(PRIM_POINTS, u3dVertexFormat_[POINT], u3dVertexBuffer_[POINT], vboArray_[POINT].u1.bufferCount, 0);
@@ -160,7 +160,7 @@ namespace GRAPH
     void DrawNode::drawLine(const MATH::Vector2f &origin, const MATH::Vector2f &destination, const Color4F &color) {
         ensureCapacity(2, 2);
 
-        V2F_C4B_T2F *point = (V2F_C4B_T2F*)(vboArray_[2].u1.bufferCount + vboArray_[2].u1.bufferCount);
+        V2F_C4B_T2F *point = (V2F_C4B_T2F*) (vboArray_[2].u1.bufferData + vboArray_[2].u1.bufferCount);
 
         V2F_C4B_T2F a = {origin, Color4B(color), Tex2F(0.0, 0.0)};
         V2F_C4B_T2F b = {destination, Color4B(color), Tex2F(0.0, 0.0)};
@@ -190,7 +190,7 @@ namespace GRAPH
             ensureCapacity(2, vertext_count);
         }
 
-        V2F_C4B_T2F *point = (V2F_C4B_T2F*)(vboArray_[2].u1.bufferCount + vboArray_[2].u1.bufferCount);
+        V2F_C4B_T2F *point = (V2F_C4B_T2F*) (vboArray_[2].u1.bufferData + vboArray_[2].u1.bufferCount);
 
         unsigned int i = 0;
         for(; i<numberOfPoints-1; i++) {
